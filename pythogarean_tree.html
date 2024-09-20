@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Pythagoras Tree</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: black;
+        }
+
+        canvas {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas" width="600" height="600"></canvas>
+    <script>
+        window.onload = function() {
+            var canvas = document.getElementById('canvas');
+            var ctx = canvas.getContext('2d');
+
+            // Set canvas size
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            var depth = 9; // Adjust for more or fewer recursion levels
+
+            // Calculate the maximum possible size so that the tree fits in the canvas
+            var size = Math.min(canvas.width, canvas.height) / 6;
+
+            // Adjust starting x and y to center the tree
+            var x = canvas.width / 2 - size / 2;
+            var y = canvas.height / 2 + size * 3/ 4;
+
+            drawTree(ctx, x, y, size, 0, depth);
+        };
+
+        function drawTree(ctx, x, y, size, angle, depth) {
+            if (depth === 0) return;
+
+            // Save the current context before transformations
+            ctx.save();
+
+            // Move to the square's center
+            ctx.translate(x + size / 2, y + size / 2);
+            // Rotate around the center
+            ctx.rotate(angle * Math.PI / 180);
+            // Move back to the top-left corner
+            ctx.translate(-size / 2, -size / 2);
+
+            // Draw the square
+            ctx.fillStyle = 'hsl(' + (depth * 25 % 360) + ', 100%, 50%)';
+            ctx.fillRect(0, 0, size, size);
+
+            // Calculate the size of the next squares
+            var newSize = size * Math.cos(45 * Math.PI / 180);
+
+            // Coordinates for left branch
+            var x0 = 0;
+            var y0 = -newSize;
+
+            // Left branch
+            ctx.save();
+            ctx.translate(0, 0);
+            ctx.rotate(-45 * Math.PI / 180);
+            drawTree(ctx, x0, y0, newSize, 0, depth - 1);
+            ctx.restore();
+
+            // Coordinates for right branch
+            x0 = size;
+            y0 = 0;
+
+            // Right branch
+            ctx.save();
+            ctx.translate(size / 4, -size*3/4);
+            ctx.rotate(45 * Math.PI / 180);
+            drawTree(ctx, x0 - newSize, y0 - newSize, newSize, 0, depth - 1);
+            ctx.restore();
+
+            // Restore the context to the state before transformations
+            ctx.restore();
+        }
+    </script>
+</body>
+</html>
+
