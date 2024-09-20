@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perpendicular Rings in 3D</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+<canvas id="ringsCanvas" width="500" height="500"></canvas>
+
+<script>
+    const canvas = document.getElementById('ringsCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    const radius = 100;
+    const numPoints = 100;
+
+    // Function to project 3D points onto 2D canvas
+    function project(x, y, z) {
+        const scale = 300 / (300 + z); // Simple perspective projection
+        const x2d = x * scale + centerX;
+        const y2d = y * scale + centerY;
+        return { x: x2d, y: y2d };
+    }
+
+    // Function to draw a ring in 3D
+    function drawRing(rotationMatrix, color) {
+        ctx.strokeStyle = color;
+        ctx.beginPath();
+        for (let i = 0; i <= numPoints; i++) {
+            const angle = (i / numPoints) * Math.PI * 2;
+            const x = radius * Math.cos(angle);
+            const y = radius * Math.sin(angle);
+            const z = 0;
+
+            // Apply rotation
+            const newX = rotationMatrix[0][0] * x + rotationMatrix[0][1] * y + rotationMatrix[0][2] * z;
+            const newY = rotationMatrix[1][0] * x + rotationMatrix[1][1] * y + rotationMatrix[1][2] * z;
+            const newZ = rotationMatrix[2][0] * x + rotationMatrix[2][1] * y + rotationMatrix[2][2] * z;
+
+            const point = project(newX, newY, newZ);
+
+            if (i === 0) {
+                ctx.moveTo(point.x, point.y);
+            } else {
+                ctx.lineTo(point.x, point.y);
+            }
+        }
+        ctx.stroke();
+    }
+
+    // Rotation matrices for the two perpendicular rings
+    const identityMatrix = [
+        [1, 0, 0],
+        [0, 1, 0],
+        [0, 0, 1]
+    ];
+
+    const rotate90Degrees = [
+        [1, 0, 0],
+        [0, 0, -1],
+        [0, 1, 0]
+    ];
+
+    // Clear canvas and draw the rings
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Draw the first ring in the XY plane
+        drawRing(identityMatrix, 'blue');
+
+        // Draw the second ring in the XZ plane (perpendicular to the first)
+        drawRing(rotate90Degrees, 'red');
+    }
+
+    draw();
+</script>
+</body>
+</html>
+

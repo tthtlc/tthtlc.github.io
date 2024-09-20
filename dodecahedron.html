@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dodecahedron Line Graphics</title>
+    <style>
+        canvas {
+            display: block;
+            margin: auto;
+            background-color: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+<canvas id="canvas"></canvas>
+
+<script>
+// Dodecahedron vertices calculation based on golden ratio
+const canvas = document.getElementById('canvas');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+const ctx = canvas.getContext('2d');
+
+const phi = (1 + Math.sqrt(5)) / 2; // golden ratio
+const size = 200; // scale size
+const vertices = [
+    [1, 1, 1], [1, 1, -1], [1, -1, 1], [1, -1, -1],
+    [-1, 1, 1], [-1, 1, -1], [-1, -1, 1], [-1, -1, -1],
+    [0, 1 / phi, phi], [0, 1 / phi, -phi], [0, -1 / phi, phi], [0, -1 / phi, -phi],
+    [1 / phi, phi, 0], [1 / phi, -phi, 0], [-1 / phi, phi, 0], [-1 / phi, -phi, 0],
+    [phi, 0, 1 / phi], [phi, 0, -1 / phi], [-phi, 0, 1 / phi], [-phi, 0, -1 / phi]
+];
+
+// Edges between vertices
+const edges = [
+	[12, 14], [18,19], [8,10], [15,13], [16,17],  [11,9], 
+    [0, 8], [0, 12], [0, 16], [1, 9], [1, 12], [1, 17], [2, 10], [2, 13], [2, 16], [3, 11],
+    [3, 13], [3, 17], [4, 8], [4, 14], [4, 18], [5, 9], [5, 14], [5, 19], [6, 10], [6, 15],
+    [6, 18], [7, 11], [7, 15], [7, 19], [8, 4], [8, 0], [9, 5], [9, 1], [10, 2], [10, 6],
+    [11, 3], [11, 7], [12, 0], [12, 1], [13, 2], [13, 3], [14, 4], [14, 5], [15, 6], [15, 7],
+    [16, 0], [16, 2], [17, 1], [17, 3], [18, 4], [18, 6], [19, 5], [19, 7]
+];
+
+// Rotation angles
+let angleX = 0;
+let angleY = 0;
+
+// Project 3D coordinates to 2D
+function project([x, y, z]) {
+    const scale = size / (z + 4); // Perspective scaling
+    const x2d = x * scale + canvas.width / 2;
+    const y2d = y * scale + canvas.height / 2;
+    return [x2d, y2d];
+}
+
+// Rotation around X axis
+function rotateX([x, y, z], theta) {
+    const sinTheta = Math.sin(theta);
+    const cosTheta = Math.cos(theta);
+    return [x, cosTheta * y - sinTheta * z, sinTheta * y + cosTheta * z];
+}
+
+// Rotation around Y axis
+function rotateY([x, y, z], theta) {
+    const sinTheta = Math.sin(theta);
+    const cosTheta = Math.cos(theta);
+    return [cosTheta * x + sinTheta * z, y, -sinTheta * x + cosTheta * z];
+}
+
+// Draw the dodecahedron
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const rotatedVertices = vertices.map(v => rotateX(rotateY(v, angleY), angleX));
+    const projectedVertices = rotatedVertices.map(v => project(v));
+
+    // Draw edges
+    ctx.strokeStyle = 'black';
+    ctx.lineWidth = 2;
+    edges.forEach(([start, end]) => {
+        const [x1, y1] = projectedVertices[start];
+        const [x2, y2] = projectedVertices[end];
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+    });
+
+    // Label vertices
+    ctx.fillStyle = 'red';
+    ctx.font = '12px Arial';
+    projectedVertices.forEach(([x, y], index) => {
+        ctx.fillText(index, x + 5, y - 5); // Offset the text slightly to avoid overlap
+    });
+}
+
+// Animation loop
+function animate() {
+    angleX += 0.01;
+    angleY += 0.01;
+    draw();
+    requestAnimationFrame(animate);
+}
+
+animate();
+</script>
+</body>
+</html>
+

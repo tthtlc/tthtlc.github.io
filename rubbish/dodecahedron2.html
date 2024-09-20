@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Rotating Dodecahedron</title>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #111;
+        }
+        canvas {
+            border: 1px solid #fff;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="dodecahedronCanvas" width="600" height="600"></canvas>
+
+    <script>
+        const canvas = document.getElementById("dodecahedronCanvas");
+        const ctx = canvas.getContext("2d");
+        const width = canvas.width;
+        const height = canvas.height;
+
+        const points = [];
+        const faces = [
+            [0, 1, 2, 3, 4],
+            [0, 1, 6, 10, 5],
+            [1, 2, 7, 11, 6],
+            [2, 3, 8, 12, 7],
+            [3, 4, 9, 13, 8],
+            [4, 0, 5, 14, 9],
+            [5, 10, 15, 14],
+            [6, 11, 16, 10],
+            [7, 12, 17, 11],
+            [8, 13, 18, 12],
+            [9, 14, 19, 13],
+            [10, 16, 15],
+            [11, 17, 16],
+            [12, 18, 17],
+            [13, 19, 18],
+            [14, 15, 19],
+            [15, 16, 17, 18, 19]
+        ];
+
+        let angleX = 0;
+        let angleY = 0;
+        let angleZ = 0;
+
+        function createDodecahedron() {
+            const phi = (1 + Math.sqrt(5)) / 2;
+            const scale = 40;
+            const a = scale, b = scale / phi, c = (2 - phi)*scale;
+
+            points.push([-a, -a, -a]);
+            points.push([a, -a, -a]);
+            points.push([a, a, -a]);
+            points.push([-a, a, -a]);
+            points.push([-a, -a, a]);
+            points.push([a, -a, a]);
+            points.push([a, a, a]);
+            points.push([-a, a, a]);
+
+            points.push([-b, -c, 0]);
+            points.push([b, -c, 0]);
+            points.push([c, 0, -b]);
+            points.push([c, 0, b]);
+            points.push([-c, 0, -b]);
+            points.push([-c, 0, b]);
+
+            points.push([0, -b, -c]);
+            points.push([0, b, -c]);
+            points.push([0, b, c]);
+            points.push([0, -b, c]);
+        }
+
+        function rotate(point, angleX, angleY, angleZ) {
+            let [x, y, z] = point;
+
+            // Rotate around X-axis
+            let tempY = y * Math.cos(angleX) - z * Math.sin(angleX);
+            let tempZ = y * Math.sin(angleX) + z * Math.cos(angleX);
+            y = tempY;
+            z = tempZ;
+
+            // Rotate around Y-axis
+            let tempX = x * Math.cos(angleY) + z * Math.sin(angleY);
+            tempZ = -x * Math.sin(angleY) + z * Math.cos(angleY);
+            x = tempX;
+            z = tempZ;
+
+            // Rotate around Z-axis
+            tempX = x * Math.cos(angleZ) - y * Math.sin(angleZ);
+            tempY = x * Math.sin(angleZ) + y * Math.cos(angleZ);
+            x = tempX;
+            y = tempY;
+
+            return [x, y, z];
+        }
+
+        function project([x, y, z]) {
+            const fov = 400;
+            const scale = fov / (fov + z);
+            const x2d = x * scale + width / 2;
+            const y2d = y * scale + height / 2;
+            return [x2d, y2d];
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, width, height);
+
+            // Rotate and project points
+            const projectedPoints = points.map(point => project(rotate(point, angleX, angleY, angleZ)));
+
+            // Draw faces
+            ctx.strokeStyle = "#fff";
+            ctx.lineWidth = 2;
+            faces.forEach(face => {
+                ctx.beginPath();
+                const startPoint = projectedPoints[face[0]];
+                ctx.moveTo(startPoint[0], startPoint[1]);
+                for (let i = 1; i < face.length; i++) {
+                    const point = projectedPoints[face[i]];
+                    ctx.lineTo(point[0], point[1]);
+                }
+                ctx.closePath();
+                ctx.stroke();
+            });
+        }
+
+        function animate() {
+            angleX += 0.01;
+            angleY += 0.01;
+            angleZ += 0.01;
+            draw();
+            requestAnimationFrame(animate);
+        }
+
+        createDodecahedron();
+        animate();
+    </script>
+</body>
+</html>
+

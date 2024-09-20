@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tangential Ellipse on Circle (One Contact Point)</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #333;
+        }
+        canvas {
+            border: 1px solid black;
+            background-color: #333;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="tangentialEllipseCanvas" width="800" height="800"></canvas>
+    <script>
+        const canvas = document.getElementById('tangentialEllipseCanvas');
+        const ctx = canvas.getContext('2d');
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        const circleRadius = 200;
+        const ellipseRadiusX = 100;
+        const ellipseRadiusY = 50;
+        const speed = 0.01; // Speed of the ellipse moving along the circle
+
+        let angle = 0;
+
+        function drawCircle() {
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, circleRadius, 0, 2 * Math.PI);
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+
+        function drawEllipse(x, y, rotationAngle) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(rotationAngle);
+            ctx.beginPath();
+            ctx.ellipse(0, 0, ellipseRadiusX, ellipseRadiusY, 0, 0, 2 * Math.PI);
+            ctx.strokeStyle = '#00ff00';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            drawCircle();
+
+            // Calculate the position of the ellipse's center on the circle's circumference
+            const ellipseX = centerX + circleRadius * Math.cos(angle);
+            const ellipseY = centerY + circleRadius * Math.sin(angle);
+
+            // The ellipse should be rotated so that one point on its boundary is touching the circle
+            // To achieve this, we align the ellipse's long axis to be tangent to the circle at the point of contact.
+            const rotationAngle = angle; // Align ellipse's long axis with the tangent to the circle
+
+            // Draw the ellipse at the calculated position, with the proper rotation to maintain tangency
+            drawEllipse(ellipseX, ellipseY, rotationAngle);
+
+            // Update the angle for the next frame
+            angle += speed;
+
+            // Request the next frame
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    </script>
+</body>
+</html>
+

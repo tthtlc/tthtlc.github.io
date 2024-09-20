@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Figure of 8 using Polar Coordinates</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        canvas {
+            background-color: white;
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="figure8Canvas" width="500" height="500"></canvas>
+
+    <script>
+        const canvas = document.getElementById('figure8Canvas');
+        const ctx = canvas.getContext('2d');
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        const scale = 100;
+        const parts = 120;
+        const step = 2*Math.PI/parts;
+
+        function drawFigure8() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.beginPath();
+
+            for (let theta = 0; theta <= 8 * Math.PI; theta += step) {
+                // Polar coordinates for figure of 8 (lemniscate of Bernoulli)
+                const r = scale * (Math.cos(2 * theta/3));
+                const x = r * Math.cos(theta);
+                const y = r * Math.sin(theta);
+
+                // Convert to Cartesian coordinates and draw
+                if (theta == 0) {
+                    ctx.moveTo(centerX + x, centerY + y);
+                } else {
+                    ctx.lineTo(centerX + x, centerY + y);
+                }
+            }
+
+            ctx.strokeStyle = 'blue';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+
+        drawFigure8();
+    </script>
+</body>
+</html>
+

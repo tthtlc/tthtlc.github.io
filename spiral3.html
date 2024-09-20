@@ -1,0 +1,94 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spiral with Rotating Colors</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="illusionCanvas" width="800" height="800"></canvas>
+
+<script>
+const canvas = document.getElementById('illusionCanvas');
+const ctx = canvas.getContext('2d');
+
+const centerX = canvas.width / 2;
+const centerY = canvas.height / 2;
+const sector = 3;
+const dotsPerSpiral = 180 / sector;
+const maxRadius = Math.min(canvas.width, canvas.height) / 2;
+
+const colors = ['red', 'green', 'blue'];
+
+let allCoordinates = [];
+
+// Generate all spirals and collect their coordinates
+for (let shiftAngle = 0; shiftAngle < 4 * Math.PI; shiftAngle += 2 * Math.PI / sector) {
+    let coords = drawSpiral(centerX, centerY, maxRadius / 10, 0, dotsPerSpiral, shiftAngle);
+    allCoordinates.push(coords);
+}
+
+// Connect corresponding points between spirals using rotating colors
+connectCorrespondingPoints(allCoordinates);
+
+function drawSpiral(centerX, centerY, smallRad, largeRad, sectors, shiftAngle) {
+    let coordinates = [];
+
+    ctx.strokeStyle = 'black';
+    ctx.beginPath();
+    ctx.moveTo(centerX, centerY);
+
+    for (let i = 0; i < sectors; i++) {
+        let angle = (i / sectors) * 2 * Math.PI;
+
+        let x = centerX + (smallRad * angle + largeRad) * Math.cos(angle + shiftAngle);
+        let y = centerY + (smallRad * angle + largeRad) * Math.sin(angle + shiftAngle);
+
+        ctx.lineTo(x, y);
+
+        coordinates.push({ x, y });
+    }
+
+    ctx.stroke();
+
+    return coordinates;
+}
+
+function connectCorrespondingPoints(coordsArray) {
+    if (coordsArray.length === 0) return;
+
+    let numberOfPoints = coordsArray[0].length;
+    let colorIndex = 0;
+    let targetPoint = 0;
+
+    for (let j = 0; j < coordsArray.length; j++) {
+        ctx.beginPath();
+            colorIndex++;
+            ctx.strokeStyle = colors[colorIndex % colors.length];
+        
+        for (let i = 0; i < numberOfPoints; i++) {
+            let startPoint = coordsArray[j][i];
+            targetPoint = coordsArray[(j + 1) % coordsArray.length][i];
+
+            ctx.moveTo(startPoint.x, startPoint.y);
+            ctx.lineTo(targetPoint.x, targetPoint.y);
+
+        }
+            ctx.fillStyle = colors[colorIndex % colors.length];
+            ctx.font = "12px Arial";
+            ctx.fillText(colors[colorIndex % colors.length], targetPoint.x + 5, targetPoint.y + 5);
+        ctx.stroke();
+    }
+}
+</script>
+
+</body>
+</html>
+

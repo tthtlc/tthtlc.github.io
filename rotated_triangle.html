@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rotating Growing Triangles with Color Gradient</title>
+    <style>
+        canvas {
+            background-color: #f0f0f0;
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+<canvas id="triangleCanvas" width="600" height="600"></canvas>
+
+<script>
+    const canvas = document.getElementById('triangleCanvas');
+    const ctx = canvas.getContext('2d');
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    let angle = 0;
+    let size = 10;
+    let increment = 2;
+    let colorIndex = 0;
+
+    // Array of 16 colors forming a gradient
+    const colors = [
+        '#FF5733', '#FF6F33', '#FF8733', '#FF9F33', 
+        '#FFB733', '#FFCF33', '#FFE733', '#FFFF33', 
+        '#E7FF33', '#CFFF33', '#B7FF33', '#9FFF33', 
+        '#87FF33', '#6FFF33', '#57FF33', '#33FF33'
+    ];
+
+    function drawTriangle(x, y, size, rotation, color) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(rotation);
+        ctx.strokeStyle = color;
+        
+        ctx.beginPath();
+        ctx.moveTo(0, -size);
+        ctx.lineTo(size, size);
+        ctx.lineTo(-size, size);
+        ctx.closePath();
+        
+        ctx.stroke();
+        ctx.restore();
+    }
+
+    function animate() {
+        let x = canvas.width / 2;
+        let y = canvas.height / 2;
+
+        // Draw triangle with color from the array
+        drawTriangle(x, y, size, angle * Math.PI / 180, colors[colorIndex]);
+        
+        angle += 5; // Rotate 5 degrees each frame
+        size += increment; // Increase the size
+
+        // Change the color index for the next triangle
+        colorIndex = (colorIndex + 1) % colors.length;
+
+        // Clear the canvas only when size direction changes
+        if (size > 200 || size < 10) {
+            increment = -increment; // Reverse the growth when hitting a threshold
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas on direction change
+        }
+
+        requestAnimationFrame(animate);
+    }
+
+    animate();
+</script>
+</body>
+</html>
+

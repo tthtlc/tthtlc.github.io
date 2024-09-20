@@ -1,0 +1,220 @@
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Sansagraphics Jems</title>
+        <style>
+            body { font-family: Arial, sans-serif; margin: 20px; }
+            a { display: block; margin-bottom: 10px; text-decoration: none; color: blue; }
+            iframe { width: 100%; height: 500px; border: none; margin-top: 20px; }
+        </style>
+    </head>
+    <body>
+        <h1>Sansagraphics Jems</h1>
+    
+            <a href="icosahedron_surface.html">icosahedron_surface.html</a>
+            <iframe src="icosahedron_surface.html"></iframe>
+            
+            <a href="icosahedron_centroid.html">icosahedron_centroid.html</a>
+            <iframe src="icosahedron_centroid.html"></iframe>
+            
+            <a href="icosahedron.html">icosahedron.html</a>
+            <iframe src="icosahedron.html"></iframe>
+            
+            <a href="sphere.html">sphere.html</a>
+            <iframe src="sphere.html"></iframe>
+            
+            <a href="ovalellipse.html">ovalellipse.html</a>
+            <iframe src="ovalellipse.html"></iframe>
+            
+            <a href="klein2_animation3.html">klein2_animation3.html</a>
+            <iframe src="klein2_animation3.html"></iframe>
+            
+            <a href="klein2_animation.html">klein2_animation.html</a>
+            <iframe src="klein2_animation.html"></iframe>
+            
+            <a href="klein3.html">klein3.html</a>
+            <iframe src="klein3.html"></iframe>
+            
+            <a href="torus.html">torus.html</a>
+            <iframe src="torus.html"></iframe>
+            
+            <a href="line_drawing.html">line_drawing.html</a>
+            <iframe src="line_drawing.html"></iframe>
+            
+            <a href="mobius.html">mobius.html</a>
+            <iframe src="mobius.html"></iframe>
+            
+            <a href="moving_square2.html">moving_square2.html</a>
+            <iframe src="moving_square2.html"></iframe>
+            
+            <a href="moving_square3.html">moving_square3.html</a>
+            <iframe src="moving_square3.html"></iframe>
+            
+            <a href="moving_square4.html">moving_square4.html</a>
+            <iframe src="moving_square4.html"></iframe>
+            
+            <a href="moving_square5.html">moving_square5.html</a>
+            <iframe src="moving_square5.html"></iframe>
+            
+            <a href="moving_square.html">moving_square.html</a>
+            <iframe src="moving_square.html"></iframe>
+            
+            <a href="quart_motion.html">quart_motion.html</a>
+            <iframe src="quart_motion.html"></iframe>
+            
+            <a href="rotating_sector.html">rotating_sector.html</a>
+            <iframe src="rotating_sector.html"></iframe>
+            
+            <a href="rotating_spiral.html">rotating_spiral.html</a>
+            <iframe src="rotating_spiral.html"></iframe>
+            
+            <a href="rotating_spoke.html">rotating_spoke.html</a>
+            <iframe src="rotating_spoke.html"></iframe>
+            
+            <a href="sinsoidal5.html">sinsoidal5.html</a>
+            <iframe src="sinsoidal5.html"></iframe>
+            
+            <a href="sinusoidal.html">sinusoidal.html</a>
+            <iframe src="sinusoidal.html"></iframe>
+            
+            <a href="solid_torus1.html">solid_torus1.html</a>
+            <iframe src="solid_torus1.html"></iframe>
+            
+            <a href="special.html">special.html</a>
+            <iframe src="special.html"></iframe>
+            
+            <a href="spherical_sinusoid1.html">spherical_sinusoid1.html</a>
+            <iframe src="spherical_sinusoid1.html"></iframe>
+            
+            <a href="spherical_sinusoid3.html">spherical_sinusoid3.html</a>
+            <iframe src="spherical_sinusoid3.html"></iframe>
+            
+            <a href="spherical_sinusoid.html">spherical_sinusoid.html</a>
+            <iframe src="spherical_sinusoid.html"></iframe>
+            
+            <a href="spiral.html">spiral.html</a>
+            <iframe src="spiral.html"></iframe>
+            
+            <a href="spoke_subspokes.html">spoke_subspokes.html</a>
+            <iframe src="spoke_subspokes.html"></iframe>
+            
+            <a href="static_concentric.html">static_concentric.html</a>
+            <iframe src="static_concentric.html"></iframe>
+            
+            <a href="concentric.html">concentric.html</a>
+            <iframe src="concentric.html"></iframe>
+            
+            <a href="three_petal.html">three_petal.html</a>
+            <iframe src="three_petal.html"></iframe>
+            
+            <a href="torus2.html">torus2.html</a>
+            <iframe src="torus2.html"></iframe>
+            
+            <a href="triple_motion.html">triple_motion.html</a>
+            <iframe src="triple_motion.html"></iframe>
+            
+            <a href="try5.html">try5.html</a>
+            <iframe src="try5.html"></iframe>
+            
+            <a href="two_ellipse.html">two_ellipse.html</a>
+            <iframe src="two_ellipse.html"></iframe>
+            
+            <a href="two_petal.html">two_petal.html</a>
+            <iframe src="two_petal.html"></iframe>
+            
+            <a href="double_motion.html">double_motion.html</a>
+            <iframe src="double_motion.html"></iframe>
+            
+            <a href="drawsector.html">drawsector.html</a>
+            <iframe src="drawsector.html"></iframe>
+            
+            <a href="ellipse2.html">ellipse2.html</a>
+            <iframe src="ellipse2.html"></iframe>
+            
+            <a href="ellipse3.html">ellipse3.html</a>
+            <iframe src="ellipse3.html"></iframe>
+            
+            <a href="ellipse4.html">ellipse4.html</a>
+            <iframe src="ellipse4.html"></iframe>
+            
+            <a href="ellipsical_line.html">ellipsical_line.html</a>
+            <iframe src="ellipsical_line.html"></iframe>
+            
+            <a href="ellipsical_line_rotate.html">ellipsical_line_rotate.html</a>
+            <iframe src="ellipsical_line_rotate.html"></iframe>
+            
+            <a href="figure_eight2.html">figure_eight2.html</a>
+            <iframe src="figure_eight2.html"></iframe>
+            
+            <a href="figure_eight.html">figure_eight.html</a>
+            <iframe src="figure_eight.html"></iframe>
+            
+            <a href="five_rotate_spoke.html">five_rotate_spoke.html</a>
+            <iframe src="five_rotate_spoke.html"></iframe>
+            
+            <a href="five_rotate_spoke_sector.html">five_rotate_spoke_sector.html</a>
+            <iframe src="five_rotate_spoke_sector.html"></iframe>
+            
+            <a href="four_petal_double.html">four_petal_double.html</a>
+            <iframe src="four_petal_double.html"></iframe>
+            
+            <a href="four_petal.html">four_petal.html</a>
+            <iframe src="four_petal.html"></iframe>
+            
+            <a href="four_petal_rotate.html">four_petal_rotate.html</a>
+            <iframe src="four_petal_rotate.html"></iframe>
+            
+            <a href="klein2_animation2.html">klein2_animation2.html</a>
+            <iframe src="klein2_animation2.html"></iframe>
+            
+            <a href="chasing_square1.html">chasing_square1.html</a>
+            <iframe src="chasing_square1.html"></iframe>
+            
+            <a href="chasing_square2.html">chasing_square2.html</a>
+            <iframe src="chasing_square2.html"></iframe>
+            
+            <a href="chasing_square.html">chasing_square.html</a>
+            <iframe src="chasing_square.html"></iframe>
+            
+            <a href="circle2.html">circle2.html</a>
+            <iframe src="circle2.html"></iframe>
+            
+            <a href="circle_color.html">circle_color.html</a>
+            <iframe src="circle_color.html"></iframe>
+            
+            <a href="circle.html">circle.html</a>
+            <iframe src="circle.html"></iframe>
+            
+            <a href="counter_rotating_sector.html">counter_rotating_sector.html</a>
+            <iframe src="counter_rotating_sector.html"></iframe>
+            
+            <a href="css_3dcube.html">css_3dcube.html</a>
+            <iframe src="css_3dcube.html"></iframe>
+            
+            <a href="css_circle1.html">css_circle1.html</a>
+            <iframe src="css_circle1.html"></iframe>
+            
+            <a href="css_circle.html">css_circle.html</a>
+            <iframe src="css_circle.html"></iframe>
+            
+            <a href="d3_graph.html">d3_graph.html</a>
+            <iframe src="d3_graph.html"></iframe>
+            
+            <a href="double3.html">double3.html</a>
+            <iframe src="double3.html"></iframe>
+            
+            <a href="double4.html">double4.html</a>
+            <iframe src="double4.html"></iframe>
+            
+            <a href="double5.html">double5.html</a>
+            <iframe src="double5.html"></iframe>
+            
+            <a href="double.html">double.html</a>
+            <iframe src="double.html"></iframe>
+            
+    </body>
+    </html>
+    

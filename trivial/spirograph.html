@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spirograph Simulation</title>
+    <style>
+        canvas {
+            display: block;
+            margin: 0 auto;
+            background-color: #f0f0f0;
+        }
+        body {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Spirograph Simulation</h1>
+    <canvas id="spirographCanvas" width="600" height="600"></canvas>
+    <script>
+        const canvas = document.getElementById('spirographCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Set up spirograph parameters
+        const R = 200; // Radius of the stationary circle
+        const r = 60;  // Radius of the rolling circle
+        const O = 30;  // Distance of the drawing point from the center of the rolling circle
+
+        // Position the origin at the center of the canvas
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+
+        let angle = 0;
+        const speed = 0.05;
+
+        function drawSpirograph() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            ctx.beginPath();
+            ctx.moveTo(
+                centerX + (R - r) * Math.cos(angle) + O * Math.cos(((R - r) / r) * angle),
+                centerY + (R - r) * Math.sin(angle) - O * Math.sin(((R - r) / r) * angle)
+            );
+
+            for (let t = 0; t <= Math.PI * 2 * r / gcd(R, r); t += speed) {
+                const x = centerX + (R - r) * Math.cos(t) + O * Math.cos(((R - r) / r) * t);
+                const y = centerY + (R - r) * Math.sin(t) - O * Math.sin(((R - r) / r) * t);
+                ctx.lineTo(x, y);
+            }
+
+            ctx.strokeStyle = 'blue';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+
+            angle += speed;
+            requestAnimationFrame(drawSpirograph);
+        }
+
+        function gcd(a, b) {
+            return b === 0 ? a : gcd(b, a % b);
+        }
+
+        drawSpirograph();
+    </script>
+</body>
+</html>
+

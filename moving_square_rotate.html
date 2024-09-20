@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Animated Expanding and Rotating Square</title>
+<style>
+    canvas {
+        border: 1px solid black;
+    }
+</style>
+</head>
+<body>
+
+<canvas id="myCanvas" width="480" height="320"></canvas>
+
+<script>
+    var canvas = document.getElementById('myCanvas');
+    var ctx = canvas.getContext('2d');
+
+    var size = 20; // Initial size of the square
+    var maxSize = 200; // Maximum size of the square
+    var minSize = 20; // Minimum size of the square
+    var increase = 2; // Amount to increase the size of the square each frame
+    var angle = 0; // Initial rotation angle
+    var rotationSpeed = 0.02; // Speed of rotation
+    var clockwise = true; // Whether the square is rotating clockwise
+
+    function drawSquare() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+
+        // Save the current context state
+        ctx.save();
+
+        // Move the origin to the center of the canvas
+        ctx.translate(canvas.width / 2, canvas.height / 2);
+
+        // Rotate the canvas based on the current angle
+        ctx.rotate(angle);
+
+        // Draw the square centered at the new origin
+        ctx.beginPath();
+        ctx.rect(-size / 2, -size / 2, size, size);
+        ctx.stroke();
+
+        // Restore the context to its original state
+        ctx.restore();
+
+        // Update size and angle
+        if (clockwise) {
+            size += increase;
+            angle += rotationSpeed;
+            if (size >= maxSize) {
+                clockwise = false; // Switch to shrinking and reverse rotation
+                rotationSpeed = -rotationSpeed;
+            }
+        } else {
+            size -= increase;
+            angle += rotationSpeed;
+            if (size <= minSize) {
+                clockwise = true; // Switch to growing and reverse rotation again
+                rotationSpeed = -rotationSpeed;
+            }
+        }
+
+        // Request the next animation frame
+        window.requestAnimationFrame(drawSquare);
+    }
+
+    drawSquare(); // Initial call to start the animation
+</script>
+
+</body>
+</html>
+

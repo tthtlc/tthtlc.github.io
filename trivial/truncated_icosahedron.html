@@ -1,0 +1,139 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Truncated Icosahedron Wireframe</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas" width="800" height="800"></canvas>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const width = canvas.width;
+        const height = canvas.height;
+        const centerX = width / 2;
+        const centerY = height / 2;
+        const scale = 50;
+
+        let angleX = 0;
+        let angleY = 0;
+
+        const vertices = [];
+        const faces = [];
+
+        function initTruncatedIcosahedron() {
+            const t = (1 + Math.sqrt(5)) / 2;
+            const s = 1;
+
+            const V = [
+                [-s,  s, 3*t], [ s,  s, 3*t], [-s, -s, 3*t], [ s, -s, 3*t],
+                [ 0,  t, 3*s], [ 0, -t, 3*s], [-t,  s, 3*s], [ t,  s, 3*s],
+                [-t, -s, 3*s], [ t, -s, 3*s], [3*s,  0,  t], [3*s,  0, -t],
+                [3*t,  s,  s], [3*t,  s, -s], [3*t, -s,  s], [3*t, -s, -s],
+                [ s, 3*t,  s], [-s, 3*t,  s], [ s, 3*t, -s], [-s, 3*t, -s],
+                [ 0,  t, -3*s], [ 0, -t, -3*s], [-t,  s, -3*s], [ t,  s, -3*s],
+                [-t, -s, -3*s], [ t, -s, -3*s], [-3*s,  0,  t], [-3*s,  0, -t],
+                [-3*t,  s,  s], [-3*t,  s, -s], [-3*t, -s,  s], [-3*t, -s, -s],
+                [-s, -3*t,  s], [ s, -3*t,  s], [-s, -3*t, -s], [ s, -3*t, -s]
+            ];
+
+            for (let i = 0; i < V.length; i++) {
+                vertices.push([V[i][0], V[i][1], V[i][2]]);
+                vertices.push([-V[i][0], -V[i][1], -V[i][2]]);
+            }
+
+            const F = [
+                [0, 4, 1], [0, 1, 2], [0, 2, 3], [0, 3, 4],
+                [1, 4, 7], [1, 7, 6], [1, 6, 2], [2, 6, 5],
+                [2, 5, 3], [3, 5, 8], [3, 8, 4], [4, 8, 7],
+                [6, 7, 10], [6, 10, 9], [6, 9, 5], [5, 9, 12],
+                [5, 12, 8], [8, 12, 11], [8, 11, 7], [7, 11, 10],
+                [9, 10, 13], [9, 13, 14], [9, 14, 12], [12, 14, 15],
+                [12, 15, 11], [11, 15, 10], [10, 15, 13], [13, 14, 15]
+            ];
+
+            for (let i = 0; i < F.length; i++) {
+                faces.push(F[i]);
+            }
+        }
+
+        function rotateX(point, angle) {
+            const cos = Math.cos(angle);
+            const sin = Math.sin(angle);
+            const [x, y, z] = point;
+            return [
+                x,
+                y * cos - z * sin,
+                y * sin + z * cos
+            ];
+        }
+
+        function rotateY(point, angle) {
+            const cos = Math.cos(angle);
+            const sin = Math.sin(angle);
+            const [x, y, z] = point;
+            return [
+                x * cos + z * sin,
+                y,
+                -x * sin + z * cos
+            ];
+        }
+
+        function project(point) {
+            const [x, y, z] = point;
+            const perspective = 1 / (1 - z / 4);
+            return [
+                centerX + x * scale * perspective,
+                centerY - y * scale * perspective
+            ];
+        }
+
+        function drawTruncatedIcosahedron() {
+            ctx.clearRect(0, 0, width, height);
+
+            const rotatedVertices = vertices.map(v => rotateY(rotateX(v, angleX), angleY));
+
+            faces.forEach(face => {
+                ctx.beginPath();
+                const projectedPoint = project(rotatedVertices[face[0]]);
+                ctx.moveTo(projectedPoint[0], projectedPoint[1]);
+
+                face.forEach(index => {
+                    const [x, y] = project(rotatedVertices[index]);
+                    ctx.lineTo(x, y);
+                });
+
+                ctx.closePath();
+                ctx.strokeStyle = 'black';
+                ctx.stroke();
+            });
+        }
+
+        function animate() {
+            angleX += 0.01;
+            angleY += 0.01;
+            drawTruncatedIcosahedron();
+            requestAnimationFrame(animate);
+        }
+
+        initTruncatedIcosahedron();
+        animate();
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic 3D Spiral Surface with Random Rotation - WebGL</title>
+    <style>
+        body, html { margin: 0; padding: 0; overflow: hidden; background-color: black; }
+        canvas { display: block; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <canvas id="glCanvas" width="6oo" height="600"></canvas>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix-min.js"></script>
+    <script>
+        let canvas = document.getElementById('glCanvas');
+        let gl = canvas.getContext('webgl');
+
+        if (!gl) {
+            alert('WebGL not supported, falling back on experimental-webgl');
+            gl = canvas.getContext('experimental-webgl');
+        }
+
+        if (!gl) {
+            alert('Your browser does not support WebGL');
+        }
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            gl.viewport(0, 0, canvas.width, canvas.height);
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // Variables for rotation control
+        let rotationX = 0;
+        let rotationY = 0;
+        let rotationZ = 0; // Introduce Z-axis rotation
+        const randomRotationX = Math.random() * 0.02 + 0.01; // Random rotation speed
+        const randomRotationY = Math.random() * 0.02 + 0.01;
+        const randomRotationZ = Math.random() * 0.02 + 0.01;
+
+        // Vertex shader program
+        const vsSource = `
+            attribute vec4 aVertexPosition;
+            uniform mat4 uModelViewMatrix;
+            uniform mat4 uProjectionMatrix;
+            void main(void) {
+                gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
+            }
+        `;
+
+        // Fragment shader program
+        const fsSource = `
+            void main(void) {
+                gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+            }
+        `;
+
+        // Initialize a shader program; this is where all the lighting
+        // for the vertices and so forth is established.
+        const shaderProgram = initShaderProgram(gl, vsSource, fsSource);
+
+        // Collect all the info needed to use the shader program.
+        const programInfo = {
+            program: shaderProgram,
+            attribLocations: {
+                vertexPosition: gl.getAttribLocation(shaderProgram, 'aVertexPosition'),
+            },
+            uniformLocations: {
+                projectionMatrix: gl.getUniformLocation(shaderProgram, 'uProjectionMatrix'),
+                modelViewMatrix: gl.getUniformLocation(shaderProgram, 'uModelViewMatrix'),
+            },
+        };
+
+        // Here's where we call the routine that builds all the objects
+        // we'll be drawing.
+        const buffers = initBuffers(gl);
+
+        let then = 0;
+
+        // Draw the scene repeatedly
+        function render(now) {
+            now *= 0.01;  // convert to seconds
+            const deltaTime = now - then;
+            then = now;
+
+            // Apply random rotation in each frame
+            rotationX += randomRotationX * deltaTime;
+            rotationY += randomRotationY * deltaTime;
+            rotationZ += randomRotationZ * deltaTime;
+
+            drawScene(gl, programInfo, buffers, deltaTime);
+
+            requestAnimationFrame(render);
+        }
+        requestAnimationFrame(render);
+
+        function initShaderProgram(gl, vsSource, fsSource) {
+            const vertexShader = loadShader(gl, gl.VERTEX_SHADER, vsSource);
+            const fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, fsSource);
+
+            // Create the shader program
+            const shaderProgram = gl.createProgram();
+            gl.attachShader(shaderProgram, vertexShader);
+            gl.attachShader(shaderProgram, fragmentShader);
+            gl.linkProgram(shaderProgram);
+
+            // If creating the shader program failed, alert
+            if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+                alert('Unable to initialize the shader program: ' + gl.getProgramInfoLog(shaderProgram));
+                return null;
+            }
+
+            return shaderProgram;
+        }
+
+        function loadShader(gl, type, source) {
+            const shader = gl.createShader(type);
+
+            // Send the source to the shader object
+            gl.shaderSource(shader, source);
+
+            // Compile the shader program
+            gl.compileShader(shader);
+
+            // See if it compiled successfully
+            if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+                alert('An error occurred compiling the shaders: ' + gl.getShaderInfoLog(shader));
+                gl.deleteShader(shader);
+                return null;
+            }
+
+            return shader;
+        }
+
+        function initBuffers(gl) {
+            // Create a buffer for the spiral's vertex positions.
+            const positionBuffer = gl.createBuffer();
+
+            // Select the positionBuffer as the one to apply buffer
+            // operations to from here out.
+            gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+
+            // Now create an array of positions for the spiral surface.
+            const positions = createSpiralSurface();
+
+            // Now pass the list of positions into WebGL to build the
+            // shape. We do this by creating a Float32Array from the
+            // JavaScript array, then use it to fill the current buffer.
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+
+            return {
+                position: positionBuffer,
+                vertexCount: positions.length / 3
+            };
+        }
+
+        function createSpiralSurface(radius1 = 2.0, radius2 = 2.0, turns1 = 30, turns2 = 30) {
+            const positions = [];
+            const itheta = 2 * Math.PI / turns1;
+            const jtheta = 2 * Math.PI / turns2;
+
+            for (let i = 0; i < turns1; i++) {
+                for (let j = 0; j < turns2; j++) {
+                    const x = radius1 * Math.cos(j * jtheta);
+                    const y = radius2 * Math.sin(i * itheta);
+                    const z = radius1 * Math.cos(i * itheta) + radius2 * Math.sin(j * jtheta);
+                    positions.push(x, y, z);
+                }
+            }
+
+            return positions;
+        }
+
+        function drawScene(gl, programInfo, buffers, deltaTime) {
+            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+            const fieldOfView = 45 * Math.PI / 180;   // in radians
+            const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
+            const zNear = 0.1;
+            const zFar = 100.0;
+            const projectionMatrix = mat4.create();
+
+            mat4.perspective(projectionMatrix,
+                             fieldOfView,
+                             aspect,
+                             zNear,
+                             zFar);
+
+            const modelViewMatrix = mat4.create();
+
+            mat4.translate(modelViewMatrix,    // destination matrix
+                           modelViewMatrix,    // matrix to translate
+                           [0.0, 0.0, -10.0]); // amount to translate
+
+            // Apply random rotations
+            mat4.rotate(modelViewMatrix,  // destination matrix
+                        modelViewMatrix,  // matrix to rotate
+                        rotationX,        // rotation around the X axis
+                        [1, 0, 0]);       // X axis
+            mat4.rotate(modelViewMatrix,  // destination matrix
+                        modelViewMatrix,  // matrix to rotate
+                        rotationY,        // rotation around the Y axis
+                        [0, 1, 0]);       // Y axis
+            mat4.rotate(modelViewMatrix,  // destination matrix
+                        modelViewMatrix,  // matrix to rotate
+                        rotationZ,        // rotation around the Z axis
+                        [0, 0, 1]);       // Z axis
+
+            // Tell WebGL how to pull out the positions from the position buffer into the vertexPosition attribute
+            {
+                const numComponents = 3;
+                const type = gl.FLOAT;
+                const normalize = false;
+                const stride = 0;
+                const offset = 0;
+                gl.bindBuffer(gl.ARRAY_BUFFER, buffers.position);
+                gl.vertexAttribPointer(
+                    programInfo.attribLocations.vertexPosition,
+                    numComponents,
+                    type,
+                    normalize,
+                    stride,
+                    offset);
+                gl.enableVertexAttribArray(
+                    programInfo.attribLocations.vertexPosition);
+            }
+
+            // Tell WebGL to use our program when drawing
+            gl.useProgram(programInfo.program);
+
+            // Set the shader uniforms
+            gl.uniformMatrix4fv(
+                programInfo.uniformLocations.projectionMatrix,
+                false,
+                projectionMatrix);
+            gl.uniformMatrix4fv(
+                programInfo.uniformLocations.modelViewMatrix,
+                false,
+                modelViewMatrix);
+
+            {
+                const offset = 0;
+                gl.drawArrays(gl.LINE_STRIP, offset, buffers.vertexCount);
+            }
+        }
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sinusoidal Wave Animation</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #000;
+        }
+        canvas {
+            display: block;
+            background-color: #111;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="waveCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('waveCanvas');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let waveOffset1 = 0;
+        let waveOffset2 = 0;
+        let waveOffset3 = 0;
+        let waveOffset4 = 0;
+        let waveOffset5 = 0;
+
+        function drawWave(frequency, amplitude, offset, speed, color, shift) {
+            ctx.beginPath();
+            ctx.moveTo(0, canvas.height / 2);
+
+            for (let x = 0; x < canvas.width; x++) {
+                let y = amplitude * Math.sin((x + offset + shift) * frequency) + (canvas.height / 2);
+                ctx.lineTo(x, y);
+            }
+
+            ctx.strokeStyle = color;
+            ctx.stroke();
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw 5 different waves with different frequencies, amplitudes, speeds, and colors
+            drawWave(0.01, 50, waveOffset1, 0.5, 'rgba(255, 255, 255, 0.5)', 0);
+            drawWave(0.02, 40, waveOffset2, 1, 'rgba(0, 255, 0, 0.5)', 100);
+            drawWave(0.03, 30, waveOffset3, 1.5, 'rgba(0, 0, 255, 0.5)', 200);
+            drawWave(0.04, 20, waveOffset4, 2, 'rgba(255, 0, 255, 0.5)', 300);
+            drawWave(0.05, 10, waveOffset5, 2.5, 'rgba(255, 255, 0, 0.5)', 400);
+
+            // Increment the offsets at different speeds
+            waveOffset1 += 0.5; 
+            waveOffset2 += 1; 
+            waveOffset3 += 1.5; 
+            waveOffset4 += 2; 
+            waveOffset5 += 2.5;
+
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    </script>
+</body>
+</html>
+

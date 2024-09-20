@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sinusoidal Waves Around a Sphere (Side View)</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #000;
+        }
+        canvas {
+            display: block;
+            background-color: #111;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="waveCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('waveCanvas');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        const radius = Math.min(canvas.width, canvas.height) / 3;
+
+        let waveOffset1 = 0;
+        let waveOffset2 = 0;
+        let waveOffset3 = 0;
+        let waveOffset4 = 0;
+        let waveOffset5 = 0;
+
+        let perspectiveAngle = 0; // Angle in radians
+
+        function drawWaveAroundSphere(frequency, amplitude, offset, speed, color, shift) {
+            ctx.beginPath();
+
+            for (let angle = 0; angle <= 360; angle += 1) {
+                let radian = angle * (Math.PI / 180);
+                let x = centerX + radius * Math.cos(radian + perspectiveAngle);
+                let y = centerY + amplitude * Math.sin((radian * frequency) + offset + shift) * Math.cos(radian);
+                
+                if (angle === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            }
+
+            ctx.strokeStyle = color;
+            ctx.stroke();
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw 5 different waves moving around the sphere with perspective
+            drawWaveAroundSphere(3, 20, waveOffset1, 0.5, 'rgba(255, 255, 255, 0.5)', 0);
+            drawWaveAroundSphere(4, 15, waveOffset2, 1, 'rgba(0, 255, 0, 0.5)', 100);
+            drawWaveAroundSphere(5, 10, waveOffset3, 1.5, 'rgba(0, 0, 255, 0.5)', 200);
+            drawWaveAroundSphere(6, 5, waveOffset4, 2, 'rgba(255, 0, 255, 0.5)', 300);
+            drawWaveAroundSphere(7, 3, waveOffset5, 2.5, 'rgba(255, 255, 0, 0.5)', 400);
+
+            // Increment the offsets at different speeds
+            waveOffset1 += 0.05; 
+            waveOffset2 += 0.08; 
+            waveOffset3 += 0.12; 
+            waveOffset4 += 0.15; 
+            waveOffset5 += 0.2;
+
+            requestAnimationFrame(animate);
+        }
+
+        function onMouseMove(event) {
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = event.clientX - rect.left;
+            perspectiveAngle = (mouseX - centerX) / canvas.width * Math.PI * 2;
+        }
+
+        // Event listener to change perspective based on mouse movement
+        canvas.addEventListener('mousemove', onMouseMove);
+
+        animate();
+    </script>
+</body>
+</html>
+

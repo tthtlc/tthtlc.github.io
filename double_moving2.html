@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moving Circles with Complex Line Drawing</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #333;
+        }
+        canvas {
+            border: 1px solid black;
+            background-color: #333;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="complexLineCanvas" width="600" height="600"></canvas>
+    <script>
+        const canvas = document.getElementById('complexLineCanvas');
+        const ctx = canvas.getContext('2d');
+        const numLines = 160;
+
+        // Circle 1 properties
+        let circle1 = {
+            x: canvas.width / 4,
+            y: canvas.height / 2,
+            radius: 80,
+            dx: 2,  // Movement speed in x direction
+            dy: 2,  // Movement speed in y direction
+        };
+
+        // Circle 2 properties
+        let circle2 = {
+            x: (3 * canvas.width) / 4,
+            y: canvas.height / 2,
+            radius: 50,
+            dx: -3, // Movement speed in x direction
+            dy: -1.5, // Movement speed in y direction
+        };
+
+        // Function to draw lines between the two moving circles
+        function drawComplexPattern() {
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 0.5;
+
+            // Clear the canvas before drawing
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Loop for drawing lines between points on the two circles
+            for (let i = 0; i < numLines; i++) {
+                const angle1 = (i / numLines) * 2 * Math.PI;
+                const angle2 = ((i + 180) / numLines) * 2 * Math.PI;
+
+                // Points on Circle 1
+                const x1 = circle1.x + circle1.radius * Math.cos(angle1);
+                const y1 = circle1.y + circle1.radius * Math.sin(angle1);
+
+                // Points on Circle 2
+                const x2 = circle2.x + circle2.radius * Math.cos(angle2);
+                const y2 = circle2.y + circle2.radius * Math.sin(angle2);
+
+                // Draw line between points on Circle 1 and Circle 2
+                ctx.beginPath();
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x2, y2);
+                ctx.stroke();
+            }
+        }
+
+        // Function to update the position of Circle 1 and handle boundary collisions
+        function updateCircle1() {
+            // Move Circle 1
+            circle1.x += circle1.dx;
+            circle1.y += circle1.dy;
+
+            // Boundary check for Circle 1
+            if (circle1.x - circle1.radius < 0 || circle1.x + circle1.radius > canvas.width) {
+                circle1.dx = -circle1.dx; // Reverse direction when hitting the boundary
+            }
+            if (circle1.y - circle1.radius < 0 || circle1.y + circle1.radius > canvas.height) {
+                circle1.dy = -circle1.dy; // Reverse direction when hitting the boundary
+            }
+        }
+
+        // Function to update the position of Circle 2 and handle boundary collisions
+        function updateCircle2() {
+            // Move Circle 2
+            circle2.x += circle2.dx;
+            circle2.y += circle2.dy;
+
+            // Boundary check for Circle 2
+            if (circle2.x - circle2.radius < 0 || circle2.x + circle2.radius > canvas.width) {
+                circle2.dx = -circle2.dx; // Reverse direction when hitting the boundary
+            }
+            if (circle2.y - circle2.radius < 0 || circle2.y + circle2.radius > canvas.height) {
+                circle2.dy = -circle2.dy; // Reverse direction when hitting the boundary
+            }
+        }
+
+        // Animation loop
+        function animate() {
+            updateCircle1();       // Update the position of Circle 1 independently
+            updateCircle2();       // Update the position of Circle 2 independently
+            drawComplexPattern();  // Redraw the lines based on new positions
+
+            requestAnimationFrame(animate);  // Call animate again for the next frame
+        }
+
+        // Start the animation
+        animate();
+    </script>
+</body>
+</html>
+

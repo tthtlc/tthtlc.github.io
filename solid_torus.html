@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Wireframe Shapes with Three.js</title>
+    <style>
+        body { margin: 0; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        let scene, camera, renderer;
+        let xrot = 0.2, yrot = 0.0, zrot = 0.0;
+        let mouseDown = false;
+        let xdiff = 0.0, ydiff = 0.0;
+        let counter = 0;
+
+        function init() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 100);
+            camera.position.z = 10;
+
+            renderer = new THREE.WebGLRenderer();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+
+            // Wireframe materials
+            const wireframeMaterial = new THREE.MeshBasicMaterial({ color: 0x808080, wireframe: true });
+
+            // Wireframe sphere
+            const wireframeSphere = new THREE.Mesh(
+                new THREE.SphereGeometry(2, 10, 10),
+                wireframeMaterial
+            );
+            scene.add(wireframeSphere);
+
+            // Wireframe cube
+            const wireframeCube = new THREE.Mesh(
+                new THREE.BoxGeometry(1, 1, 1),
+                wireframeMaterial
+            );
+            scene.add(wireframeCube);
+
+            // Wireframe torus
+            const wireframeTorus = new THREE.Mesh(
+                new THREE.TorusGeometry(3, 1, 5, 5),
+                wireframeMaterial
+            );
+            scene.add(wireframeTorus);
+
+            // Solid torus (also wireframe for consistency)
+            const solidTorus = new THREE.Mesh(
+                new THREE.TorusGeometry(4, 2, 6, 18),
+                wireframeMaterial
+            );
+            scene.add(solidTorus);
+
+            // Solid shapes (all wireframe)
+            const solidDodecahedron = new THREE.Mesh(
+                new THREE.DodecahedronGeometry(),
+                wireframeMaterial
+            );
+            scene.add(solidDodecahedron);
+
+            const solidOctahedron = new THREE.Mesh(
+                new THREE.OctahedronGeometry(),
+                wireframeMaterial
+            );
+            scene.add(solidOctahedron);
+
+            const solidTetrahedron = new THREE.Mesh(
+                new THREE.TetrahedronGeometry(),
+                wireframeMaterial
+            );
+            scene.add(solidTetrahedron);
+
+            const solidIcosahedron = new THREE.Mesh(
+                new THREE.IcosahedronGeometry(),
+                wireframeMaterial
+            );
+            scene.add(solidIcosahedron);
+
+            // Conditional teapot shape (approximated with a torus knot for demo)
+            const teapotGeometry = new THREE.TorusKnotGeometry(0.5, 0.2, 300, 16);
+            const solidTeapot = new THREE.Mesh(teapotGeometry, wireframeMaterial);
+            scene.add(solidTeapot);
+
+            // Solid cone
+            const solidCone = new THREE.Mesh(
+                new THREE.ConeGeometry(1, 1, 10),
+                wireframeMaterial
+            );
+            scene.add(solidCone);
+
+            // Solid cube
+            const solidCube = new THREE.Mesh(
+                new THREE.BoxGeometry(1, 1, 1),
+                wireframeMaterial
+            );
+            scene.add(solidCube);
+
+            window.addEventListener('resize', onWindowResize, false);
+            document.addEventListener('mousemove', onMouseMove, false);
+            document.addEventListener('mousedown', onMouseDown, false);
+            document.addEventListener('mouseup', onMouseUp, false);
+
+            animate();
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            if (!mouseDown) {
+                xrot += 0.3;
+                yrot += 0.3;
+                zrot += 1.0;
+            }
+
+            scene.rotation.x = xrot * Math.PI / 180;
+            scene.rotation.y = yrot * Math.PI / 180;
+            scene.rotation.z = zrot * Math.PI / 180;
+
+            renderer.render(scene, camera);
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function onMouseMove(event) {
+            if (mouseDown) {
+                yrot = event.clientX - xdiff;
+                xrot = event.clientY + ydiff;
+            }
+        }
+
+        function onMouseDown(event) {
+            mouseDown = true;
+            xdiff = event.clientX - yrot;
+            ydiff = event.clientY - xrot;
+        }
+
+        function onMouseUp() {
+            mouseDown = false;
+        }
+
+        init();
+    </script>
+</body>
+</html>
+

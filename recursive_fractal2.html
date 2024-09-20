@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pythagoras Tree Fractal</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: white;
+        }
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="fractalCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('fractalCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = 800;
+        canvas.height = 600;
+
+        function drawSquare(x, y, size, angle) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(angle);
+            ctx.fillStyle = 'black';
+            ctx.fillRect(-size / 2, -size / 2, size, size);
+            ctx.restore();
+        }
+
+        function drawFractal(x, y, size, angle, depth) {
+            if (depth === 0) return;
+            
+            drawSquare(x, y, size, angle);
+
+            const newSize = size * 0.5;
+            const nextDepth = depth - 1;
+            
+            // Draw two branches recursively
+            const angleOffset = Math.PI / 4; // 45 degrees
+            const branchLength = newSize * Math.sqrt(2) / 2;
+
+            // Left branch
+            const leftX = x - branchLength * Math.cos(angle - angleOffset);
+            const leftY = y - branchLength * Math.sin(angle - angleOffset);
+            drawFractal(leftX, leftY, newSize, angle - angleOffset, nextDepth);
+
+            // Right branch
+            const rightX = x + branchLength * Math.cos(angle + angleOffset);
+            const rightY = y + branchLength * Math.sin(angle + angleOffset);
+            drawFractal(rightX, rightY, newSize, angle + angleOffset, nextDepth);
+        }
+
+        function drawTreeFractal() {
+            const baseSize = 100;
+            const startX = canvas.width / 2;
+            const startY = canvas.height - 100;
+
+            drawFractal(startX, startY, baseSize, 0, 8); // Depth of 8 for fractal
+        }
+
+        drawTreeFractal();
+    </script>
+</body>
+</html>
+

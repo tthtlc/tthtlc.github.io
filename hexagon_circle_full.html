@@ -1,0 +1,78 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hexagon with Pulsating Circles</title>
+    <style>
+        canvas {
+            display: block;
+            margin: 0 auto;
+            background-color: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="hexagonCanvas" width="600" height="600"></canvas>
+    <script>
+        const canvas = document.getElementById('hexagonCanvas');
+        const ctx = canvas.getContext('2d');
+        const width = canvas.width;
+        const height = canvas.height;
+        const hexRadius = 100;
+        const edgeLength = 100;
+        const centerX = width / 2;
+        const centerY = height / 2;
+        let growingRadius = 0;
+        let growing = true; // true for growing, false for shrinking
+        const hexagonPoints = [];
+
+        function drawHexagon(x, y, radius) {
+            ctx.beginPath();
+            for (let i = 0; i < 6; i++) {
+                const angle = (Math.PI / 3) * i;
+                const pointX = x + radius * Math.cos(angle);
+                const pointY = y + radius * Math.sin(angle);
+                hexagonPoints.push({ x: pointX, y: pointY });
+                if (i === 0) {
+                    ctx.moveTo(pointX, pointY);
+                } else {
+                    ctx.lineTo(pointX, pointY);
+                }
+            }
+            ctx.closePath();
+            ctx.stroke();
+        }
+
+        function drawPulsatingCircles() {
+            ctx.clearRect(0, 0, width, height);
+            hexagonPoints.length = 0; // Clear previous hexagon points
+            drawHexagon(centerX, centerY, hexRadius);
+            hexagonPoints.forEach(point => {
+                ctx.beginPath();
+                ctx.arc(point.x, point.y, growingRadius, 0, Math.PI * 2);
+                ctx.stroke();
+            });
+
+            if (growing) {
+                growingRadius += 1;
+                if (growingRadius >= edgeLength) {
+                    growing = false; // Start shrinking
+                }
+            } else {
+                growingRadius -= 1;
+                if (growingRadius <= 0) {
+                    growing = true; // Start growing again
+                }
+            }
+
+            requestAnimationFrame(drawPulsatingCircles);
+        }
+
+        // Start the animation
+        drawPulsatingCircles();
+    </script>
+</body>
+</html>
+

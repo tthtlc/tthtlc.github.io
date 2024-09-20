@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tangential Ellipse on Circle</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #333;
+        }
+        canvas {
+            border: 1px solid black;
+            background-color: #333;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="tangentialEllipseCanvas" width="800" height="800"></canvas>
+    <script>
+        const canvas = document.getElementById('tangentialEllipseCanvas');
+        const ctx = canvas.getContext('2d');
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        const circleRadius = 200;
+        const ellipseRadiusX = 100;
+        const ellipseRadiusY = 50;
+        const numPoints = 60; // Number of points on both the ellipse and the circle
+        const speed = 0.01; // Speed of the ellipse moving along the circle
+
+        let angle = 0;
+
+        function drawCircle() {
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, circleRadius, 0, 2 * Math.PI);
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+
+        function drawEllipse(x, y, angle) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(angle);
+            ctx.beginPath();
+            ctx.ellipse(0, 0, ellipseRadiusX, ellipseRadiusY, 0, 0, 2 * Math.PI);
+            ctx.strokeStyle = '#00ff00';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        function generatePointsOnCircle(radius, centerX, centerY, numPoints) {
+            const points = [];
+            for (let i = 0; i < numPoints; i++) {
+                const angle = (i / numPoints) * 2 * Math.PI;
+                const x = centerX + radius * Math.cos(angle);
+                const y = centerY + radius * Math.sin(angle);
+                points.push({ x, y });
+            }
+            return points;
+        }
+
+        function generatePointsOnEllipse(centerX, centerY, radiusX, radiusY, numPoints, rotationAngle) {
+            const points = [];
+            for (let i = 0; i < numPoints; i++) {
+                const angle = (i / numPoints) * 2 * Math.PI;
+                const x = centerX + radiusX * Math.cos(angle) * Math.cos(rotationAngle) - radiusY * Math.sin(angle) * Math.sin(rotationAngle);
+                const y = centerY + radiusX * Math.cos(angle) * Math.sin(rotationAngle) + radiusY * Math.sin(angle) * Math.cos(rotationAngle);
+                points.push({ x, y });
+            }
+            return points;
+        }
+
+        function drawConnectingLines(points1, points2) {
+            for (let i = 0; i < numPoints; i++) {
+                ctx.beginPath();
+                ctx.moveTo(points1[i].x, points1[i].y);
+                ctx.lineTo(points2[i].x, points2[i].y);
+                ctx.strokeStyle = `hsl(${(i / numPoints) * 360}, 100%, 50%)`; // Vary color for each line
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            drawCircle();
+
+            // Calculate the position of the ellipse on the circle's circumference
+            const ellipseX = centerX + circleRadius * Math.cos(angle);
+            const ellipseY = centerY + circleRadius * Math.sin(angle);
+
+            // The angle of the ellipse should always be perpendicular to the radius (tangential to the circle)
+            const tangentAngle = angle + Math.PI / 2;
+
+            // Generate points on the circle and the ellipse
+            const circlePoints = generatePointsOnCircle(circleRadius, centerX, centerY, numPoints);
+            const ellipsePoints = generatePointsOnEllipse(ellipseX, ellipseY, ellipseRadiusX, ellipseRadiusY, numPoints, tangentAngle);
+
+            // Draw the ellipse
+            drawEllipse(ellipseX, ellipseY, tangentAngle);
+
+            // Draw lines connecting the points on the circle and the ellipse
+            drawConnectingLines(circlePoints, ellipsePoints);
+
+            // Update the angle for the next frame
+            angle += speed;
+
+            // Request the next frame
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    </script>
+</body>
+</html>
+

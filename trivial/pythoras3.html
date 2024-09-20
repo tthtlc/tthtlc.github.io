@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pythagoras Tree</title>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: black;
+        }
+        canvas {
+            background-color: black;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="pythagorasTree"></canvas>
+
+    <script>
+        function initCanvas() {
+            const canvas = document.getElementById('pythagorasTree');
+            canvas.width = 700;
+            canvas.height = 800;
+            const ctx = canvas.getContext('2d');
+            ctx.translate(canvas.width / 2, canvas.height);
+            return ctx;
+        }
+
+        function drawPythagorasTree(ctx, x1, y1, x2, y2, currentDepth, maxDepth) {
+            if (currentDepth > 0) {
+                // Calculate the differences in x and y coordinates between the two points
+                let dx = x2 - x1;
+                let dy = y2 - y1;
+
+                // Calculate the coordinates for the three additional points to create the branches
+                let x3 = x2 - dy;
+                let y3 = y2 + dx;
+                let x4 = x1 - dy;
+                let y4 = y1 + dx;
+                let x5 = x4 + (dx - dy) / 2;
+                let y5 = y4 + (dx + dy) / 2;
+
+                let colorIntensity = 1.0 - (currentDepth / maxDepth);
+                let color = `rgba(255, ${colorIntensity * 255}, 255, 1)`;
+
+                ctx.beginPath();
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x2, y2);
+                ctx.lineTo(x3, y3);
+                ctx.lineTo(x4, y4);
+                ctx.closePath();
+                ctx.fillStyle = color;
+                ctx.fill();
+
+                // Recursive drawing for the branches
+                drawPythagorasTree(ctx, x4, y4, x5, y5, currentDepth - 1, maxDepth);
+                drawPythagorasTree(ctx, x5, y5, x3, y3, currentDepth - 1, maxDepth);
+            }
+        }
+
+        const ctx = initCanvas();
+        drawPythagorasTree(ctx, -100, 0, 100, 0, 12, 12);
+    </script>
+</body>
+</html>
+

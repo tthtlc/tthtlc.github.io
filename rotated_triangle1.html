@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rotating Growing Polygon with Blue to Red Gradient</title>
+    <style>
+        canvas {
+            background-color: #f0f0f0;
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+<canvas id="polygonCanvas" width="600" height="600"></canvas>
+
+<script>
+    const canvas = document.getElementById('polygonCanvas');
+    const ctx = canvas.getContext('2d');
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    let angle = 0;
+    let size = 10;
+    let increment = 2;
+    let colorIndex = 0;
+    let n = 4; // Number of sides for the polygon (e.g., n=4 for a square)
+
+    // Array of 16 colors forming a gradient from dark blue to red
+    const colors = [
+        '#00008B', '#1A006F', '#330054', '#4C0039', 
+        '#66001F', '#800005', '#990000', '#B20000', 
+        '#CC0000', '#E60000', '#FF0000', '#FF1A1A', 
+        '#FF3333', '#FF4C4C', '#FF6666', '#FF8080'
+    ];
+
+    function drawPolygon(x, y, size, sides, rotation, color) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(rotation);
+        ctx.strokeStyle = color;
+
+        const angleStep = (2 * Math.PI) / sides; // Angle between vertices
+        ctx.beginPath();
+        for (let i = 0; i < sides; i++) {
+            const vx = size * Math.cos(i * angleStep);
+            const vy = size * Math.sin(i * angleStep);
+            if (i === 0) {
+                ctx.moveTo(vx, vy);
+            } else {
+                ctx.lineTo(vx, vy);
+            }
+        }
+        ctx.closePath();
+        ctx.stroke();
+        ctx.restore();
+    }
+
+    function animate() {
+        let x = canvas.width / 2;
+        let y = canvas.height / 2;
+
+        // Draw polygon with color from the array
+        drawPolygon(x, y, size, n, angle * Math.PI / 180, colors[colorIndex]);
+        
+        angle += 5; // Rotate 5 degrees each frame
+        size += increment; // Increase the size
+
+        // Change the color index for the next polygon
+        colorIndex = (colorIndex + 1) % colors.length;
+
+        // Clear the canvas only when size direction changes
+        if (size > 200 || size < 10) {
+            increment = -increment; // Reverse the growth when hitting a threshold
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas on direction change
+        }
+
+        requestAnimationFrame(animate);
+    }
+
+    animate();
+</script>
+</body>
+</html>
+

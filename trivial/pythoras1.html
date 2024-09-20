@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pythagoras Tree Drawer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        canvas {
+            border: 1px solid black;
+            display: block;
+            margin: 20px auto;
+            background-color: #f0f0f0;
+        }
+        input[type="range"] {
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Pythagoras Tree Drawer</h1>
+
+    <label for="depthRange">Depth:</label>
+    <input type="range" id="depthRange" min="1" max="12" value="6">
+    <span id="depthValue">6</span>
+
+    <canvas id="canvas" width="800" height="600"></canvas>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const depthRange = document.getElementById('depthRange');
+        const depthValue = document.getElementById('depthValue');
+
+        // Function to draw a square
+        function drawSquare(x, y, size, angle) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(angle);
+            ctx.beginPath();
+            ctx.rect(0, 0, size, size);
+            ctx.fillStyle = 'green';
+            ctx.fill();
+            ctx.restore();
+        }
+
+        // Function to draw the Pythagoras Tree
+        function drawPythagorasTree(x, y, size, angle, depth) {
+            if (depth === 0) {
+                return;
+            }
+
+            // Draw base square
+            drawSquare(x, y, size, angle);
+
+            // Calculate new positions for the next squares
+            const newSize = size * Math.sqrt(2) / 2;
+            const leftX = x + size * Math.cos(angle);
+            const leftY = y - size * Math.sin(angle);
+            const rightX = x + size * Math.cos(angle) - newSize * Math.cos(angle + Math.PI / 4);
+            const rightY = y - size * Math.sin(angle) - newSize * Math.sin(angle + Math.PI / 4);
+
+            // Recursive calls to draw the two branches
+            drawPythagorasTree(leftX, leftY, newSize, angle - Math.PI / 4, depth - 1);  // Left branch
+            drawPythagorasTree(rightX, rightY, newSize, angle + Math.PI / 4, depth - 1); // Right branch
+        }
+
+        // Function to start drawing the tree
+        function drawTree() {
+            const depth = parseInt(depthRange.value);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const baseSize = 80;
+            const startX = canvas.width / 2 - baseSize / 2;
+            const startY = canvas.height - 150;
+            drawPythagorasTree(startX, startY, baseSize, 0, depth);
+        }
+
+        // Initial draw
+        drawTree();
+
+        // Event listener for changing depth
+        depthRange.addEventListener('input', function () {
+            depthValue.textContent = depthRange.value;
+            drawTree();
+        });
+    </script>
+
+</body>
+</html>
+

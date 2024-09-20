@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animated Lemniscate with Growing and Shrinking Lobes</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        canvas {
+            background-color: white;
+            border: 1px solid black;
+        }
+        #sizeValue {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="sizeValue">Size: 1.00, Rotation: 0</div>
+    <canvas id="figure8Canvas" width="500" height="500"></canvas>
+
+    <script>
+        const canvas = document.getElementById('figure8Canvas');
+        const ctx = canvas.getContext('2d');
+        const sizeValueLabel = document.getElementById('sizeValue');
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        const parts = 300;
+        const step = 2 * Math.PI / parts;
+        
+        let size = 1; // Initial size of the lobes
+        let maxSize = 3; // Maximum size of the lobes
+        let minSize = 0.5; // Minimum size of the lobes
+        let sizeDirection = 1; // 1 to grow, -1 to shrink
+        let rotation = 0; // Initial rotation
+        let rotationSpeed = 0.02; // Speed of rotation
+        let reverseRotation = false; // Controls rotation reversal
+
+        function drawFigure8(size, rotation) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.beginPath();
+            
+            ctx.save(); // Save the current state
+            ctx.translate(centerX, centerY); // Translate to the center
+            ctx.rotate(rotation); // Rotate the entire canvas
+            ctx.translate(-centerX, -centerY); // Translate back
+
+            for (let theta = 0; theta <= 8 * Math.PI; theta += step) {
+                const r = size * 100 * (Math.cos(0.2 * theta));
+                const x = r * Math.cos(theta);
+                const y = r * Math.sin(theta);
+
+                if (theta === 0) {
+                    ctx.moveTo(centerX + x, centerY + y);
+                } else {
+                    ctx.lineTo(centerX + x, centerY + y);
+                }
+            }
+
+            ctx.strokeStyle = 'blue';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            ctx.restore(); // Restore the original state
+        }
+
+        function animateFigure8() {
+            // Update size
+            size += sizeDirection * 0.02;
+            if (size >= maxSize || size <= minSize) {
+                sizeDirection *= -1; // Reverse size direction when limit is hit
+                reverseRotation = !reverseRotation; // Reverse rotation direction
+            }
+
+            // Update rotation
+            rotation += reverseRotation ? -rotationSpeed : rotationSpeed;
+
+            // Draw the figure with the current size and rotation
+            drawFigure8(size, rotation);
+
+            // Update size and rotation value display
+            sizeValueLabel.textContent = `Size: ${size.toFixed(2)}, Rotation: ${rotation.toFixed(2)}`;
+
+            // Request the next frame
+            requestAnimationFrame(animateFigure8);
+        }
+
+        // Start animation
+        animateFigure8();
+    </script>
+</body>
+</html>
+

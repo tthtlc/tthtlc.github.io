@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sphere Triangulation</title>
+    <style>
+        body { margin: 0; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        const radius = Math.min(centerX, centerY) * 0.5;
+
+        let rotationX = 0;
+        let rotationY = 0;
+
+        let isDragging = false;
+        let lastMouseX = 0;
+        let lastMouseY = 0;
+
+        canvas.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            lastMouseX = e.clientX;
+            lastMouseY = e.clientY;
+        });
+
+        canvas.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                const deltaX = e.clientX - lastMouseX;
+                const deltaY = e.clientY - lastMouseY;
+                rotationX += deltaX * 0.01;
+                rotationY += deltaY * 0.01;
+                lastMouseX = e.clientX;
+                lastMouseY = e.clientY;
+                drawSphere();
+            }
+        });
+
+        function drawLine(x1, y1, x2, y2) {
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.strokeStyle = 'white';
+            ctx.stroke();
+        }
+
+        function drawSphere() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = 'black';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const points = [];
+            const triangles = [];
+            const latLines = 20;
+            const longLines = 20;
+
+            for (let lat = 0; lat <= latLines; lat++) {
+                const theta = lat * Math.PI / latLines;
+                const sinTheta = Math.sin(theta);
+                const cosTheta = Math.cos(theta);
+
+                for (let lon = 0; lon <= longLines; lon++) {
+                    const phi = lon * 2 * Math.PI / longLines;
+                    const x = radius * cosTheta * Math.cos(phi);
+                    const y = radius * sinTheta;
+                    const z = radius * cosTheta * Math.sin(phi);
+
+                    points.push({ x, y, z });
+                }
+            }
+
+            for (let lat = 0; lat < latLines; lat++) {
+                for (let lon = 0; lon < longLines; lon++) {
+                    const first = lat * (longLines + 1) + lon;
+                    const second = first + longLines + 1;
+
+                    triangles.push([first, second, first + 1]);
+                    triangles.push([second, second + 1, first + 1]);
+                }
+            }
+
+            triangles.forEach(triangle => {
+                const p1 = project(rotate(points[triangle[0]]));
+                const p2 = project(rotate(points[triangle[1]]));
+                const p3 = project(rotate(points[triangle[2]]));
+
+                drawLine(p1.x + centerX, p1.y + centerY, p2.x + centerX, p2.y + centerY);
+                drawLine(p2.x + centerX, p2.y + centerY, p3.x + centerX, p3.y + centerY);
+                drawLine(p3.x + centerX, p3.y + centerY, p1.x + centerX, p1.y + centerY);
+            });
+        }
+
+        function rotate(point) {
+            const cosX = Math.cos(rotationX);
+            const sinX = Math.sin(rotationX);
+            const cosY = Math.cos(rotationY);
+            const sinY = Math.sin(rotationY);
+
+            let y = point.y * cosY - point.z * sinY;
+            let z = point.y * sinY + point.z * cosY;
+
+            let x = point.x * cosX - z * sinX;
+            z = point.x * sinX + z * cosX;
+
+            return { x, y, z };
+        }
+
+        function project(point) {
+            const distance = 400;
+            const scale = distance / (distance - point.z);
+            return {
+                x: point.x * scale,
+                y: point.y * scale
+            };
+        }
+
+        drawSphere();
+    </script>
+</body>
+</html>
+

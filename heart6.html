@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heart-shaped Line Art</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+<canvas id="heartCanvas" width="600" height="600"></canvas>
+
+<script>
+    const canvas = document.getElementById('heartCanvas');
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width;
+    const height = canvas.height;
+
+    const radius = Math.min(width, height) / 2 - 20; // Circle radius
+    const centerX = width / 2;
+    const centerY = height / 2;
+    const totalPoints = 160; // Total points around the circle
+    const multiplier = 4; // Affects how the points are connected (try different values)
+
+    // Function to calculate the position of points around the circle
+    function getPointOnCircle(index, totalPoints) {
+        const angle = (2 * Math.PI * index) / totalPoints;
+        const x = centerX + radius * Math.cos(angle);
+        const y = centerY + radius * Math.sin(angle);
+        return { x, y };
+    }
+
+    // Draw the numbered points and connect them with lines
+    function drawHeartLines() {
+        ctx.clearRect(0, 0, width, height); // Clear the canvas
+
+        // Draw the circle points
+        ctx.fillStyle = "black";
+        for (let i = 0; i < totalPoints; i++) {
+            const { x, y } = getPointOnCircle(i, totalPoints);
+            ctx.beginPath();
+            ctx.arc(x, y, 3, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.fillText(i, x + 5, y + 5); // Label the points with numbers
+        }
+
+        // Draw the connecting lines
+        for (let i = 0; i < totalPoints; i++) {
+            const { x: x1, y: y1 } = getPointOnCircle(i, totalPoints);
+            const { x: x2, y: y2 } = getPointOnCircle((i * multiplier) % totalPoints, totalPoints);
+            
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            
+            // Use different colors for different regions (as per the original image)
+            if (i < totalPoints / 2) {
+                ctx.strokeStyle = 'blue';
+            } else {
+                ctx.strokeStyle = 'red';
+            }
+            
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
+        }
+    }
+
+    drawHeartLines();
+</script>
+</body>
+</html>
+

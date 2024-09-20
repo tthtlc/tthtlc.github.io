@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pentagon to Star Morphing Animation</title>
+    <style>
+        canvas {
+            display: block;
+            margin: 0 auto;
+            background-color: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = 600;
+        canvas.height = 600;
+
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        const radius = 150;
+        let t = 0; // interpolation factor (0 to 1)
+
+        const pentagonVertices = [];
+        const starVertices = [];
+
+        // Calculate vertices for pentagon
+        for (let i = 0; i < 5; i++) {
+            const angle = (i * 2 * Math.PI) / 5 - Math.PI / 2;
+            pentagonVertices.push({
+                x: centerX + radius * Math.cos(angle),
+                y: centerY + radius * Math.sin(angle),
+            });
+        }
+
+        // Calculate vertices for star (5 points star)
+        for (let i = 0; i < 5; i++) {
+            const outerAngle = (i * 2 * Math.PI) / 5 - Math.PI / 2;
+            const innerAngle = outerAngle + Math.PI / 5;
+            const outerVertex = {
+                x: centerX + radius * 1.5 * Math.cos(outerAngle),
+                y: centerY + radius * 1.5 * Math.sin(outerAngle),
+            };
+            const innerVertex = {
+                x: centerX + radius * 0.5 * Math.cos(innerAngle),
+                y: centerY + radius * 0.5 * Math.sin(innerAngle),
+            };
+            starVertices.push(outerVertex);
+            starVertices.push(innerVertex);
+        }
+
+        function interpolate(v1, v2, t) {
+            return {
+                x: v1.x + (v2.x - v1.x) * t,
+                y: v1.y + (v2.y - v1.y) * t,
+            };
+        }
+
+        function drawShape(vertices) {
+            ctx.beginPath();
+            ctx.moveTo(vertices[0].x, vertices[0].y);
+            for (let i = 1; i < vertices.length; i++) {
+                ctx.lineTo(vertices[i].x, vertices[i].y);
+            }
+            ctx.closePath();
+            ctx.stroke();
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const interpolatedVertices = [];
+            for (let i = 0; i < 5; i++) {
+                const pentagonVertex = pentagonVertices[i];
+                const starOuterVertex = starVertices[i * 2];
+                const starInnerVertex = starVertices[i * 2 + 1];
+
+                // Interpolate outer and inner vertices
+                interpolatedVertices.push(interpolate(pentagonVertex, starOuterVertex, t));
+                interpolatedVertices.push(interpolate(pentagonVertex, starInnerVertex, t));
+            }
+
+            drawShape(interpolatedVertices);
+
+            // Increase t to gradually morph from pentagon to star
+            t += 0.01;
+            if (t <= 1) {
+                requestAnimationFrame(animate);
+            }
+        }
+
+        animate();
+    </script>
+

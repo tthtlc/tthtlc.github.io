@@ -1,0 +1,135 @@
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chinese Idiom Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        .idioms-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .idiom {
+            padding: 15px;
+            border: 1px solid #333;
+            margin: 10px;
+            cursor: pointer;
+            width: 150px;
+            background-color: lightblue;
+        }
+
+        .idiom.selected {
+            background-color: lightgreen;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin-top: 20px;
+        }
+
+        .message {
+            margin-top: 20px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Identify the Chinese Idioms with Similar Meaning</h1>
+    
+    <div class="idioms-container" id="idiomsContainer"></div>
+    
+    <button id="checkButton">Check Answer</button>
+    
+    <div class="message" id="message"></div>
+
+    <script>
+        // Predefined list of idioms, two have similar meanings
+        const idioms = [
+            { text: "画蛇添足", meaning: "Overdo something unnecessary" },
+            { text: "弄巧成拙", meaning: "Trying to be clever but failing" },
+            { text: "守株待兔", meaning: "Waiting for things to happen without effort" },
+            { text: "好高骛远", meaning: "Having overly ambitious goals" },
+            { text: "自作聪明", meaning: "Overestimating one's cleverness" }, 
+            { text: "聪明反被聪明误", meaning: "Being too clever can backfire" }
+        ];
+
+        let selectedIdioms = [];
+        const idiomsContainer = document.getElementById("idiomsContainer");
+        const messageDiv = document.getElementById("message");
+
+        // Shuffle idioms array
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        // Render idioms on the page
+        function renderIdioms() {
+            idiomsContainer.innerHTML = "";
+            shuffle(idioms);
+
+            idioms.forEach((idiom, index) => {
+                const idiomDiv = document.createElement("div");
+                idiomDiv.classList.add("idiom");
+                idiomDiv.innerText = idiom.text;
+                idiomDiv.dataset.index = index;
+                idiomDiv.addEventListener("click", selectIdiom);
+                idiomsContainer.appendChild(idiomDiv);
+            });
+        }
+
+        // Handle idiom selection
+        function selectIdiom(event) {
+            const idiomDiv = event.target;
+            const index = idiomDiv.dataset.index;
+
+            // Toggle selection
+            if (selectedIdioms.includes(index)) {
+                selectedIdioms = selectedIdioms.filter(i => i !== index);
+                idiomDiv.classList.remove("selected");
+            } else if (selectedIdioms.length < 2) {
+                selectedIdioms.push(index);
+                idiomDiv.classList.add("selected");
+            }
+        }
+
+        // Check if the selected idioms are similar
+        document.getElementById("checkButton").addEventListener("click", () => {
+            if (selectedIdioms.length !== 2) {
+                messageDiv.innerText = "Please select exactly two idioms.";
+                return;
+            }
+
+            const selectedMeanings = selectedIdioms.map(index => idioms[index].meaning);
+            
+            // Check if meanings match
+            if (selectedMeanings[0] === selectedMeanings[1]) {
+                messageDiv.innerText = "Correct! The idioms have similar meanings.";
+            } else {
+                messageDiv.innerText = "Incorrect. Try again!";
+            }
+        });
+
+        // Initial render
+        renderIdioms();
+    </script>
+
+</body>
+</html>
+

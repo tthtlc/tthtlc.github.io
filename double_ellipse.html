@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Ellipse Connection</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #333;
+        }
+        canvas {
+            border: 1px solid black;
+            background-color: #333;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="ellipseCanvas" width="800" height="800"></canvas>
+    <script>
+        const canvas = document.getElementById('ellipseCanvas');
+        const ctx = canvas.getContext('2d');
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        const numPoints = 60;
+        const ellipse1RadiusX = 150;
+        const ellipse1RadiusY = 100;
+        const ellipse2RadiusX = 200;
+        const ellipse2RadiusY = 120;
+
+        // Function to generate ellipse points
+        function generateEllipsePoints(centerX, centerY, radiusX, radiusY, numPoints, angleOffset) {
+            const points = [];
+            for (let i = 0; i < numPoints; i++) {
+                const angle = (i / numPoints) * 2 * Math.PI + angleOffset;
+                const x = centerX + radiusX * Math.cos(angle);
+                const y = centerY + radiusY * Math.sin(angle);
+                points.push({ x, y });
+            }
+            return points;
+        }
+
+        // Function to draw lines between two sets of points
+        function drawConnectingLines(points1, points2) {
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 0.5;
+            for (let i = 0; i < numPoints; i++) {
+                ctx.beginPath();
+                ctx.moveTo(points1[i].x, points1[i].y);
+                ctx.lineTo(points2[i].x, points2[i].y);
+                ctx.stroke();
+            }
+        }
+
+        // Function to randomize translation and rotation
+        function randomTransform() {
+            const translateX = Math.random() * 100 - 50;
+            const translateY = Math.random() * 100 - 50;
+            const rotateAngle = Math.random() * 2 * Math.PI;
+            return { translateX, translateY, rotateAngle };
+        }
+
+        // Main function to draw the pattern
+        function drawDynamicEllipses() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const transform1 = randomTransform();
+            const transform2 = randomTransform();
+
+            const ellipse1Points = generateEllipsePoints(
+                centerX + transform1.translateX,
+                centerY + transform1.translateY,
+                ellipse1RadiusX,
+                ellipse1RadiusY,
+                numPoints,
+                transform1.rotateAngle
+            );
+
+            const ellipse2Points = generateEllipsePoints(
+                centerX + transform2.translateX,
+                centerY + transform2.translateY,
+                ellipse2RadiusX,
+                ellipse2RadiusY,
+                numPoints,
+                transform2.rotateAngle
+            );
+
+            drawConnectingLines(ellipse1Points, ellipse2Points);
+
+            // Redraw the pattern every 2 seconds with new random transformations
+            setTimeout(drawDynamicEllipses, 200);
+        }
+
+        drawDynamicEllipses();
+    </script>
+</body>
+</html>
+

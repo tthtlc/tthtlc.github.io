@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tangential Ellipse Animation</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #333;
+        }
+        canvas {
+            border: 1px solid black;
+            background-color: #333;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="tangentialEllipseCanvas" width="500" height="500"></canvas>
+    <script>
+        const canvas = document.getElementById('tangentialEllipseCanvas');
+        const ctx = canvas.getContext('2d');
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        const circleRadius = canvas.width / 4;
+        const ellipseRadiusX = canvas.width / 10;
+        const ellipseRadiusY = canvas.width/16;
+        const speed = 0.01; // Speed of the ellipse moving along the circle
+        const rotationSpeed = 0.005; // Speed of ellipse rotation
+
+        let angle = 0;
+        let ellipseAngle = 0;
+
+        function drawCircle() {
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, circleRadius, 0, 2 * Math.PI);
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+
+        function drawEllipse(x, y, angle) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(angle);
+            ctx.beginPath();
+            ctx.ellipse(0, 0, ellipseRadiusX, ellipseRadiusY, 0, 0, 2 * Math.PI);
+            ctx.strokeStyle = '#00ff00';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            drawCircle();
+
+            // Calculate the position of the ellipse on the circle's circumference
+            const ellipseDistance = Math.sqrt(Math.pow(ellipseRadiusX * Math.cos(ellipseAngle), 2) + Math.pow(ellipseRadiusY * Math.sin(ellipseAngle), 2));
+            const ellipseX = centerX + (circleRadius + ellipseDistance) * Math.cos(angle);
+            const ellipseY = centerY + (circleRadius + ellipseDistance) * Math.sin(angle);
+
+            // Draw the ellipse at the calculated position with the current rotation angle
+            drawEllipse(ellipseX, ellipseY, ellipseAngle);
+
+            // Update the angles for the next frame
+            angle += speed;
+            ellipseAngle += rotationSpeed;
+
+            // Request the next frame
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    </script>
+</body>
+</html>
+

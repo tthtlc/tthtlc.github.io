@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rotating Perpendicular Rings in 3D</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+<canvas id="ringsCanvas" width="500" height="500"></canvas>
+
+<script>
+    const canvas = document.getElementById('ringsCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    const radius = 100;
+    const numPoints = 90; // Dividing the ring into 90 points
+
+    let angleX = 0;
+    let angleY = 0;
+    let angleZ = 0;
+
+    // Function to project 3D points onto 2D canvas
+    function project(x, y, z) {
+        const scale = 300 / (300 + z); // Simple perspective projection
+        const x2d = x * scale + centerX;
+        const y2d = y * scale + centerY;
+        return { x: x2d, y: y2d };
+    }
+
+    // Function to rotate a point in 3D space by the given angles
+    function rotate3D(x, y, z, angleX, angleY, angleZ) {
+        // Rotation around X-axis
+        let newY = y * Math.cos(angleX) - z * Math.sin(angleX);
+        let newZ = y * Math.sin(angleX) + z * Math.cos(angleX);
+        y = newY;
+        z = newZ;
+
+        // Rotation around Y-axis
+        let newX = x * Math.cos(angleY) + z * Math.sin(angleY);
+        newZ = -x * Math.sin(angleY) + z * Math.cos(angleY);
+        x = newX;
+        z = newZ;
+
+        // Rotation around Z-axis
+        newX = x * Math.cos(angleZ) - y * Math.sin(angleZ);
+        newY = x * Math.sin(angleZ) + y * Math.cos(angleZ);
+        x = newX;
+        y = newY;
+
+        return { x, y, z };
+    }
+
+    // Function to generate points for a ring in 3D
+    function generateRingPoints(rotationMatrix) {
+        const points = [];
+        for (let i = 0; i < numPoints; i++) {
+            const angle = (i / numPoints) * Math.PI * 2;
+            const x = radius * Math.cos(angle);
+            const y = radius * Math.sin(angle);
+            const z = 0;
+
+            // Apply rotation
+            const rotated = rotate3D(x, y, z, rotationMatrix[0], rotationMatrix[1], rotationMatrix[2]);
+            points.push(rotated);
+        }
+        return points;
+    }
+
+    // Function to draw a ring
+    function drawRing(points, color) {
+        ctx.strokeStyle = color;
+        ctx.beginPath();
+        for (let i = 0; i < points.length; i++) {
+            const point = project(points[i].x, points[i].y, points[i].z);
+            if (i === 0) {
+                ctx.moveTo(point.x, point.y);
+            } else {
+                ctx.lineTo(point.x, point.y);
+            }
+        }
+        ctx.closePath();
+        ctx.stroke();
+    }
+
+    // Function to draw lines connecting points from the two rings
+    function drawConnectingLines(points1, points2) {
+        ctx.strokeStyle = 'green';
+       	let shiftnos = Math.floor (3 * numPoints / 4);
+        for (let i = 0; i < numPoints; i++) {
+            const p1 = project(points1[i].x, points1[i].y, points1[i].z);
+	    let j = (i + shiftnos ) % numPoints;
+            const p2 = project(points2[j].x, points2[j].y, points2[j].z);
+
+            ctx.beginPath();
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.stroke();
+        }
+    }
+
+    // Clear canvas and draw the rings
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Generate points for the first ring (XY plane)
+        const ring1Points = generateRingPoints([angleX, angleY, angleZ]);
+
+        // Generate points for the second ring (XZ plane, perpendicular to the first)
+        const ring2Points = generateRingPoints([angleX + Math.PI / 2, angleY, angleZ]);
+
+        // Draw both rings
+        drawRing(ring1Points, 'blue');
+        drawRing(ring2Points, 'red');
+
+        // Draw lines connecting corresponding points from both rings
+        drawConnectingLines(ring1Points, ring2Points);
+    }
+
+    // Update the rotation angles slightly each frame for a slow rotation
+    function updateAngles() {
+        angleX += (Math.random() * 0.03 - 0.005); // Small random changes to X angle
+        angleY += (Math.random() * 0.03 - 0.005); // Small random changes to Y angle
+        angleZ += (Math.random() * 0.03 - 0.005); // Small random changes to Z angle
+    }
+
+    // Animation loop
+    function animate() {
+        updateAngles();
+        draw();
+        requestAnimationFrame(animate);
+    }
+
+    // Start the animation
+    animate();
+</script>
+</body>
+</html>
+

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hexagon Circle Tessellation</title>
+    <style>
+        canvas {
+            display: block;
+            margin: 0 auto;
+            background-color: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="hexCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('hexCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Resize canvas to fit window
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        const maxRadius = Math.min(centerX, centerY) * 0.9;  // Circle boundary
+
+        function drawHexagon(x, y, size) {
+            ctx.beginPath();
+            for (let i = 0; i < 6; i++) {
+                const angle = Math.PI / 3 * i;
+                const dx = size * Math.cos(angle);
+                const dy = size * Math.sin(angle);
+                if (i === 0) {
+                    ctx.moveTo(x + dx, y + dy);
+                } else {
+                    ctx.lineTo(x + dx, y + dy);
+                }
+            }
+            ctx.closePath();
+            ctx.stroke();
+        }
+
+        function drawTessellation() {
+            const baseHexSize = 50;  // Largest size at the center
+            const hexHeight = Math.sqrt(3) * baseHexSize;
+            const hexWidth = 2 * baseHexSize;
+
+            // Loop to draw multiple rings of hexagons
+            for (let r = 0; r < maxRadius; r += baseHexSize * 1.5) {
+                const scaleFactor = 1 - (r / maxRadius);  // Reduce size as we move outward
+                const currentHexSize = baseHexSize * scaleFactor;
+                const currentHexHeight = Math.sqrt(3) * currentHexSize;
+                const currentHexWidth = 2 * currentHexSize;
+
+                // Calculate number of hexagons to fit in the current ring
+                const hexCount = Math.ceil((2 * Math.PI * r) / currentHexWidth);
+                
+                for (let i = 0; i < hexCount; i++) {
+                    const angle = (2 * Math.PI / hexCount) * i;
+                    const x = centerX + r * Math.cos(angle);
+                    const y = centerY + r * Math.sin(angle);
+
+                    // Ensure hexagons are inside the circle
+                    if (Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2)) + currentHexSize <= maxRadius) {
+                        drawHexagon(x, y, currentHexSize);
+                    }
+                }
+            }
+        }
+
+        // Draw the tessellation pattern
+        drawTessellation();
+    </script>
+</body>
+</html>
+

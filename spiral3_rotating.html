@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rotating Spiral with Color Lines</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="illusionCanvas" width="800" height="800"></canvas>
+
+<script>
+const canvas = document.getElementById('illusionCanvas');
+const ctx = canvas.getContext('2d');
+
+const centerX = canvas.width / 2;
+const centerY = canvas.height / 2;
+const sector = 3;
+const dotperspiral = 60 / sector;
+const maxRadius = Math.min(canvas.width, canvas.height) / 2;
+
+// Define colors A, B, C
+const colors = ['red', 'green', 'blue'];
+
+let allCoordinates = [];
+let rotationAngle = 0;
+let clockwise = true; // Initial direction is clockwise
+let lastSwitchTime = Date.now(); // Store the time to alternate direction
+
+// Generate all spirals and collect their coordinates
+function generateSpirals() {
+    allCoordinates = []; // Clear previous coordinates
+    for (let shift_angle = 0; shift_angle < 4 * Math.PI; shift_angle += 2 * Math.PI / sector) {
+        let coords = draw_spiral(centerX, centerY, maxRadius / 10, 0, dotperspiral, shift_angle + rotationAngle);
+        allCoordinates.push(coords);  // Collect all coordinates for this spiral
+    }
+}
+
+// Draw and rotate spirals
+function drawAndRotateSpirals() {
+    // Clear the canvas before redrawing
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Update the direction of rotation every 3 seconds
+    if (Date.now() - lastSwitchTime > 3000) {
+        clockwise = !clockwise; // Switch direction
+        lastSwitchTime = Date.now(); // Reset the timer
+    }
+
+    // Adjust the rotation angle based on the direction
+    if (clockwise) {
+        rotationAngle += 0.01; // Rotate clockwise
+    } else {
+        rotationAngle -= 0.01; // Rotate counterclockwise
+    }
+
+    // Generate and draw the spirals with the updated rotation
+    generateSpirals();
+    
+    // Connect corresponding points between spirals using rotating colors
+    connect_corresponding_points(allCoordinates);
+
+    // Continue the animation
+    requestAnimationFrame(drawAndRotateSpirals);
+}
+
+// Function to draw a single spiral
+function draw_spiral(centerx, centery, small_rad, large_rad, mysector, shift_angle) {
+    let coordinates = [];  // Array to store (x, y) coordinates
+
+    ctx.strokeStyle = 'black';
+    ctx.beginPath();
+    ctx.moveTo(centerx, centery);
+
+    for (let i = 0; i < mysector; i++) {
+        let angle = (i / mysector) * 2 * Math.PI;
+
+        let x = centerx + (small_rad * angle + large_rad) * Math.cos(angle + shift_angle);
+        let y = centery + (small_rad * angle + large_rad) * Math.sin(angle + shift_angle);
+
+        ctx.lineTo(x, y);
+        
+        // Store the coordinates
+        coordinates.push({ x: x, y: y });
+    }
+
+    ctx.stroke();
+    
+    return coordinates;  // Return the array of coordinates
+}
+
+// Function to connect corresponding points between spirals with rotating colors
+function connect_corresponding_points(coordsArray) {
+    if (coordsArray.length === 0) return;
+
+    let numberOfPoints = coordsArray[0].length;
+
+    for (let i = 0; i < numberOfPoints; i++) {
+        let colorIndex = 0;  // Start with the first color (A)
+
+        ctx.beginPath();
+        // Start from the first spiral's point
+        let startPoint = coordsArray[0][i];
+        ctx.moveTo(startPoint.x, startPoint.y);
+
+        // Draw lines to corresponding points in all other spirals
+        for (let j = 1; j < coordsArray.length; j++) {
+            // Rotate colors A, B, C
+            ctx.strokeStyle = colors[colorIndex % 3];  // Cycle through colors A (red), B (green), C (blue)
+            colorIndex++;  // Increment color index to rotate
+
+            let targetPoint = coordsArray[j][i];
+            ctx.lineTo(targetPoint.x, targetPoint.y);
+        }
+
+        ctx.stroke();
+    }
+}
+
+// Start the animation
+drawAndRotateSpirals();
+</script>
+
+</body>
+</html>
+

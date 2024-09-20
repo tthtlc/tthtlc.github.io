@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Circle Rotation Contour</title>
+  <style>
+    canvas {
+      border: 1px solid black;
+      display: block;
+      margin: 20px auto;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="canvas" width="500" height="500"></canvas>
+
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    
+    const bigRadius = 150; // Radius of the big circle
+    const smallRadius = 50; // Radius of the small circle
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    
+    let angle = 0;
+    
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      // Draw the big circle
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, bigRadius, 0, 2 * Math.PI);
+      ctx.stroke();
+      
+      // Position of the small circle's center as it rotates inside the big circle
+      const smallCenterX = centerX + (bigRadius - smallRadius) * Math.cos(angle);
+      const smallCenterY = centerY + (bigRadius - smallRadius) * Math.sin(angle);
+      
+      // Draw the small circle
+      ctx.beginPath();
+      ctx.arc(smallCenterX, smallCenterY, smallRadius, 0, 2 * Math.PI);
+      ctx.stroke();
+      
+      // Draw the point on the small circle tracing the contour
+      const pointX = smallCenterX + smallRadius * Math.cos(-angle * (bigRadius / smallRadius - 1));
+      const pointY = smallCenterY + smallRadius * Math.sin(-angle * (bigRadius / smallRadius - 1));
+      
+      ctx.beginPath();
+      ctx.arc(pointX, pointY, 3, 0, 2 * Math.PI);
+      ctx.fillStyle = 'red';
+      ctx.fill();
+      
+      // Update the angle for the next frame
+      angle += 0.02;
+      
+      requestAnimationFrame(draw);
+    }
+    
+    draw();
+  </script>
+</body>
+</html>
+

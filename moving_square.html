@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Animated Expanding and Contracting Squares</title>
+<style>
+    canvas {
+        border: 1px solid black;
+    }
+</style>
+</head>
+<body>
+
+<canvas id="myCanvas" width="480" height="320"></canvas>
+
+<script>
+    var canvas = document.getElementById('myCanvas');
+    var ctx = canvas.getContext('2d');
+
+    var maxSize = 300; // Maximum size of the squares
+    var increase = 10; // Amount to increase/decrease the size of the square each frame
+    var timeout = 100; // Timeout in milliseconds to slow down the animation
+
+    var outerSize = 20; // Initial size of the expanding square
+    var innerSize = maxSize; // Initial size of the contracting square
+
+    function drawSquares() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+
+        // Draw expanding squares (assigned color: blue)
+        ctx.strokeStyle = 'blue';
+        for (let i = 0; i < 5; i++) {
+            let size = outerSize + i * 10;
+            let x = (canvas.width - size) / 2;
+            let y = (canvas.height - size) / 2;
+            ctx.beginPath();
+            ctx.rect(x, y, size, size);
+            ctx.stroke();
+        }
+
+        // Draw contracting squares (assigned color: red)
+        ctx.strokeStyle = 'red';
+        for (let i = 0; i < 5; i++) {
+            let size = innerSize - i * 10;
+            let x = (canvas.width - size) / 2;
+            let y = (canvas.height - size) / 2;
+            ctx.beginPath();
+            ctx.rect(x, y, size, size);
+            ctx.stroke();
+        }
+
+        // Update sizes for next frame
+        outerSize += increase;
+        innerSize -= increase;
+
+        // Reset if squares are too large or small
+        if (outerSize > maxSize) {
+            outerSize = 20;
+        }
+        if (innerSize < 20) {
+            innerSize = maxSize;
+        }
+
+        // Slow down the animation using setTimeout
+        setTimeout(() => {
+            window.requestAnimationFrame(drawSquares);
+        }, timeout);
+    }
+
+    drawSquares(); // Initial call to start the animation
+</script>
+
+</body>
+</html>
+
