@@ -1,135 +1,135 @@
-cardiod.html
-cardiod1.html
-chinese_idiom.html
-circle.html
-circle_color.html
-circle_cycle.html
-circle_on_circle.html
-concentric.html
-counter_rotating_sector.html
-cubic.html
-dodecahedron.html
-dodecahedron_fixed.html
-dodecahedron_nolabel.html
-double.html
-double3.html
-double4.html
-double5.html
-double_circle.html
-double_ellipse.html
-double_motion.html
-double_moving.html
-double_moving2.html
-double_ring_rotate.html
-double_ring_rotate_line.html
-double_square.html
-double_square_line_rotate.html
-double_triangle.html
-double_triangle1.html
-drawsector.html
-ellipse_rotating_circle.html
-ellipse_rotating_circle_line.html
-ellipse_sliding_circle.html
-ellipse_sliding_circle_with_line.html
-ellipse_superrotating_circle.html
-ellipsical_line.html
-ellipsical_line_rotate.html
-figure_eight.html
-figure_eight_double.html
-figure_eight_double_wheel.html
-figure_eight_fifth.html
-figure_eight_radiating.html
-figure_eight_radiating_fixed.html
-figure_eight_rotating.html
-figure_eight_third.html
-five_rotate_spoke.html
-five_rotate_spoke_sector.html
-four_petal.html
-four_petal_double.html
-four_petal_rotate.html
-generalized.html
-generalized_drawing_board.html
-heart3.html
-heart4.html
-heart5.html
-heart6.html
-hexagon_circle.html
-hexagon_circle_full.html
-hexagon_line_rotate.html
-hexagon_tessellation.html
-icosahedron.html
-icosahedron_centroid.html
-icosahedron_labelled.html
-icosahedron_surface.html
-index.html
-klein2_animation.html
-klein2_animation2.html
-klein2_animation3.html
-klein3.html
-koch.html
-lemniscate2_fixed.html
-lemniscate2_radiating.html
-lemniscate2_rotate.html
-lemniscate3_rotate.html
-lemniscate5_radiating.html
-lemniscate5_rotate.html
-lemniscate6_radiating.html
-lemniscate6_rotate.html
-lemniscate8_radiating.html
-lemniscate_radiating.html
-line_drawing.html
-mobius.html
-mobius_radiating.html
-moving_square.html
-moving_square_rotate.html
-moving_square_rotate_double.html
-ovalellipse.html
-pentagon_line_rotate.html
-pentagon_star.html
-pentagon_star_full.html
-pythoras.html
-pythoras_tree.html
-quart_motion.html
-recursive_fractal2.html
-rotated_ngon.html
-rotated_triangle.html
-rotated_triangle1.html
-rotating_sector.html
-rotating_spiral.html
-rotating_spoke.html
-sinsoidal5.html
-sinusoidal.html
-solid_torus.html
-special.html
-sphere.html
-spherical_sinusoid.html
-spherical_sinusoid1.html
-spherical_sinusoid3.html
-spiral.html
-spiral3.html
-spiral3_rotating.html
-spiral4.html
-spirograph.html
-spirograph_outline.html
-spoke_subspokes.html
-spoke_subspokes1.html
-spoke_subspokes2.html
-square_line_rotate.html
-square_sphere.html
-square_triangle.html
-static_concentric.html
-three_petal.html
-torus.html
-torus2.html
-torus2_rotating.html
-triangle_line_rotate.html
-triple_donut.html
-triple_motion.html
-truncated_dodecahedron2.html
-truncated_dodecahedron3.html
-truncated_dodecahedron4.html
-truncated_icosahedron.html
-two_ellipse.html
-two_petal.html
-twotriangle.html
-webgl_3d_ellipsoid.html
++ cardiod.html
++ cardiod1.html
++ chinese_idiom.html
++ circle.html
++ circle_color.html
++ circle_cycle.html
++ circle_on_circle.html
++ concentric.html
++ counter_rotating_sector.html
++ cubic.html
++ dodecahedron.html
++ dodecahedron_fixed.html
++ dodecahedron_nolabel.html
++ double.html
++ double3.html
++ double4.html
++ double5.html
++ double_circle.html
++ double_ellipse.html
++ double_motion.html
++ double_moving.html
++ double_moving2.html
++ double_ring_rotate.html
++ double_ring_rotate_line.html
++ double_square.html
++ double_square_line_rotate.html
++ double_triangle.html
++ double_triangle1.html
++ drawsector.html
++ ellipse_rotating_circle.html
++ ellipse_rotating_circle_line.html
++ ellipse_sliding_circle.html
++ ellipse_sliding_circle_with_line.html
++ ellipse_superrotating_circle.html
++ ellipsical_line.html
++ ellipsical_line_rotate.html
++ figure_eight.html
++ figure_eight_double.html
++ figure_eight_double_wheel.html
++ figure_eight_fifth.html
++ figure_eight_radiating.html
++ figure_eight_radiating_fixed.html
++ figure_eight_rotating.html
++ figure_eight_third.html
++ five_rotate_spoke.html
++ five_rotate_spoke_sector.html
++ four_petal.html
++ four_petal_double.html
++ four_petal_rotate.html
++ generalized.html
++ generalized_drawing_board.html
++ heart3.html
++ heart4.html
++ heart5.html
++ heart6.html
++ hexagon_circle.html
++ hexagon_circle_full.html
++ hexagon_line_rotate.html
++ hexagon_tessellation.html
++ icosahedron.html
++ icosahedron_centroid.html
++ icosahedron_labelled.html
++ icosahedron_surface.html
++ index.html
++ klein2_animation.html
++ klein2_animation2.html
++ klein2_animation3.html
++ klein3.html
++ koch.html
++ lemniscate2_fixed.html
++ lemniscate2_radiating.html
++ lemniscate2_rotate.html
++ lemniscate3_rotate.html
++ lemniscate5_radiating.html
++ lemniscate5_rotate.html
++ lemniscate6_radiating.html
++ lemniscate6_rotate.html
++ lemniscate8_radiating.html
++ lemniscate_radiating.html
++ line_drawing.html
++ mobius.html
++ mobius_radiating.html
++ moving_square.html
++ moving_square_rotate.html
++ moving_square_rotate_double.html
++ ovalellipse.html
++ pentagon_line_rotate.html
++ pentagon_star.html
++ pentagon_star_full.html
++ pythoras.html
++ pythoras_tree.html
++ quart_motion.html
++ recursive_fractal2.html
++ rotated_ngon.html
++ rotated_triangle.html
++ rotated_triangle1.html
++ rotating_sector.html
++ rotating_spiral.html
++ rotating_spoke.html
++ sinsoidal5.html
++ sinusoidal.html
++ solid_torus.html
++ special.html
++ sphere.html
++ spherical_sinusoid.html
++ spherical_sinusoid1.html
++ spherical_sinusoid3.html
++ spiral.html
++ spiral3.html
++ spiral3_rotating.html
++ spiral4.html
++ spirograph.html
++ spirograph_outline.html
++ spoke_subspokes.html
++ spoke_subspokes1.html
++ spoke_subspokes2.html
++ square_line_rotate.html
++ square_sphere.html
++ square_triangle.html
++ static_concentric.html
++ three_petal.html
++ torus.html
++ torus2.html
++ torus2_rotating.html
++ triangle_line_rotate.html
++ triple_donut.html
++ triple_motion.html
++ truncated_dodecahedron2.html
++ truncated_dodecahedron3.html
++ truncated_dodecahedron4.html
++ truncated_icosahedron.html
++ two_ellipse.html
++ two_petal.html
++ twotriangle.html
++ webgl_3d_ellipsoid.html
