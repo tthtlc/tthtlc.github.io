@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cardioid Shape</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="cardioidCanvas" width="800" height="800"></canvas>
+
+<script>
+const canvas = document.getElementById('cardioidCanvas');
+const ctx = canvas.getContext('2d');
+
+// Canvas center point
+const centerX = canvas.width / 2;
+const centerY = canvas.height / 2;
+const radius = 200;  // Radius of the cardioid
+const points = [];
+
+function drawCardioid() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+    ctx.strokeStyle = 'red';  // Set color to red
+    ctx.lineWidth = 2;        // Set line width
+
+    ctx.beginPath();
+
+    // Loop through angles from 0 to 2 * PI
+    for (let theta = 0; theta <= 2 * Math.PI; theta += 0.05) {
+        // Parametric equations for cardioid
+        let x = radius * (1 - Math.cos(theta)) * Math.cos(theta) + centerX;
+        let y = radius * (1 - Math.cos(theta)) * Math.sin(theta) + centerY;
+        points.push({x: x, y: y});
+
+        // Draw the curve
+        if (theta === 0) {
+            ctx.moveTo(x, y);  // Move to starting point
+        } else {
+            ctx.lineTo(x, y);  // Draw line to next point
+        }
+    }
+
+    ctx.closePath();
+    ctx.stroke();  // Render the cardioid
+}
+
+function connectPoints() {
+    ctx.strokeStyle = 'blue';  // Set color to blue for the lines
+    ctx.lineWidth = 1;         // Set line width
+
+    let midpoint = Math.floor(points.length / 2);  // Find the midpoint of the array
+
+    for (let i = 0; i < midpoint; i++) {
+        ctx.beginPath();
+        ctx.moveTo(points[i].x, points[i].y);  // Move to point from the first half
+        ctx.lineTo(points[midpoint + i].x, points[midpoint + i].y);  // Connect to corresponding point in the second half
+        ctx.stroke();
+    }
+}
+
+drawCardioid();  // Draw the cardioid when the page loads
+connectPoints();  // Call the new function to draw the connecting lines
+</script>
+
+</body>
+</html>
+
