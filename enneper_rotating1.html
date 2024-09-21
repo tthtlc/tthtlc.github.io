@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Enneper Surface</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="enneperCanvas" width="600" height="600"></canvas>
+    <script>
+        // Get the canvas element and context
+        const canvas = document.getElementById('enneperCanvas');
+        const ctx = canvas.getContext('2d');
+        const width = canvas.width;
+        const height = canvas.height;
+        const centerX = width / 2;
+        const centerY = height / 2;
+
+        // Parameters for Enneper surface
+        const steps = 40;
+        const scale = 50;
+
+        // Rotation angles
+        let angleX = 0;
+        let angleY = 0;
+
+        // Time variable for animation
+        let time = 0;
+
+        // Parametric equations for the Enneper surface
+        function enneperX(u, v) {
+            return u - (u ** 3) / 3 + u * v ** 2;
+        }
+
+        function enneperY(u, v) {
+            return v - (v ** 3) / 3 + u ** 2 * v;
+        }
+
+        function enneperZ(u, v) {
+            return u ** 2 - v ** 2;
+        }
+
+        // 3D rotation around the X axis
+        function rotateX(x, y, z, angle) {
+            const cosA = Math.cos(angle);
+            const sinA = Math.sin(angle);
+            const yRot = y * cosA - z * sinA;
+            const zRot = y * sinA + z * cosA;
+            return [x, yRot, zRot];
+        }
+
+        // 3D rotation around the Y axis
+        function rotateY(x, y, z, angle) {
+            const cosA = Math.cos(angle);
+            const sinA = Math.sin(angle);
+            const xRot = x * cosA + z * sinA;
+            const zRot = -x * sinA + z * cosA;
+            return [xRot, y, zRot];
+        }
+
+        // 3D point to 2D projection
+        function project3D(x, y, z) {
+            const scaleFactor = 300 / (300 + z); // Simple perspective projection
+            const x2D = centerX + x * scale * scaleFactor;
+            const y2D = centerY - y * scale * scaleFactor;
+            return [x2D, y2D];
+        }
+
+        // Animate dynamic uMin, uMax, vMin, vMax based on time
+        function getDynamicParamRange() {
+            const uRangeAmplitude = 1.5;
+            const vRangeAmplitude = 1.5;
+
+            const uMin = -2 + uRangeAmplitude * Math.sin(time / 200);
+            const uMax = 2 + uRangeAmplitude * Math.cos(time / 200);
+
+            const vMin = -2 + vRangeAmplitude * Math.cos(time / 200);
+            const vMax = 2 + vRangeAmplitude * Math.sin(time / 200);
+
+            return { uMin, uMax, vMin, vMax };
+        }
+
+        // Draw the surface using lines between points
+        function drawEnneperSurface() {
+            ctx.clearRect(0, 0, width, height); // Clear the canvas
+
+            const { uMin, uMax, vMin, vMax } = getDynamicParamRange(); // Get the dynamic range
+
+            for (let i = 0; i <= steps; i++) {
+                const u = uMin + (uMax - uMin) * (i / steps);
+                for (let j = 0; j <= steps; j++) {
+                    const v = vMin + (vMax - vMin) * (j / steps);
+
+                    let x = enneperX(u, v);
+                    let y = enneperY(u, v);
+                    let z = enneperZ(u, v);
+
+                    // Apply rotation around the X and Y axes
+                    [x, y, z] = rotateX(x, y, z, angleX);
+                    [x, y, z] = rotateY(x, y, z, angleY);
+
+                    const [x2D, y2D] = project3D(x, y, z);
+
+                    // Plot point on the canvas
+                    if (i > 0 && j > 0) {
+                        const uPrev = uMin + (uMax - uMin) * ((i - 1) / steps);
+                        const vPrev = vMin + (vMax - vMin) * ((j - 1) / steps);
+
+                        let xPrev = enneperX(uPrev, vPrev);
+                        let yPrev = enneperY(uPrev, vPrev);
+                        let zPrev = enneperZ(uPrev, vPrev);
+
+                        // Apply rotation to previous points
+                        [xPrev, yPrev, zPrev] = rotateX(xPrev, yPrev, zPrev, angleX);
+                        [xPrev, yPrev, zPrev] = rotateY(xPrev, yPrev, zPrev, angleY);
+
+                        const [x2DPrev, y2DPrev] = project3D(xPrev, yPrev, zPrev);
+
+                        // Draw line between previous and current point
+                        ctx.beginPath();
+                        ctx.moveTo(x2DPrev, y2DPrev);
+                        ctx.lineTo(x2D, y2D);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        // Update and rotate the surface
+        function animate() {
+            angleX += 0.01; // Slowly rotate around the X axis
+            angleY += 0.01; // Slowly rotate around the Y axis
+            time += 1; // Increment time to change parametric range
+
+            drawEnneperSurface(); // Redraw the surface with updated rotation and range
+
+            requestAnimationFrame(animate); // Continue the animation
+        }
+
+        // Start the animation loop
+        animate();
+    </script>
+</body>
+</html>

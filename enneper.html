@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enneper Surface</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="enneperCanvas" width="600" height="600"></canvas>
+    <script>
+        // Get the canvas element and context
+        const canvas = document.getElementById('enneperCanvas');
+        const ctx = canvas.getContext('2d');
+        const width = canvas.width;
+        const height = canvas.height;
+        const centerX = width / 2;
+        const centerY = height / 2;
+
+        // Parameters for Enneper surface
+        const uMin = -2, uMax = 2, vMin = -2, vMax = 2;
+        const steps = 40;
+        const scale = 50;
+
+        // Parametric equations for the Enneper surface
+        function enneperX(u, v) {
+            return u - (u ** 3) / 3 + u * v ** 2;
+        }
+
+        function enneperY(u, v) {
+            return v - (v ** 3) / 3 + u ** 2 * v;
+        }
+
+        function enneperZ(u, v) {
+            return u ** 2 - v ** 2;
+        }
+
+        // 3D point to 2D projection
+        function project3D(x, y, z) {
+            const scaleFactor = 300 / (300 + z); // Simple perspective projection
+            const x2D = centerX + x * scale * scaleFactor;
+            const y2D = centerY - y * scale * scaleFactor;
+            return [x2D, y2D];
+        }
+
+        // Draw the surface using lines between points
+        function drawEnneperSurface() {
+            for (let i = 0; i <= steps; i++) {
+                const u = uMin + (uMax - uMin) * (i / steps);
+                for (let j = 0; j <= steps; j++) {
+                    const v = vMin + (vMax - vMin) * (j / steps);
+
+                    const x = enneperX(u, v);
+                    const y = enneperY(u, v);
+                    const z = enneperZ(u, v);
+
+                    const [x2D, y2D] = project3D(x, y, z);
+
+                    // Plot point on the canvas
+                    if (i > 0 && j > 0) {
+                        const uPrev = uMin + (uMax - uMin) * ((i - 1) / steps);
+                        const vPrev = vMin + (vMax - vMin) * ((j - 1) / steps);
+
+                        const xPrev = enneperX(uPrev, vPrev);
+                        const yPrev = enneperY(uPrev, vPrev);
+                        const zPrev = enneperZ(uPrev, vPrev);
+
+                        const [x2DPrev, y2DPrev] = project3D(xPrev, yPrev, zPrev);
+
+                        // Draw line between previous and current point
+                        ctx.beginPath();
+                        ctx.moveTo(x2DPrev, y2DPrev);
+                        ctx.lineTo(x2D, y2D);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        // Set up the canvas and draw
+        ctx.clearRect(0, 0, width, height);
+        drawEnneperSurface();
+
+    </script>
+</body>
+</html>
