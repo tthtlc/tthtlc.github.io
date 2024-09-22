@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cardioid Shape</title>
+    <title>Cardioid Shape with Point Labels</title>
     <style>
         body {
             display: flex;
@@ -30,6 +30,9 @@ const centerX = canvas.width / 2;
 const centerY = canvas.height / 2;
 const radius = 200;  // Radius of the cardioid
 const points = [];
+const total_num_point = 120;
+const angleinc = 2 * Math.PI / total_num_point;
+const offset = 25;  // Define your offset here
 
 function drawCardioid() {
     ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
@@ -39,11 +42,11 @@ function drawCardioid() {
     ctx.beginPath();
 
     // Loop through angles from 0 to 2 * PI
-    for (let theta = 0; theta <= 2 * Math.PI; theta += 0.05) {
+    for (let theta = 0; theta <= 2 * Math.PI; theta += angleinc) {
         // Parametric equations for cardioid
         let x = radius * (1 - Math.cos(theta)) * Math.cos(theta) + centerX;
         let y = radius * (1 - Math.cos(theta)) * Math.sin(theta) + centerY;
-        points.push({x: x, y: y});
+        points.push({ x: x, y: y });
 
         // Draw the curve
         if (theta === 0) {
@@ -60,14 +63,21 @@ function drawCardioid() {
 function connectPoints() {
     ctx.strokeStyle = 'blue';  // Set color to blue for the lines
     ctx.lineWidth = 1;         // Set line width
+    ctx.font = "12px Arial";   // Set font for labels
+    ctx.fillStyle = 'black';   // Set color for the text
 
-    let midpoint = Math.floor(points.length / 2);  // Find the midpoint of the array
+    let numPoints = points.length;
 
-    for (let i = 0; i < midpoint; i++) {
+    for (let i = 0; i < numPoints; i++) {
+        let nextIndex = (i + offset) % numPoints;  // Wrap around with modulus
+
         ctx.beginPath();
-        ctx.moveTo(points[i].x, points[i].y);  // Move to point from the first half
-        ctx.lineTo(points[midpoint + i].x, points[midpoint + i].y);  // Connect to corresponding point in the second half
+        ctx.moveTo(points[i].x, points[i].y);  // Move to the current point
+        ctx.lineTo(points[nextIndex].x, points[nextIndex].y);  // Connect to the point at (i + offset) % numPoints
         ctx.stroke();
+
+        // Add labels with the index at the end of the line (nextIndex)
+        ctx.fillText(nextIndex, points[nextIndex].x + 5, points[nextIndex].y - 5);
     }
 }
 

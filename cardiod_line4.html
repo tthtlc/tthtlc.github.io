@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animated Cardioid Shape with Point Labels</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="cardioidCanvas" width="800" height="800"></canvas>
+
+<script>
+const canvas = document.getElementById('cardioidCanvas');
+const ctx = canvas.getContext('2d');
+
+// Canvas center point
+const centerX = canvas.width / 2;
+const centerY = canvas.height / 2;
+const radius = 200;  // Radius of the cardioid
+const points = [];
+const total_num_point = 120;
+const angleinc = 2 * Math.PI / total_num_point;
+
+let offset = 4;  // Start offset value
+let increasing = true;  // To track if offset is increasing or decreasing
+
+// Function to draw the cardioid curve
+function drawCardioid() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+    ctx.strokeStyle = 'red';  // Set color to red
+    ctx.lineWidth = 2;        // Set line width
+
+    ctx.beginPath();
+    points.length = 0; // Clear points array before redrawing
+
+    // Loop through angles from 0 to 2 * PI
+    for (let theta = 0; theta <= 2 * Math.PI; theta += angleinc) {
+        // Parametric equations for cardioid
+        let x = radius * (1 - Math.cos(theta)) * Math.cos(theta) + centerX;
+        let y = radius * (1 - Math.cos(theta)) * Math.sin(theta) + centerY;
+        points.push({ x: x, y: y });
+
+        // Draw the curve
+        if (theta === 0) {
+            ctx.moveTo(x, y);  // Move to starting point
+        } else {
+            ctx.lineTo(x, y);  // Draw line to next point
+        }
+    }
+
+    ctx.closePath();
+    ctx.stroke();  // Render the cardioid
+}
+
+// Function to connect points based on the current offset
+function connectPoints() {
+    ctx.lineWidth = 1;         // Set line width
+    ctx.font = "12px Arial";   // Set font for labels
+    ctx.fillStyle = 'black';   // Set color for the text
+
+    let numPoints = points.length;
+
+    for (let i = 0; i < numPoints; i++) {
+        let nextIndex = (i + offset) % numPoints;  // Wrap around with modulus
+
+        // Dynamically set the color using HSL, varying by nextIndex
+        ctx.strokeStyle = `hsl(${(nextIndex / numPoints) * 360}, 100%, 50%)`;
+
+        ctx.beginPath();
+        ctx.moveTo(points[i].x, points[i].y);  // Move to the current point
+        ctx.lineTo(points[nextIndex].x, points[nextIndex].y);  // Connect to the point at (i + offset) % numPoints
+        ctx.stroke();
+
+        // Add labels with the index at the end of the line (nextIndex)
+        ctx.fillText(nextIndex, points[nextIndex].x + 5, points[nextIndex].y - 5);
+    }
+}
+
+// Function to animate the offset change and redraw the canvas
+function animate() {
+    drawCardioid();  // Redraw the cardioid
+    connectPoints();  // Connect points based on current offset
+
+    // Update the offset value
+    if (increasing) {
+        offset++;
+        if (offset >= points.length) {
+            increasing = false;  // Start decreasing when offset reaches points.length
+        }
+    } else {
+        offset--;
+        if (offset <= 4) {
+            increasing = true;  // Start increasing when offset goes below 4
+        }
+    }
+
+    requestAnimationFrame(animate);  // Continue the animation
+}
+
+// Initialize and start the animation
+drawCardioid();  // Initial cardioid drawing
+animate();  // Start the animation loop
+</script>
+
+</body>
+</html>
+
