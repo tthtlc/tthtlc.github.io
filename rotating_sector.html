@@ -1,8 +1,24 @@
 <!DOCTYPE html>
 <html>
+<head>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        canvas {
+            background-color: white;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
 <body>
 
-<canvas id="illusionCanvas" width="800" height="800"></canvas>
+<canvas id="illusionCanvas" width="500" height="500"></canvas>
 
 <script>
 
@@ -31,6 +47,8 @@ function draw() {
 
     shift_angle += sub_shift_angle;
     ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+    centerx = canvas.width /2 ;
+    centery = canvas.height /2 ;
 
     //draw_rotating_spoke(spokeCenterX, spokeCenterY, maxRadius / 5, sub_shift_angle); // Draw each spoke
 // Example usage: Draw a sector of a circle and radially cut it into half
@@ -40,10 +58,10 @@ var mysize = Math.PI * 2/ngon;
 var mysize_diff = mysize/10;
 
 for (let angle = 0.0; angle < 2*Math.PI; angle += mysize) {
-drawSector(ctx, 200, 200, 100, angle+shift_angle, angle+mysize-mysize_diff+shift_angle, 'blue'); // Drawing and cutting a quarter circle sector
-drawSector(ctx, 200, 200, 3*100/4, angle+shift_angle, angle+mysize-mysize_diff+shift_angle, 'white'); // Drawing and cutting a quarter circle sector
-drawSector(ctx, 200, 200, 100/2, angle+shift_angle, angle+mysize-mysize_diff+shift_angle, 'blue'); // Drawing and cutting a quarter circle sector
-drawSector(ctx, 200, 200, 100/4, angle+shift_angle, angle+mysize-mysize_diff+shift_angle, 'white'); // Drawing and cutting a quarter circle sector
+drawSector(ctx, centerx, centery, 100, angle+shift_angle, angle+mysize-mysize_diff+shift_angle, 'blue'); // Drawing and cutting a quarter circle sector
+drawSector(ctx, centerx, centery, 3*100/4, angle+shift_angle, angle+mysize-mysize_diff+shift_angle, 'white'); // Drawing and cutting a quarter circle sector
+drawSector(ctx, centerx, centery, 100/2, angle+shift_angle, angle+mysize-mysize_diff+shift_angle, 'blue'); // Drawing and cutting a quarter circle sector
+drawSector(ctx, centerx, centery, 100/4, angle+shift_angle, angle+mysize-mysize_diff+shift_angle, 'white'); // Drawing and cutting a quarter circle sector
 }
 
     window.requestAnimationFrame(draw); // Continue the animation

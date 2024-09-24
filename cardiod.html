@@ -35,7 +35,7 @@ function drawCardioid() {
     // Loop through angles from 0 to 2 * PI
     for (let theta = 0; theta <= 2 * Math.PI; theta += 0.01) {
         // Parametric equations for cardioid
-        let x = radius * (1 - Math.cos(theta)) * Math.cos(theta) + centerX;
+        let x = radius * (1 - Math.cos(theta)) * Math.cos(theta) + centerX + centerX/2;
         let y = radius * (1 - Math.cos(theta)) * Math.sin(theta) + centerY;
 
         // Draw the curve
