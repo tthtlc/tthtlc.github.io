@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Concentric Polygons</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="polygonCanvas" width="500" height="500"></canvas>
+
+<script>
+    function drawPolygon(context, centerX, centerY, sides, radius) {
+        const angleStep = (2 * Math.PI) / sides;
+        context.beginPath();
+
+        for (let i = 0; i <= sides; i++) {
+            let x = centerX + radius * Math.cos(i * angleStep);
+            let y = centerY + radius * Math.sin(i * angleStep);
+            if (i === 0) {
+                context.moveTo(x, y);
+            } else {
+                context.lineTo(x, y);
+            }
+        }
+
+        context.closePath();
+        context.stroke();
+    }
+
+    window.onload = function() {
+        const canvas = document.getElementById('polygonCanvas');
+        const context = canvas.getContext('2d');
+
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+
+        const sides = 5; // For a pentagon, change this to other values for different polygons
+        const radius = 100; // For a pentagon, change this to other values for different polygons
+        drawPolygon(context, centerX, centerY, sides, radius);
+    }
+</script>
+
+</body>
+</html>
+
