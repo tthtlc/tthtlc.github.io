@@ -68,9 +68,9 @@
 
     // Function to draw a pentagon using turtle graphics
     function drawPentagon(turtle, sideLength, numTimes) {
-        const numSides = 5;
+        const numSides = 3;
         const angle = 360 / numSides; // Angle to turn at each vertex
-        const offset = 0.98; // Adjust this value to change the pattern
+        const offset = 0.9; // Adjust this value to change the pattern
 
         for (let i = 0; i < numTimes * numSides; i++) {
             turtle.forward(sideLength);
@@ -89,7 +89,7 @@
         const turtle = new Turtle(context, centerX-sidelength/2, centerY-sidelength/2);
 
         // Draw a pentagon with side length 100 pixels, repeated 20 times
-        drawPentagon(turtle, sidelength, 5);
+        drawPentagon(turtle, sidelength, 40);
     }
 </script>
 
