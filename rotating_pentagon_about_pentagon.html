@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pentagon with Touching Pentagons</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="pentagonCanvas" width="500" height="500"></canvas>
+
+<script>
+    const canvas = document.getElementById('pentagonCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Function to draw a pentagon given a center point, side length, and rotation angle
+    function drawPentagon(centerX, centerY, sideLength, rotationAngle = 0) {
+        const angleIncrement = (2 * Math.PI) / 5; // 360/5 in radians
+        let points = [];
+        
+        ctx.beginPath();
+        for (let i = 0; i < 5; i++) {
+            const angle = rotationAngle + i * angleIncrement;
+            const x = centerX + sideLength * Math.cos(angle);
+            const y = centerY + sideLength * Math.sin(angle);
+            points.push({x, y});
+            
+            if (i === 0) {
+                ctx.moveTo(x, y);
+            } else {
+                ctx.lineTo(x, y);
+            }
+        }
+        ctx.closePath();
+        ctx.stroke();
+        return points; // Return the vertices of the pentagon
+    }
+
+    // Function to draw smaller pentagons on each edge of the main pentagon
+    function drawTouchingPentagons(mainPentagonPoints, sideLength) {
+        for (let i = 0; i < mainPentagonPoints.length; i++) {
+            const p1 = mainPentagonPoints[i];
+            const p2 = mainPentagonPoints[(i + 1) % mainPentagonPoints.length];
+
+            // Calculate the midpoint of the edge
+            const midX = (p1.x + p2.x) / 2;
+            const midY = (p1.y + p2.y) / 2;
+
+            // Calculate the angle of the edge
+            const edgeAngle = Math.atan2(p2.y - p1.y, p2.x - p1.x);
+
+            // Draw a new pentagon on the edge, with the same side length
+            drawPentagon(midX, midY, sideLength, edgeAngle + Math.PI / 5); // Rotate by 36 degrees to align the pentagon properly
+        }
+    }
+
+    // Initial pentagon configuration
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    const sideLength = 100;
+
+    // Draw the main pentagon
+    const mainPentagonPoints = drawPentagon(centerX, centerY, sideLength);
+
+    // Draw the smaller pentagons touching each edge of the main pentagon
+    drawTouchingPentagons(mainPentagonPoints, sideLength);
+
+</script>
+
+</body>
+</html>
+
