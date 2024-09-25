@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Turtle Graphics Pentagon</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="turtleCanvas" width="500" height="500"></canvas>
+
+<script>
+    // Turtle object to simulate turtle graphics
+    class Turtle {
+        constructor(context, x, y) {
+            this.context = context;
+            this.x = x; // Current x position
+            this.y = y; // Current y position
+            this.angle = 0; // Angle the turtle is facing (0 degrees is right)
+            this.penDown = true; // Whether the pen is down (drawing)
+        }
+
+        // Move forward by a certain distance
+        forward(distance) {
+            const radians = this.angle * (Math.PI / 180);
+            const newX = this.x + distance * Math.cos(radians);
+            const newY = this.y + distance * Math.sin(radians);
+
+            if (this.penDown) {
+                this.context.beginPath();
+                this.context.moveTo(this.x, this.y);
+                this.context.lineTo(newX, newY);
+                this.context.stroke();
+            }
+
+            // Update turtle's position
+            this.x = newX;
+            this.y = newY;
+        }
+
+        // Turn the turtle by a certain angle
+        right(degrees) {
+            this.angle = (this.angle + degrees) % 360;
+        }
+
+        // Pen up (stop drawing)
+        penUp() {
+            this.penDown = false;
+        }
+
+        // Pen down (start drawing)
+        penDown() {
+            this.penDown = true;
+        }
+    }
+
+    // Function to draw a pentagon using turtle graphics
+    function drawPentagon(turtle, sideLength) {
+        const numSides = 5;
+        const angle = 360 / numSides; // Angle to turn at each vertex
+
+        for (let i = 0; i < numSides; i++) {
+            turtle.forward(sideLength);
+            turtle.right(angle);
+        }
+    }
+
+    window.onload = function() {
+        const canvas = document.getElementById('turtleCanvas');
+        const context = canvas.getContext('2d');
+
+        // Create a turtle at the center of the canvas
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        const turtle = new Turtle(context, centerX, centerY);
+
+        // Draw a pentagon with side length 100 pixels
+        drawPentagon(turtle, 100);
+    }
+</script>
+
+</body>
+</html>
+

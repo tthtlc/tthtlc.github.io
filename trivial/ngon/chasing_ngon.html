@@ -1,0 +1,120 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Turtle Graphics Ngon with Gradient</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="turtleCanvas" width="500" height="500"></canvas>
+
+<script>
+    // Turtle object to simulate turtle graphics
+    class Turtle {
+        constructor(context, x, y) {
+            this.context = context;
+            this.x = x ; // Current x position
+            this.y = y ; // Current y position
+            this.angle = 0; // Angle the turtle is facing (0 degrees is right)
+            this.penDown = true; // Whether the pen is down (drawing)
+            this.lineCount = 0; // Track number of lines drawn
+        }
+
+        // Move forward by a certain distance
+        forward(distance) {
+            const radians = this.angle * (Math.PI / 180);
+            const newX = this.x + distance * Math.cos(radians);
+            const newY = this.y + distance * Math.sin(radians);
+
+            if (this.penDown) {
+                this.context.beginPath();
+                this.context.moveTo(this.x, this.y);
+                this.context.lineTo(newX, newY);
+
+                // Update color based on line count to create a gradient
+                this.context.strokeStyle = this.getGradientColor(this.lineCount);
+                this.context.stroke();
+                this.lineCount++;
+            }
+
+            // Update turtle's position
+            this.x = newX;
+            this.y = newY;
+        }
+
+        // Turn the turtle by a certain angle
+        right(degrees) {
+            this.angle = (this.angle + degrees) % 360;
+        }
+
+        // Pen up (stop drawing)
+        penUp() {
+            this.penDown = false;
+        }
+
+        // Pen down (start drawing)
+        penDown() {
+            this.penDown = true;
+        }
+
+        // Get a gradient color based on the current line count
+        getGradientColor(lineIndex) {
+            const startColor = [255, 0, 0]; // Red
+            const endColor = [0, 0, 255];   // Blue
+            const totalLines = 60; // Total number of lines to draw gradient
+
+            const ratio = Math.min(lineIndex / totalLines, 1); // Ensure the ratio is between 0 and 1
+
+            const r = Math.floor(startColor[0] * (1 - ratio) + endColor[0] * ratio);
+            const g = Math.floor(startColor[1] * (1 - ratio) + endColor[1] * ratio);
+            const b = Math.floor(startColor[2] * (1 - ratio) + endColor[2] * ratio);
+
+            return `rgb(${r},${g},${b})`;
+        }
+    }
+
+    // Function to draw a pentagon using turtle graphics
+    function drawNgon(turtle, sideLength, numTimes, numSides) {
+        const angle = 360 / numSides; // Angle to turn at each vertex
+        const offset = 30; // Adjust this value to change the pattern
+
+        for (let i = 0; i < numTimes * numSides; i++) {
+            turtle.forward(sideLength);
+            turtle.right(angle + offset);
+        }
+    }
+
+    window.onload = function() {
+        const canvas = document.getElementById('turtleCanvas');
+        const context = canvas.getContext('2d');
+
+        // Create a turtle at the center of the canvas
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        const turtle = new Turtle(context, centerX, centerY);
+
+        // Draw a pentagon with side length 100 pixels, repeated 20 times
+	for (i=3; i< 80; i++) {
+		context.clearRect(0, 0, canvas.width, canvas.height);
+        	drawNgon(turtle, 100, 60, i);
+	}
+    }
+</script>
+
+</body>
+</html>
+
