@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Rotating Polygon Drawer</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        canvas {
+            border: 1px solid black;
+        }
+        h2 {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Random Rotating Polygon Drawer</h2>
+    <canvas id="polygonCanvas" width="500" height="500"></canvas>
+
+    <script>
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function drawPolygon(ctx, centerX, centerY, sides, radius, rotation) {
+            ctx.beginPath();
+            const angleStep = (2 * Math.PI) / sides;
+            for (let i = 0; i <= sides; i++) {
+                const angle = i * 3 * angleStep + rotation;
+                const x = centerX + radius * Math.cos(angle);
+                const y = centerY + radius * Math.sin(angle);
+                if (i === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            }
+            ctx.closePath();
+            ctx.stroke();
+        }
+
+        function drawPolygons() {
+            const canvas = document.getElementById('polygonCanvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = 150;
+
+            // Randomly generate parameters
+            const sides = getRandomInt(3, 10); // Random sides between 3 and 10
+            const rotationAngle = getRandomInt(0, 360) * (Math.PI / 180); // Random angle between 15 and 360 degrees
+            const repeat = getRandomInt(5, 20); // Random number of drawings between 5 and 20
+
+            for (let i = 0; i < repeat; i++) {
+                const rotation = i * rotationAngle;
+                drawPolygon(ctx, centerX, centerY, sides, radius, rotation);
+            }
+        }
+
+        function startDrawing() {
+            drawPolygons();
+            setInterval(drawPolygons, 1000); // Draw new polygons every second
+        }
+
+        window.onload = startDrawing;
+    </script>
+</body>
+</html>
+
