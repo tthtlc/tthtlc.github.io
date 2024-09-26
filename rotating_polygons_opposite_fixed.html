@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Rotating Polygon Drawer</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .canvas-container {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <h2>Random Rotating Polygon Drawer</h2>
+
+    <script>
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function drawPolygon(ctx, centerX, centerY, sides, radius, rotation) {
+            ctx.beginPath();
+            const angleStep = (Math.PI - (2 * Math.PI) / sides);
+            for (let i = 0; i <= sides; i++) {
+                const angle = i * angleStep + rotation;
+                const x = centerX + radius * Math.cos(angle);
+                const y = centerY + radius * Math.sin(angle);
+                if (i === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            }
+            ctx.closePath();
+            ctx.stroke();
+        }
+
+        function drawPolygons(canvas, sides, rotationAngle, repeat) {
+            const ctx = canvas.getContext('2d');
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = 150;
+
+            for (let i = 0; i < repeat; i++) {
+                const rotation = i * rotationAngle;
+                drawPolygon(ctx, centerX, centerY, sides, radius, rotation);
+            }
+        }
+
+        function createPolygonCanvas() {
+            const canvasContainer = document.createElement('div');
+            canvasContainer.className = 'canvas-container';
+
+            const canvas = document.createElement('canvas');
+            canvas.width = 500;
+            canvas.height = 500;
+            canvasContainer.appendChild(canvas);
+
+            // Randomly generate parameters
+            const sides = 10;
+            const repeat = 13;
+
+            // Draw the polygons
+            drawPolygons(canvas, sides, rotationAngle, repeat);
+
+            // Add a label with the parameters below the canvas
+            const label = document.createElement('p');
+            label.textContent = `Sides: ${sides}, Rotation Angle: ${(rotationAngle * 180 / Math.PI).toFixed(2)}°, Repeat: ${repeat}`;
+            canvasContainer.appendChild(label);
+
+            document.body.appendChild(canvasContainer);
+        }
+
+        function generateCanvases() {
+            const steps = 30;
+            const rotationAngleStart = 150.90;
+            const rotationAngleEnd = 151.90;
+            const rotationAngleStep = ((rotationAngleEnd - rotationAngleStart)/steps / 180 )* Math.PI;
+	    rotationAngle = (rotationAngleStart / 180 )* Math.PI;
+            for (let i = 0; i < steps; i++) {
+
+                createPolygonCanvas( rotationAngle );
+		rotationAngle += rotationAngleStep;
+
+            }
+        }
+
+        window.onload = generateCanvases;
+    </script>
+</body>
+</html>
+
