@@ -22,7 +22,8 @@
 
 <canvas id="illusionCanvas" width="500" height="500"></canvas>
 
-<script>
+<script> 
+document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
 // Function to draw a sector of a circle and radially cut it into half
 function drawSector(ctx, x, y, radius, startAngle, endAngle, fillColor) {
     ctx.beginPath(); // Start a new path

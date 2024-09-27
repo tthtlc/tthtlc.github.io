@@ -1,3 +1,4 @@
+document.addEventListener(contextmenu, function(event) { event.preventDefault(); });
 
 // Function to draw a sector of a circle and radially cut it into half
 function drawSectorAndCut(ctx, x, y, radius, startAngle, endAngle, fillColor) {

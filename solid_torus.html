@@ -11,7 +11,8 @@
 </head>
 <body>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script>
+    <script> 
+document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
         let scene, camera, renderer;
         let xrot = 0.2, yrot = 0.0, zrot = 0.0;
         let mouseDown = false;

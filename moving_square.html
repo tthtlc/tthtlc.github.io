@@ -22,7 +22,8 @@
 
 <canvas id="myCanvas" width="480" height="320"></canvas>
 
-<script>
+<script> 
+document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
     var canvas = document.getElementById('myCanvas');
     var ctx = canvas.getContext('2d');
 

@@ -1,3 +1,4 @@
+document.addEventListener(contextmenu, function(event) { event.preventDefault(); });
 const canvas = document.getElementById('animationCanvas');
 const ctx = canvas.getContext('2d');
 const numDots = 100; // Number of points along each triangle

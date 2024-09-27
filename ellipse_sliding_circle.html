@@ -21,7 +21,8 @@
 </head>
 <body>
     <canvas id="tangentialEllipseCanvas" width="500" height="500"></canvas>
-    <script>
+    <script> 
+document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
         const canvas = document.getElementById('tangentialEllipseCanvas');
         const ctx = canvas.getContext('2d');
         const centerX = canvas.width / 2;

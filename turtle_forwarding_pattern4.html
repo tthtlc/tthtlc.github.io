@@ -21,7 +21,8 @@
 
 <canvas id="turtleCanvas" width="500" height="500"></canvas>
 
-<script>
+<script> 
+document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
     // Turtle object to simulate turtle graphics
     class Turtle {
         constructor(context, x, y) {

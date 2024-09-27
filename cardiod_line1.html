@@ -21,7 +21,8 @@
 
 <canvas id="cardioidCanvas" width="800" height="800"></canvas>
 
-<script>
+<script> 
+document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
 const canvas = document.getElementById('cardioidCanvas');
 const ctx = canvas.getContext('2d');
 

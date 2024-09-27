@@ -13,7 +13,8 @@
     <canvas id="glCanvas" width="6oo" height="600"></canvas>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix-min.js"></script>
-    <script>
+    <script> 
+document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
         let canvas = document.getElementById('glCanvas');
         let gl = canvas.getContext('webgl');
 

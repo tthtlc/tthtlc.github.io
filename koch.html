@@ -16,7 +16,8 @@
 
     <canvas id="fractalCanvas" width="500" height="500"></canvas>
 
-    <script>
+    <script> 
+document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
         function drawFractal() {
             const iterations = 6;
             const canvas = document.getElementById('fractalCanvas');

@@ -21,7 +21,8 @@
 </head>
 <body>
     <canvas id="enneperCanvas" width="600" height="600"></canvas>
-    <script>
+    <script> 
+document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
         // Get the canvas element and context
         const canvas = document.getElementById('enneperCanvas');
         const ctx = canvas.getContext('2d');

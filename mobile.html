@@ -51,7 +51,8 @@
 
     <div class="iframe-container" id="iframeContainer"></div>
 
-    <script>
+    <script> 
+document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
         // Sample list of HTML file names
         const fileList = [
 'cardiod.html', 

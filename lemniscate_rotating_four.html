@@ -30,7 +30,8 @@
     <div class="canvas-container"><canvas id="figure8Canvas3" width="250" height="250"></canvas></div>
     <div class="canvas-container"><canvas id="figure8Canvas4" width="250" height="250"></canvas></div>
 
-    <script>
+    <script> 
+document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
 	
 
         function initializeCanvas(canvasId, direction_rotation) {

@@ -1,3 +1,4 @@
+document.addEventListener(contextmenu, function(event) { event.preventDefault(); });
 
 // Set the dimensions and margins of the graph
 const margin = {top: 20, right: 30, bottom: 40, left: 50},

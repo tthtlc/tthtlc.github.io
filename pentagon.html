@@ -21,7 +21,8 @@
 
 <canvas id="polygonCanvas" width="500" height="500"></canvas>
 
-<script>
+<script> 
+document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
     function drawPolygon(context, centerX, centerY, sides, radius) {
         const angleStep = (2 * Math.PI) / sides;
         context.beginPath();

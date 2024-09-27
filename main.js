@@ -1,3 +1,4 @@
+document.addEventListener(contextmenu, function(event) { event.preventDefault(); });
 // Get canvas element and create a WebGL rendering context
 const canvas = document.getElementById("glCanvas");
 const gl = canvas.getContext("webgl");

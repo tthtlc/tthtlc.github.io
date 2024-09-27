@@ -24,7 +24,8 @@
 <body>
     <h2>Random Rotating Polygon Drawer</h2>
 
-    <script>
+    <script> 
+document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
         function getRandomInt(min, max) {
             return Math.floor(Math.random() * (max - min + 1)) + min;
         }

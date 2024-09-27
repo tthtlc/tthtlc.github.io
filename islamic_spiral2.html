@@ -22,7 +22,8 @@
 <body>
     <canvas id="spiralCanvas" width="500" height="500"></canvas>
 
-    <script>
+    <script> 
+document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
         const canvas = document.getElementById("spiralCanvas");
         const ctx = canvas.getContext("2d");
         canvas.width = window.innerWidth;
@@ -48,6 +49,17 @@
                     let angle = (Math.PI * 2 / steps) * step + (i * Math.PI / mylineCountDense) + angleOffset;
                     let x = centerX + radius * Math.cos(angle) * (step / steps);
                     let y = centerY + radius * Math.sin(angle) * (step / steps);
+
+                    if (step === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                }
+                for (let step = 0; step < steps; step++) {
+                    let angle = (Math.PI * 2 / steps) * step + (i * Math.PI / mylineCountDense) + angleOffset;
+                    let x = centerX + radius * Math.cos(angle);
+                    let y = centerY + radius * Math.sin(angle);
 
                     if (step === 0) {
                         ctx.moveTo(x, y);

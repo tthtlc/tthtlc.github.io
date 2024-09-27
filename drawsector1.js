@@ -1,3 +1,4 @@
+document.addEventListener(contextmenu, function(event) { event.preventDefault(); });
 
 // Function to draw a sector of a circle and bisect it perpendicularly to the radial direction
 function drawSectorAndBisectPerpendicularly(ctx, x, y, radius, startAngle, endAngle, fillColor) {
