@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Islamic Spiral Design</title>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+
+        canvas {
+            border: 2px solid black;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="spiralCanvas" width="500" height="500"></canvas>
+
+    <script>
+        const canvas = document.getElementById("spiralCanvas");
+        const ctx = canvas.getContext("2d");
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        function drawIslamicSpiral() {
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = Math.min(canvas.width, canvas.height) * 0.45;
+            const steps = 120;
+            const lineCount = 50;
+
+            // Define colors commonly found in Islamic art
+            const colors = ["#1f3b4d", "#c49a6c", "#ac785a", "#b28774", "#a8a3b3"];
+
+            for (let i = 0; i < lineCount; i++) {
+                ctx.beginPath();
+                ctx.strokeStyle = colors[i % colors.length];
+                ctx.lineWidth = 2;
+
+                for (let step = 0; step < steps; step++) {
+                    let angle = (Math.PI * 2 / steps) * step + (i * Math.PI / lineCount);
+                    let x = centerX + radius * Math.cos(angle) * (step / steps);
+                    let y = centerY + radius * Math.sin(angle) * (step / steps);
+
+                    if (step === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                }
+                ctx.stroke();
+            }
+        }
+
+        drawIslamicSpiral();
+    </script>
+</body>
+</html>
+
