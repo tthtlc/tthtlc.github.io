@@ -1,4 +1,4 @@
-document.addEventListener(contextmenu, function(event) { event.preventDefault(); });
+document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
 // Initialize WebGL context
 const canvas = document.getElementById('webgl-canvas');
 const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');

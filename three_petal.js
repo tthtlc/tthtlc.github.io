@@ -1,4 +1,3 @@
-document.addEventListener(contextmenu, function(event) { event.preventDefault(); });
 
 const canvas = document.getElementById('animationCanvas');
 const ctx = canvas.getContext('2d');

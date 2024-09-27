@@ -1,4 +1,4 @@
-document.addEventListener(contextmenu, function(event) { event.preventDefault(); });
+document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
 
 const canvas = document.getElementById('waveCanvas');
 const ctx = canvas.getContext('2d');

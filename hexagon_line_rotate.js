@@ -1,4 +1,4 @@
-document.addEventListener(contextmenu, function(event) { event.preventDefault(); });
+document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
 const canvas = document.getElementById('animationCanvas');
 const ctx = canvas.getContext('2d');
 const nPoints = 60; // Number of points to place along the hexagon
