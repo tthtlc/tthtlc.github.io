@@ -30,10 +30,10 @@
 
     // Variables for ellipse properties
     let angle = 0; // Angle for rotation
-    const radiusx_incr = (Math.random() * 20 + 10);
-    const radiusy_incr = (Math.random() * 10 + 1);
-    const radiusX = Math.floor(Math.random() * 180 + 10);
-    const radiusY = Math.floor(Math.random() * 80 + 10);
+    let radiusx_incr = (Math.random() * 20 + 10);
+    let radiusy_incr = (Math.random() * 10 + 1);
+    let radiusX = Math.floor(Math.random() * 180 + 10);
+    let radiusY = Math.floor(Math.random() * 80 + 10);
 
     // New color palette transitioning from light yellow to dark brown-yellow
     const colors = [
@@ -49,6 +49,7 @@
 
     // Timer delay in milliseconds (0.5 seconds)
     const delay = 200;
+    const delay1 = 3000;
 
     // Calculate vertices of the octagon
     const octagonVertices = [];
@@ -58,8 +59,15 @@
         octagonVertices.push({x: vertexX, y: vertexY});
     }
 
+    function generateNewParam() {
+    radiusx_incr = (Math.random() * 20 + 10);
+    radiusy_incr = (Math.random() * 10 + 1);
+    radiusX = Math.floor(Math.random() * 180 + 10);
+    radiusY = Math.floor(Math.random() * 80 + 10);
+    }
     // Function to draw the octagon
     function drawOctagon() {
+    	ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
         ctx.beginPath();
         ctx.moveTo(octagonVertices[0].x, octagonVertices[0].y);
         for (let i = 1; i < octagonVertices.length; i++) {
@@ -114,10 +122,12 @@
     // Start the drawing process
     function startDrawing() {
         drawOctagon();
+    	generateNewParam();
         for (const vertex of octagonVertices) {
             drawRotatingEllipse(vertex, direction);
 	    direction = -1 * direction;
         }
+        setTimeout(startDrawing, delay1);
     }
 
     // Start the animation
