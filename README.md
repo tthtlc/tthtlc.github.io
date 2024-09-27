@@ -80,6 +80,8 @@
 + icosahedron_centroid.html
 + icosahedron_labelled.html
 + icosahedron_surface.html
++ islamic_spiral.html
++ islamic_spiral2.html
 + klein2_animation.html
 + klein2_animation2.html
 + klein2_animation3.html
@@ -123,6 +125,12 @@
 + rotated_triangle1.html
 + rotating_pentagon_about_pentagon.html
 + rotating_polygons.html
++ rotating_polygons_duo.html
++ rotating_polygons_opposite.html
++ rotating_polygons_opposite_30canvas.html
++ rotating_polygons_opposite_fixed.html
++ rotating_polygons_quarter.html
++ rotating_polygons_tri.html
 + rotating_sector.html
 + rotating_spiral.html
 + rotating_spoke.html
