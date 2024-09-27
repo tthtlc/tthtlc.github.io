@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Octagon with Rotating Ellipses</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        canvas {
+            display: block;
+            background-color: #000000; /* Dark black background */
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="ellipseCanvas"></canvas>
+
+<script>
+    const canvas = document.getElementById('ellipseCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Set canvas size to full window
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    // Variables for ellipse properties
+    let angle = 0; // Angle for rotation
+    const radiusx_incr = (Math.random() * 20 + 10);
+    const radiusy_incr = (Math.random() * 10 + 1);
+    const radiusX = Math.floor(Math.random() * 180 + 10);
+    const radiusY = Math.floor(Math.random() * 80 + 10);
+
+    // New color palette transitioning from light yellow to dark brown-yellow
+    const colors = [
+        '#FFFFE0', '#FFFACD', '#FAFAD2', '#FFE4B5', '#FFD700', 
+        '#FFA500', '#FF8C00', '#DAA520', '#B8860B', '#A0522D'
+    ];
+
+    // Octagon settings
+    const octagonRadius = 200;
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    let direction = 1;
+
+    // Timer delay in milliseconds (0.5 seconds)
+    const delay = 200;
+
+    // Calculate vertices of the octagon
+    const octagonVertices = [];
+    for (let i = 0; i < 6; i++) {
+        let vertexX = centerX + octagonRadius * Math.cos((i * Math.PI) / 3);
+        let vertexY = centerY + octagonRadius * Math.sin((i * Math.PI) / 3);
+        octagonVertices.push({x: vertexX, y: vertexY});
+    }
+
+    // Function to draw the octagon
+    function drawOctagon() {
+        ctx.beginPath();
+        ctx.moveTo(octagonVertices[0].x, octagonVertices[0].y);
+        for (let i = 1; i < octagonVertices.length; i++) {
+            ctx.lineTo(octagonVertices[i].x, octagonVertices[i].y);
+        }
+        ctx.closePath();
+        ctx.strokeStyle = '#FFFFFF'; // White color for octagon
+        ctx.lineWidth = 2;
+        ctx.stroke();
+    }
+
+    function drawRotatingEllipse(vertex, direction) {
+
+    	let colorIndex = 0;
+	let radiusX1=radiusX;
+	let radiusY1=radiusY;
+	let angle=0;
+
+        function animateEllipse() {
+            // Stop after one full rotation (2 * Math.PI)
+            if ((angle >= Math.PI/3) || (radiusY1 <= 0)) return;
+
+            // Select a color from the new palette
+            const color = colors[colorIndex % colors.length];
+
+            ctx.save(); // Save the current state
+            ctx.translate(vertex.x, vertex.y); // Move the origin to the vertex
+            ctx.rotate(angle); // Rotate the canvas by the current angle
+
+            // Draw the ellipse with the selected color
+            ctx.beginPath();
+            ctx.ellipse(0, 0, radiusX1, radiusY1, 0, 0, Math.PI * 2);
+            ctx.strokeStyle = color; // Use the gradient color
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.restore(); // Restore the original state
+
+            // Increment the angle and color index for the next frame
+            angle += 0.1*direction;
+            colorIndex++;
+
+            radiusX1 += radiusx_incr;
+            radiusY1 -= radiusy_incr;
+
+            // Schedule the next frame after the delay
+            setTimeout(animateEllipse, delay);
+        }
+
+        animateEllipse();
+    }
+
+    // Start the drawing process
+    function startDrawing() {
+        drawOctagon();
+        for (const vertex of octagonVertices) {
+            drawRotatingEllipse(vertex, direction);
+	    direction = -1 * direction;
+        }
+    }
+
+    // Start the animation
+    startDrawing();
+
+</script>
+
+</body>
+</html>
+
