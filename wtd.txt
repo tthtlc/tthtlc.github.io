@@ -1,0 +1,680 @@
+
+cone 
+3d volume and motion
+cylinder
+cube
+sphere
+stepped cone
+
+Not added: googletag + contextmenu
+	rotating_cardiod.html
+	rotating_cardiod2.html
+	rotating_cardiod_line4.html
+	rotating_chasing_3gon.html
+	rotating_circle.html
+	rotating_circle1.html
+
+
+
+
+✓ Polynomial Factoring Calculator
+
+✓ Factor Trinomial Calculator
+
+✓ Expand Expression
+
+✓ Solve For x
+
+✓ Rational Functions
+
+✓ Horizontal Line Test
+
+✓ One-To-One Functions
+
+✓ Inverse Function Graph
+
+✓ Inverse Function Calculator
+
+✓ Inequality Grapher
+
+✓ Polynomial Inequalities
+
+✓ Quadratic Inequalities
+
+✓ Linear Inequalities
+
+✓ Inequality Calculator
+
+✓ Equation Simplifier
+
+✓ Rational Equation Calculator
+
+✓ Rational Equation Calculator
+
+✓ Radical Equation Calculator
+
+✓ Trigonometric Equation Calculator
+
+✓ Logarithmic Equation Calculator
+
+✓ Exponential Equation Calculator
+
+✓ Algebra Equations
+
+✓ Polynomial Calculator
+
+✓ Solving Linear Equations Calculator
+
+✓ Equation Calculator
+
+✓ FOIL Calculator
+
+✓ Difference Quotient Calculator
+
+✓ Graph Calculator
+
+✓ Radical Calculator
+
+✓ Two Sample z-test calculator
+
+✓ Two Sample t test calculator
+
+✓ Gradient Calculator
+
+✓ Inverse Trig Derivatives
+
+✓ Chain Rule Calculator
+
+✓ Trig Derivatives
+
+✓ Differential Calculator
+
+✓ Second Derivative Calculator
+
+✓ Quotient Rule
+
+✓ Product Rule
+
+✓ Tangent Line Calculator
+
+✓ Linear Approximation Calculator
+
+✓ Implicit differentiation calculator
+
+✓ Partial Derivative Calculator
+
+✓ Derivative Rules
+
+✓ Derivative Calculator
+
+✓ Polynomial Graph
+
+✓ Synthetic Division Calculator
+
+✓ Synthetic Substitution
+
+✓ Polynomial Long Division
+
+✓ Polynomial Division
+
+✓ Descartes Rule of Signs
+
+✓ Polynomial Equations
+
+✓ Polynomial Zeros
+
+✓ Factoring Calculator
+
+✓ Polynomial Functions
+
+✓ Factor Theorem
+
+✓ Remainder Theorem
+
+✓ Rational Zero Theorem Calculator
+
+✓ Composite Function Calculator
+
+✓ Linear Equation Grapher
+
+✓ Linear Equation
+
+✓ Linear Graph
+
+✓ Linear Function
+
+✓ Cos Graph
+
+✓ Sin Calculator
+
+✓ Trig Calculator
+
+✓ Round Calculator
+
+✓ Floor Calculator
+
+✓ Ceil
+
+✓ Formula of Slope
+
+✓ Function Calculator
+
+✓ Function Graph
+
+✓ Order of Operations Calculator
+
+✓ PEMDAS Calculator
+
+✓ Quadratic Function
+
+✓ Polynomial Calculation
+
+✓ Simplify Calculator
+
+✓ Quadratic Graph
+
+✓ Quadratic Factorization
+
+✓ Degree of Polynomial
+
+✓ Circle Equation
+
+✓ Factoring Quadratic Equations
+
+✓ Calculate Quadratic Equation
+
+✓ Vertex Formula
+
+✓ Axis of Symmetry
+
+✓ Vertex Form Calculator
+
+✓ Discriminant Formula Calculator
+
+✓ Area of a Circle from diameter
+
+✓ Area to Diameter
+
+✓ General Form of a Circle
+
+✓ Standard Form of a Circle
+
+✓ Equation of a Circle Calculator
+
+✓ Circumference to Diameter Calculator
+
+✓ Radius of a Circle Calculator
+
+✓ Diameter to Circumference Calculator
+
+✓ Circumference Formula Calculator
+
+✓ Area of a Sector Formula
+
+✓ Completing the Square
+
+✓ Exponent Calculator
+
+✓ Sum Calculator
+
+✓ Square Root Calculator
+
+✓ Simplify Expressions
+
+✓ Composite and Prime Numbers
+
+✓ Prime Factorization
+
+✓ Multiples of Fractions
+
+✓ Mixed Number Calculator
+
+✓ Simplifier for Fractions
+
+✓ Fraction Calculator
+
+✓ Area of an Ellipse
+
+✓ Area of a Circle
+
+✓ Area of a Triangle
+
+✓ Area of a Rhombus
+
+✓ Area of a Rectangle
+
+✓ Area of a Square
+
+✓ Ounces to Liters
+
+✓ Liters to Ounces
+
+✓ Cups to Quarts
+
+✓ Quarts to Gallons
+
+✓ Ounces to Cups
+
+✓ Cups to Ounces Calculator
+
+✓ Feet and Inches to Centimeter Calculator
+
+✓ Centimeters to Feet and Inches Calculator
+
+✓ Feet and Inches to inches calculator
+
+✓ Feet and Inches to Meters Conversion Calculator
+
+✓ Meters to Inches Calculator
+
+✓ Meters to Feet Conversion Calculator
+
+✓ Centimeters to Feet Calculator
+
+✓ Centimeters to Inches Calculator
+
+✓ Inverse of a Linear Function Calculator
+
+✓ Intersection of two lines grapher
+
+✓ Solve For x Calculator
+
+✓ Parallel Lines Calculator
+
+✓ Solve for y
+
+✓ System of Equations Graphing Method Calculator
+
+✓ System of Equations: Elimination Method Calculator
+
+✓ System of Equations Substitution Method Calculator
+
+✓ Two Lines Grapher
+
+✓ System of Equations Calculator
+
+✓ Matrix Form to System of Equations Calculator
+
+✓ System of Equation Calculator Using Matrices
+
+✓ System of Equations to Matrix form Calculator
+
+✓ Cramer's Rule Calculator
+
+✓ Point Slope Form Calculator
+
+✓ Slope Intercept Form Calculator
+
+✓ Line in Standard Form Calculator
+
+✓ Graph of a Line Calculator
+
+✓ Perpendicular slope calculator
+
+✓ Perpendicular Line Calculator
+
+✓ Slope Calculator
+
+✓ X-Intercept Calculator
+
+✓ Y-intercept calculator
+
+✓ Invertible Matrix Calculator
+
+✓ Determine If a Matrix is Invertible Calculator
+
+✓ RREF Calculator
+
+✓ Row Echelon Form Calculator
+
+✓ Determinant of Matrix Calculator
+
+✓ Cofactor Matrix Calculator
+
+✓ Adjoint Matrix Calculator
+
+✓ Symmetric Matrix Calculator
+
+✓ Matrix Transpose Calculator
+
+✓ Elementary Row Matrix Calculator
+
+✓ Pythagorean Theorem Calculator
+
+✓ Matrix Multiplication Calculator
+
+✓ Subtract Matrices Calculator
+
+✓ Sum of Matrices Calculator
+
+✓ Identity Matrix Calculator
+
+✓ Seconds to Hours Calculator
+
+✓ Minutes to Hours Calculator
+
+✓ Hours to Minutes Calculator
+
+✓ Hours to Seconds Calculator
+
+✓ Percent to Fraction Calculator
+
+✓ Percentage to Decimal Calculator
+
+✓ Fraction to Decimal Calculator
+
+✓ Decimal to Percent Calculator
+
+✓ Decimal to Fraction Calculator
+
+✓ Correlation Coefficient Confidence Interval with Given Correlation
+
+✓ Correlation Coefficient Confidence Interval Calculator
+
+✓ C-Chart Maker
+
+✓ P-chart Maker
+
+✓ R-chart Maker
+
+✓ Xbar Chart Maker
+
+✓ Radar Chart Maker
+
+✓ Bar Chart Maker with Error Bars
+
+✓ Bubble Chart Generator
+
+✓ Triangle Calculator with two angles and one opposite side
+
+✓ Triangle Calculator for Two Sides and the Angle between them
+
+✓ Triangle Calculator with three sides known
+
+✓ Chauvenet's Criterion calculator
+
+✓ Power Regression Calculator
+
+✓ Exponential Regression Calculator
+
+✓ Random Sample Generator
+
+✓ Non Repeated Random Numbers Generator
+
+✓ Random Number Generator
+
+✓ Time to Double Your Money Calculator
+
+✓ Donut Graph Maker
+
+✓ Polar Plot Maker
+
+✓ Word cloud generator
+
+✓ Slope from correlation Calculator
+
+✓ Binomial Expansion Calculator
+
+✓ Negative Predictive Value Calculator
+
+✓ Positive Predictive Value Calculator
+
+✓ Test Specificity Calculator
+
+✓ Test Sensitivity Calculator
+
+✓ Logarithmic Function Calculator
+
+✓ Degrees to Radians
+
+✓ CAPM Calculator
+
+✓ Beta Calculator
+
+✓ Covariance Calculator
+
+✓ Deviation Score Calculator
+
+✓ Standard Deviation Percentile Calculator
+
+✓ Degrees of Freedom Calculator Paired Samples
+
+✓ Degrees of Freedom Calculator Two Samples
+
+✓ Degrees of Freedom Calculator One Sample
+
+✓ Interquartile Range Calculator
+
+✓ Decile Calculator
+
+✓ Quartile Calculator
+
+✓ Fraction to Percentage Calculator
+
+✓ Percentage Calculator
+
+✓ Pooled Proportion Calculator
+
+✓ Weighted Average Calculator
+
+✓ Ogive Graph Maker
+
+✓ Frequency Polygon Graph Maker
+
+✓ Sample Variance of Grouped Data Calculator
+
+✓ Sample Mean of Grouped Data Calculator
+
+✓ Effect Size Calculator
+
+✓ Coefficient of Determination Calculator
+
+✓ Residual Plot Grapher
+
+✓ Regression Predicted Values Calculator
+
+✓ Regression Residuals Calculator
+
+✓ Pie Graph Maker for Sample Data
+
+✓ Sample Min Calculator
+
+✓ Sample Max Calculator
+
+✓ Relative Frequency Graph Maker
+
+✓ Markov’s Inequality calculator
+
+✓ Frequency Table Calculator
+
+✓ Summation Calculator
+
+✓ Sample Mode Calculator
+
+✓ Period and Frequency Calculator
+
+✓ Trigonometric Function Grapher
+
+✓ Period and Frequency Calculator
+
+✓ Standard Normal Distribution Probability Calculator
+
+✓ Logarithmic Function Graph maker
+
+✓ Bayes Rule Calculator
+
+✓ Average Rate of Change Calculator
+
+✓ Exponential Function Graph maker
+
+✓ Stirling Approximation Calculator
+
+✓ Contingency Table Calculator
+
+✓ Spearman’s Critical Correlation Calculator
+
+✓ Exponential Function Calculator
+
+✓ Exponential Growth Calculator
+
+✓ Exponential Decay Calculator
+
+✓ Multinomial Coefficient Calculator
+
+✓ Meters per Second to Miles Per hour
+
+✓ Feet to Miles
+
+✓ Meters per Second to Miles Per hour
+
+✓ Multiple Correlation Coefficient Calculator
+
+✓ Infinite Geometric Series Calculator
+
+✓ Double Angle Formula
+
+✓ Quadratic Equation Solver
+
+✓ Radians To Degrees
+
+✓ Midpoint Formula Calculator
+
+✓ Distance Formula Calculator
+
+✓ Confidence Interval for the Difference Between Proportions Calculator
+
+✓ Confidence Interval for the Difference Between Means Calculator
+
+✓ Confidence Interval for Mean Calculator
+
+✓ Confidence Interval for Mean Calculator for Unknown Standard Deviation
+
+✓ Confidence Interval for the Difference Between Means Calculator for Unknown Population Variances
+
+✓ Confidence Interval for Ratio of two Variances
+
+✓ Confidence Interval for Proportion Calculator
+
+✓ Confidence Interval for Variance Calculator
+
+✓ Sample Variance Calculator
+
+✓ Z-score to T-score Calculator
+
+✓ Residual Sum of Squares Calculator
+
+✓ Regression Sum of Squares Calculator
+
+✓ Raw Score Calculator
+
+✓ Sum of Squares Calculator
+
+✓ Percentile to Z-score Calculator
+
+✓ Z-Score to Percentile Calculator
+
+✓ Law of Multiplication Calculator
+
+✓ Law of Addition Calculator
+
+✓ Conditional Probability Calculator
+
+✓ Total Probability Rule Calculator
+
+✓ EVWPI Calculator
+
+✓ EVPI Calculator
+
+✓ Minimax Regret Criterion
+
+✓ Expected Opportunity Loss Criterion
+
+✓ Expected Monetary Value Criterion
+
+✓ Hurwicz Criterion Calculator
+
+✓ Maximin Criterion Calculator
+
+✓ Maximax Criterion Calculator
+
+✓ Prediction Interval Calculator for a Regression Prediction
+
+✓ Confidence Interval Calculator for a Regression Prediction
+
+✓ Five Number Summary Calculator
+
+✓ Chi-Square Distribution Calculator
+
+✓ F Distribution Calculator
+
+✓ Mean Squared Deviation Calculator
+
+✓ R^2 to Adj. R^2 calculator
+
+✓ Adj. R^2 Calculator for Multiple Regression
+
+✓ Adj.R^2 Calculator for Simple Regression
+
+✓ Finite Population Correction Calculator
+
+✓ Sampling Distribution of the Sample Proportion
+
+✓ McNemar's Test for Paired Data
+
+✓ Mean Absolute Deviation for Sample Data
+
+✓ MidRange Calculator
+
+✓ Mean And St.Dev. for a Discrete Distribution
+
+✓ Polynomial Regression Calculator
+
+✓ Multiple Linear Regression Calculator
+
+✓ Probability to Odds Calculator
+
+✓ Odds to Probability Calculator
+
+✓ Learning Curve Calculator
+
+✓ Constant Service Time Model
+
+✓ Multiple Server Model Calculator
+
+✓ Single Server Model Calculator
+
+✓ Single Period Model Calculator
+
+✓ Production Order Quantity Calculator
+
+✓ Economic Order Quantity Calculator
+
+✓ Process Capability Index Calculator
+
+✓ Process Capability Ratio Calculator
+
+✓ Exponential Smoothing with Trend Adjustment
+
+✓ Weighted Moving Average Forecast Calculator
+
+✓ Exponential Smoothing Forecast Calculator
+
+✓ Naive Forecast Calculator
+
+✓ Moving Average Forecast Calculator
+
+✓ Multifactor Productivity Calculator
+
+✓ Factor Productivity Calculator
+
+✓ Break even point calculator
+
+✓ Present Value Calculator
+
+✓ Effective Annual Rate Calculator
+
+✓ Net Present Value Calculator
+
+✓ CAPM Calculator
+
+✓ Mortgage Calculator

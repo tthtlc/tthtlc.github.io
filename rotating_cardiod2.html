@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rotating Cardioid Shape</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        canvas {
+            background-color: white;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="cardioidCanvas" width="800" height="800"></canvas>
+
+<script> 
+document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
+const canvas = document.getElementById('cardioidCanvas');
+const ctx = canvas.getContext('2d');
+
+// Rotation center point (10,10)
+const rotationCenterX = 10;
+const rotationCenterY = 10;
+
+const centerX = canvas.width / 2;
+const centerY = canvas.height / 2;
+const radius = 200;  // Radius of the cardioid
+let rotationAngle = 0;  // Rotation angle in radians
+
+// Function to rotate a point (x, y) around (cx, cy) by an angle
+function rotatePoint(x, y, cx, cy, angle) {
+    const cosA = Math.cos(angle);
+    const sinA = Math.sin(angle);
+    const dx = x - cx;
+    const dy = y - cy;
+
+    const rotatedX = cx + dx * cosA - dy * sinA;
+    const rotatedY = cy + dx * sinA + dy * cosA;
+
+    return { x: rotatedX, y: rotatedY };
+}
+
+// Function to draw the cardioid curve
+function drawCardioid() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+    ctx.strokeStyle = 'red';  // Set color to red
+    ctx.lineWidth = 2;        // Set line width
+
+    ctx.beginPath();
+
+    // Loop through angles from 0 to 2 * PI
+    for (let theta = 0; theta <= 2 * Math.PI; theta += 0.01) {
+        // Parametric equations for cardioid
+        let x = radius * (1 - Math.cos(theta)) * Math.cos(theta) + centerX + centerX / 2;
+        let y = radius * (1 - Math.cos(theta)) * Math.sin(theta) + centerY;
+
+        // Apply rotation around the point (10,10)
+        const rotatedPoint = rotatePoint(x, y, rotationCenterX, rotationCenterY, rotationAngle);
+
+        // Draw the curve
+        if (theta === 0) {
+            ctx.moveTo(rotatedPoint.x, rotatedPoint.y);  // Move to starting point
+        } else {
+            ctx.lineTo(rotatedPoint.x, rotatedPoint.y);  // Draw line to next point
+        }
+    }
+
+    ctx.closePath();
+    ctx.stroke();  // Render the cardioid
+}
+
+// Function to animate the cardioid rotation
+function animate() {
+    rotationAngle += 0.01;  // Increment the rotation angle
+    drawCardioid();  // Redraw the cardioid with the new rotation angle
+    requestAnimationFrame(animate);  // Continue the animation loop
+}
+
+drawCardioid();  // Initial cardioid drawing
+animate();  // Start the animation loop
+</script>
+
+</body>
+</html>
+

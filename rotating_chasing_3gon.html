@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pentagon Drawing with Iterations</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        canvas {
+            background-color: white;
+            border: 1px solid #ccc;
+        }
+    </style>
+<!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-GEX61LPT08"></script> <script>   window.dataLayer = window.dataLayer || [];   function gtag(){dataLayer.push(arguments);}   gtag('js', new Date());   gtag('config', 'G-GEX61LPT08'); </script> </head>
+<body>
+
+<canvas id="pentagonCanvas" width="500" height="500"></canvas>
+
+<script> 
+document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
+    const canvas = document.getElementById('pentagonCanvas');
+    const ctx = canvas.getContext('2d');
+
+    let rotationAngle = 0; // Initial rotation angle
+
+    // Function to draw a pentagon and return its edges
+    function drawPentagon(points) {
+        ctx.beginPath();
+        for (let i = 0; i < points.length; i++) {
+            const startPoint = points[i];
+            const endPoint = points[(i + 1) % points.length]; // Connect the last point to the first
+            ctx.moveTo(startPoint.x, startPoint.y);
+            ctx.lineTo(endPoint.x, endPoint.y);
+        }
+        ctx.stroke();
+    }
+
+    // Function to rotate points around (10, 10)
+    function rotatePoints(points, angle) {
+        const cx = points[0].x; // Rotation center X
+        const cy = points[0].y; // Rotation center Y
+        const rotatedPoints = points.map(p => {
+            const x = p.x - cx;
+            const y = p.y - cy;
+            return {
+                x: cx + x * Math.cos(angle) - y * Math.sin(angle),
+                y: cy + x * Math.sin(angle) + y * Math.cos(angle)
+            };
+        });
+        return rotatedPoints;
+    }
+
+    // Function to calculate the next pentagon's points
+    function getNextPentagonPoints(previousPoints) {
+        let newPoints = [];
+
+        // For each edge, calculate a point 1/10th along the line
+        for (let i = 0; i < previousPoints.length; i++) {
+            const startPoint = previousPoints[i];
+            const endPoint = previousPoints[(i + 1) % previousPoints.length];
+
+            // Calculate 1/10th point along the line
+            const newPoint = {
+                x: startPoint.x + (endPoint.x - startPoint.x) * 0.1,
+                y: startPoint.y + (endPoint.y - startPoint.y) * 0.1
+            };
+            newPoints.push(newPoint);
+        }
+
+        return newPoints;
+    }
+
+    // Function to create and draw pentagons
+    function createPentagons(points, iterations, angle) {
+        let currentPoints = rotatePoints(points, angle);
+        for (let i = 0; i < iterations; i++) {
+            drawPentagon(currentPoints);
+            currentPoints = getNextPentagonPoints(currentPoints);
+        }
+    }
+
+    // Initial points for the first pentagon ABCDE
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    const radius = 150;
+
+    // Generate points for the initial pentagon ABC
+    const initialPentagon = [];
+    for (let i = 0; i < 3; i++) {
+        const angle = (2 * Math.PI / 3) * i - Math.PI / 2; // Starting from the top
+        initialPentagon.push({
+            x: centerX + radius * Math.cos(angle),
+            y: centerY + radius * Math.sin(angle)
+        });
+    }
+
+    // Animation loop
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
+        createPentagons(initialPentagon, 40, rotationAngle);
+        rotationAngle += 0.01; // Increment the rotation angle
+        requestAnimationFrame(animate); // Loop the animation
+    }
+
+    // Start animation
+    animate();
+
+</script>
+
+</body>
+</html>
+
