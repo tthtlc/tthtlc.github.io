@@ -18,7 +18,7 @@
             border: 1px solid #ccc;
         }
     </style>
-</head>
+<!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-GEX61LPT08"></script> <script>   window.dataLayer = window.dataLayer || [];   function gtag(){dataLayer.push(arguments);}   gtag('js', new Date());   gtag('config', 'G-GEX61LPT08'); </script> </head>
 <body>
 
 <canvas id="cardioidCanvas" width="800" height="800"></canvas>
@@ -33,7 +33,7 @@ const ctx = canvas.getContext('2d');
 const centerX = canvas.width / 2;
 const centerY = canvas.height / 2;
 const radius = 50;  // Radius of the circle
-const radius1 = 100;  // Radius of the circle
+const radius1 = 100;  // Radius of center of the circle
 let nstep = 3;  // Rotation angle in radians
 let rotationStep = 2*Math.PI/nstep;  // Rotation angle in radians
 let rotationAngle = 0;  // Rotation angle in radians
@@ -59,11 +59,11 @@ function drawCircle() {
     ctx.lineWidth = 2;        // Set line width
 
     ctx.beginPath();
+	let centerX1 = centerX + radius1 * Math.cos(rotationAngle);
+	let centerY1 = centerY + radius1 * Math.sin(rotationAngle);
 
     // Loop through angles from 0 to 2 * PI
     for (let theta = 0; theta <= 2 * Math.PI; theta += 0.01) {
-	let centerX1 = centerX + radius1 * Math.cos(rotationAngle);
-	let centerY1 = centerY + radius1 * Math.sin(rotationAngle);
         let x = radius * Math.cos(theta) + centerX1;
         let y = radius * Math.sin(theta) + centerY1;
 
@@ -92,7 +92,7 @@ function animate() {
     }
     drawCircle();  // Redraw the cardioid with the new rotation angle
     //requestAnimationFrame(animate);  // Continue the animation loop
-    setTimeout(animate, 500);
+    setTimeout(animate, 100);
 }
 
 drawCircle();  // Initial cardioid drawing
