@@ -6,6 +6,13 @@ cube
 sphere
 stepped cone
 
+
+https://support.google.com/tagmanager/answer/12811173
+https://analytics.google.com/analytics/web/#/p460666704/reports/intelligenthome:   github.io
+https://analytics.google.com/analytics/web/#/p460662091/reports/intelligenthome:   artdeveloper.art
+
+
+
 Not added: googletag + contextmenu
 	rotating_cardiod.html
 	rotating_cardiod2.html
