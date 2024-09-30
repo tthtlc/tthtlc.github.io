@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>T-Square Fractal</title>
+    <style>
+        body {
+            margin: 0;
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        canvas {
+            border: 1px solid #fff;
+            background-color: #000;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="tSquareCanvas" width="800" height="800"></canvas>
+    <script>
+        const canvas = document.getElementById('tSquareCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function drawTSquare(x, y, size, depth) {
+            if (depth === 0) {
+                ctx.fillStyle = '#123';
+                ctx.fillRect(x, y, size, size);
+            } else {
+                const newSize = size / 2;
+
+                // Draw the central square
+                ctx.fillStyle = '#303';
+                ctx.fillRect(x + newSize / 2, y + newSize / 2, newSize, newSize);
+
+                // Recursive calls for each corner
+                drawTSquare(x, y, newSize, depth - 1); // Top-left
+                drawTSquare(x + newSize, y, newSize, depth - 1); // Top-right
+                drawTSquare(x, y + newSize, newSize, depth - 1); // Bottom-left
+                drawTSquare(x + newSize, y + newSize, newSize, depth - 1); // Bottom-right
+            }
+        }
+
+        // Initial call to draw the T-square fractal
+        const maxDepth = 6; // You can adjust the depth level here
+        drawTSquare(0, 0, canvas.width, maxDepth);
+    </script>
+</body>
+</html>
+

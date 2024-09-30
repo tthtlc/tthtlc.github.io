@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cantor Set</title>
+    <style>
+        canvas {
+            display: block;
+            margin: auto;
+            background-color: #000;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="cantorCanvas" width="600" height="200"></canvas>
+
+    <script>
+        const canvas = document.getElementById("cantorCanvas");
+        const ctx = canvas.getContext("2d");
+
+        function drawCantor(x, y, length, depth) {
+            if (depth === 0) return;
+
+            ctx.fillStyle = "#00FF00";
+            ctx.fillRect(x, y, length, 20);
+
+            const newY = y + 40;
+            const newLength = length / 3;
+
+            drawCantor(x, newY, newLength, depth - 1);
+            drawCantor(x + 2 * newLength, newY, newLength, depth - 1);
+        }
+
+        drawCantor(50, 20, 500, 6);
+    </script>
+</body>
+</html>
+

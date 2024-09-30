@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rotating Islamic Spiral Design</title>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+
+        canvas {
+            border: 2px solid black;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="spiralCanvas"></canvas>
+
+    <script>
+        const ngon = 8;
+        const canvas = document.getElementById("spiralCanvas");
+        const ctx = canvas.getContext("2d");
+        let direction = 1;
+ 	const radius2 = Math.min(canvas.width, canvas.height) * 0.44;
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let angleOffset = 0;
+
+        function drawIslamicSpiral(newx, newy, rotationAngle, direction) {
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = Math.min(canvas.width, canvas.height) * 0.2;
+            const steps = 10;
+            const lineCount = 2;
+
+            // Clear canvas before each new frame
+
+            // Save the context state
+            ctx.save();
+
+            // Translate to the center of the canvas and rotate
+            ctx.translate(centerX, centerY);
+            ctx.rotate(rotationAngle);
+            ctx.translate(-centerX + newx, -centerY + newy);
+
+            // Define colors commonly found in Islamic art
+            const colors = ["#1f3b4d", "#c49a6c", "#ac785a", "#b28774", "#a8a3b3"];
+
+            for (let i = 0; i < lineCount; i++) {
+                ctx.beginPath();
+                ctx.strokeStyle = colors[i % colors.length];
+                ctx.lineWidth = 2;
+
+                for (let step = 0; step < steps; step++) {
+                    let angle = (Math.PI * 2 / steps) * step + (i * Math.PI / lineCount);
+                    let x = centerX + radius * Math.cos(direction*angle) * (step / steps);
+                    let y = centerY + radius * Math.sin(direction*angle) * (step / steps);
+
+                    if (step === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                }
+                ctx.stroke();
+            }
+
+            // Restore the context to the original state
+            ctx.restore();
+        }
+
+        function animate() {
+            angleOffset += Math.PI*2/ngon; // Increment the angle to rotate the spiral
+	    x = radius2 * Math.cos(angleOffset);
+	    y = radius2 * Math.sin(angleOffset);
+	    direction = -1 * direction;
+            drawIslamicSpiral(x, y, angleOffset, direction);
+            setTimeout(animate, 500);
+        }
+
+        // Start the animation
+        animate();
+    </script>
+</body>
+</html>
+

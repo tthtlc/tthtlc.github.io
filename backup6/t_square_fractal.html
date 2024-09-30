@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>T-Square Fractal</title>
+    <style>
+        canvas {
+            display: block;
+            margin: auto;
+            background-color: #000;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="tSquareCanvas" width="600" height="600"></canvas>
+
+    <script>
+        const canvas = document.getElementById("tSquareCanvas");
+        const ctx = canvas.getContext("2d");
+
+        function drawTSquare(x, y, size, depth) {
+            if (depth === 0) {
+                ctx.fillStyle = "#00FF00";
+                ctx.fillRect(x - size / 2, y - size / 2, size, size);
+            } else {
+                const newSize = size / 2;
+                drawTSquare(x - newSize, y - newSize, newSize, depth - 1);
+                drawTSquare(x + newSize, y - newSize, newSize, depth - 1);
+                drawTSquare(x - newSize, y + newSize, newSize, depth - 1);
+                drawTSquare(x + newSize, y + newSize, newSize, depth - 1);
+            }
+        }
+
+        drawTSquare(canvas.width / 2, canvas.height / 2, 200, 5);
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,75 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Gosper Curve (Flowsnake)</title>
+    <style>
+        body {
+            margin: 0;
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        canvas {
+            background-color: #000;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gosperCanvas" width="800" height="800"></canvas>
+    <script>
+        const canvas = document.getElementById('gosperCanvas');
+        const ctx = canvas.getContext('2d');
+        const size = 4; // Length of each segment
+        const depth = 5; // Adjust depth for detail
+
+        function generateGosperCurve(iterations) {
+            let axiom = 'A';
+            const rules = {
+                'A': 'A-B--B+A++AA+B-',
+                'B': '+A-BB--B-A++A+B'
+            };
+
+            for (let i = 0; i < iterations; i++) {
+                let newAxiom = '';
+                for (let char of axiom) {
+                    newAxiom += rules[char] || char;
+                }
+                axiom = newAxiom;
+            }
+            return axiom;
+        }
+
+        function drawGosper() {
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 1;
+            ctx.save();
+            ctx.translate(100, canvas.height - 100); // Starting position
+            ctx.rotate(-Math.PI / 2);
+
+            const instructions = generateGosperCurve(depth);
+            for (let char of instructions) {
+                if (char === 'A' || char === 'B') {
+                    ctx.beginPath();
+                    ctx.moveTo(0, 0);
+                    ctx.lineTo(size, 0);
+                    ctx.stroke();
+                    ctx.translate(size, 0);
+                } else if (char === '+') {
+                    ctx.rotate(Math.PI / 3); // Turn left 60 degrees
+                } else if (char === '-') {
+                    ctx.rotate(-Math.PI / 3); // Turn right 60 degrees
+                }
+            }
+
+            ctx.restore();
+        }
+
+        drawGosper();
+    </script>
+</body>
+</html>
+

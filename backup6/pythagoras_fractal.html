@@ -1,0 +1,52 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pythagoras Fractal</title>
+    <style>
+        canvas {
+            display: block;
+            margin: auto;
+            background-color: #000;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="pythagorasCanvas" width="600" height="600"></canvas>
+
+    <script>
+        const canvas = document.getElementById("pythagorasCanvas");
+        const ctx = canvas.getContext("2d");
+
+        function drawSquare(x, y, size) {
+            ctx.fillStyle = "#00FF00";
+            ctx.fillRect(x, y, size, size);
+        }
+
+        function drawPythagorasTree(x, y, size, angle, depth) {
+            if (depth === 0) return;
+
+            drawSquare(x, y, size);
+
+            const newSize = size * Math.sqrt(2) / 2;
+            const newAngle = angle - Math.PI / 4;
+
+            const x1 = x - newSize * Math.cos(newAngle);
+            const y1 = y - newSize * Math.sin(newAngle);
+
+            drawPythagorasTree(x1, y1, newSize, newAngle, depth - 1);
+
+            const newAngle2 = angle + Math.PI / 4;
+            const x2 = x + size + newSize * Math.cos(newAngle2);
+            const y2 = y - newSize * Math.sin(newAngle2);
+
+            drawPythagorasTree(x2, y2, newSize, newAngle2, depth - 1);
+        }
+
+        drawPythagorasTree(300, 500, 80, 0, 7);
+    </script>
+</body>
+</html>
+

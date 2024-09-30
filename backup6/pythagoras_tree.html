@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pythagoras Tree</title>
+    <style>
+        canvas {
+            display: block;
+            margin: auto;
+            background-color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="pythagorasTreeCanvas" width="600" height="600"></canvas>
+
+    <script>
+        const canvas = document.getElementById("pythagorasTreeCanvas");
+        const ctx = canvas.getContext("2d");
+
+        function drawSquare(x, y, size, angle) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(angle);
+
+            // Draw a square
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, size, size);
+
+            ctx.restore();
+        }
+
+        function drawTriangle(x, y, size, angle) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(angle);
+
+            // Draw a right triangle
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(size, 0);
+            ctx.lineTo(0, -size);
+            ctx.closePath();
+            ctx.fillStyle = '#000';
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        function drawPythagorasTree(x, y, size, angle, depth) {
+            if (depth === 0) return;
+
+            // Draw the main square
+            drawSquare(x, y, size, angle);
+
+            // Coordinates of the top corners of the square
+            const xLeft = x + Math.cos(angle + Math.PI / 2) * size;
+            const yLeft = y + Math.sin(angle + Math.PI / 2) * size;
+            const xRight = x + Math.cos(angle + Math.PI / 2) * size + Math.cos(angle) * size;
+            const yRight = y + Math.sin(angle + Math.PI / 2) * size;  // + Math.sin(angle) * size;
+
+            // Draw left and right triangles
+            drawTriangle(xLeft, yLeft, size / 2, angle + Math.PI / 4);
+            drawTriangle(xRight, yRight, size / 2, angle - Math.PI / 4);
+
+            // Recursively draw the left and right squares
+            drawPythagorasTree(xLeft, yLeft, size * Math.sqrt(2) / 2, angle + Math.PI / 4, depth - 1);
+            drawPythagorasTree(xRight, yRight, size * Math.sqrt(2) / 2, angle - Math.PI / 4, depth - 1);
+        }
+
+        // Start drawing the Pythagoras tree
+        function drawTree() {
+            const initialSize = 100;
+            const startX = canvas.width / 2 - initialSize / 2;
+            const startY = canvas.height - 50;
+            const initialDepth = 10; // Increase this for more detailed branches
+
+            drawPythagorasTree(startX, startY, initialSize, 0, initialDepth);
+        }
+
+        drawTree();
+    </script>
+</body>
+</html>
+

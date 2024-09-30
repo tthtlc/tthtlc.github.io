@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Apollonian Gasket</title>
+    <style>
+        body {
+            margin: 0;
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        canvas {
+            background-color: #000;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="apollonianCanvas" width="800" height="800"></canvas>
+    <script>
+        const canvas = document.getElementById('apollonianCanvas');
+        const ctx = canvas.getContext('2d');
+        const width = canvas.width;
+        const height = canvas.height;
+
+        function drawCircle(x, y, r, depth) {
+            if (r < 1 || depth <= 0) return;
+
+            ctx.beginPath();
+            ctx.arc(x, y, r, 0, 2 * Math.PI);
+            ctx.fillStyle = `hsl(${(depth * 50) % 360}, 100%, 50%)`;
+            ctx.fill();
+
+            // Recursively draw smaller circles
+            drawCircle(x + r / 2, y, r / 2, depth - 1);
+            drawCircle(x - r / 2, y, r / 2, depth - 1);
+            drawCircle(x, y + r / 2, r / 2, depth - 1);
+            drawCircle(x, y - r / 2, r / 2, depth - 1);
+        }
+
+        function init() {
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, width, height);
+
+            const depth = 6; // Adjust depth for detail
+            const radius = width / 4;
+
+            drawCircle(width / 2, height / 2, radius, depth);
+        }
+
+        init();
+    </script>
+</body>
+</html>
+

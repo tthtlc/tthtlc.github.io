@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fractal Island (Midpoint Displacement)</title>
+    <style>
+        canvas {
+            display: block;
+            margin: auto;
+            background-color: #87CEEB; /* Sky blue background */
+        }
+    </style>
+</head>
+<body>
+    <canvas id="fractalCanvas" width="600" height="600"></canvas>
+
+    <script>
+        const canvas = document.getElementById("fractalCanvas");
+        const ctx = canvas.getContext("2d");
+
+        function midpointDisplacement(points, roughness, depth) {
+            if (depth <= 0) return;
+
+            const newPoints = [];
+            for (let i = 0; i < points.length - 1; i++) {
+                // Add the existing point
+                newPoints.push(points[i]);
+
+                // Calculate the midpoint
+                const midX = (points[i].x + points[i + 1].x) / 2;
+                const midY = (points[i].y + points[i + 1].y) / 2;
+
+                // Displace the midpoint
+                const displacement = (Math.random() - 0.5) * roughness;
+                newPoints.push({ x: midX, y: midY + displacement });
+            }
+            newPoints.push(points[points.length - 1]); // Add the last point
+
+            // Recursive call with reduced roughness
+            midpointDisplacement(newPoints, roughness / 2, depth - 1);
+
+            return newPoints;
+        }
+
+        function drawFractalIsland() {
+            const width = canvas.width;
+            const height = canvas.height;
+
+            // Starting points (A line across the bottom of the canvas)
+            let points = [
+                { x: 50, y: height - 100 }, // Left point
+                { x: width - 50, y: height - 100 } // Right point
+            ];
+
+            // Apply midpoint displacement
+            points = midpointDisplacement(points, 200, 7); // Roughness and recursion depth
+
+            // Draw the coastline
+            ctx.beginPath();
+            ctx.moveTo(points[0].x, points[0].y);
+            for (let i = 1; i < points.length; i++) {
+                ctx.lineTo(points[i].x, points[i].y);
+            }
+            ctx.lineTo(width - 50, height); // Right bottom corner
+            ctx.lineTo(50, height); // Left bottom corner
+            ctx.closePath();
+
+            // Set fill and stroke styles
+            ctx.fillStyle = "#228B22"; // Forest green for land
+            ctx.strokeStyle = "#000"; // Black outline
+            ctx.fill();
+            ctx.stroke();
+        }
+
+        // Clear the canvas and draw the fractal island
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawFractalIsland();
+    </script>
+</body>
+</html>
+
