@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Vicsek Fractal Animation</title>
+    <style>
+        body {
+            margin: 0;
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        canvas {
+            background-color: #000;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="vicsekCanvas" width="800" height="800"></canvas>
+    <script>
+        const canvas = document.getElementById('vicsekCanvas');
+        const ctx = canvas.getContext('2d');
+        const maxDepth = 5; // Adjust depth for detail
+        let colorIndex = 0;
+const colors = [
+    '#0000FF', '#1A33FF', '#3366FF', '#4D99FF', '#66CCFF', '#80FFFF', '#99FFCC', '#B3FF99',
+    '#CCFF66', '#E6FF33', '#FFFF00', '#FFCC00', '#FF9933', '#FF6600', '#FF3300', '#FFFF33'
+];
+        const colorsXXX = [
+            "#0000FF", "#0011EE", "#0022DD", "#0033CC", "#0044BB", "#0055AA", "#006699", "#007788", 
+            "#008877", "#009966", "#00AA55", "#00BB44", "#00CC33", "#00DD22", "#00EE11", "#FF0000"
+        ];
+
+        function drawVicsek(x, y, size, depth) {
+            if (depth === 0) {
+                // Base case: Draw the smallest square with current color
+                ctx.fillStyle = colors[colorIndex % colors.length];
+                ctx.fillRect(x, y, size, size);
+                // Increment color index
+                colorIndex = (colorIndex + 1) % colors.length;
+            } else {
+                const newSize = size / 3;
+
+                // Draw the center square
+                ctx.fillStyle = colors[colorIndex % colors.length];
+                ctx.fillRect(x + newSize, y + newSize, newSize, newSize);
+                // Increment color index
+                colorIndex = (colorIndex + 1) % colors.length;
+
+                // Recursive calls for the corners and center
+                drawVicsek(x, y, newSize, depth - 1); // Top-left
+                drawVicsek(x + newSize, y + newSize, newSize, depth - 1); // Center
+                drawVicsek(x + 2 * newSize, y, newSize, depth - 1); // Top-right
+                drawVicsek(x, y + 2 * newSize, newSize, depth - 1); // Bottom-left
+                drawVicsek(x + 2 * newSize, y + 2 * newSize, newSize, depth - 1); // Bottom-right
+            }
+        }
+
+        async function animateVicsek() {
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            colorIndex = colorIndex + 1;
+            drawVicsek(0, 0, canvas.width, maxDepth);
+            await new Promise(r => setTimeout(r, 300)); // Pause for 1 second
+            requestAnimationFrame(animateVicsek); // Repeat the animation
+        }
+
+        animateVicsek();
+    </script>
+</body>
+</html>
+
