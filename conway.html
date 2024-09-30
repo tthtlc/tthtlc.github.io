@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game of Life</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameOfLifeCanvas" width="600" height="600"></canvas>
+
+    <script>
+        const canvas = document.getElementById('gameOfLifeCanvas');
+        const ctx = canvas.getContext('2d');
+        const cellSize = 10;
+        const rows = canvas.height / cellSize;
+        const cols = canvas.width / cellSize;
+
+        let grid = createGrid(rows, cols);
+
+        // Initialize the grid with random values
+        function createGrid(rows, cols) {
+            const grid = [];
+            for (let i = 0; i < rows; i++) {
+                grid[i] = [];
+                for (let j = 0; j < cols; j++) {
+                    grid[i][j] = Math.floor(Math.random() * 2);
+                }
+            }
+            return grid;
+        }
+
+        // Draw the grid on the canvas
+        function drawGrid(grid) {
+            for (let i = 0; i < rows; i++) {
+                for (let j = 0; j < cols; j++) {
+                    ctx.beginPath();
+                    ctx.rect(j * cellSize, i * cellSize, cellSize, cellSize);
+                    ctx.fillStyle = grid[i][j] ? 'black' : 'white';
+                    ctx.fill();
+                    ctx.stroke();
+                }
+            }
+        }
+
+        // Calculate the next state of the grid
+        function nextGeneration(grid) {
+            const nextGen = createGrid(rows, cols);
+
+            for (let i = 0; i < rows; i++) {
+                for (let j = 0; j < cols; j++) {
+                    const neighbors = countNeighbors(grid, i, j);
+                    const cell = grid[i][j];
+
+                    if (cell === 1 && (neighbors < 2 || neighbors > 3)) {
+                        nextGen[i][j] = 0; // Die
+                    } else if (cell === 0 && neighbors === 3) {
+                        nextGen[i][j] = 1; // Alive
+                    } else {
+                        nextGen[i][j] = cell; // Stay the same
+                    }
+                }
+            }
+
+            return nextGen;
+        }
+
+        // Count the alive neighbors of a cell
+        function countNeighbors(grid, x, y) {
+            let neighbors = 0;
+
+            for (let i = -1; i <= 1; i++) {
+                for (let j = -1; j <= 1; j++) {
+                    if (i === 0 && j === 0) continue;
+
+                    const row = (x + i + rows) % rows;
+                    const col = (y + j + cols) % cols;
+                    neighbors += grid[row][col];
+                }
+            }
+
+            return neighbors;
+        }
+
+        // Main loop for the Game of Life
+        function update() {
+            grid = nextGeneration(grid);
+            drawGrid(grid);
+            requestAnimationFrame(update);
+        }
+
+        // Start the game
+        drawGrid(grid);
+        update();
+    </script>
+</body>
+</html>
+
