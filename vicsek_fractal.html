@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Vicsek Fractal</title>
+    <style>
+        body {
+            margin: 0;
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        canvas {
+            background-color: #000;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="vicsekCanvas" width="800" height="800"></canvas>
+    <script>
+        const canvas = document.getElementById('vicsekCanvas');
+        const ctx = canvas.getContext('2d');
+        const maxDepth = 5; // Adjust depth for detail
+
+        function drawVicsek(x, y, size, depth) {
+            if (depth === 0) {
+                // Base case: Draw the smallest square
+                ctx.fillStyle = '#fff';
+                ctx.fillRect(x, y, size, size);
+            } else {
+                const newSize = size / 3;
+
+                // Draw the center square
+                ctx.fillStyle = '#fff';
+                ctx.fillRect(x + newSize, y + newSize, newSize, newSize);
+
+                // Recursive calls for the corners and center
+                drawVicsek(x, y, newSize, depth - 1); // Top-left
+                drawVicsek(x + newSize, y + newSize, newSize, depth - 1); // Center
+                drawVicsek(x + 2 * newSize, y, newSize, depth - 1); // Top-right
+                drawVicsek(x, y + 2 * newSize, newSize, depth - 1); // Bottom-left
+                drawVicsek(x + 2 * newSize, y + 2 * newSize, newSize, depth - 1); // Bottom-right
+            }
+        }
+
+        function init() {
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            drawVicsek(0, 0, canvas.width, maxDepth);
+        }
+
+        init();
+    </script>
+</body>
+</html>
+

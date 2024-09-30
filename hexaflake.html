@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hexaflake Fractal</title>
+    <style>
+        canvas {
+            display: block;
+            margin: auto;
+            background-color: #000;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="hexaflakeCanvas" width="600" height="600"></canvas>
+
+    <script>
+        const canvas = document.getElementById("hexaflakeCanvas");
+        const ctx = canvas.getContext("2d");
+
+        function drawHexagon(x, y, size) {
+            ctx.beginPath();
+            for (let i = 0; i < 6; i++) {
+                const angle = (Math.PI / 3) * i;
+                const newX = x + size * Math.cos(angle);
+                const newY = y + size * Math.sin(angle);
+                ctx.lineTo(newX, newY);
+            }
+            ctx.closePath();
+            ctx.fillStyle = "#00FF00";
+            ctx.fill();
+        }
+
+        function drawHexaflake(x, y, size, depth) {
+            if (depth === 0) {
+                drawHexagon(x, y, size);
+            } else {
+                const newSize = size / 3;
+                for (let i = 0; i < 6; i++) {
+                    const angle = (Math.PI / 3) * i;
+                    const newX = x + size * Math.cos(angle);
+                    const newY = y + size * Math.sin(angle);
+                    drawHexaflake(newX, newY, newSize, depth - 1);
+                }
+                drawHexaflake(x, y, newSize, depth - 1);
+            }
+        }
+
+        drawHexaflake(canvas.width / 2, canvas.height / 2, 150, 4);
+    </script>
+</body>
+</html>
+

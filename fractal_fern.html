@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fractal Fern</title>
+    <style>
+        canvas {
+            display: block;
+            margin: auto;
+            background-color: #000;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="fernCanvas" width="500" height="500"></canvas>
+
+    <script>
+        const canvas = document.getElementById("fernCanvas");
+        const ctx = canvas.getContext("2d");
+
+        function drawFern() {
+            const width = canvas.width;
+            const height = canvas.height;
+
+            // Set the starting point for the fern
+            let x = 0;
+            let y = 0;
+
+            ctx.fillStyle = "#00FF00"; // Fern color
+
+            // Draw the fractal fern using an iterated function system
+            for (let i = 0; i < 50000; i++) {
+                // Randomly choose one of four transformations
+                let r = Math.random();
+                let newX, newY;
+
+                if (r < 0.01) {
+                    // Stem
+                    newX = 0;
+                    newY = 0.16 * y;
+                } else if (r < 0.86) {
+                    // Largest left leaf
+                    newX = 0.85 * x + 0.04 * y;
+                    newY = -0.04 * x + 0.85 * y + 1.6;
+                } else if (r < 0.93) {
+                    // Smallest left leaf
+                    newX = 0.2 * x - 0.26 * y;
+                    newY = 0.23 * x + 0.22 * y + 1.6;
+                } else {
+                    // Right leaf
+                    newX = -0.15 * x + 0.28 * y;
+                    newY = 0.26 * x + 0.24 * y + 0.44;
+                }
+
+                x = newX;
+                y = newY;
+
+                // Scale and shift the points to fit on the canvas
+                let plotX = width / 2 + x * 50;
+                let plotY = height - y * 50;
+
+                // Draw the point on the canvas
+                ctx.fillRect(plotX, plotY, 1, 1);
+            }
+        }
+
+        drawFern();
+    </script>
+</body>
+</html>
+

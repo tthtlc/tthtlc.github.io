@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mandelbrot Set with Color Gradient</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #000;
+        }
+        canvas {
+            border: 1px solid white;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="mandelbrotCanvas" width="800" height="600"></canvas>
+
+    <script>
+        const canvas = document.getElementById('mandelbrotCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const maxIterations = 100;
+        const width = canvas.width;
+        const height = canvas.height;
+
+        let minReal = -2.5;
+        let maxReal = 1.5;
+        let minImaginary = -1.5;
+        let maxImaginary = 1.5;
+
+        // Define the color gradient from blue to yellow
+        const colorGradient = [
+            [0, 0, 255], // Blue
+            [51, 51, 204],
+            [102, 102, 153],
+            [153, 153, 102],
+            [204, 204, 51],
+            [255, 255, 0], // Yellow
+            [255, 204, 0],
+            [255, 153, 0]  // Darker Yellow/Orange
+        ];
+
+        function mandelbrot(c) {
+            let z = { real: 0, imaginary: 0 };
+            let n = 0;
+
+            while (n < maxIterations) {
+                const realTemp = z.real * z.real - z.imaginary * z.imaginary + c.real;
+                z.imaginary = 2 * z.real * z.imaginary + c.imaginary;
+                z.real = realTemp;
+
+                if (z.real * z.real + z.imaginary * z.imaginary > 4) {
+                    return n;
+                }
+                n++;
+            }
+            return maxIterations;
+        }
+
+        function drawMandelbrot() {
+            const imageData = ctx.createImageData(width, height);
+            for (let x = 0; x < width; x++) {
+                for (let y = 0; y < height; y++) {
+                    const real = minReal + (x / width) * (maxReal - minReal);
+                    const imaginary = minImaginary + (y / height) * (maxImaginary - minImaginary);
+
+                    const c = { real, imaginary };
+                    const n = mandelbrot(c);
+
+                    // Determine color based on iterations (n)
+                    let color;
+                    if (n === maxIterations) {
+                        // If the point is in the Mandelbrot set, color it black
+                        color = [0, 0, 0];
+                    } else {
+                        // Assign a color based on the number of iterations (n)
+                        const colorIndex = Math.floor((n / maxIterations) * colorGradient.length);
+                        color = colorGradient[colorIndex % colorGradient.length];
+                    }
+
+                    const pixelIndex = (y * width + x) * 4;
+                    imageData.data[pixelIndex] = color[0]; // Red
+                    imageData.data[pixelIndex + 1] = color[1]; // Green
+                    imageData.data[pixelIndex + 2] = color[2]; // Blue
+                    imageData.data[pixelIndex + 3] = 255; // Alpha
+                }
+            }
+            ctx.putImageData(imageData, 0, 0);
+        }
+
+        function getMousePos(canvas, evt) {
+            const rect = canvas.getBoundingClientRect();
+            return {
+                x: evt.clientX - rect.left,
+                y: evt.clientY - rect.top
+            };
+        }
+
+        canvas.addEventListener('click', (event) => {
+            const mousePos = getMousePos(canvas, event);
+
+            const realClick = minReal + (mousePos.x / width) * (maxReal - minReal);
+            const imaginaryClick = minImaginary + (mousePos.y / height) * (maxImaginary - minImaginary);
+
+            const zoomFactor = 2; // Zoom in by a factor of 2
+
+            const realRange = (maxReal - minReal) / zoomFactor;
+            const imaginaryRange = (maxImaginary - minImaginary) / zoomFactor;
+
+            minReal = realClick - realRange / 2;
+            maxReal = realClick + realRange / 2;
+            minImaginary = imaginaryClick - imaginaryRange / 2;
+            maxImaginary = imaginaryClick + imaginaryRange / 2;
+
+            drawMandelbrot();
+        });
+
+        drawMandelbrot();
+    </script>
+</body>
+</html>
+

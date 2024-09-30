@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Julia Set</title>
+    <style>
+        body {
+            margin: 0;
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        canvas {
+            background-color: #000;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="juliaCanvas" width="800" height="800"></canvas>
+    <script>
+        const canvas = document.getElementById('juliaCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const width = canvas.width;
+        const height = canvas.height;
+
+        const maxIterations = 100;
+        const zoom = 1;
+        const moveX = 0;
+        const moveY = 0;
+
+        // Constant parameter c for the Julia Set
+        let cRe = -0.7;
+        let cIm = 0.27015;
+
+        function drawJuliaSet() {
+            const imageData = ctx.createImageData(width, height);
+            for (let x = 0; x < width; x++) {
+                for (let y = 0; y < height; y++) {
+                    let zx = 1.5 * (x - width / 2) / (0.5 * zoom * width) + moveX;
+                    let zy = (y - height / 2) / (0.5 * zoom * height) + moveY;
+
+                    let i = maxIterations;
+                    while (zx * zx + zy * zy < 4 && i > 1) {
+                        let tmp = zx * zx - zy * zy + cRe;
+                        zy = 2 * zx * zy + cIm;
+                        zx = tmp;
+                        i--;
+                    }
+
+                    const pixelIndex = (x + y * width) * 4;
+                    const color = i === maxIterations ? 0 : (i * 255) / maxIterations;
+                    imageData.data[pixelIndex] = color; // Red
+                    imageData.data[pixelIndex + 1] = color; // Green
+                    imageData.data[pixelIndex + 2] = color; // Blue
+                    imageData.data[pixelIndex + 3] = 255; // Alpha
+                }
+            }
+            ctx.putImageData(imageData, 0, 0);
+        }
+
+        drawJuliaSet();
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menger Sponge</title>
+    <style>
+        canvas {
+            display: block;
+            margin: auto;
+            background-color: #000;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="mengerCanvas" width="600" height="600"></canvas>
+
+    <script>
+        const canvas = document.getElementById("mengerCanvas");
+        const ctx = canvas.getContext("2d");
+
+        function drawMenger(x, y, size, depth) {
+            if (depth === 0) {
+                ctx.fillStyle = "#00FF00";
+                ctx.fillRect(x, y, size, size);
+                return;
+            }
+
+            const newSize = size / 3;
+            for (let i = 0; i < 3; i++) {
+                for (let j = 0; j < 3; j++) {
+                    if (i !== 1 || j !== 1) {
+                        drawMenger(x + i * newSize, y + j * newSize, newSize, depth - 1);
+                    }
+                }
+            }
+        }
+
+        drawMenger(0, 0, canvas.width, 4);
+    </script>
+</body>
+</html>
+

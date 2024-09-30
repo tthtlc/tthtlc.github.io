@@ -1,0 +1,52 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sierpinski Triangle</title>
+    <style>
+        canvas {
+            display: block;
+            margin: auto;
+            background-color: #000;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="sierpinskiCanvas" width="500" height="500"></canvas>
+
+    <script>
+        const canvas = document.getElementById("sierpinskiCanvas");
+        const ctx = canvas.getContext("2d");
+
+        function drawTriangle(x, y, size) {
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.lineTo(x + size, y);
+            ctx.lineTo(x + size / 2, y - Math.sqrt(3) / 2 * size);
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        function sierpinski(x, y, size, depth) {
+            if (depth === 0) {
+                drawTriangle(x, y, size);
+            } else {
+                let newSize = size / 2;
+                sierpinski(x, y, newSize, depth - 1); // Bottom-left triangle
+                sierpinski(x + newSize, y, newSize, depth - 1); // Bottom-right triangle
+                sierpinski(x + newSize / 2, y - Math.sqrt(3) / 2 * newSize, newSize, depth - 1); // Top triangle
+            }
+        }
+
+        // Set the canvas background and triangle fill color
+        ctx.fillStyle = "#00FF00"; // Green color for the triangles
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Draw the Sierpinski Triangle with specified depth
+        sierpinski(50, 450, 400, 5); // (x, y, size, depth)
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dragon Curve</title>
+    <style>
+        canvas {
+            display: block;
+            margin: auto;
+            background-color: #000;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="dragonCanvas" width="800" height="800"></canvas>
+
+    <script>
+        const canvas = document.getElementById("dragonCanvas");
+        const ctx = canvas.getContext("2d");
+
+        function drawDragonCurve(x, y, length, depth, angle) {
+            if (depth === 0) {
+                const xEnd = x + length * Math.cos(angle);
+                const yEnd = y + length * Math.sin(angle);
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+                ctx.lineTo(xEnd, yEnd);
+                ctx.strokeStyle = "#00FF00";
+                ctx.stroke();
+            } else {
+                length /= Math.sqrt(2);
+                drawDragonCurve(x, y, length, depth - 1, angle - Math.PI / 4);
+                x += length * Math.cos(angle - Math.PI / 4);
+                y += length * Math.sin(angle - Math.PI / 4);
+                drawDragonCurve(x, y, length, depth - 1, angle + Math.PI / 4);
+            }
+        }
+
+        drawDragonCurve(300, 300, 300, 14, 0);
+    </script>
+</body>
+</html>
+
