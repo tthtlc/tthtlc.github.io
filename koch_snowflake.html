@@ -1,0 +1,74 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Koch Snowflake</title>
+    <style>
+        canvas {
+            display: block;
+            margin: auto;
+            background-color: #000;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="kochCanvas" width="600" height="600"></canvas>
+
+    <script>
+        const canvas = document.getElementById("kochCanvas");
+        const ctx = canvas.getContext("2d");
+
+        function drawKoch(x1, y1, x2, y2, depth) {
+            if (depth === 0) {
+                ctx.beginPath();
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x2, y2);
+                ctx.strokeStyle = "#00FF00";
+                ctx.stroke();
+                return;
+            }
+
+            const dx = (x2 - x1) / 3;
+            const dy = (y2 - y1) / 3;
+
+            const xA = x1 + dx;
+            const yA = y1 + dy;
+
+            const xB = x2 - dx;
+            const yB = y2 - dy;
+
+            const xC = (xA + xB) / 2 - (yB - yA) * Math.sqrt(3) / 2;
+            const yC = (yA + yB) / 2 + (xB - xA) * Math.sqrt(3) / 2;
+
+            drawKoch(x1, y1, xA, yA, depth - 1);
+            drawKoch(xA, yA, xC, yC, depth - 1);
+            drawKoch(xC, yC, xB, yB, depth - 1);
+            drawKoch(xB, yB, x2, y2, depth - 1);
+        }
+
+        function drawSnowflake() {
+            const size = 300;
+            const height = size * Math.sqrt(3) / 2;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const x1 = canvas.width / 2 - size / 2;
+            const y1 = canvas.height / 2 + height / 2;
+
+            const x2 = canvas.width / 2 + size / 2;
+            const y2 = canvas.height / 2 + height / 2;
+
+            const x3 = canvas.width / 2;
+            const y3 = canvas.height / 2 - height / 2;
+
+            drawKoch(x1, y1, x2, y2, 4);
+            drawKoch(x2, y2, x3, y3, 4);
+            drawKoch(x3, y3, x1, y1, 4);
+        }
+
+        drawSnowflake();
+    </script>
+</body>
+</html>
+
