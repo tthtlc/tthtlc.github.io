@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Diamond Drawing</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="diamondCanvas" width="800" height="800"></canvas>
+    <script>
+        const canvas = document.getElementById("diamondCanvas");
+        const ctx = canvas.getContext("2d");
+
+        const colors = [
+            "#FF0000", "#FF7F00", "#FFFF00", "#7FFF00", "#00FF00", "#00FF7F", "#00FFFF", "#007FFF", 
+            "#0000FF", "#7F00FF", "#FF00FF", "#FF007F", "#FF004F", "#00FF4F", "#4F00FF", "#4FFF00"
+        ]; // 16-color gradient
+
+        let angle45 = 0;  // Start from 0 degrees for gradual change
+        let angle120;
+
+        // Update angles
+        function updateAngles() {
+            angle45 = (angle45 + 5) % 90;  // Gradually change between 0 and 90 degrees
+            angle120 = (360 - 2 * angle45) / 2;  // Calculate based on the formula
+        }
+
+        // Calculate points for diamond shape
+        function calculateDiamondPoints(centerX, centerY, size, angle45) {
+            let halfSize = size / 2;
+            let radians45 = angle45 * (Math.PI / 180);
+
+            return [
+                { x: centerX, y: centerY - halfSize },  // Top
+                { x: centerX + halfSize * Math.cos(radians45), y: centerY - halfSize * Math.sin(radians45) },  // Right
+                { x: centerX, y: centerY + halfSize },  // Bottom
+                { x: centerX - halfSize * Math.cos(radians45), y: centerY - halfSize * Math.sin(radians45) }   // Left
+            ];
+        }
+
+        // Draw diamond
+        function drawDiamond() {
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            let centerX = canvas.width / 2;
+            let centerY = canvas.height / 2;
+            let size = 200;
+            
+            for (let i = 0; i < 16; i++) {  // Draw 16 diamonds with changing color and angles
+                updateAngles();  // Update the angles for each frame
+
+                // Calculate diamond points with current angle45
+                let points = calculateDiamondPoints(centerX, centerY, size, angle45);
+                
+                // Pick a color from the gradient pool
+                ctx.strokeStyle = colors[i % colors.length];
+                ctx.beginPath();
+                ctx.moveTo(points[0].x, points[0].y);
+                for (let j = 1; j < points.length; j++) {
+                    ctx.lineTo(points[j].x, points[j].y);
+                }
+                ctx.closePath();
+                ctx.stroke();
+            }
+        }
+
+        // Continuously redraw the canvas with changing angles
+        function animate() {
+            drawDiamond();
+            setTimeout(animate,500);  // Loop the animation
+        }
+
+        // Start the animation
+        animate();
+    </script>
+</body>
+</html>
+

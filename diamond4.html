@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diamond Shape with Labels</title>
+</head>
+<body>
+    <canvas id="diamondCanvas" width="500" height="500"></canvas>
+    <script>
+        const canvas = document.getElementById("diamondCanvas");
+        const ctx = canvas.getContext("2d");
+
+        // Diamond dimensions and starting point
+        const startX =  canvas.width / 2;
+        const startY =  canvas.height / 2;
+        const sideLength = 100;
+        const mycolor = 'Black';
+
+        // Convert degrees to radians
+        function toRadians(deg) {
+            return deg * (Math.PI / 180);
+        }
+
+        // Function to rotate a point around a given origin by an angle
+        function rotatePoint(x, y, originX, originY, rotateAngle) {
+            const radians = rotateAngle * Math.PI / 180;
+            const newX = originX + (x - originX) * Math.cos(radians) - (y - originY) * Math.sin(radians);
+            const newY = originY + (x - originX) * Math.sin(radians) + (y - originY) * Math.cos(radians);
+            return { x: newX, y: newY };
+        }
+
+        // Function to calculate diamond vertices based on start point and side length
+        function calculateDiamondPoints(x, y) {
+            const angle30 = toRadians(30);
+            const angle120 = toRadians(90);
+
+            const p1 = { x: x, y: y };
+            const p2 = { x: p1.x + sideLength * Math.cos(angle30), y: p1.y - sideLength * Math.sin(angle30) };
+            const p3 = { x: p2.x + sideLength * Math.cos(angle120), y: p2.y + sideLength * Math.sin(angle120) };
+            const p4 = { x: p3.x - sideLength * Math.cos(angle30), y: p3.y + sideLength * Math.sin(angle30) };
+            return { p1, p2, p3, p4 };
+        }
+
+        // Function to draw a diamond using the provided points and color
+        function drawDiamond(p1, p2, p3, p4, mycolor) {
+            ctx.beginPath();
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.lineTo(p3.x, p3.y);
+            ctx.lineTo(p4.x, p4.y);
+            ctx.closePath();
+
+            // Styling and rendering the shape
+            ctx.strokeStyle = mycolor;
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Label each vertex
+            //ctx.font = "16px Arial";
+            //ctx.fillStyle = "black";
+
+            //ctx.fillText("P1", p1.x - 20, p1.y - 10); // Label for P1
+            //ctx.fillText("P2", p2.x + 5, p2.y - 10);  // Label for P2
+            //ctx.fillText("P3", p3.x + 5, p3.y + 20);  // Label for P3
+            //ctx.fillText("P4", p4.x - 20, p4.y + 20); // Label for P4
+        }
+
+        // Starting coordinates
+        let x = startX;
+        let y = startY;
+
+        // Calculate the initial diamond points
+        let { p1, p2, p3, p4 } = calculateDiamondPoints(x, y);
+	x=p4.x;
+	y=p4.y;
+
+        // Rotate and draw the diamond multiple times
+        for (let rotateAngle = 0; rotateAngle < 360; rotateAngle += 360/6) {
+            const rotatedP1 = rotatePoint(p1.x, p1.y, x, y, rotateAngle);
+            const rotatedP2 = rotatePoint(p2.x, p2.y, x, y, rotateAngle);
+            const rotatedP3 = rotatePoint(p3.x, p3.y, x, y, rotateAngle);
+            const rotatedP4 = rotatePoint(p4.x, p4.y, x, y, rotateAngle);
+            drawDiamond(rotatedP1, rotatedP2, rotatedP3, rotatedP4, mycolor);
+        }
+
+    </script>
+</body>
+</html>
+

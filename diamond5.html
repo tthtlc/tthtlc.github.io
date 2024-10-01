@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diamond Shape with Labels</title>
+</head>
+<body>
+    <canvas id="diamondCanvas" width="500" height="500"></canvas>
+    <script>
+        const canvas = document.getElementById("diamondCanvas");
+        const ctx = canvas.getContext("2d");
+
+        // Diamond dimensions and starting point
+        const startX = 150;
+        const startY = 150;
+        const sideLength = 100;
+        const mycolor = 'Black';
+
+        // Convert degrees to radians
+        function toRadians(deg) {
+            return deg * (Math.PI / 180);
+        }
+
+        // Function to rotate a point around a given origin by an angle
+        function rotatePoint(x, y, originX, originY, rotateAngle) {
+            const radians = rotateAngle * Math.PI / 180;
+            const newX = originX + (x - originX) * Math.cos(radians) - (y - originY) * Math.sin(radians);
+            const newY = originY + (x - originX) * Math.sin(radians) + (y - originY) * Math.cos(radians);
+            return { x: newX, y: newY };
+        }
+
+        //function calculateDiamondPoints(x, y) {
+        //}
+
+        // Function to draw a diamond using the provided points and color
+        function drawDiamond(p1, p2, p3, p4, mycolor) {
+            ctx.beginPath();
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.lineTo(p3.x, p3.y);
+            ctx.lineTo(p4.x, p4.y);
+            ctx.closePath();
+
+            // Styling and rendering the shape
+            ctx.strokeStyle = mycolor;
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Label each vertex
+            //ctx.font = "16px Arial";
+            //ctx.fillStyle = "black";
+
+            //ctx.fillText("P1", p1.x - 20, p1.y - 10); // Label for P1
+            //ctx.fillText("P2", p2.x + 5, p2.y - 10);  // Label for P2
+            //ctx.fillText("P3", p3.x + 5, p3.y + 20);  // Label for P3
+            //ctx.fillText("P4", p4.x - 20, p4.y + 20); // Label for P4
+        }
+
+        // Starting coordinates
+        let x = startX;
+        let y = startY;
+
+        // Calculate the initial diamond points
+        let { p1, p2, p3, p4 } = calculateDiamondPoints(x, y);
+	x=p2.x;
+	y=p2.y;
+
+        // Rotate and draw the diamond multiple times
+        for (let rotateAngle = 0; rotateAngle < 360; rotateAngle += 45/2) {
+            const rotatedP1 = rotatePoint(p1.x, p1.y, x, y, rotateAngle);
+            const rotatedP2 = rotatePoint(p2.x, p2.y, x, y, rotateAngle);
+            const rotatedP3 = rotatePoint(p3.x, p3.y, x, y, rotateAngle);
+            const rotatedP4 = rotatePoint(p4.x, p4.y, x, y, rotateAngle);
+            drawDiamond(rotatedP1, rotatedP2, rotatedP3, rotatedP4, mycolor);
+        }
+
+
+
+
+
+
+
+
+        const colors = [
+            "#FF0000", "#FF7F00", "#FFFF00", "#7FFF00", "#00FF00", "#00FF7F", "#00FFFF", "#007FFF", 
+            "#0000FF", "#7F00FF", "#FF00FF", "#FF007F", "#FF004F", "#00FF4F", "#4F00FF", "#4FFF00"
+        ]; // 16-color gradient
+
+        let angle45 = 0;  // Start from 0 degrees for gradual change
+        let angle120;
+
+        // Update angles
+        function updateAngles() {
+            angle45 = (angle45 + 5) % 90;  // Gradually change between 0 and 90 degrees
+            angle120 = (360 - 2 * angle45) / 2;  // Calculate based on the formula
+        }
+
+        // Calculate points for diamond shape
+        function calculateDiamondPoints(centerX, centerY, size, angle45) {
+            let halfSize = size / 2;
+            let radians45 = angle45 * (Math.PI / 180);
+
+            return [
+                { x: centerX, y: centerY - halfSize },  // Top
+                { x: centerX + halfSize * Math.cos(radians45), y: centerY - halfSize * Math.sin(radians45) },  // Right
+                { x: centerX, y: centerY + halfSize },  // Bottom
+                { x: centerX - halfSize * Math.cos(radians45), y: centerY - halfSize * Math.sin(radians45) }   // Left
+            ];
+
+            const angle30 = toRadians(45);
+            const angle120 = toRadians(125);
+
+            const p1 = { x: x, y: y };
+            const p2 = { x: p1.x + sideLength * Math.cos(angle30), y: p1.y - sideLength * Math.sin(angle30) };
+            const p3 = { x: p2.x + sideLength * Math.cos(angle120), y: p2.y + sideLength * Math.sin(angle120) };
+            const p4 = { x: p3.x - sideLength * Math.cos(angle30), y: p3.y + sideLength * Math.sin(angle30) };
+            return { p1, p2, p3, p4 };
+        }
+
+        // Draw diamond
+        function drawDiamond() {
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            let centerX = canvas.width / 2;
+            let centerY = canvas.height / 2;
+            let size = 200;
+            
+            for (let i = 0; i < 16; i++) {  // Draw 16 diamonds with changing color and angles
+                updateAngles();  // Update the angles for each frame
+
+                // Calculate diamond points with current angle45
+                let points = calculateDiamondPoints(centerX, centerY, size, angle45);
+                
+                // Pick a color from the gradient pool
+                ctx.strokeStyle = colors[i % colors.length];
+                ctx.beginPath();
+                ctx.moveTo(points[0].x, points[0].y);
+                for (let j = 1; j < points.length; j++) {
+                    ctx.lineTo(points[j].x, points[j].y);
+                }
+                ctx.closePath();
+                ctx.stroke();
+            }
+        }
+
+        // Continuously redraw the canvas with changing angles
+        function animate() {
+            drawDiamond();
+            setTimeout(animate,500);  // Loop the animation
+        }
+
+        // Start the animation
+        animate();
+
+
+
+
+
+
+
+
+
+
+    </script>
+</body>
+</html>
+
