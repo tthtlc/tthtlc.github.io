@@ -119,6 +119,7 @@
         }
 
         // Draw diamond
+        drawDiamond(rotatedP1, rotatedP2, rotatedP3, rotatedP4, mycolor);
         function drawDiamond() {
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -143,6 +144,7 @@
                 ctx.stroke();
             }
         }
+
 
         // Continuously redraw the canvas with changing angles
         function animate() {
