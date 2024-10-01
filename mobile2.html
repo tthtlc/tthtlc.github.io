@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Random Item Selector</title>
+  <style>
+    body {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+    }
+    iframe {
+      width: 300px;
+      height: 200px;
+      margin: 10px;
+      border: 1px solid black;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="iframe-container"></div>
+
+  <script>
+    // Master list of URLs or items
+    const masterList = [
+      "https://example.com/1", "https://example.com/2", "https://example.com/3", "https://example.com/4", 
+      "https://example.com/5", "https://example.com/6", "https://example.com/7", "https://example.com/8",
+      "https://example.com/9", "https://example.com/10", "https://example.com/11", "https://example.com/12",
+      "https://example.com/13", "https://example.com/14", "https://example.com/15", "https://example.com/16",
+      "https://example.com/17", "https://example.com/18", "https://example.com/19", "https://example.com/20"
+      // Add more URLs or items as necessary
+    ];
+
+    let currentSubList = [];
+    let currentIndex = 0;
+
+    // Function to shuffle and select 10 random items from the master list
+    function getRandomSubList() {
+      let shuffledList = [...masterList].sort(() => 0.5 - Math.random());
+      return shuffledList.slice(0, 10);
+    }
+
+    // Function to display the current sublist in iframes
+    function displaySubList() {
+      const iframeContainer = document.getElementById("iframe-container");
+      iframeContainer.innerHTML = ""; // Clear current iframes
+      currentSubList.forEach((item, index) => {
+        const iframe = document.createElement("iframe");
+        iframe.src = item;
+        iframe.title = `Item ${index + 1}`;
+        iframeContainer.appendChild(iframe);
+      });
+    }
+
+    // Function to check the index and switch to a new sublist when needed
+    function checkForNewSubList() {
+      if (currentIndex >= 7) {
+        currentSubList = getRandomSubList();
+        currentIndex = 0; // Reset index for the new sublist
+        displaySubList();
+      } else {
+        currentIndex++;
+      }
+    }
+
+    // Initial setup
+    currentSubList = getRandomSubList();
+    displaySubList();
+
+    // Simulate user navigating the sublist (you can use buttons, timers, or scroll events to call this)
+    setInterval(checkForNewSubList, 3000); // For example, this will check every 3 seconds
+  </script>
+
+</body>
+</html>
+
