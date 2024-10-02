@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dragon Curve Animation</title>
+    <style>
+        canvas {
+            display: block;
+            margin: auto;
+            background-color: #000;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="dragonCanvas" width="500" height="500"></canvas>
+
+    <script>
+        const canvas = document.getElementById("dragonCanvas");
+        const ctx = canvas.getContext("2d");
+        const centerx = canvas.width / 2;
+	const centery = canvas.height / 2;
+        let depth_color = 0;
+
+        // let colors = generateGradient(360); // Generate 360 colors
+    	let colors = [
+        '#FFFFE0', '#FFFACD', '#FAFAD2', '#FFE4B5', '#FFD700', 
+        '#FFA500', '#FF8C00', '#DAA520', '#B8860B', '#A0522D'
+    ];
+        let iteration = 0; // Iteration count for animation
+        let depth = 14; // Recursion depth
+
+        // Function to generate a gradient of colors
+        function generateGradient(steps) {
+            let gradient = [];
+            for (let i = 0; i < steps; i++) {
+                const hue = i / steps * 360;
+                gradient.push(`hsl(${hue}, 100%, 50%)`); // Hue in HSL format
+            }
+            return gradient;
+        }
+
+        function drawDragonCurve(x, y, length, depth, angle) {
+            if (depth === 0) {
+                const xEnd = x + length * Math.cos(angle);
+                const yEnd = y + length * Math.sin(angle);
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+                ctx.lineTo(xEnd, yEnd);
+		depth_color = (depth_color + 1) % colors.length;
+                ctx.strokeStyle = colors[depth_color]; // Cycle through colors
+                ctx.stroke();
+            } else {
+                length /= Math.sqrt(2);
+                drawDragonCurve(x, y, length, depth - 1, angle - Math.PI / 4);
+                x += length * Math.cos(angle - Math.PI / 4);
+                y += length * Math.sin(angle - Math.PI / 4);
+                drawDragonCurve(x, y, length, depth - 1, angle + Math.PI / 4);
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
+            drawDragonCurve(centerx - centerx * 1.5/3, centery + centery/3, 225, depth, 0); // Redraw the dragon curve
+            iteration++; // Move to the next color
+            setTimeout(animate, 300); // Delay for animation (1 second)
+        }
+
+        animate(); // Start animation
+    </script>
+</body>
+</html>
+
