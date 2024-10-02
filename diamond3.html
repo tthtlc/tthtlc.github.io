@@ -4,6 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Diamond Shape with Labels</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        canvas {
+            background-color: white;
+            border: 1px solid #ccc;
+        }
+    </style>
 </head>
 <body>
     <canvas id="diamondCanvas" width="500" height="500"></canvas>
@@ -12,9 +26,9 @@
         const ctx = canvas.getContext("2d");
 
         // Diamond dimensions and starting point
-        const startX = 150;
-        const startY = 150;
-        const sideLength = 100;
+        const startX = canvas.width / 2;
+        const startY = canvas.height / 2;
+        const sideLength = canvas.height / 6;
         const mycolor = 'Black';
 
         // Convert degrees to radians
