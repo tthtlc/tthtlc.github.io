@@ -31,12 +31,13 @@
     // Variables for ellipse properties
     const centerX = canvas.width / 2;
     const centerY = canvas.height / 2;
-    let radiusX = 80;
-    let radiusY = 80;
     let angle = 0; // Angle for rotation
     let colorIndex = 0;
-    let radiusx_incr = (Math.random() * 20 + 1);
-    let radiusy_incr = (Math.random() * 20 + 50);
+    let radiusx_incr = -15; //(Math.random() * 20 + 1);
+    let radiusy_incr = 5; // (Math.random() * 20 + 50);
+    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
+    let radiusX = 400; //Math.floor(Math.random() * 150 + 10);
+    let radiusY = 50; //Math.floor(Math.random() * 80 + 50);
 
     // Gradient colors array
     const colors = [
@@ -50,16 +51,9 @@
 
     function drawRotatingEllipse() {
         // Stop after one full rotation (2 * Math.PI)
-        if ((angle >= Math.PI/1.5) || (radiusY<=0))  {
-    		ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
-    		radiusX = Math.floor(Math.random() * 150 + 10);
-    		radiusY = Math.floor(Math.random() * 80 + 50);
-		radiusx_incr = (Math.random() * 20 + 1);
-		radiusy_incr = (Math.random() * 20 + 1);
-
-		angle=0;
+        if ((angle >= 2*Math.PI / 3))  {
+		return;
 	}
-
 
         // Select a color from the gradient palette
         const color = colors[colorIndex % colors.length];
@@ -77,12 +71,12 @@
         ctx.restore(); // Restore the original state
 
         // Increment the angle and color index for the next frame
-        angle += 0.1;
+        angle += 2*Math.PI/60;
         colorIndex++;
 
         // Slightly increase radiusX and decrease radiusY for each rotation
         radiusX += radiusx_incr;
-        radiusY -= radiusy_incr;
+        radiusY += radiusy_incr;
 
         // Schedule the next frame after the delay
         setTimeout(drawRotatingEllipse, delay);
