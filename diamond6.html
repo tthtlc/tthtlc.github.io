@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radial Symmetry Animated Diamonds</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="diamondCanvas" width="800" height="800"></canvas>
+    <script>
+        const canvas = document.getElementById("diamondCanvas");
+        const ctx = canvas.getContext("2d");
+
+        const colors = [
+            "#0000FF", "#7F00FF", "#FF00FF", "#FF007F", "#FF004F", "#00FF4F", "#4F00FF", "#4FFF00",
+            "#FF0000", "#FF7F00", "#FFFF00", "#7FFF00", "#00FF00", "#00FF7F", "#00FFFF", "#007FFF", 
+            "#0000FF", "#7F00FF", "#FF00FF", "#FF007F", "#FF004F", "#00FF4F", "#4F00FF", "#4FFF00"
+        ]; // 16-color gradient
+
+        let angle45 = 0;  // Start from 0 degrees for gradual change
+        let angle120;
+
+        // Update angles
+        function updateAngles() {
+            angle45 = (angle45 + 5) % 90;  // Gradually change between 0 and 90 degrees
+            angle120 = (360 - 2 * angle45) / 2;  // Calculate based on the formula
+        }
+
+        // Calculate points for diamond shape
+        function calculateDiamondPoints(centerX, centerY, size, angle45) {
+            let halfSize = size / 2;
+            let radians45 = angle45 * (Math.PI / 180);
+
+            return [
+                { x: centerX, y: centerY - halfSize },  // Top
+                { x: centerX + halfSize * Math.cos(radians45), y: centerY - halfSize * Math.sin(radians45) },  // Right
+                { x: centerX, y: centerY + halfSize },  // Bottom
+                { x: centerX - halfSize * Math.cos(radians45), y: centerY - halfSize * Math.sin(radians45) }   // Left
+            ];
+        }
+
+        // Rotate a point around a center (for radial symmetry)
+        function rotatePoint(x, y, originX, originY, rotateAngle) {
+            const radians = rotateAngle * Math.PI / 180;
+            const newX = originX + (x - originX) * Math.cos(radians) - (y - originY) * Math.sin(radians);
+            const newY = originY + (x - originX) * Math.sin(radians) + (y - originY) * Math.cos(radians);
+            return { x: newX, y: newY };
+        }
+
+        // Draw diamond
+        function drawDiamond(centerX, centerY, size, angle45, rotateAngle, color) {
+            ctx.save();
+            ctx.translate(centerX, centerY);
+            ctx.rotate(rotateAngle * Math.PI / 180);
+            ctx.translate(-centerX, -centerY);
+
+            // Calculate diamond points with current angle45
+            let points = calculateDiamondPoints(centerX, centerY, size, angle45);
+            
+            // Draw the diamond with the selected color
+            ctx.strokeStyle = color;
+            ctx.beginPath();
+            ctx.moveTo(points[0].x, points[0].y);
+            for (let j = 1; j < points.length; j++) {
+                ctx.lineTo(points[j].x, points[j].y);
+            }
+            ctx.closePath();
+            ctx.stroke();
+
+            ctx.restore();
+        }
+
+        // Animation loop
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            let centerX = canvas.width / 2;
+            let centerY = canvas.height / 2;
+            let size = 100;
+
+            for (let i = 0; i < 16; i++) {  // Loop for 16 diamonds
+                updateAngles();  // Update the angles for each frame
+                let rotateAngle = i * 22.5;  // 360/16 for radial symmetry
+                let color = colors[i % colors.length];
+
+                // Calculate the rotated position for each diamond
+                let rotatedPosition = rotatePoint(centerX, centerY - 150, centerX, centerY, rotateAngle);
+
+                // Draw the diamond at the rotated position
+                drawDiamond(rotatedPosition.x, rotatedPosition.y, size, angle45, rotateAngle, color);
+            }
+
+            setTimeout(animate, 500);  // Loop the animation
+        }
+
+        // Start the animation
+        animate();
+    </script>
+</body>
+</html>
+
