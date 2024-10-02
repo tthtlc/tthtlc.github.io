@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rotating Diamond</title>
+    <style>
+        canvas {
+            display: block;
+            margin: 0 auto;
+            background-color: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="diamondCanvas" width="400" height="400"></canvas>
+
+<script>
+    const canvas = document.getElementById('diamondCanvas');
+    const ctx = canvas.getContext('2d');
+    const sideLength = 100; // Length of each side of the diamond
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    let angle = 0; // Initial rotation angle
+
+    // Convert degrees to radians
+    function toRadians(degrees) {
+        return degrees * (Math.PI / 180);
+    }
+
+    // Function to calculate diamond vertices based on center point and side length
+    function calculateDiamondPoints(cx, cy, rotation) {
+        const halfSide = sideLength / 2;
+        const points = [
+            { x: cx, y: cy - sideLength }, // Top vertex
+            { x: cx + halfSide, y: cy },   // Right vertex
+            { x: cx, y: cy + sideLength }, // Bottom vertex
+            { x: cx - halfSide, y: cy }    // Left vertex
+        ];
+
+        // Rotate the points around the center (cx, cy)
+        const rotatedPoints = points.map(point => {
+            const dx = point.x - cx;
+            const dy = point.y - cy;
+            const rotatedX = cx + (dx * Math.cos(rotation)) - (dy * Math.sin(rotation));
+            const rotatedY = cy + (dx * Math.sin(rotation)) + (dy * Math.cos(rotation));
+            return { x: rotatedX, y: rotatedY };
+        });
+
+        return rotatedPoints;
+    }
+
+    // Function to draw the diamond
+    function drawDiamond(points) {
+        ctx.beginPath();
+        ctx.moveTo(points[0].x, points[0].y); // Move to the first point
+        for (let i = 1; i < points.length; i++) {
+            ctx.lineTo(points[i].x, points[i].y); // Draw lines to the remaining points
+        }
+        ctx.closePath();
+        ctx.fillStyle = 'lightblue'; // Fill color for the diamond
+        ctx.fill();
+        ctx.strokeStyle = 'blue'; // Border color
+        ctx.stroke();
+    }
+
+    // Animation loop
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+
+        // Calculate the diamond points with current rotation angle
+        const points = calculateDiamondPoints(centerX, centerY, angle);
+
+        // Draw the diamond
+        drawDiamond(points);
+
+        // Increment the rotation angle
+        angle += toRadians(1); // Rotate by 1 degree each frame
+
+        // Request the next frame of animation
+        requestAnimationFrame(animate);
+    }
+
+    // Start the animation
+    animate();
+
+</script>
+
+</body>
+</html>
+
