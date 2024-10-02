@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>T-Square Fractal with High Contrast</title>
+    <style>
+        body {
+            margin: 0;
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        canvas {
+            border: 1px solid #fff;
+            background-color: #000;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="tSquareCanvas" width="800" height="800"></canvas>
+    <script>
+        const canvas = document.getElementById('tSquareCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function drawTSquare(x, y, size, depth) {
+            if (depth === 0) {
+                // Base case: Draw the smallest square
+                ctx.fillStyle = '#fff';
+                ctx.fillRect(x, y, size, size);
+            } else {
+                // Alternate colors based on depth for contrast
+                if (depth % 2 === 0) {
+                    ctx.fillStyle = '#fff'; // White
+                } else {
+                    ctx.fillStyle = '#000'; // Black
+                }
+
+                // Draw the central square
+                ctx.fillRect(x + size / 4, y + size / 4, size / 2, size / 2);
+
+                // Recursive calls for each corner
+                const newSize = size / 2;
+                drawTSquare(x, y, newSize, depth - 1); // Top-left
+                drawTSquare(x + newSize, y, newSize, depth - 1); // Top-right
+                drawTSquare(x, y + newSize, newSize, depth - 1); // Bottom-left
+                drawTSquare(x + newSize, y + newSize, newSize, depth - 1); // Bottom-right
+            }
+        }
+
+        // Initial call to draw the T-square fractal
+        const maxDepth = 8; // Increased depth for more detail
+        drawTSquare(0, 0, canvas.width, maxDepth);
+    </script>
+</body>
+</html>
+
