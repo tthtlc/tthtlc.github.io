@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Square Rotation and Translation</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        canvas {
+            background-color: white;
+            border: 1px solid #ccc;
+        }
+    </style>
+    <!-- Google tag (gtag.js) --> 
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-GEX61LPT08"></script> 
+    <script>   
+        window.dataLayer = window.dataLayer || [];   
+        function gtag(){dataLayer.push(arguments);}   
+        gtag('js', new Date());   
+        gtag('config', 'G-GEX61LPT08'); 
+    </script>
+</head>
+<body>
+    <canvas id="squareCanvas" width="600" height="600"></canvas>
+
+    <script> 
+        document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
+        
+        const canvas = document.getElementById('squareCanvas');
+        const ctx = canvas.getContext('2d');
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        const squareRadius = 100;
+        let angleOffset = 0; // Rotation angle for the squares
+
+        // Function to calculate the 4 points of a square
+        function getSquarePoints(centerX, centerY, size, rotationAngle = 0) {
+            const points = [];
+            for (let i = 0; i < 4; i++) {
+                const angle = (Math.PI / 2 * i) + rotationAngle;
+                const x = centerX + size * Math.cos(angle);
+                const y = centerY + size * Math.sin(angle);
+                points.push({ x, y });
+            }
+            return points;
+        }
+
+        // Function to draw a square
+        function drawPolygon(points) {
+            ctx.beginPath();
+            ctx.moveTo(points[0].x, points[0].y);
+            for (let i = 1; i < points.length; i++) {
+                ctx.lineTo(points[i].x, points[i].y);
+            }
+            ctx.closePath();
+            ctx.stroke();
+        }
+
+        // Function to draw the squares around the center
+        function drawRotatingSquares() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
+            ctx.strokeStyle = 'black';
+
+            // Calculate the positions of the 4 squares
+            const squareCenters = getSquarePoints(centerX, centerY, squareRadius);
+
+            // Loop through each square center to draw a rotating square
+            for (let i = 0; i < squareCenters.length; i++) {
+                const center = squareCenters[i];
+                const size = 50; // Square size
+
+                // Get the points for the square rotated around its center
+                const rotatedSquare = getSquarePoints(center.x, center.y, size, angleOffset);
+
+                // Draw the square
+                drawPolygon(rotatedSquare);
+            }
+
+            // Increment the rotation angle
+            angleOffset += 0.02;
+
+            // Request the next frame to continue the animation
+            requestAnimationFrame(drawRotatingSquares);
+        }
+
+        // Start the animation
+        drawRotatingSquares();
+    </script>
+</body>
+</html>
+
