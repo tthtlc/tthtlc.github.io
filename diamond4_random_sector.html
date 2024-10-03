@@ -32,6 +32,10 @@
         const startY = canvas.height / 2;
         const sideLength = 100;
         const mycolor = 'Black';
+        let nnn30 = Math.floor(Math.random() * 360) + 1; // Random number between 3 and 12
+        let nnn120 = Math.floor(Math.random() * 360) + 1; // Random number between 3 and 12
+        let angle30 = toRadians(nnn30);
+        let angle120 = toRadians(nnn120);
 
         // Convert degrees to radians
         function toRadians(deg) {
@@ -48,8 +52,6 @@
 
         // Function to calculate diamond vertices based on start point and side length
         function calculateDiamondPoints(x, y) {
-            const angle30 = toRadians(30);
-            const angle120 = toRadians(90);
 
             const p1 = { x: x, y: y };
             const p2 = { x: p1.x + sideLength * Math.cos(angle30), y: p1.y - sideLength * Math.sin(angle30) };
@@ -79,7 +81,11 @@
 
         // Function to get a random integer for nnn
         function getRandomNNN() {
-            return Math.floor(Math.random() * 10) + 3; // Random number between 3 and 12
+        nnn30 = Math.floor(Math.random() * 360) + 1; // Random number between 3 and 12
+        nnn120 = Math.floor(Math.random() * 360) + 1; // Random number between 3 and 12
+        angle30 = toRadians(nnn30);
+        angle120 = toRadians(nnn120);
+            return Math.floor(Math.random() * 36) + 2; // Random number between 3 and 12
         }
 
         let nnn = getRandomNNN(); // Initialize with a random value
