@@ -31,10 +31,15 @@ document.addEventListener("contextmenu", function(event) { event.preventDefault(
     const centerY = canvas.height / 2;
     const radius = 100;
     const numPoints = 90; // Dividing the ring into 90 points
+    let gcounter=0;
 
     let angleX = 0;
     let angleY = 0;
     let angleZ = 0;
+
+    let	xrandom=Math.random() * 0.5; // Small random changes to X angle
+    let	yrandom=Math.random() * 0.5; // Small random changes to X angle
+    let	zrandom=Math.random() * 0.5; // Small random changes to X angle
 
     // Function to project 3D points onto 2D canvas
     function project(x, y, z) {
@@ -135,16 +140,23 @@ document.addEventListener("contextmenu", function(event) { event.preventDefault(
 
     // Update the rotation angles slightly each frame for a slow rotation
     function updateAngles() {
-        angleX += (Math.random() * 0.03 - 0.005); // Small random changes to X angle
-        angleY += (Math.random() * 0.03 - 0.005); // Small random changes to Y angle
-        angleZ += (Math.random() * 0.03 - 0.005); // Small random changes to Z angle
+        angleX += xrandom;
+        angleY += yrandom;
+        angleZ += zrandom;
     }
 
     // Animation loop
     function animate() {
+        gcounter++;
         updateAngles();
         draw();
-        requestAnimationFrame(animate);
+        if (gcounter> 20) {
+                gcounter = 0;
+        xrandom=Math.random() * 0.5; // Small random changes to X angle
+        yrandom=Math.random() * 0.5;
+        zrandom=Math.random() * 0.5;
+        }
+        setTimeout(animate, 200);
     }
 
     // Start the animation
