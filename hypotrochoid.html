@@ -1,0 +1,87 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hypotrochoid Curves</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        canvas {
+            border: 1px solid black;
+        }
+        #controls {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: white;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div id="controls">
+        <label for="R">R (Outer radius):</label>
+        <input type="number" id="R" value="100"><br>
+        <label for="r">r (Inner radius):</label>
+        <input type="number" id="r" value="40"><br>
+        <label for="d">d (Distance from center):</label>
+        <input type="number" id="d" value="60"><br>
+        <button onclick="drawHypotrochoid()">Draw Hypotrochoid</button>
+    </div>
+    <canvas id="canvas" width="600" height="600"></canvas>
+
+    <script>
+        function drawHypotrochoid() {
+            const R = parseFloat(document.getElementById('R').value);
+            const r = parseFloat(document.getElementById('r').value);
+            const d = parseFloat(document.getElementById('d').value);
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width;
+            const height = canvas.height;
+
+            // Clear the canvas
+            ctx.clearRect(0, 0, width, height);
+
+            ctx.beginPath();
+            ctx.strokeStyle = 'blue';
+            ctx.lineWidth = 1;
+
+            // Move to the starting point of the curve
+            let x0 = (R - r) * Math.cos(0) + d * Math.cos(((R - r) / r) * 0);
+            let y0 = (R - r) * Math.sin(0) - d * Math.sin(((R - r) / r) * 0);
+            ctx.moveTo(width / 2 + x0, height / 2 - y0);
+
+            // Draw the Hypotrochoid curve
+            for (let t = 0; t <= 2 * Math.PI * r / Math.gcd(R, r); t += 0.01) {
+                const x = (R - r) * Math.cos(t) + d * Math.cos(((R - r) / r) * t);
+                const y = (R - r) * Math.sin(t) - d * Math.sin(((R - r) / r) * t);
+                ctx.lineTo(width / 2 + x, height / 2 - y);
+            }
+
+            ctx.stroke();
+        }
+
+        // Utility function to calculate the greatest common divisor (GCD)
+        Math.gcd = function(a, b) {
+            return b ? Math.gcd(b, a % b) : Math.abs(a);
+        };
+
+        // Draw the default Hypotrochoid curve on page load
+        window.onload = function() {
+            drawHypotrochoid();
+        };
+    </script>
+</body>
+</html>
+
