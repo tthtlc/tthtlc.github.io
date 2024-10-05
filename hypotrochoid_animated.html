@@ -35,7 +35,8 @@
         <!-- Canvases will be dynamically appended here -->
     </div>
 
-    <script>
+    <script> 
+document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
         function drawHypotrochoid(R, r, d, canvas) {
             const ctx = canvas.getContext('2d');
             const width = canvas.width;
@@ -118,7 +119,7 @@
         };
 
         // Refresh periodically
-        setInterval(createNewCanvas, 3000);
+        setInterval(createNewCanvas, 1500);
     </script>
 </body>
 </html>
