@@ -32,7 +32,8 @@
 <body>
     <div id="iframeList"></div>
 
-    <script>
+    <script> 
+document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
         // Master list of HTML files (URLs) to load
         const masterList = [
 '3gon_around_3gon.html', 

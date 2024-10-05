@@ -16,7 +16,8 @@
 <body>
     <canvas id="sierpinskiCanvas" width="600" height="600"></canvas>
 
-    <script>
+    <script> 
+document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
         const canvas = document.getElementById("sierpinskiCanvas");
         const ctx = canvas.getContext("2d");
 

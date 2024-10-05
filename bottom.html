@@ -23,7 +23,8 @@
 <body>
     <div id="iframeList"></div>
 
-    <script>
+    <script> 
+document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
         // Master list of HTML files (URLs) to load
         const masterList = [
             'https://ar5iv.labs.arxiv.org/html/2402.06196',

@@ -16,7 +16,8 @@
 
 <canvas id="diamondCanvas" width="400" height="400"></canvas>
 
-<script>
+<script> 
+document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
     const canvas = document.getElementById('diamondCanvas');
     const ctx = canvas.getContext('2d');
     const sideLength = 100; // Length of each side of the diamond

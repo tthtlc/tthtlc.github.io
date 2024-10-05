@@ -15,7 +15,8 @@
 <body>
     <canvas id="fernCanvas" width="600" height="600"></canvas>
 
-    <script>
+    <script> 
+document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
         const canvas = document.getElementById("fernCanvas");
         const ctx = canvas.getContext("2d");
 

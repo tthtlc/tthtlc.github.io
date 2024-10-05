@@ -22,7 +22,8 @@
 <body>
     <canvas id="spiralCanvas"></canvas>
 
-    <script>
+    <script> 
+document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
         const canvas = document.getElementById("spiralCanvas");
         const ctx = canvas.getContext("2d");
         canvas.width = window.innerWidth;

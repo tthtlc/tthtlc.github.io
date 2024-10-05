@@ -19,7 +19,8 @@
 </head>
 <body>
     <canvas id="vicsekCanvas" width="800" height="800"></canvas>
-    <script>
+    <script> 
+document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
         const canvas = document.getElementById('vicsekCanvas');
         const ctx = canvas.getContext('2d');
         const maxDepth = 5; // Adjust depth for detail

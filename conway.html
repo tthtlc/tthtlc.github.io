@@ -20,7 +20,8 @@
 <body>
     <canvas id="gameOfLifeCanvas" width="600" height="600"></canvas>
 
-    <script>
+    <script> 
+document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
         const canvas = document.getElementById('gameOfLifeCanvas');
         const ctx = canvas.getContext('2d');
         const cellSize = 10;
