@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mandelbrot Zoom Animation</title>
+    <style>
+        canvas {
+            display: block;
+            margin: 0 auto;
+            background-color: black;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="mandelbrotCanvas" width="800" height="800"></canvas>
+
+    <script>
+        const canvas = document.getElementById('mandelbrotCanvas');
+        const ctx = canvas.getContext('2d');
+        const width = canvas.width;
+        const height = canvas.height;
+
+        let zoomLevel = 1; // Initial zoom level
+        let centerX = -0.5;
+        let centerY = 0;
+        const maxIterations = 100;
+
+        function mandelbrot(cRe, cIm, maxIterations) {
+            let zRe = 0, zIm = 0;
+            let n = 0;
+            while (n < maxIterations) {
+                const zRe2 = zRe * zRe - zIm * zIm;
+                const zIm2 = 2 * zRe * zIm;
+                zRe = zRe2 + cRe;
+                zIm = zIm2 + cIm;
+
+                if (zRe * zRe + zIm * zIm > 4) {
+                    return n;
+                }
+                n++;
+            }
+            return maxIterations;
+        }
+
+        function drawMandelbrot() {
+            const imageData = ctx.createImageData(width, height);
+            const pixels = imageData.data;
+
+            const scale = 4 / (zoomLevel * width);
+            for (let x = 0; x < width; x++) {
+                for (let y = 0; y < height; y++) {
+                    const cRe = centerX + (x - width / 2) * scale;
+                    const cIm = centerY + (y - height / 2) * scale;
+                    const n = mandelbrot(cRe, cIm, maxIterations);
+
+                    const color = (n === maxIterations) ? 0 : 255 - Math.floor((n / maxIterations) * 255);
+                    const pixelIndex = (y * width + x) * 4;
+                    pixels[pixelIndex] = color;     // Red
+                    pixels[pixelIndex + 1] = color; // Green
+                    pixels[pixelIndex + 2] = color; // Blue
+                    pixels[pixelIndex + 3] = 255;   // Alpha (opacity)
+                }
+            }
+
+            ctx.putImageData(imageData, 0, 0);
+        }
+
+        function animateZoom() {
+            drawMandelbrot();
+            zoomLevel *= 1.02; // Increase zoom level slightly for each frame
+            requestAnimationFrame(animateZoom);
+        }
+
+        // Event listener for mouse clicks
+        canvas.addEventListener('click', (event) => {
+            // Get the mouse click position relative to the canvas
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = event.clientX - rect.left;
+            const mouseY = event.clientY - rect.top;
+
+            // Convert canvas coordinates to Mandelbrot coordinates
+            const scale = 4 / (zoomLevel * width);
+            centerX += (mouseX - width / 2) * scale;
+            centerY += (mouseY - height / 2) * scale;
+
+            // Redraw the Mandelbrot set with the new center
+            drawMandelbrot();
+        });
+
+        // Start the animation
+        animateZoom();
+    </script>
+</body>
+</html>
+
