@@ -1,7 +1,10 @@
 set -x
+mkdir /tmp/tmp$$
+
 for name in $*
 do
 
+	cp $name /tmp/tmp$$
 	cat $name | sed "s/<.head>/\
 <!-- Google tag (gtag.js) --> \
 <script async src=\"https:\/\/www.googletagmanager.com\/gtag\/js?id=G-GEX61LPT08\"><\/script> \
