@@ -18,11 +18,36 @@
             background-color: white;
             border: 1px solid #ccc;
         }
-    </style>
+    
+        /* Centered link at the bottom */ 
+        .footer-link { 
+            position: absolute; 
+            bottom: 20px; 
+            text-align: center; 
+            width: 100%; 
+        } 
+ 
+        .footer-link a { 
+            font-size: 16px; 
+            color: #007bff; 
+            text-decoration: none; 
+        } 
+ 
+        .footer-link a:hover { 
+            text-decoration: underline; 
+        } 
+</style>
 </head>
 <body>
     <canvas id="animationCanvas" width="600" height="600"></canvas>
-    <script>
+    
+    <div class="footer-link">
+Different loading will display differently. <br>
+        <a href="index_spa.html">Mobile Phone</a> <br>
+        <a href="rotating_polygons_opposite_30canvas.html">Experiment Version</a> <br>
+        <a href="hypotrochoid_animated.html">Latest Creation</a>
+    </div>
+    <script> 
 const canvas = document.getElementById('animationCanvas');
 const ctx = canvas.getContext('2d');
 const sideLength = 100; // Length of each triangle side

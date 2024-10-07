@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -17,68 +16,51 @@
         canvas {
             border: 1px solid black;
         }
-        #controls {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background-color: white;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-        }
-    
-        /* Centered link at the bottom */ 
         .footer-link { 
             position: absolute; 
             bottom: 20px; 
             text-align: center; 
             width: 100%; 
         } 
- 
         .footer-link a { 
             font-size: 16px; 
             color: #007bff; 
             text-decoration: none; 
         } 
- 
         .footer-link a:hover { 
             text-decoration: underline; 
         } 
-</style>
-<!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-GEX61LPT08"></script> <script>   window.dataLayer = window.dataLayer || [];   function gtag(){dataLayer.push(arguments);}   gtag('js', new Date());   gtag('config', 'G-GEX61LPT08'); </script> 
+    </style>
 </head>
 <body>
-    <div id="controls">
-        <label for="R">R (Outer radius):</label>
-        <input type="number" id="R" value="100"><br>
-        <label for="r">r (Inner radius):</label>
-        <input type="number" id="r" value="40"><br>
-        <label for="d">d (Distance from center):</label>
-        <input type="number" id="d" value="60"><br>
-        <button onclick="drawHypotrochoid()">Draw Hypotrochoid</button>
-    </div>
     <canvas id="canvas" width="600" height="600"></canvas>
-
-    
     <div class="footer-link">
-Different loading will display differently. <br>
+        Different loading will display differently. <br>
         <a href="index_spa.html">Mobile Phone</a> <br>
         <a href="rotating_polygons_opposite_30canvas.html">Experiment Version</a> <br>
         <a href="hypotrochoid_animated.html">Latest Creation</a>
     </div>
-    <script> 
-document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
+    <script>
+        document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
+
+        const R = 200;
+        const r = 40;
+        let d = 130;
+        let rotationAngle = 0;
+        let decreasing = true; // Flag to determine if d is decreasing
+        let reverseRotation = false; // Flag to determine the rotation direction
+
         function drawHypotrochoid() {
-            const R = parseFloat(document.getElementById('R').value);
-            const r = parseFloat(document.getElementById('r').value);
-            const d = parseFloat(document.getElementById('d').value);
             const canvas = document.getElementById('canvas');
             const ctx = canvas.getContext('2d');
             const width = canvas.width;
             const height = canvas.height;
 
-            // Clear the canvas
-            ctx.clearRect(0, 0, width, height);
+            // Save the current transformation matrix and rotate the canvas
+            ctx.save();
+            ctx.translate(width / 2, height / 2);
+            ctx.rotate(rotationAngle * Math.PI / 180);
+            ctx.translate(-width / 2, -height / 2);
 
             ctx.beginPath();
             ctx.strokeStyle = 'blue';
@@ -97,6 +79,27 @@ document.addEventListener("contextmenu", function(event) { event.preventDefault(
             }
 
             ctx.stroke();
+            ctx.restore();
+
+            // Update rotation angle
+            rotationAngle += reverseRotation ? -5 : 5;
+
+            // Update d and determine when to reverse
+            if (decreasing) {
+                d -= 10;
+                if (d <= 50) {
+                    decreasing = false;
+                    reverseRotation = !reverseRotation;
+                    ctx.clearRect(0, 0, width, height); // Clear the canvas
+                }
+            } else {
+                d += 10;
+                if (d >= 130) {
+                    decreasing = true;
+                    reverseRotation = !reverseRotation;
+                    ctx.clearRect(0, 0, width, height); // Clear the canvas
+                }
+            }
         }
 
         // Utility function to calculate the greatest common divisor (GCD)
@@ -104,10 +107,8 @@ document.addEventListener("contextmenu", function(event) { event.preventDefault(
             return b ? Math.gcd(b, a % b) : Math.abs(a);
         };
 
-        // Draw the default Hypotrochoid curve on page load
-        window.onload = function() {
-            drawHypotrochoid();
-        };
+        // Draw and animate the Hypotrochoid curve
+        setInterval(drawHypotrochoid, 100); // Adjust interval as needed for speed
     </script>
 </body>
 </html>

@@ -20,12 +20,37 @@
         h2 {
             margin-bottom: 10px;
         }
-    </style>
+    
+        /* Centered link at the bottom */ 
+        .footer-link { 
+            position: absolute; 
+            bottom: 20px; 
+            text-align: center; 
+            width: 100%; 
+        } 
+ 
+        .footer-link a { 
+            font-size: 16px; 
+            color: #007bff; 
+            text-decoration: none; 
+        } 
+ 
+        .footer-link a:hover { 
+            text-decoration: underline; 
+        } 
+</style>
 <!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-GEX61LPT08"></script> <script>   window.dataLayer = window.dataLayer || [];   function gtag(){dataLayer.push(arguments);}   gtag('js', new Date());   gtag('config', 'G-GEX61LPT08'); </script> </head>
 <body>
     <h2>Random Rotating Polygon Drawer</h2>
     <canvas id="polygonCanvas" width="500" height="500"></canvas>
 
+    
+    <div class="footer-link">
+Different loading will display differently. <br>
+        <a href="index_spa.html">Mobile Phone</a> <br>
+        <a href="rotating_polygons_opposite_30canvas.html">Experiment Version</a> <br>
+        <a href="hypotrochoid_animated.html">Latest Creation</a>
+    </div>
     <script> 
 document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
         function getRandomInt(min, max) {

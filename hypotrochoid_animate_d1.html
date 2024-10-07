@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,15 +15,6 @@
         }
         canvas {
             border: 1px solid black;
-        }
-        #controls {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background-color: white;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
         }
     
         /* Centered link at the bottom */ 
@@ -48,15 +38,6 @@
 <!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-GEX61LPT08"></script> <script>   window.dataLayer = window.dataLayer || [];   function gtag(){dataLayer.push(arguments);}   gtag('js', new Date());   gtag('config', 'G-GEX61LPT08'); </script> 
 </head>
 <body>
-    <div id="controls">
-        <label for="R">R (Outer radius):</label>
-        <input type="number" id="R" value="100"><br>
-        <label for="r">r (Inner radius):</label>
-        <input type="number" id="r" value="40"><br>
-        <label for="d">d (Distance from center):</label>
-        <input type="number" id="d" value="60"><br>
-        <button onclick="drawHypotrochoid()">Draw Hypotrochoid</button>
-    </div>
     <canvas id="canvas" width="600" height="600"></canvas>
 
     
@@ -68,17 +49,21 @@ Different loading will display differently. <br>
     </div>
     <script> 
 document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
-        function drawHypotrochoid() {
-            const R = parseFloat(document.getElementById('R').value);
-            const r = parseFloat(document.getElementById('r').value);
-            const d = parseFloat(document.getElementById('d').value);
+
+        const R = 200;  // Outer radius
+        const r = 40;   // Inner radius
+        let d = 10;     // Initial distance from center
+        let increasing = true; // To handle increasing/decreasing d
+
+        function drawHypotrochoid(d) {
             const canvas = document.getElementById('canvas');
             const ctx = canvas.getContext('2d');
             const width = canvas.width;
             const height = canvas.height;
 
             // Clear the canvas
-            ctx.clearRect(0, 0, width, height);
+	    if (!increasing)
+            	ctx.clearRect(0, 0, width, height);
 
             ctx.beginPath();
             ctx.strokeStyle = 'blue';
@@ -104,9 +89,22 @@ document.addEventListener("contextmenu", function(event) { event.preventDefault(
             return b ? Math.gcd(b, a % b) : Math.abs(a);
         };
 
-        // Draw the default Hypotrochoid curve on page load
+        function animateHypotrochoid() {
+            if (increasing) {
+                d += 5;
+                if (d >= 120) increasing = false;
+            } else {
+                d -= 5;
+                if (d <= 10) increasing = true;
+            }
+
+            drawHypotrochoid(d);
+            setTimeout(animateHypotrochoid, 100);
+        }
+
+        // Start the animation on page load
         window.onload = function() {
-            drawHypotrochoid();
+            animateHypotrochoid();
         };
     </script>
 </body>
