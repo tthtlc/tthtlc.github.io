@@ -38,14 +38,9 @@
     <script> 
 document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
 
-        //const R = 240;
-        //const r = 40;
-        //let d = 150;
 
-        function drawHypotrochoid(R, r, d, canvas) {
-            let rotationAngle = 0;
-            let decreasing = true; // Flag to determine if d is decreasing
-            let reverseRotation = false; // Flag to determine the rotation direction
+        function drawHypotrochoid(R, r, canvas) {
+
             const ctx = canvas.getContext('2d');
             const width = canvas.width;
             const height = canvas.height;
@@ -53,11 +48,70 @@ document.addEventListener("contextmenu", function(event) { event.preventDefault(
             // Clear the canvas
             ctx.clearRect(0, 0, width, height);
 
-            // Save the current transformation matrix and rotate the canvas
-            ctx.save();
-            ctx.translate(width / 2, height / 2);
-            ctx.rotate(rotationAngle * Math.PI / 180);
-            ctx.translate(-width / 2, -height / 2);
+            ctx.beginPath();
+            ctx.strokeStyle = 'blue';
+            ctx.lineWidth = 1;
+
+            const rotationAngle = 10;
+            let decreasing = true;
+            let reverseRotation = false;
+            let d = 160;
+            //let d = Math.floor(Math.random() * 200) + 10;   // Distance from center between 20 and 100
+
+		for (d = 160; d>40; d-=20) {
+                ctx.save();
+                ctx.translate(width / 2, height / 2);
+                ctx.rotate(rotationAngle * Math.PI / 180);
+                ctx.translate(-width / 2, -height / 2);
+
+                ctx.beginPath();
+                ctx.strokeStyle = 'blue';
+                ctx.lineWidth = 1;
+
+                let x0 = (R - r) * Math.cos(0) + d * Math.cos(((R - r) / r) * 0);
+                let y0 = (R - r) * Math.sin(0) - d * Math.sin(((R - r) / r) * 0);
+                ctx.moveTo(width / 2 + x0, height / 2 - y0);
+
+                for (let t = 0; t <= 2 * Math.PI * r / Math.gcd(R, r); t += 0.01) {
+                    const x = (R - r) * Math.cos(t) + d * Math.cos(((R - r) / r) * t);
+                    const y = (R - r) * Math.sin(t) - d * Math.sin(((R - r) / r) * t);
+                    ctx.lineTo(width / 2 + x, height / 2 - y);
+                }
+
+                ctx.stroke();
+                ctx.restore();
+
+			/*
+                rotationAngle += reverseRotation ? -5 : 5;
+
+                if (decreasing) {
+                    d -= 10;
+                    if (d <= 40) {
+                        decreasing = false;
+                        reverseRotation = !reverseRotation;
+                	ctx.clearRect(0, 0, width, height);
+                    }
+                } else {
+                    d += 10;
+                    if (d >= 150) {
+                        decreasing = true;
+                        reverseRotation = !reverseRotation;
+                	ctx.clearRect(0, 0, width, height);
+                    }
+                }
+		*/
+		}
+                //label.textContent = `R: ${R}, r: ${r}, d: ${Math.round(d)}`;
+	}
+
+
+        function drawHypotrochoid1(R, r, d, canvas) {
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width;
+            const height = canvas.height;
+
+            // Clear the canvas
+            ctx.clearRect(0, 0, width, height);
 
             ctx.beginPath();
             ctx.strokeStyle = 'blue';
@@ -76,27 +130,6 @@ document.addEventListener("contextmenu", function(event) { event.preventDefault(
             }
 
             ctx.stroke();
-            ctx.restore();
-
-            // Update rotation angle
-            rotationAngle += reverseRotation ? -5 : 5;
-
-            // Update d and determine when to reverse
-            if (decreasing) {
-                d -= 10;
-                if (d <= 40) {
-                    decreasing = false;
-                    reverseRotation = !reverseRotation;
-                    ctx.clearRect(0, 0, width, height); // Clear the canvas
-                }
-            } else {
-                d += 10;
-                if (d >= 150) {
-                    decreasing = true;
-                    reverseRotation = !reverseRotation;
-                    ctx.clearRect(0, 0, width, height); // Clear the canvas
-                }
-            }
         }
 
         // Utility function to calculate the greatest common divisor (GCD)
@@ -104,45 +137,17 @@ document.addEventListener("contextmenu", function(event) { event.preventDefault(
             return b ? Math.gcd(b, a % b) : Math.abs(a);
         };
 
-        function drawHypotrochoid_orig(R, r, d, canvas) {
-            const ctx = canvas.getContext('2d');
-            const width = canvas.width;
-            const height = canvas.height;
-
-            // Clear the canvas
-            ctx.clearRect(0, 0, width, height);
-
-            ctx.beginPath();
-            ctx.strokeStyle = 'blue';
-            ctx.lineWidth = 1;
-
-            // Move to the starting point of the curve
-            let x0 = (R - r) * Math.cos(0) + d * Math.cos(((R - r) / r) * 0);
-            let y0 = (R - r) * Math.sin(0) - d * Math.sin(((R - r) / r) * 0);
-            ctx.moveTo(width / 2 + x0, height / 2 - y0);
-
-            // Draw the Hypotrochoid curve
-            for (let t = 0; t <= 2 * Math.PI * r / Math.gcd(R, r); t += 0.01) {
-                const x = (R - r) * Math.cos(t) + d * Math.cos(((R - r) / r) * t);
-                const y = (R - r) * Math.sin(t) - d * Math.sin(((R - r) / r) * t);
-                ctx.lineTo(width / 2 + x, height / 2 - y);
-            }
-
-            ctx.stroke();
-        }
-
         // Function to generate random values for R, r, and d
         function getRandomParameters() {
-            const R = Math.floor(Math.random() * 150) + 90;  // Outer radius between 50 and 150
-            const r = Math.floor(Math.random() * 80) + 40;   // Inner radius between 10 and 60
-            const d = Math.floor(Math.random() * 10) + 10;   // Distance from center between 20 and 100
-            return { R, r, d };
+            const R = (Math.floor(Math.random() * 30) + 1) * 4;  // Outer radius between 50 and 150
+            const r = (Math.floor(Math.random() * 30) + 1) * 4;   // Inner radius between 10 and 60
+            return { R, r };
         }
 
         // Function to create a new canvas and label, then append to the page
         function createNewCanvas() {
             const container = document.getElementById('canvasContainer');
-            const { R, r, d } = getRandomParameters();
+            const { R, r } = getRandomParameters();
 
             // Create a new div to hold the label and canvas
             const canvasContainer = document.createElement('div');
@@ -151,7 +156,7 @@ document.addEventListener("contextmenu", function(event) { event.preventDefault(
             // Create a label for displaying the R, r, and d values
             const label = document.createElement('div');
             label.className = 'label';
-            label.textContent = `R: ${R}, r: ${r}, d: ${d}`;
+            label.textContent = `R: ${R}, r: ${r}, d: 160`;
 
             // Create the canvas
             const canvas = document.createElement('canvas');
@@ -164,7 +169,7 @@ document.addEventListener("contextmenu", function(event) { event.preventDefault(
             container.appendChild(canvasContainer);
 
             // Draw the Hypotrochoid curve on the new canvas
-            drawHypotrochoid(R, r, d, canvas);
+            drawHypotrochoid(R, r, canvas);
         }
 
         // Detect when the user scrolls near the bottom of the page
