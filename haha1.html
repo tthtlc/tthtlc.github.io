@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rotating Hypotrochoid Curves</title>
+    <style>
+        body {
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .canvas-container {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        canvas {
+            border: 1px solid black;
+            margin-top: 10px;
+        }
+        .label {
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="canvasContainer">
+        <!-- Canvases will be dynamically appended here -->
+    </div>
+    <script>
+        document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
+
+        function createRotatingHypotrochoid() {
+            const canvasContainer = document.createElement('div');
+            canvasContainer.className = 'canvas-container';
+
+            const canvas = document.createElement('canvas');
+            canvas.width = 600;
+            canvas.height = 600;
+
+            const label = document.createElement('div');
+            label.className = 'label';
+
+            canvasContainer.appendChild(canvas);
+            canvasContainer.appendChild(label);
+            document.getElementById('canvasContainer').appendChild(canvasContainer);
+
+            const ctx = canvas.getContext('2d');
+
+            const R = 240;
+            const r = 40;
+            let d = 150;
+            let rotationAngle = 0;
+            let decreasing = true;
+            let reverseRotation = false;
+
+            function drawHypotrochoid() {
+                const width = canvas.width;
+                const height = canvas.height;
+
+
+                ctx.save();
+                ctx.translate(width / 2, height / 2);
+                ctx.rotate(rotationAngle * Math.PI / 180);
+                ctx.translate(-width / 2, -height / 2);
+
+                ctx.beginPath();
+                ctx.strokeStyle = 'blue';
+                ctx.lineWidth = 1;
+
+                let x0 = (R - r) * Math.cos(0) + d * Math.cos(((R - r) / r) * 0);
+                let y0 = (R - r) * Math.sin(0) - d * Math.sin(((R - r) / r) * 0);
+                ctx.moveTo(width / 2 + x0, height / 2 - y0);
+
+                for (let t = 0; t <= 2 * Math.PI * r / Math.gcd(R, r); t += 0.01) {
+                    const x = (R - r) * Math.cos(t) + d * Math.cos(((R - r) / r) * t);
+                    const y = (R - r) * Math.sin(t) - d * Math.sin(((R - r) / r) * t);
+                    ctx.lineTo(width / 2 + x, height / 2 - y);
+                }
+
+                ctx.stroke();
+                ctx.restore();
+
+                rotationAngle += reverseRotation ? -5 : 5;
+
+                if (decreasing) {
+                    d -= 10;
+                    if (d <= 40) {
+                        decreasing = false;
+                        reverseRotation = !reverseRotation;
+                	ctx.clearRect(0, 0, width, height);
+                    }
+                } else {
+                    d += 10;
+                    if (d >= 150) {
+                        decreasing = true;
+                        reverseRotation = !reverseRotation;
+                	ctx.clearRect(0, 0, width, height);
+                    }
+                }
+                label.textContent = `R: ${R}, r: ${r}, d: ${Math.round(d)}`;
+
+                setTimeout(drawHypotrochoid, 500);
+            }
+
+            drawHypotrochoid();
+        }
+
+        Math.gcd = function(a, b) {
+            return b ? Math.gcd(b, a % b) : Math.abs(a);
+        };
+
+        window.onscroll = function() {
+            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 100) {
+                createRotatingHypotrochoid();
+            }
+        };
+
+        window.onload = function() {
+            createRotatingHypotrochoid();
+        };
+    </script>
+</body>
+</html>

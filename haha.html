@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rotating Hypotrochoid Curves</title>
+    <style>
+        body {
+            margin: 0;
+            background-color: #f0f0f0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        canvas {
+            border: 1px solid black;
+            margin-bottom: 20px;
+        }
+        .footer-link { 
+            text-align: center; 
+            width: 100%; 
+            margin-top: 20px;
+        }
+        .footer-link a { 
+            font-size: 16px; 
+            color: #007bff; 
+            text-decoration: none; 
+        } 
+        .footer-link a:hover { 
+            text-decoration: underline; 
+        }
+    </style>
+</head>
+<body>
+    <div id="canvasContainer"></div>
+    <div class="footer-link">
+        Different loading will display differently. <br>
+        <a href="index_spa.html">Mobile Phone</a> <br>
+        <a href="rotating_polygons_opposite_30canvas.html">Experiment Version</a> <br>
+        <a href="hypotrochoid_animated.html">Latest Creation</a>
+    </div>
+
+    <script>
+        document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
+
+        // Utility function to calculate the greatest common divisor (GCD)
+        Math.gcd = function(a, b) {
+            return b ? Math.gcd(b, a % b) : Math.abs(a);
+        };
+
+        // Function to generate random values for R, r
+        function getRandomParameters() {
+            const R = Math.floor(Math.random() * 200) + 50;
+            const r = Math.floor(Math.random() * 100) + 20;
+            return { R, r };
+        }
+
+        function createNewCanvas() {
+            const container = document.getElementById('canvasContainer');
+            const { R, r } = getRandomParameters();
+            let d = 40;
+            let rotationAngle = 0;
+            let decreasing = false; // Start increasing
+            let reverseRotation = false;
+
+            // Create a new canvas element
+            const canvas = document.createElement('canvas');
+            canvas.width = 600;
+            canvas.height = 600;
+            container.appendChild(canvas);
+
+            // Function to draw the rotating hypotrochoid
+            function drawHypotrochoid() {
+                const ctx = canvas.getContext('2d');
+                const width = canvas.width;
+                const height = canvas.height;
+
+                // Clear the canvas
+                ctx.clearRect(0, 0, width, height);
+
+                // Rotate the canvas
+                ctx.save();
+                ctx.translate(width / 2, height / 2);
+                ctx.rotate(rotationAngle * Math.PI / 180);
+                ctx.translate(-width / 2, -height / 2);
+
+                ctx.beginPath();
+                ctx.strokeStyle = 'blue';
+                ctx.lineWidth = 1;
+
+                // Move to the starting point of the curve
+                let x0 = (R - r) * Math.cos(0) + d * Math.cos(((R - r) / r) * 0);
+                let y0 = (R - r) * Math.sin(0) - d * Math.sin(((R - r) / r) * 0);
+                ctx.moveTo(width / 2 + x0, height / 2 - y0);
+
+                // Draw the Hypotrochoid curve
+                for (let t = 0; t <= 2 * Math.PI * r / Math.gcd(R, r); t += 0.01) {
+                    const x = (R - r) * Math.cos(t) + d * Math.cos(((R - r) / r) * t);
+                    const y = (R - r) * Math.sin(t) - d * Math.sin(((R - r) / r) * t);
+                    ctx.lineTo(width / 2 + x, height / 2 - y);
+                }
+
+                ctx.stroke();
+                ctx.restore();
+
+                // Update rotation angle
+                rotationAngle += reverseRotation ? -5 : 5;
+
+                // Update d value and reverse rotation
+                if (decreasing) {
+                    d -= 10;
+                    if (d <= 40) {
+                        decreasing = false;
+                        reverseRotation = !reverseRotation;
+                    }
+                } else {
+                    d += 10;
+                    if (d >= 160) {
+                        decreasing = true;
+                        reverseRotation = !reverseRotation;
+                    }
+                }
+            }
+
+            // Draw and animate the Hypotrochoid curve
+            setInterval(drawHypotrochoid, 900); // Adjust interval as needed
+        }
+
+        // Detect when the user scrolls near the bottom of the page
+        window.onscroll = function() {
+            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 10) {
+                createNewCanvas();
+            }
+        };
+
+        // Initial canvas on page load
+        window.onload = function() {
+            createNewCanvas();
+        };
+    </script>
+</body>
+</html>
+
