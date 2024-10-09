@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Windmill Curves</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        canvas {
+            border: 1px solid black;
+        }
+        #controls {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: white;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+        .footer-link { 
+            position: absolute; 
+            bottom: 20px; 
+            text-align: center; 
+            width: 100%; 
+        } 
+        .footer-link a { 
+            font-size: 16px; 
+            color: #007bff; 
+            text-decoration: none; 
+        } 
+        .footer-link a:hover { 
+            text-decoration: underline; 
+        } 
+    </style>
+<!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-GEX61LPT08"></script> <script>   window.dataLayer = window.dataLayer || [];   function gtag(){dataLayer.push(arguments);}   gtag('js', new Date());   gtag('config', 'G-GEX61LPT08'); </script> </head>
+<body>
+    <canvas id="canvas" width="600" height="600"></canvas>
+    
+    <div class="footer-link">
+        Different loading will display differently. <br>
+        <a href="index_spa.html">Mobile Phone</a> <br>
+        <a href="rotating_polygons_opposite_30canvas.html">Experiment Version</a> <br>
+        <a href="hypotrochoid_animated.html">Latest Creation</a>
+    </div>
+        
+<script>
+    document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
+
+    function drawWindmill() {
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const width = canvas.width;
+        const height = canvas.height;
+        
+        let points = [];
+
+        ctx.clearRect(0, 0, width, height);
+
+        // Calculate the windmill points and store them in an array
+        for (let t = -6; t <= 6; t += Math.PI/200) {
+            const x = 20 * (10 * Math.sin(9.9 * t) * Math.round(Math.sqrt(Math.cos(Math.cos(10 * t)))));
+            const y = 20 * (9 * Math.cos(9.9 * t) * Math.cos(9.9 * t) * Math.sin(Math.sin(10 * t)));
+            points.push({ x, y });
+        }
+
+        // Function to draw the figure from the points array with rotation
+        function drawFigure(translateX = 0, translateY = 0, angle = 0) {
+            ctx.beginPath();
+            const cosAngle = Math.cos(angle);
+            const sinAngle = Math.sin(angle);
+
+            points.forEach((point, index) => {
+                const rotatedX = point.x * cosAngle - point.y * sinAngle + width / 2 + translateX;
+                const rotatedY = point.x * sinAngle + point.y * cosAngle + height / 2 + translateY;
+
+                if (index === 0) {
+                    ctx.moveTo(rotatedX, rotatedY);
+                } else {
+                    ctx.lineTo(rotatedX, rotatedY);
+                }
+            });
+            ctx.stroke();
+        }
+
+        ctx.strokeStyle = 'blue';
+        ctx.lineWidth = 1;
+
+        // Draw the original figure
+        drawFigure();
+
+        // Draw the vertically translated figure
+        drawFigure(0, 100);
+
+        // Rotate both figures by 90 degrees (π/2 radians) and superimpose them
+        const rotationAngle = Math.PI / 2;
+        drawFigure(0, 0, rotationAngle);
+        drawFigure(0, 100, rotationAngle);
+    }
+
+    window.onload = function() {
+        drawWindmill();
+    };
+</script>
+</body>
+</html>
+
