@@ -18,7 +18,7 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            /* height: 100vh; */
             margin: 0;
             background-color: #f0f0f0;
             font-family: Arial, sans-serif;
@@ -104,7 +104,7 @@
 
         /* Centered link at the bottom */
         .footer-link {
-            position: absolute;
+            /* position: absolute; */
             bottom: 20px;
             text-align: center;
             width: 100%;
@@ -137,10 +137,8 @@
     </div>
 
     <!-- Centered link to "mobile.html" at the bottom -->   <br>
-    <br>
-    <br>
-    <br>
-    <br>
+
+<!-- Add this div where you want the table to appear -->
     <br>
     <div class="footer-link">
 Different loading will display differently. <br>
@@ -148,6 +146,8 @@ Different loading will display differently. <br>
 	<a href="rotating_polygons_opposite_30canvas.html">Experiment Version</a> <br>
         <a href="hypotrochoid_animated.html">Latest Creation</a>
     </div>
+    <br>
+    <div id="fileTableContainer"></div>
     <script> 
         document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
 
@@ -408,12 +408,47 @@ Different loading will display differently. <br>
             filenameDiv.innerHTML = '';
             filenameDiv.appendChild(link);
         }
+    // Function to create and insert the table
+    function createFileTable(files) {
+        const table = document.createElement('table');
+        table.style.width = '100%';
+        table.style.borderCollapse = 'collapse';
+        
+        let row;
+        
+        files.forEach((file, index) => {
+            // Create a new row every four files
+            if (index % 4 === 0) {
+                row = document.createElement('tr');
+                table.appendChild(row);
+            }
+            
+            const cell = document.createElement('td');
+            cell.style.border = '1px solid #ddd';
+            cell.style.padding = '8px';
+            cell.style.textAlign = 'center';
+
+            const link = document.createElement('a');
+            link.href = file;
+            link.target = '_blank';
+            link.innerText = file;
+
+            cell.appendChild(link);
+            row.appendChild(cell);
+        });
+
+        // Append the table to the container div
+        document.getElementById('fileTableContainer').appendChild(table);
+    }
 
         const selectedFiles = getRandomFiles(htmlFiles, 4);
         loadContentIntoIframe(selectedFiles[0], 'iframe1', 'filename1');
         loadContentIntoIframe(selectedFiles[1], 'iframe2', 'filename2');
         loadContentIntoIframe(selectedFiles[2], 'iframe3', 'filename3');
         loadContentIntoIframe(selectedFiles[3], 'iframe4', 'filename4');
+
+    // Call the function to create the table with all HTML files
+    createFileTable(htmlFiles);
     </script>
 </body>
 </html>
