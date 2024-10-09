@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Windmill Curves</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        canvas {
+            border: 1px solid black;
+        }
+        #controls {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: white;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+        .footer-link { 
+            position: absolute; 
+            bottom: 20px; 
+            text-align: center; 
+            width: 100%; 
+        } 
+        .footer-link a { 
+            font-size: 16px; 
+            color: #007bff; 
+            text-decoration: none; 
+        } 
+        .footer-link a:hover { 
+            text-decoration: underline; 
+        } 
+    </style>
+</head>
+<body>
+    <div id="controls">
+        <label for="R">R (Outer radius):</label>
+        <input type="number" id="R" value="100"><br>
+        <label for="r">r (Inner radius):</label>
+        <input type="number" id="r" value="40"><br>
+        <label for="d">d (Distance from center):</label>
+        <input type="number" id="d" value="60"><br>
+        <button onclick="drawHypotrochoid()">Draw Hypotrochoid</button>
+    </div>
+    <canvas id="canvas" width="600" height="600"></canvas>
+    
+    <div class="footer-link">
+        Different loading will display differently. <br>
+        <a href="index_spa.html">Mobile Phone</a> <br>
+        <a href="rotating_polygons_opposite_30canvas.html">Experiment Version</a> <br>
+        <a href="hypotrochoid_animated.html">Latest Creation</a>
+    </div>
+    <script> 
+        document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
+
+        function drawWindmill() {
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width;
+            const height = canvas.height;
+            
+            let points = [];
+
+            ctx.clearRect(0, 0, width, height);
+
+            // Calculate the windmill points and store them in an array
+            for (let t = -6; t <= 6; t += Math.PI/200) {
+                const x = 20 * (10 * Math.sin(9.9 * t) * Math.round(Math.sqrt(Math.cos(Math.cos(10 * t)))));
+                const y = 20 * (9 * Math.cos(9.9 * t) * Math.cos(9.9 * t) * Math.sin(Math.sin(10 * t)));
+                points.push({ x: width / 2 + x, y: height / 2 - y });
+            }
+
+            // Function to draw the figure from the points array
+            function drawFigure(translateX = 0, translateY = 0, rotate = false) {
+                ctx.beginPath();
+                points.forEach((point, index) => {
+                    const x = rotate ? point.y + translateX : point.x + translateX;
+                    const y = rotate ? -point.x + translateY : point.y + translateY;
+                    if (index === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                });
+                ctx.stroke();
+            }
+
+            ctx.strokeStyle = 'blue';
+            ctx.lineWidth = 1;
+
+            // Draw the original figure
+            drawFigure();
+
+            // Draw the vertically translated figure
+            drawFigure(0, 100);
+
+            // Rotate both figures by 90 degrees and superimpose them
+            drawFigure(0, 0, true);
+            drawFigure(0, 100, true);
+        }
+
+        window.onload = function() {
+            drawWindmill();
+        };
+    </script>
+</body>
+</html>
+

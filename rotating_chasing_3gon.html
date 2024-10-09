@@ -70,7 +70,7 @@ document.addEventListener("contextmenu", function(event) { event.preventDefault(
     // Function to rotate points around (10, 10)
     function rotatePoints(points, angle) {
         const cx = points[0].x; // Rotation center X
-        const cy = points[0].y; // Rotation center Y
+        const cy = points[0].y*2.7; // Rotation center Y
         const rotatedPoints = points.map(p => {
             const x = p.x - cx;
             const y = p.y - cy;
