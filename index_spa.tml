@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic HTML Loader with Centered Filenames</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .iframe-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Center content horizontally */
+            margin-bottom: 40px; /* Space between containers */
+        }
+        .filename {
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            margin: 10px 0;
+        }
+        iframe {
+            width: 80%;  /* Set width of iframe to 80% of viewport width */
+            height: 600px;
+            border: none;
+        }
+    </style>
+<!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-GEX61LPT08"></script> <script>   window.dataLayer = window.dataLayer || [];   function gtag(){dataLayer.push(arguments);}   gtag('js', new Date());   gtag('config', 'G-GEX61LPT08'); </script> </head>
+<body>
+    <div id="iframeList"></div>
+
+    <script> 
+document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
+        // Master list of HTML files (URLs) to load
+        const masterList = [
+PETER.TMPL
+        ];
+
+        // Function to get a random element from the master list
+        function getRandomHtml() {
+            const randomIndex = Math.floor(Math.random() * masterList.length);
+            return masterList[randomIndex];
+        }
+
+        // Function to load and append an iframe with a random HTML file
+        function loadIframe() {
+            const iframeContainer = document.createElement('div');
+            iframeContainer.classList.add('iframe-container');
+            
+            const url = getRandomHtml();
+            const fileName = url.split('/').pop(); // Extracts the file name from the URL
+
+            // Create and add the filename element above the iframe as a hyperlink
+            const fileNameTag = document.createElement('p');
+            fileNameTag.classList.add('filename');
+            fileNameTag.innerHTML = `Loading: <a href="${url}">${fileName}</a>`;  // Hyperlinked filename
+            
+            const iframe = document.createElement('iframe');
+            iframe.src = url;
+
+            // Append the filename tag and iframe to the container
+            iframeContainer.appendChild(fileNameTag);
+            iframeContainer.appendChild(iframe);
+
+            // Append the container to the main list
+            document.getElementById('iframeList').appendChild(iframeContainer);
+        }
+
+        // Load initial iframes
+        for (let i = 0; i < 3; i++) {
+            loadIframe();
+        }
+
+        // Detect when user scrolls near the bottom of the page and load more iframes
+        window.addEventListener('scroll', () => {
+            const nearBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 100;
+            
+            if (nearBottom) {
+                loadIframe();  // Load one more iframe when the bottom is reached
+            }
+        });
+    </script>
+</body>
+</html>
+
