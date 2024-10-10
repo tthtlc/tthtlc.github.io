@@ -51,11 +51,7 @@ const ctx = canvas.getContext('2d');
 
 const centerX = canvas.width / 2;
 const centerY = canvas.height / 2;
-const radius = 50;  // Radius of the circle
-const radius1 = 100;  // Radius of center of the circle
-let nstep = 3;  // Rotation angle in radians
-let rotationStep = 2*Math.PI/nstep;  // Rotation angle in radians
-let rotationAngle = 0;  // Rotation angle in radians
+
 const rotationCenterX = centerX;
 const rotationCenterY = centerY;
 
@@ -73,7 +69,7 @@ function rotatePoint(x, y, cx, cy, angle) {
 }
 
 // Function to draw the cardioid curve
-function drawCircle() {
+function drawCircle(n = 1) {
     ctx.strokeStyle = 'red';  // Set color to red
     ctx.lineWidth = 2;        // Set line width
 
@@ -83,8 +79,8 @@ function drawCircle() {
 
     // Loop through angles from 0 to 2 * PI
     for (let theta = 0; theta <= 2 * Math.PI; theta += 0.01) {
-        let x = radius * Math.cos(theta) + centerX1;
-        let y = radius * Math.sin(theta) + centerY1;
+        let x = radius * Math.cos(n * theta) + centerX1;
+        let y = radius * Math.sin(n * theta) + centerY1;
 
         const rotatedPoint = rotatePoint(x, y, rotationCenterX, rotationCenterY, rotationAngle);
 
@@ -100,21 +96,15 @@ function drawCircle() {
     ctx.stroke();  // Render the cardioid
 }
 
+n=1;
+
 // Function to animate the cardioid rotation
 function animate() {
-    rotationAngle += rotationStep;  // Increment the rotation angle
-    if (rotationAngle > Math.PI) {
-    nstep += 1;  // Increment the rotation angle
-    rotationStep = 2*Math.PI/nstep;  // Rotation angle in radians
-    rotationAngle = 0;  // Increment the rotation angle
-    ctx.clearRect(0, 0, canvas.width, canvas.height); 
+    for (let rotationgAngle = 0; rotationAngle < 2*Math.PI ; rotationAngle += 2*Math.PI/300) {
+    	drawCircle(n, rotationgAngle);  // Redraw the cardioid with the new rotation angle
     }
-    drawCircle();  // Redraw the cardioid with the new rotation angle
-    //requestAnimationFrame(animate);  // Continue the animation loop
-    setTimeout(animate, 100);
 }
 
-drawCircle();  // Initial cardioid drawing
 animate();  // Start the animation loop
 </script>
 

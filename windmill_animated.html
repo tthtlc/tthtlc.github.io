@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hypotrochoid Curves</title>
+    <title>Windmill Curves</title>
     <style>
         body {
             margin: 0;
@@ -91,7 +91,7 @@ document.addEventListener("contextmenu", function(event) { event.preventDefault(
     }
 
 
-        function drawHypotrochoid(R, r, d, canvas) {
+        function drawWindmill(R, r, d, canvas) {
             const ctx = canvas.getContext('2d');
             const width = canvas.width;
             const height = canvas.height;
@@ -108,7 +108,7 @@ document.addEventListener("contextmenu", function(event) { event.preventDefault(
             let y0 = (R - r) * Math.sin(0) - d * Math.sin(((R - r) / r) * 0);
             ctx.moveTo(width / 2 + x0, height / 2 - y0);
 
-            // Draw the Hypotrochoid curve
+            // Draw the Windmill curve
             for (let t = 0; t <= 2 * Math.PI * r / Math.gcd(R, r); t += 0.01) {
                 const x = (R - r) * Math.cos(t) + d * Math.cos(((R - r) / r) * t);
                 const y = (R - r) * Math.sin(t) - d * Math.sin(((R - r) / r) * t);
@@ -158,7 +158,7 @@ document.addEventListener("contextmenu", function(event) { event.preventDefault(
             canvasContainer.appendChild(canvas);
             container.appendChild(canvasContainer);
 
-            // Draw the Hypotrochoid curve on the new canvas
+            // Draw the Windmill curve on the new canvas
             drawWindmill(R, r, r1, r2, r3, r4, canvas);
         }
 
