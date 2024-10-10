@@ -51,13 +51,6 @@ const ctx = canvas.getContext('2d');
 
 const centerX = canvas.width / 2;
 const centerY = canvas.height / 2;
-const radius = 100;  // Radius of the circle
-const radius1 = 100;  // Radius of the circle
-let nstep = 2;  // Rotation angle in radians
-let rotationStep = 2*Math.PI/nstep;  // Rotation angle in radians
-let rotationAngle = 0;  // Rotation angle in radians
-const rotationCenterX = centerX;
-const rotationCenterY = centerY;
 
 // Function to rotate a point (x, y) around (cx, cy) by an angle
 function rotatePoint(x, y, cx, cy, angle) {
@@ -73,26 +66,28 @@ function rotatePoint(x, y, cx, cy, angle) {
 }
 
 // Function to draw the cardioid curve
-function drawCircle() {
+function drawCircle(rotationAngle, radius, radius1, centerX, centerY) {
     ctx.strokeStyle = 'red';  // Set color to red
     ctx.lineWidth = 2;        // Set line width
 
     ctx.beginPath();
 
     // Loop through angles from 0 to 2 * PI
-    for (let theta = 0; theta <= 2 * Math.PI; theta += 0.01) {
+    for (let theta = 0; theta <= 2 * Math.PI; theta += 2*Math.PI/120) {
 	let centerX1 = centerX + radius1 * Math.cos(rotationAngle);
 	let centerY1 = centerY + radius1 * Math.sin(rotationAngle);
         let x = radius * Math.cos(theta) + centerX1;
         let y = radius * Math.sin(theta) + centerY1;
 
-        const rotatedPoint = rotatePoint(x, y, rotationCenterX, rotationCenterY, rotationAngle);
+        //const rotatedPoint = rotatePoint(x, y, rotationCenterX, rotationCenterY, rotationAngle);
 
         // Draw the curve
         if (theta === 0) {
-            ctx.moveTo(rotatedPoint.x, rotatedPoint.y);  // Move to starting point
+            //ctx.moveTo(rotatedPoint.x, rotatedPoint.y);  // Move to starting point
+            ctx.moveTo(x, y);  // Move to starting point
         } else {
-            ctx.lineTo(rotatedPoint.x, rotatedPoint.y);  // Draw line to next point
+            //ctx.lineTo(rotatedPoint.x, rotatedPoint.y);  // Draw line to next point
+            ctx.lineTo(x, y);  // Draw line to next point
         }
     }
 
@@ -101,21 +96,18 @@ function drawCircle() {
 }
 
 // Function to animate the cardioid rotation
-function animate() {
-    rotationAngle += rotationStep;  // Increment the rotation angle
-    if (rotationAngle > Math.PI) {
-    nstep += 4;  // Increment the rotation angle
-    rotationStep = 2*Math.PI/nstep;  // Rotation angle in radians
-    rotationAngle = 0;  // Increment the rotation angle
-    ctx.clearRect(0, 0, canvas.width, canvas.height); 
-    }
-    drawCircle();  // Redraw the cardioid with the new rotation angle
+function drawRotatingCircle(n) {
+    const radius = 50;
+    const radius1 = 100;
+    for (rotationAngle = 0; rotationAngle < 2*Math.PI; rotationAngle += 2*Math.PI/n) {
+    //ctx.clearRect(0, 0, canvas.width, canvas.height); 
+    drawCircle(rotationAngle, radius, radius1, centerX, centerY);
     //requestAnimationFrame(animate);  // Continue the animation loop
-    setTimeout(animate, 500);
+}
 }
 
-drawCircle();  // Initial cardioid drawing
-animate();  // Start the animation loop
+drawRotatingCircle(8);  // Initial cardioid drawing
+
 </script>
 
 </body>
