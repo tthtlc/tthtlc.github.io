@@ -21,16 +21,20 @@
 const ctx = canvas.getContext('2d');
 
 let phase = 0;
-const amplitude = 50; // height of the wave
-const frequency = 0.02; // number of waves per width of canvas
-const speed = 0.05; // speed of animation
+const amplitude = 100; // height of the wave
+const frequency = 1/8; // number of waves per width of canvas
+const speed = 2*Math.PI/8; // speed of animation
 
 function drawSineWave() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.beginPath();
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
     
-    for (let x = 0; x < canvas.width; x++) {
-        const y = canvas.height / 2 + amplitude * Math.sin((frequency * x) + phase);
+    for (let theta = 0; theta < 2*Math.PI; theta += 2*Math.PI/300) {
+        const r = amplitude * Math.sin((frequency * theta) + phase);
+	x=centerX + r*Math.cos(theta);
+	y=centerY + r*Math.sin(theta);
         ctx.lineTo(x, y);
     }
     
@@ -42,7 +46,7 @@ function drawSineWave() {
 function animate() {
     phase += speed; // increase phase to move the wave
     drawSineWave();
-    requestAnimationFrame(animate);
+    setTimeout(animate, 50);
 }
 
 animate(); // Start the animation
