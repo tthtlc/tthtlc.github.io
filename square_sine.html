@@ -48,30 +48,13 @@
 <!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-GEX61LPT08"></script> <script>   window.dataLayer = window.dataLayer || [];   function gtag(){dataLayer.push(arguments);}   gtag('js', new Date());   gtag('config', 'G-GEX61LPT08'); </script> 
 </head>
 <body>
-    <div id="controls">
-        <label for="R">R (Outer radius):</label>
-        <input type="number" id="R" value="100"><br>
-        <label for="r">r (Inner radius):</label>
-        <input type="number" id="r" value="40"><br>
-        <label for="d">d (Distance from center):</label>
-        <input type="number" id="d" value="60"><br>
-        <button onclick="drawHypotrochoid()">Draw Hypotrochoid</button>
-    </div>
     <canvas id="canvas" width="600" height="600"></canvas>
 
     
-    <div class="footer-link">
-Different loading will display differently. <br>
-        <a href="index_spa.html">Mobile Phone</a> <br>
-        <a href="rotating_polygons_opposite_30canvas.html">Experiment Version</a> <br>
-        <a href="hypotrochoid_animated.html">Latest Creation</a>
-    </div>
     <script> 
 document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
         function drawHypotrochoid() {
-            const R = parseFloat(document.getElementById('R').value);
-            const r = parseFloat(document.getElementById('r').value);
-            const d = parseFloat(document.getElementById('d').value);
+	    const R = 200;
             const canvas = document.getElementById('canvas');
             const ctx = canvas.getContext('2d');
             const width = canvas.width;
@@ -85,18 +68,14 @@ document.addEventListener("contextmenu", function(event) { event.preventDefault(
             ctx.lineWidth = 1;
 
             // Move to the starting point of the curve
-            let x0 = (R - r) * Math.cos(0) + d * Math.cos(((R - r) / r) * 0);
-            let y0 = (R - r) * Math.sin(0) - d * Math.sin(((R - r) / r) * 0);
+	    let x0=R*(0.9*Math.cos(0) + 1/5*Math.sin(0));
+	    let y0=R*(0.9*Math.sin(0) + 1/5*Math.cos(0));
             ctx.moveTo(width / 2 + x0, height / 2 - y0);
 
             // Draw the Hypotrochoid curve
-            for (let t = 0; t <= 2 * Math.PI * r / Math.gcd(R, r); t += Math.PI/800) {
-
-		     x=R*(1.5*Math.cos(t) + 1/5*Math.sin(201*t));
-	             y=R*(1.5*Math.sin(t) + 1/5*Math.cos(193*t));
-
-                //const x = (R - r) * Math.cos(t) + d * Math.cos(((R - r) / r) * t);
-                //const y = (R - r) * Math.sin(t) - d * Math.sin(((R - r) / r) * t);
+            for (let t = 0; t <= 2 * Math.PI; t += Math.PI/1600) {
+		     x=R*(0.9*Math.cos(t) + 1/5*Math.sin(201*t));
+	             y=R*(0.9*Math.sin(t) + 1/5*Math.cos(193*t));
                 ctx.lineTo(width / 2 + x, height / 2 - y);
             }
 

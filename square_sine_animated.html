@@ -1,0 +1,139 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hypotrochoid Curves</title>
+    <style>
+        body {
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .canvas-container {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        canvas {
+            border: 1px solid black;
+            margin-top: 10px;
+        }
+        .label {
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            margin-top: 20px;
+        }
+    </style>
+<!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-GEX61LPT08"></script> <script>   window.dataLayer = window.dataLayer || [];   function gtag(){dataLayer.push(arguments);}   gtag('js', new Date());   gtag('config', 'G-GEX61LPT08'); </script> 
+</head>
+<body>
+    <div class="container" id="canvasContainer">
+        <!-- Canvases will be dynamically appended here -->
+    </div>
+    <script> 
+document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
+
+        function drawSquareSine(R,r,r1,r2,r3, canvas) {
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width;
+            const height = canvas.height;
+
+            // Clear the canvas
+            ctx.clearRect(0, 0, width, height);
+
+            ctx.beginPath();
+            ctx.strokeStyle = 'blue';
+            ctx.lineWidth = 1;
+
+            // Move to the starting point of the curve
+	    let x0=R*(r*Math.cos(0) + 1/r1*Math.sin(0));
+	    let y0=R*(r*Math.sin(0) + 1/r1*Math.cos(0));
+            ctx.moveTo(width / 2 + x0, height / 2 - y0);
+
+            // Draw the Hypotrochoid curve
+            for (let t = 0; t <= 2 * Math.PI; t += Math.PI/1600) {
+
+		     x=R*(r*Math.cos(t) + 1/r1*Math.sin(r2*t));
+	             y=R*(r*Math.sin(t) + 1/r1*Math.cos(r3*t));
+                     //x=R*(1.5*Math.cos(t+ phase) + 1/5*Math.sin(201*(t+phase    )));
+                     //y=R*(1.5*Math.sin(t+ phase) + 1/5*Math.cos(193*(t+phase    )));
+
+                ctx.lineTo(width / 2 + x, height / 2 - y);
+		//console.log(`${x}: ${y}   R: ${R}, r: ${r}, r1: ${r1}, r2: ${r2}, r3: ${r3}`);
+
+            }
+
+            ctx.stroke();
+        }
+
+        // Utility function to calculate the greatest common divisor (GCD)
+        Math.gcd = function(a, b) {
+            return b ? Math.gcd(b, a % b) : Math.abs(a);
+        };
+
+        // Function to generate random values for R, r, and d
+        function getRandomParameters() {
+            const R = Math.floor(Math.random() * 100) + 10;  // Outer radius between 50 and 150
+            const r = Math.random() * 2 + 1.5;   // Inner radius between 10 and 60
+            const r1 = Math.floor(Math.random() * 10) + 1;   // Distance from center between 20 and 100
+            const r2 = Math.floor(Math.random() * 10) + 198;   // Distance from center between 20 and 100
+            const r3 = Math.floor(Math.random() * 6) + 190;   // Distance from center between 20 and 100
+            return { R, r, r1, r2, r3 };
+
+
+
+
+        }
+
+        // Function to create a new canvas and label, then append to the page
+        function createNewCanvas() {
+            const container = document.getElementById('canvasContainer');
+            const { R, r, r1, r2, r3 } = getRandomParameters();
+
+            // Create a new div to hold the label and canvas
+            const canvasContainer = document.createElement('div');
+            canvasContainer.className = 'canvas-container';
+
+            // Create a label for displaying the R, r, and d values
+            const label = document.createElement('div');
+            label.className = 'label';
+            label.textContent = `R: ${R}, r: ${r}, r1: ${r1}, r2: ${r2}, r3: ${r3}`;
+
+            // Create the canvas
+            const canvas = document.createElement('canvas');
+            canvas.width = 600;
+            canvas.height = 600;
+
+            // Append the label and canvas to the container
+            canvasContainer.appendChild(label);
+            canvasContainer.appendChild(canvas);
+            container.appendChild(canvasContainer);
+
+            // Draw the Hypotrochoid curve on the new canvas
+            drawSquareSine(R, r, r1, r2, r3, canvas);
+        }
+
+        // Detect when the user scrolls near the bottom of the page
+        window.onscroll = function() {
+            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 10) {
+                // User is near the bottom of the page, create a new canvas
+                createNewCanvas();
+            }
+        };
+
+        // Initial canvas on page load
+        window.onload = function() {
+            createNewCanvas();
+        };
+
+        // Refresh periodically
+        setInterval(createNewCanvas, 1500);
+    </script>
+</body>
+</html>
+
