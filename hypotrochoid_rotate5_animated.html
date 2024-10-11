@@ -1,0 +1,173 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hypotrochoid Curves</title>
+    <style>
+        body {
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .canvas-container {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        canvas {
+            border: 1px solid black;
+            margin-top: 10px;
+        }
+        .label {
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            margin-top: 20px;
+        }
+    </style>
+<!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-GEX61LPT08"></script> <script>   window.dataLayer = window.dataLayer || [];   function gtag(){dataLayer.push(arguments);}   gtag('js', new Date());   gtag('config', 'G-GEX61LPT08'); </script> 
+</head>
+<body>
+    <div class="container" id="canvasContainer">
+        <!-- Canvases will be dynamically appended here -->
+    </div>
+    <script> 
+document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
+
+    // Define the color palette with five colors from blue to green
+    //const colorPalette = ['#0000FF', '#3366FF', '#3399FF', '#33CCFF', '#00FF00'];
+
+    // Define the color palette with five colors from blue to red
+    const colorPalette = ['#0000FF', '#6633FF', '#9933FF', '#CC3366', '#FF0000'];
+
+    function drawHypotrochoid(R, r, d, canvas) {
+        const ctx = canvas.getContext('2d');
+        const width = canvas.width;
+        const height = canvas.height;
+        let rotationAngle = 5;
+	if (R/r > 10) rotationAngle = 2;
+
+        ctx.clearRect(0, 0, width, height);
+        for (let i = 0; i < 5; i++) {
+            ctx.save();
+            ctx.translate(width / 2, height / 2);
+            ctx.rotate(rotationAngle * Math.PI / 180);
+            ctx.translate(-width / 2, -height / 2);
+
+            ctx.beginPath();
+            ctx.strokeStyle = colorPalette[i % colorPalette.length]; // Cycle through the color palette
+            ctx.lineWidth = 1;
+
+            // Draw the Hypotrochoid curve
+            for (let t = 0; t <= 2 * Math.PI * r; t += 2 * Math.PI / 360) {
+                const x = (R - r) * Math.cos(t) + d * Math.cos(((R - r) / r) * t);
+                const y = (R - r) * Math.sin(t) - d * Math.sin(((R - r) / r) * t);
+                if (t == 0) 
+                    ctx.moveTo(width / 2 + x, height / 2 - y);
+                else
+                    ctx.lineTo(width / 2 + x, height / 2 - y);
+            }
+
+            ctx.stroke();
+            //ctx.restore();
+        }
+    }
+
+
+        function drawHypotrochoid_old(R, r, d, canvas) {
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width;
+            const height = canvas.height;
+            const rotationAngle = 5;
+
+            ctx.clearRect(0, 0, width, height);
+	    for (i=0; i< 5; i++) {
+                ctx.save();
+                ctx.translate(width / 2, height / 2);
+                ctx.rotate(rotationAngle * Math.PI / 180);
+                ctx.translate(-width / 2, -height / 2);
+
+                ctx.beginPath();
+                ctx.strokeStyle = 'blue';
+                ctx.lineWidth = 1;
+
+            // Draw the Hypotrochoid curve
+            for (let t = 0; t <= 2 * Math.PI * r; t += 2*Math.PI/360) {
+                const x = (R - r) * Math.cos(t) + d * Math.cos(((R - r) / r) * t);
+                const y = (R - r) * Math.sin(t) - d * Math.sin(((R - r) / r) * t);
+		if (t==0) 
+            		ctx.moveTo(width / 2 + x, height / 2 - y);
+		else
+                	ctx.lineTo(width / 2 + x, height / 2 - y);
+            }
+
+            ctx.stroke();
+        }
+        }
+
+        // Utility function to calculate the greatest common divisor (GCD)
+        Math.gcd = function(a, b) {
+            return b ? Math.gcd(b, a % b) : Math.abs(a);
+        };
+
+        // Function to generate random values for R, r, and d
+        function getRandomParameters() {
+            const ratio = (Math.floor(Math.random() * 24) + 3);  // Outer radius between 50 and 150
+            let R = (Math.floor(Math.random() * 200) + 10);  // Outer radius between 50 and 150
+            let d = (Math.floor(Math.random() * 150) + 20);  // Outer radius between 50 and 150
+	    const r = Math.floor(R / ratio) + 2
+	    R = r*ratio;
+            return { R, r, d };
+        }
+
+        // Function to create a new canvas and label, then append to the page
+        function createNewCanvas() {
+            const container = document.getElementById('canvasContainer');
+            const { R, r, d } = getRandomParameters();
+
+            // Create a new div to hold the label and canvas
+            const canvasContainer = document.createElement('div');
+            canvasContainer.className = 'canvas-container';
+
+            // Create a label for displaying the R, r, and d values
+            const label = document.createElement('div');
+            label.className = 'label';
+		label.textContent = `R: ${R}, r: ${r}, d: ${d} `;
+
+            // Create the canvas
+            const canvas = document.createElement('canvas');
+            canvas.width = 600;
+            canvas.height = 600;
+
+            // Append the label and canvas to the container
+            canvasContainer.appendChild(label);
+            canvasContainer.appendChild(canvas);
+            container.appendChild(canvasContainer);
+
+            // Draw the Hypotrochoid curve on the new canvas
+            drawHypotrochoid(R, r, d, canvas);
+        }
+
+        // Detect when the user scrolls near the bottom of the page
+        window.onscroll = function() {
+            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 10) {
+                // User is near the bottom of the page, create a new canvas
+                createNewCanvas();
+            }
+        };
+
+        // Initial canvas on page load
+        window.onload = function() {
+            createNewCanvas();
+        };
+
+        // Refresh periodically
+        setInterval(createNewCanvas, 1500);
+    </script>
+</body>
+</html>
+
