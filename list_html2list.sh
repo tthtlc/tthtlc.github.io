@@ -1,5 +1,5 @@
 #ls -1tr *.html | sed -e "s/^/'/" -e "s/$/', /"
-git ls-files | grep "\.html" | grep -v old | grep -v index | grep -v test | grep -v trivia | grep -v backup | grep -v mobile | grep -v heart_animation.html | sed -e "s/^/'/" -e "s/$/', /" | tee /tmp/out$$
+git ls-files | grep "\.html" | grep -v old | grep -v index | grep -v test | grep -v trivia | grep -v backup | grep -v mobile | sed -e "s/^/'/" -e "s/$/', /" | tee /tmp/out$$
 
 mv README.md /tmp/README.md$$
 
