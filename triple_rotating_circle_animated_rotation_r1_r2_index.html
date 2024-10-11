@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Circles with Red-to-Blue Gradient</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+        .canvas-container {
+            margin: 20px 0;
+            text-align: center;
+        }
+        canvas {
+            background-color: white;
+            border: 1px solid #ccc;
+        }
+        .label {
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="canvasContainer">
+    <!-- Canvases with labels will be added here -->
+</div>
+
+<script>
+document.addEventListener("contextmenu", event => event.preventDefault());
+
+// Function to generate random integer between min and max (inclusive)
+function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+// Create a gradient palette from red to blue
+const gradientColors = [];
+for (let i = 0; i < 16; i++) {
+    const r = 255 - Math.floor(255 * (i / 15));  // Red fades out
+    const g = 0;  // No green component
+    const b = Math.floor(255 * (i / 15));  // Blue fades in
+    gradientColors.push(`rgb(${r},${g},${b})`);
+}
+
+// Function to draw the circle graphics on the provided canvas
+function drawCircleGraphics(canvas, radius, freq, radius1, freq1, radius2, freq2, n) {
+    const ctx = canvas.getContext('2d');
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    let counter = 0;
+    
+        ctx.strokeStyle = gradientColors[counter % gradientColors.length];
+	counter++;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+
+        for (let theta = 0; theta <= 200 * Math.PI; theta += 2 * Math.PI / 360) {
+            let x = centerX + radius * Math.cos(theta * freq) + radius1 * Math.cos(theta * freq1) + radius2 * Math.cos(theta * freq2);
+            let y = centerY + radius * Math.sin(theta * freq) + radius1 * Math.sin(theta * freq1) + radius2 * Math.sin(theta * freq2);
+
+            if (theta === 0) {
+                ctx.moveTo(x, y);
+            } else {
+                ctx.lineTo(x, y);
+            }
+        }
+        //ctx.closePath();
+        ctx.stroke();
+    }
+
+// Function to add a new canvas with a label and draw the circle graphics
+function addNewCanvas() {
+    // Generate random values
+    const radius = getRandomInt(60, 200);
+    const radius1 = getRandomInt(40, 60);
+    const radius2 = getRandomInt(10, 20);
+    const freq = 1/3;   //getRandomInt(2, 15);
+    const freq1 = getRandomInt(2, 6);
+    const freq2 = 3*freq1;   //getRandomInt(2, 15);
+
+    // Create container for canvas and label
+    const container = document.createElement('div');
+    container.classList.add('canvas-container');
+
+    // Create label for the generated values
+    const label = document.createElement('div');
+    label.classList.add('label');
+    label.textContent = `radius: ${radius}, freq: ${freq} radius1: ${radius1}, freq1: ${freq1} radius2: ${radius2}, freq2: ${freq2}`;
+    container.appendChild(label);
+
+    // Create canvas
+    const canvas = document.createElement('canvas');
+    canvas.width = 800;
+    canvas.height = 800;
+    container.appendChild(canvas);
+
+    // Append to main container and draw graphics
+    document.getElementById('canvasContainer').appendChild(container);
+    drawCircleGraphics(canvas, radius, freq, radius1, freq1, radius2, freq2);
+}
+
+// Detect when user scrolls near the bottom of the page
+window.addEventListener('scroll', () => {
+    if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100) {
+        addNewCanvas();
+    }
+});
+
+// Initial canvas load
+addNewCanvas();
+
+</script>
+
+</body>
+</html>
+
