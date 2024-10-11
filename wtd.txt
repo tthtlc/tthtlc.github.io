@@ -1,9 +1,6 @@
 
-
-
 https://chatgpt.com/share/6708104d-7890-8013-b218-5325b403065e
 
-1
 cone 
 3d volume and motion
 cylinder
@@ -17,9 +14,7 @@ https://support.google.com/tagmanager/answer/12811173
 https://analytics.google.com/analytics/web/#/p460666704/reports/intelligenthome:   github.io
 https://analytics.google.com/analytics/web/#/p460662091/reports/intelligenthome:   artdeveloper.art
 
-
 animation:
-
 
 suggest how drawings or mathematical rendering like mandelbrot set can be animated dynamically?
 ChatGPT said:
