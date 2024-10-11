@@ -51,7 +51,7 @@ for (let i = 0; i < 16; i++) {
 }
 
 // Function to draw the circle graphics on the provided canvas
-function drawCircleGraphics(canvas, radius, freq, radius1, freq1, radius2, freq2, n) {
+function drawCircleGraphics(canvas, radius, freq, radius1, freq1, radius2, freq2) {
     const ctx = canvas.getContext('2d');
     const centerX = canvas.width / 2;
     const centerY = canvas.height / 2;
@@ -62,7 +62,7 @@ function drawCircleGraphics(canvas, radius, freq, radius1, freq1, radius2, freq2
         ctx.lineWidth = 2;
         ctx.beginPath();
 
-        for (let theta = 0; theta <= 200 * Math.PI; theta += 2 * Math.PI / 360) {
+        for (let theta = 0; theta <= 2 * Math.PI * freq1 * freq2; theta += 2 * Math.PI / 360) {
             let x = centerX + radius * Math.cos(theta * freq) + radius1 * Math.cos(theta * freq1) + radius2 * Math.cos(theta * freq2);
             let y = centerY + radius * Math.sin(theta * freq) + radius1 * Math.sin(theta * freq1) + radius2 * Math.sin(theta * freq2);
 
@@ -79,12 +79,13 @@ function drawCircleGraphics(canvas, radius, freq, radius1, freq1, radius2, freq2
 // Function to add a new canvas with a label and draw the circle graphics
 function addNewCanvas() {
     // Generate random values
-    const radius = getRandomInt(60, 200);
+    const radius = getRandomInt(100, 200);
     const radius1 = getRandomInt(40, 60);
     const radius2 = getRandomInt(10, 20);
-    const freq = 1/getRandomInt(2, 15);
+    const freq = 1/getRandomInt(2, 8);
     const freq1 = getRandomInt(2, 6);
-    const freq2 = 4*freq1;   //getRandomInt(2, 15);
+    const freq2 = getRandomInt(2, 15);
+    //const freq2 = 2*freq1;   //getRandomInt(2, 15);
 
     // Create container for canvas and label
     const container = document.createElement('div');
