@@ -7,11 +7,14 @@ cat /tmp/out$$ | sed 's/^/+ /' > README.md
 
 mv index.html /tmp/index.html$$
 mv index_spa.html /tmp/index_spa.html$$
+mv index_search.html /tmp/index_search.html$$
 
 ./insert_into_template.pl index.tml /tmp/out$$ PETER.TMPL > index.html
 ./insert_into_template.pl index_spa.tml /tmp/out$$ PETER.TMPL > index_spa.html
+./insert_into_template.pl index_search.tml /tmp/out$$ PETER.TMPL > index_search.html
 
 echo "check content of /tmp/out$$"
+read data
 
 vi /tmp/out$$
 
