@@ -29,6 +29,7 @@
 </head>
 <body>
 
+    <p id="label"> x= radius * cos(a/b*t)*cos(t); y= radius*cos(a/b*t)*sin(t) </p>
 <div id="canvasContainer">
     <!-- Canvases with labels will be added here -->
 </div>
@@ -51,7 +52,7 @@ for (let i = 0; i < 16; i++) {
 }
 
 // Function to draw the Petal graphics on the provided canvas
-function drawPetalGraphics(canvas, radius, petal) {
+function drawPetalGraphics(canvas, radius, a, b) {
     const ctx = canvas.getContext('2d');
     const centerX = canvas.width / 2;
     const centerY = canvas.height / 2;
@@ -60,13 +61,13 @@ function drawPetalGraphics(canvas, radius, petal) {
         ctx.lineWidth = 2;
         ctx.beginPath();
 
-        for (let theta = 0; theta <= 2 * Math.PI; theta += 2 * Math.PI / 360) {
+        for (let theta = 0; theta <= 2 * Math.PI * b; theta += 2 * Math.PI / 120) {
 
         ctx.strokeStyle = gradientColors[counter % gradientColors.length];
 	counter++;
 
-            let x = radius * Math.cos(petal*theta)*Math.cos(theta) + centerX;
-            let y = radius * Math.cos(petal*theta)*Math.sin(theta) + centerY;
+            let x = radius * Math.cos(a/b*theta)*Math.cos(theta) + centerX;
+            let y = radius * Math.cos(a/b*theta)*Math.sin(theta) + centerY;
 
             if (theta === 0) {
                 ctx.moveTo(x, y);
@@ -78,11 +79,10 @@ function drawPetalGraphics(canvas, radius, petal) {
         ctx.stroke();
 }
 
-let petal = 1;
-// Function to add a new canvas with a label and draw the Petal graphics
-    let radius = 200;
-function addNewCanvas() {
+
+function addNewCanvas(a,b) {
     // Generate random values
+    const radius = 200;
 
     // Create container for canvas and label
     const container = document.createElement('div');
@@ -91,7 +91,7 @@ function addNewCanvas() {
     // Create label for the generated values
     const label = document.createElement('div');
     label.classList.add('label');
-	label.textContent = `radius: ${radius}, petal: ${petal}`;
+	label.textContent = `radius: ${radius}, a: ${a}, b: ${b}`;
     container.appendChild(label);
 
     // Create canvas
@@ -102,19 +102,37 @@ function addNewCanvas() {
 
     // Append to main container and draw graphics
     document.getElementById('canvasContainer').appendChild(container);
-    drawPetalGraphics(canvas, radius, petal);
-    petal++;
+    drawPetalGraphics(canvas, radius, a, b);
 }
 
-// Detect when user scrolls near the bottom of the page
-window.addEventListener('scroll', () => {
-    if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100) {
-        addNewCanvas();
+function traverseMap(max_ab) {
+    const coordinates = [];
+
+    for (let d = 2; d <= max_ab * 2; d++) { // diagonal levels
+        for (let x = 1; x <= max_ab; x++) {
+            let y = d - x;
+            if (y > 0 && y <= max_ab) {
+                coordinates.push([x, y]);
+            }
+        }
     }
-});
+    return coordinates;
+}
+
+const max_ab = 15;
+const result = traverseMap(max_ab);
+
+result.forEach(coord => addNewCanvas(coord[0], coord[1]));
+
+// Detect when user scrolls near the bottom of the page
+//window.addEventListener('scroll', () => {
+//    if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100) {
+//        addNewCanvas();
+//    }
+//});
 
 // Initial canvas load
-addNewCanvas();
+//addNewCanvas();
 
 </script>
 
