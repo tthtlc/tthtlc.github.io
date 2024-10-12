@@ -9,9 +9,12 @@ mv index.html /tmp/index.html$$
 mv index_spa.html /tmp/index_spa.html$$
 mv index_search.html /tmp/index_search.html$$
 
-./insert_into_template.pl index.tml /tmp/out$$ PETER.TMPL > index.html
-./insert_into_template.pl index_spa.tml /tmp/out$$ PETER.TMPL > index_spa.html
-./insert_into_template.pl index_search.tml /tmp/out$$ PETER.TMPL > index_search.html
+./list_recenthtml.sh > /tmp/latest$$
+
+./insert_into_template.pl index.tml /tmp/out$$ INDEX.TMPL > /tmp/out$$.1
+./insert_into_template.pl /tmp/out$$.1 /tmp/latest$$ LATEST.TMPL > index.html
+./insert_into_template.pl index_spa.tml /tmp/out$$ INDEX.TMPL > index_spa.html
+./insert_into_template.pl index_search.tml /tmp/out$$ INDEX.TMPL > index_search.html
 
 echo "check content of /tmp/out$$"
 read data

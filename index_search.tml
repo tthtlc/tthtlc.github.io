@@ -113,7 +113,7 @@
         document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
 
         const htmlFiles = [
-PETER.TMPL
+INDEX.TMPL
         ];
 
         let filteredFiles = [];

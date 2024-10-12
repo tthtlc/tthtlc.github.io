@@ -36,7 +36,7 @@
 document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
         // Master list of HTML files (URLs) to load
         const masterList = [
-PETER.TMPL
+INDEX.TMPL
         ];
 
         // Function to get a random element from the master list

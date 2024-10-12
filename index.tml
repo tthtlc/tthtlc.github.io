@@ -147,8 +147,7 @@
     <br>
     <div class="footer-link">
         <a href="index_spa.html">Mobile Phone</a> <br>
-	<a href="rotating_polygons_opposite_30canvas.html">Experiment Version</a> <br>
-        <a href="hypotrochoid_animated.html">Latest Creation</a>
+LATEST.TMPL
     </div>
     <br>
     <div id="fileTableContainer"></div>
@@ -156,7 +155,7 @@
         document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
 
         const htmlFiles = [
-PETER.TMPL
+INDEX.TMPL
         ];
 
         function getRandomFiles(fileList, num) {
