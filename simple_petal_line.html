@@ -60,7 +60,7 @@ function drawPetalGraphics(canvas, radius, a, b) {
         ctx.lineWidth = 2;
         ctx.beginPath();
 
-        for (let theta = 0; theta <= 2 * Math.PI * b; theta += 2 * Math.PI / 90) {
+        for (let theta = 0; theta <= 2 * Math.PI * b; theta += 2 * Math.PI /30/a) {
 
         ctx.strokeStyle = gradientColors[counter % gradientColors.length];
 	counter++;
@@ -129,20 +129,23 @@ function drawLines(points, step) {
     }
 }
 
+let a=2;
+let b=5;
+
 function animate() {
-    //const a = getRandomInt(1, 15);
-    //const b = getRandomInt(1, 15);
-    const a = 2;
-    const b = 5;
+    if (step == 59) {
+    a = getRandomInt(1, 15);
+    b = getRandomInt(1, 15);
+    }
     const points = drawPetalGraphics(canvas, radius, a, b);
     //drawPoints(points);
     drawLines(points, step);
     step = (step % (60 - 1)) + 1; // Increment step from 1 to 59
-
     setTimeout(animate, 200); // Control animation speed
+
 }
 
-const radius = getRandomInt(100, 300);
+const radius = 280;
 animate();
 
 </script>
