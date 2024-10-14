@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Traveling Sine Wave</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f0f0f0;
+    }
+    canvas {
+      border: 1px solid #ccc;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="sineCanvas" width="800" height="200"></canvas>
+
+  <script>
+    const canvas = document.getElementById('sineCanvas');
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width;
+    const height = canvas.height;
+    
+    let phase = 0;  // Phase shift to create the traveling effect
+    const frequency = 0.02;  // Frequency of the sine wave
+    const amplitude = 50;  // Amplitude of the sine wave
+    const speed = 0.05;  // Speed of the wave traveling
+
+    function drawSineWave() {
+      ctx.clearRect(0, 0, width, height);  // Clear the canvas
+      ctx.beginPath();
+      ctx.moveTo(0, height / 2);
+	    const n = 2/5;
+
+      for (let x = 0; x < width; x++) {
+        const y = height / 2 + amplitude * Math.sqrt(Math.abs(Math.sin(( n * x * frequency) + phase)));
+        ctx.lineTo(x, y);
+      }
+      
+      ctx.strokeStyle = '#007bff';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+
+    function animate() {
+      phase += speed;  // Increment phase to move the wave forward
+      drawSineWave();
+      requestAnimationFrame(animate);
+    }
+
+    animate();  // Start the animation
+  </script>
+</body>
+</html>
+

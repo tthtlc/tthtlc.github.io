@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Square Wave Approximation with Fourier Series</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f0f0f0;
+    }
+    canvas {
+      border: 1px solid #ccc;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="fourierCanvas" width="800" height="200"></canvas>
+
+  <script>
+    const canvas = document.getElementById('fourierCanvas');
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width;
+    const height = canvas.height;
+    
+    const amplitude = 50;  // Amplitude of the square wave
+    const frequency = 0.01;  // Frequency of the square wave
+    const centerY = height / 2;
+
+    function drawFourierSquareWave() {
+      ctx.clearRect(0, 0, width, height);  // Clear the canvas
+      ctx.beginPath();
+
+      for (let x = 0; x < width; x++) {
+        // Calculate the square wave approximation using the first 4 terms of the Fourier series
+        let y = 0;
+        for (let k = 1; k <= 7; k += 2) {  // k = 1, 3, 5, 7 (odd harmonics)
+          y += Math.sin(k * x * frequency) / k;
+        }
+        y = amplitude * (4 / Math.PI) * y;
+        const finalY = centerY - y;  // Center the wave vertically
+
+        if (x === 0) {
+          ctx.moveTo(x, finalY);
+        } else {
+          ctx.lineTo(x, finalY);
+        }
+      }
+
+      ctx.strokeStyle = '#007bff';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+
+    drawFourierSquareWave();  // Draw the Fourier series approximation of the square wave
+  </script>
+</body>
+</html>
+
