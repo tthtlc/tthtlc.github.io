@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Koch Snowflake Orders</title>
+    <style>
+        canvas {
+            display: inline-block;
+            margin: 10px;
+            background-color: #000;
+        }
+
+        .canvas-container {
+            display: flex;
+            justify-content: center;
+        }
+
+        .footer-link { 
+            position: absolute; 
+            bottom: 20px; 
+            text-align: center; 
+            width: 100%; 
+        } 
+ 
+        .footer-link a { 
+            font-size: 16px; 
+            color: #007bff; 
+            text-decoration: none; 
+        } 
+ 
+        .footer-link a:hover { 
+            text-decoration: underline; 
+        }
+    </style>
+</head>
+<body>
+    <div class="canvas-container">
+        <!-- Canvases for each specified Koch Snowflake order -->
+        <canvas id="snowflake0" width="200" height="200"></canvas>
+        <canvas id="snowflake1" width="200" height="200"></canvas>
+        <canvas id="snowflake2" width="200" height="200"></canvas>
+        <canvas id="snowflake4" width="200" height="200"></canvas>
+        <canvas id="snowflake5" width="200" height="200"></canvas>
+        <canvas id="snowflake6" width="200" height="200"></canvas>
+    </div>
+
+    <script>
+        function drawKoch(ctx, x1, y1, x2, y2, depth) {
+            if (depth === 0) {
+                ctx.beginPath();
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x2, y2);
+                ctx.strokeStyle = "#00FF00";
+                ctx.stroke();
+                return;
+            }
+
+            const dx = (x2 - x1) / 3;
+            const dy = (y2 - y1) / 3;
+
+            const xA = x1 + dx;
+            const yA = y1 + dy;
+
+            const xB = x2 - dx;
+            const yB = y2 - dy;
+
+            const xC = (xA + xB) / 2 - (yB - yA) * Math.sqrt(3) / 2;
+            const yC = (yA + yB) / 2 + (xB - xA) * Math.sqrt(3) / 2;
+
+            drawKoch(ctx, x1, y1, xA, yA, depth - 1);
+            drawKoch(ctx, xA, yA, xC, yC, depth - 1);
+            drawKoch(ctx, xC, yC, xB, yB, depth - 1);
+            drawKoch(ctx, xB, yB, x2, y2, depth - 1);
+        }
+
+        function drawSnowflake(order, canvasId) {
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext("2d");
+            const size = 130;
+            const height = size * Math.sqrt(3) / 2;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const x1 = canvas.width / 2 - size / 2;
+            const y1 = canvas.height / 2 + height / 2;
+
+            const x2 = canvas.width / 2 + size / 2;
+            const y2 = canvas.height / 2 + height / 2;
+
+            const x3 = canvas.width / 2;
+            const y3 = canvas.height / 2 - height / 2;
+
+            drawKoch(ctx, x1, y1, x2, y2, order);
+            drawKoch(ctx, x2, y2, x3, y3, order);
+            drawKoch(ctx, x3, y3, x1, y1, order);
+        }
+
+        // Drawing snowflakes of specific orders
+        drawSnowflake(0, "snowflake0");
+        drawSnowflake(1, "snowflake1");
+        drawSnowflake(2, "snowflake2");
+        drawSnowflake(4, "snowflake4");
+        drawSnowflake(5, "snowflake5");
+        drawSnowflake(6, "snowflake6");
+    </script>
+</body>
+</html>
+

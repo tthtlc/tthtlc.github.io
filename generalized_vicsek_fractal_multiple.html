@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vicsek Fractal - Randomized Colors</title>
+  <style>
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .fractal-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 10px;
+    }
+    canvas {
+      border: 1px solid black;
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="fractalContainer">
+    <!-- Canvases will be generated here -->
+  </div>
+
+  <script>
+    const container = document.getElementById('fractalContainer');
+    const canvasSize = 200;
+
+    // Generate 9 random numbers between 0 and 1 for coloring the squares
+    const randomColors = Array.from({ length: 9 }, () => Math.random());
+
+    function drawVicsekFractal(ctx, x, y, size, order, color) {
+      if (order === 0) {
+        // Base case: draw the center square only
+        ctx.fillStyle = color == 1 ? 'black' : 'yellow';
+        ctx.fillRect(x, y, size, size);
+      } else {
+        const newSize = size / 3;
+
+        // Positions of the neighboring squares
+        const positions = [
+          [0, 0], [2, 0], [0, 2], [2, 2], [1, 0], [2, 1], [1, 2], [0, 1], [1, 1]
+        ];
+
+        // Draw the squares in the Vicsek pattern with the random color
+        positions.forEach((pos, index) => {
+          const color = randomColors[index] > 0.5 ? 1 : 0;
+	  if (color==1) 
+          drawVicsekFractal(
+            ctx,
+            x + pos[0] * newSize,
+            y + pos[1] * newSize,
+            newSize,
+            order - 1, color
+          );
+        });
+        
+        // Center square color
+        //ctx.fillStyle = randomColors[8] > 0.5 ? 'black' : 'yellow';
+        //ctx.fillRect(x + newSize, y + newSize, newSize, newSize);
+      }
+    }
+
+    console.log(randomColors);
+
+    function createFractalCanvas(order) {
+      const fractalContainer = document.createElement('div');
+      fractalContainer.className = 'fractal-container';
+
+      const canvas = document.createElement('canvas');
+      canvas.width = canvasSize;
+      canvas.height = canvasSize;
+      const ctx = canvas.getContext('2d');
+
+      // Draw the Vicsek fractal for the given order
+      drawVicsekFractal(ctx, 0, 0, canvasSize, order);
+
+      const label = document.createElement('div');
+      label.textContent = `Order ${order}`;
+
+      fractalContainer.appendChild(canvas);
+      fractalContainer.appendChild(label);
+      container.appendChild(fractalContainer);
+    }
+
+    // Generate canvases for orders 0 to 5
+    
+    for (let order = 0; order <= 5; order++) {
+      createFractalCanvas(order);
+    }
+  </script>
+</body>
+</html>
+
