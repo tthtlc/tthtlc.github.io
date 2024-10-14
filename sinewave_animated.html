@@ -29,9 +29,9 @@
         }
 
         function generateRandomParameters() {
-            core_radius = getRandomInt(50, 100); // Example range for core_radius
-            amplitude = getRandomInt(50, 100);   // Example range for amplitude
-            frequency = getRandomInt(1, 5);      // Example range for frequency
+            core_radius = getRandomInt(-100, 100); // Example range for core_radius
+            amplitude = getRandomInt(-100, 100);   // Example range for amplitude
+            frequency = getRandomInt(2, 24);      // Example range for frequency
         }
 
         function drawSineWave() {
@@ -53,10 +53,10 @@
         }
 
         function animate(iteration = 0) {
-            if (iteration < 6) {
+            if (iteration < 12) {
                 phase += speed; // Increase phase to move the wave
                 drawSineWave();
-                setTimeout(() => animate(iteration + 1), 300); // Pause for 300ms and call animate again
+                setTimeout(() => animate(iteration + 1), 100); // Pause for 300ms and call animate again
             } else {
                 setTimeout(startAnimation, 500); // Call startAnimation again after 3 seconds
             }
