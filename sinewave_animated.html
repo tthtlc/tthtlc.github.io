@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sine Wave Animation</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+            display: block;
+            margin: 20px auto;
+        }
+    </style>
+<!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-GEX61LPT08"></script> <script>   window.dataLayer = window.dataLayer || [];   function gtag(){dataLayer.push(arguments);}   gtag('js', new Date());   gtag('config', 'G-GEX61LPT08'); </script> </head>
+<body>
+    <canvas id="sineWaveCanvas" width="600" height="300"></canvas>
+
+    <script>
+        document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
+        const canvas = document.getElementById('sineWaveCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let phase = 0;
+        let core_radius, amplitude, frequency;
+        const speed = 2 * Math.PI / 8; // speed of animation
+
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function generateRandomParameters() {
+            core_radius = getRandomInt(50, 100); // Example range for core_radius
+            amplitude = getRandomInt(50, 100);   // Example range for amplitude
+            frequency = getRandomInt(1, 5);      // Example range for frequency
+        }
+
+        function drawSineWave() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.beginPath();
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            
+            for (let theta = 0; theta < 2 * Math.PI; theta += 2 * Math.PI / 300) {
+                const r = amplitude * Math.sin((frequency * theta) + phase) + core_radius;
+                const x = centerX + r * Math.cos(theta);
+                const y = centerY + r * Math.sin(theta);
+                ctx.lineTo(x, y);
+            }
+            
+            ctx.strokeStyle = 'blue';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+
+        function animate(iteration = 0) {
+            if (iteration < 6) {
+                phase += speed; // Increase phase to move the wave
+                drawSineWave();
+                setTimeout(() => animate(iteration + 1), 300); // Pause for 300ms and call animate again
+            } else {
+                setTimeout(startAnimation, 500); // Call startAnimation again after 3 seconds
+            }
+        }
+
+        function startAnimation() {
+            generateRandomParameters(); // Generate new random parameters
+            animate(); // Start the animation with iteration reset to 0
+        }
+
+        startAnimation(); // Start the animation loop
+    </script>    
+    
+</body>
+</html>
+
