@@ -28,14 +28,22 @@
         .footer-link a:hover { 
             text-decoration: underline; 
         } 
-</style>
-<!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-GEX61LPT08"></script> <script>   window.dataLayer = window.dataLayer || [];   function gtag(){dataLayer.push(arguments);}   gtag('js', new Date());   gtag('config', 'G-GEX61LPT08'); </script> </head>
+    </style>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-GEX61LPT08"></script> 
+    <script>   
+        window.dataLayer = window.dataLayer || [];   
+        function gtag(){dataLayer.push(arguments);}   
+        gtag('js', new Date());   
+        gtag('config', 'G-GEX61LPT08'); 
+    </script>
+</head>
 <body>
     <canvas id="mengerCanvas" width="600" height="600"></canvas>
 
-    
     <script> 
-document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
+        document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
+        
         const canvas = document.getElementById("mengerCanvas");
         const ctx = canvas.getContext("2d");
 
@@ -56,7 +64,15 @@ document.addEventListener("contextmenu", function(event) { event.preventDefault(
             }
         }
 
-        drawMenger(0, 0, canvas.width, 4);
+        let depth = 1;
+
+        function animateMenger() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawMenger(0, 0, canvas.width, depth);
+            depth = depth < 7 ? depth + 1 : 1;  // Cycle depth between 1 and 6
+        }
+
+        setInterval(animateMenger, 1000);  // Update every 1 second
     </script>
 </body>
 </html>
