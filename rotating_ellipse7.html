@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rotating and Shrinking Ellipse</title>
+</head>
+<body>
+<canvas id="myCanvas" width="600" height="600"></canvas>
+<script>
+    const canvas = document.getElementById("myCanvas");
+    const ctx = canvas.getContext("2d");
+
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+
+    let majorAxis = 60+3*72; // initial major axis length
+    const orig_majorAxis = majorAxis; // initial major axis length
+    const minorAxis = 60; // fixed minor axis length
+    const decrement = (majorAxis-minorAxis) / 72; // 1/100th of the original major axis length
+    // decrement * angle == 360 / LOBES   , 360/5==>72.   so decrement=72, angle = 1
+    // decrement * angle == 360 / LOBES   , 360/5==>72.   so decrement=72, angle = 1
+    let angle = 0;
+
+    function drawRotatedEllipse() {
+        //ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.save();
+
+        // Translate to center and rotate
+        ctx.translate(centerX, centerY);
+        ctx.rotate((angle * Math.PI) / 180);
+
+        // Draw ellipse
+        ctx.beginPath();
+        ctx.ellipse(0, 0, majorAxis, minorAxis, 0, 0, 2 * Math.PI);
+        ctx.stroke();
+
+        ctx.restore();
+
+        // Update angle and major axis
+        angle += 1;   // decrement * angle = one LOBE.   so 3 * 30 = 90 degrees for one LOB ==> 360 will have 4 LOBE
+	//angle += 360 / LOBES / nos_of_parts;  
+        majorAxis -= decrement;
+
+        // Stop when major axis equals minor axis
+        if (majorAxis > minorAxis) {
+            requestAnimationFrame(drawRotatedEllipse);
+        }
+	else {
+	    majorAxis = orig_majorAxis;
+            requestAnimationFrame(drawRotatedEllipse);
+	}
+    }
+
+    drawRotatedEllipse();
+</script>
+</body>
+</html>
+
