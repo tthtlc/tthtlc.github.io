@@ -33,7 +33,7 @@
             text-decoration: underline; 
         }
     </style>
-</head>
+<!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-GEX61LPT08"></script> <script>   window.dataLayer = window.dataLayer || [];   function gtag(){dataLayer.push(arguments);}   gtag('js', new Date());   gtag('config', 'G-GEX61LPT08'); </script> </head>
 <body>
     <div class="canvas-container">
         <!-- Canvases for each specified Koch Snowflake order -->
@@ -46,6 +46,7 @@
     </div>
 
     <script>
+  document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
         function drawKoch(ctx, x1, y1, x2, y2, depth) {
             if (depth === 0) {
                 ctx.beginPath();
