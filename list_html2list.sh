@@ -3,7 +3,8 @@ git ls-files | grep "\.html" | grep -v old | grep -v index | grep -v test | grep
 
 mv README.md /tmp/README.md$$
 
-cat /tmp/out$$ | sed 's/^/+ /' > README.md
+cat /tmp/out$$ | sed 's/^\(.*\)$/+ [\1](\1)/' > README.md
+cat README.md.tmpl | sed 's/^- \(.*\)$/- [\1](\1)/' | sed 's/^  - \(.*\)$/  - [\1](\1)/' >> README.md
 
 mv index.html /tmp/index.html$$
 mv index_spa.html /tmp/index_spa.html$$
