@@ -1,4 +1,4 @@
-+ '3gon_around_3gon.html', 
++ 3gon_around_3gon.html, 
 + '3gon_around_3gon_animated.html', 
 + '3gon_around_3gon_animated_color.html', 
 + '4gon_around_4gon.html', 
