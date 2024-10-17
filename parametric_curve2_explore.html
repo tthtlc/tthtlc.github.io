@@ -29,7 +29,7 @@
             align-items: center;
         }
     </style>
-</head>
+<!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-GEX61LPT08"></script> <script>   window.dataLayer = window.dataLayer || [];   function gtag(){dataLayer.push(arguments);}   gtag('js', new Date());   gtag('config', 'G-GEX61LPT08'); </script> </head>
 <body>
     <canvas id="canvas" width="1200" height="1200"></canvas>
     <div class="controls">
@@ -50,6 +50,7 @@
         </div>
     </div>
     <script>
+        document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         const width = canvas.width;
