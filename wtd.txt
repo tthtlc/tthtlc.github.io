@@ -1,4 +1,10 @@
 
+x=7cos(0.56t)(sin(0.56t)/(1+2^(cos^2(2.02t)))   -3...t....3
+y=7(sin(0.56t)/(1+sin^2(2.02t))   -3...t....3
+
+x=2.5sin^2(-5t)2^(cos(cos(4.28x2.3t)))
+y=2.5sin(sin(-5t))(cos^2(4.28x2.3t))    -6 to 6
+
 https://chatgpt.com/share/6708104d-7890-8013-b218-5325b403065e
 
 cone 

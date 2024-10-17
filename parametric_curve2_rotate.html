@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parametric Equation Visualization with Gradient</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        canvas {
+            border: 1px solid #000;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas" width="600" height="600"></canvas>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const width = canvas.width;
+        const height = canvas.height;
+        const scale = 60; // Scale factor for better visibility
+
+        // Center the canvas
+        ctx.translate(width / 2, height / 2);
+
+        // Parametric equations
+        function x(t) {
+            return 2.2 * Math.pow(Math.sin(-7 * t), 2) * Math.pow(2, Math.cos(Math.cos(4.28 * 2.3 * t)));
+        }
+
+        function y(t) {
+            return 2.2 * Math.sin(Math.sin(-7 * t)) * Math.pow(Math.cos(4.28 * 2.3 * t), 2);
+        }
+
+        // Gradient colors
+        const colors = [
+            '#FF0000', '#FF7F00', '#FFFF00', '#7FFF00', '#00FF00',
+            '#00FF7F', '#00FFFF', '#007FFF', '#0000FF', '#7F00FF',
+            '#FF00FF', '#FF007F', '#FF0033', '#FF3300', '#FF6600', '#FF9900'
+        ];
+
+        // Draw the parametric curve with gradient
+        function drawCurve(rotationAngle) {
+            ctx.rotate(rotationAngle * Math.PI / 180);
+            ctx.beginPath();
+
+            let startX = x(-2.8) * scale;
+            let startY = y(-2.8) * scale;
+            ctx.moveTo(startX, startY);
+
+            for (let t = -2.8; t <= 2.8; t += 0.01) {
+                const newX = x(t) * scale;
+                const newY = y(t) * scale;
+
+                // Set gradient color based on current `t`
+                let colorIndex = Math.floor((t + 6) / 12 * colors.length);
+                ctx.strokeStyle = colors[colorIndex % colors.length];
+
+                ctx.lineTo(newX, newY);
+                ctx.stroke();
+
+                // Move to the last point for the next segment
+                ctx.beginPath();
+                ctx.moveTo(newX, newY);
+            }
+            ctx.setTransform(1, 0, 0, 1, width / 2, height / 2); // Reset transformation
+        }
+
+        // Draw the initial curve and then rotate it 90 degrees for each subsequent drawing
+        drawCurve(0);
+        drawCurve(90);
+        drawCurve(180);
+        drawCurve(270);
+    </script>
+</body>
+</html>
+
