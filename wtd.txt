@@ -1,4 +1,12 @@
 
+> Distorted vortex parametric curve: 
+> 
+> x(t)=cos(t)+1/3*(cos(123*t)+sin(250*t)), 
+> y(t)=sin(t)+1/3*(sin(123*t)+cos(245*t)), 
+> 
+> t∈[0; 2π], by Nico. G
+
+
 x=7cos(0.56t)(sin(0.56t)/(1+2^(cos^2(2.02t)))   -3...t....3
 y=7(sin(0.56t)/(1+sin^2(2.02t))   -3...t....3
 
