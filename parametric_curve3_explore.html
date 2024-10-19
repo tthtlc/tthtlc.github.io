@@ -35,18 +35,18 @@
     <div class="controls">
         <div class="control-group">
             <label for="aaaa">aaaa:</label>
-            <input type="range" id="aaaa" min="1" max="10" step="0.1" value="5">
-            <span id="value-aaaa">5</span>
+            <input type="range" id="aaaa" min="1" max="20" step="0.1" value="7">
+            <span id="value-aaaa">7</span>
         </div>
         <div class="control-group">
             <label for="bbbb">bbbb:</label>
-            <input type="range" id="bbbb" min="1" max="10" step="0.1" value="5">
-            <span id="value-bbbb">5</span>
+            <input type="range" id="bbbb" min="0" max="100" step="0.01" value="0.56">
+            <span id="value-bbbb">0.56</span>
         </div>
         <div class="control-group">
             <label for="cccc">cccc:</label>
-            <input type="range" id="cccc" min="1" max="10" step="0.1" value="5">
-            <span id="value-cccc">5</span>
+            <input type="range" id="cccc" min="0" max="20" step="0.5" value="3">
+            <span id="value-cccc">3</span>
         </div>
     </div>
     <script>
@@ -74,12 +74,13 @@
         ctx.strokeStyle = '#333';
 
         // Parametric equations
+
         function x(t) {
-            return aaaa * Math.pow(Math.sin(-bbbb * t), 2) * Math.pow(2, Math.cos(Math.cos(4.28 * 2.3 * t)));
+ 	    return aaaa*Math.cos(bbbb*t)*Math.sin(bbbb*t)/(1+Math.pow(2,(Math.cos(2.02*t)*Math.cos(2.02*t))));
         }
 
         function y(t) {
-            return aaaa * Math.sin(Math.sin(-bbbb * t)) * Math.pow(Math.cos(4.28 * 2.3 * t), 2);
+ 	    return aaaa*Math.sin(bbbb*t)/(1+Math.sin(2.02*t)*Math.sin(2.02*t));
         }
 
         // Draw the parametric curve with rotation
@@ -99,7 +100,7 @@
             let startY = y(-cccc) * scale;
             ctx.moveTo(startX, startY);
 
-            for (let t = -cccc; t <= cccc; t += 0.01) {
+            for (let t = -cccc; t <= cccc; t += Math.PI/800) {
                 const newX = x(t) * scale;
                 const newY = y(t) * scale;
                 ctx.lineTo(newX, newY);
