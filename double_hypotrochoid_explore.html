@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hypotrochoid Curves with Scrollbars, Labels, and Color Picker</title>
+    <title>Composite Hypotrochoid Curves</title>
     <style>
         body {
             display: flex;
@@ -45,24 +45,43 @@
     </style>
 </head>
 <body>
-    <canvas id="canvas" width="600" height="600"></canvas>
+    <canvas id="canvas" width="1000" height="1000"></canvas>
 
     <div class="controls">
+        <!-- Curve 1 Controls -->
         <div class="control-group">
-            <label for="R">R (Outer radius):</label>
-            <input type="range" id="R" min="50" max="300" value="240">
-            <span id="R-value" class="value-label">240</span>
+            <label for="R1">R1 (Outer radius 1):</label>
+            <input type="range" id="R1" min="50" max="300" value="240">
+            <span id="R1-value" class="value-label">240</span>
         </div>
         <div class="control-group">
-            <label for="r">r (Inner radius):</label>
-            <input type="range" id="r" min="10" max="150" value="40">
-            <span id="r-value" class="value-label">40</span>
+            <label for="r1">r1 (Inner radius 1):</label>
+            <input type="range" id="r1" min="10" max="150" value="40">
+            <span id="r1-value" class="value-label">40</span>
         </div>
         <div class="control-group">
-            <label for="d">d (Distance):</label>
-            <input type="range" id="d" min="10" max="150" value="150">
-            <span id="d-value" class="value-label">150</span>
+            <label for="d1">d1 (Distance 1):</label>
+            <input type="range" id="d1" min="10" max="150" value="150">
+            <span id="d1-value" class="value-label">150</span>
         </div>
+        
+        <!-- Curve 2 Controls -->
+        <div class="control-group">
+            <label for="R2">R2 (Outer radius 2):</label>
+            <input type="range" id="R2" min="50" max="300" value="240">
+            <span id="R2-value" class="value-label">240</span>
+        </div>
+        <div class="control-group">
+            <label for="r2">r2 (Inner radius 2):</label>
+            <input type="range" id="r2" min="10" max="150" value="40">
+            <span id="r2-value" class="value-label">40</span>
+        </div>
+        <div class="control-group">
+            <label for="d2">d2 (Distance 2):</label>
+            <input type="range" id="d2" min="10" max="150" value="150">
+            <span id="d2-value" class="value-label">150</span>
+        </div>
+
         <div class="control-group">
             <label for="color">Select Color:</label>
             <input type="color" id="color" value="#0000ff">
@@ -78,13 +97,13 @@
         const gradientCanvas = document.getElementById('gradientCanvas');
         const gradientCtx = gradientCanvas.getContext('2d');
 
-        let R = 240;
-        let r = 40;
-        let d = 150;
+        // Parameters for two curves
+        let R1 = 240, r1 = 40, d1 = 150;
+        let R2 = 240, r2 = 40, d2 = 150;
         let rotationAngle = 0;
         let selectedColor = '#0000ff';
 
-        function drawHypotrochoid() {
+        function drawHypotrochoids() {
             const width = canvas.width;
             const height = canvas.height;
 
@@ -103,13 +122,28 @@
             ctx.strokeStyle = gradient;
             ctx.lineWidth = 2;
 
-            let x0 = (R - r) * Math.cos(0) + d * Math.cos(((R - r) / r) * 0);
-            let y0 = (R - r) * Math.sin(0) - d * Math.sin(((R - r) / r) * 0);
+            // Move to the starting point
+            let t0 = 0;
+            let x1_0 = (R1 - r1) * Math.cos(t0) + d1 * Math.cos(((R1 - r1) / r1) * t0);
+            let y1_0 = (R1 - r1) * Math.sin(t0) - d1 * Math.sin(((R1 - r1) / r1) * t0);
+            let x2_0 = (R2 - r2) * Math.cos(t0) + d2 * Math.cos(((R2 - r2) / r2) * t0);
+            let y2_0 = (R2 - r2) * Math.sin(t0) - d2 * Math.sin(((R2 - r2) / r2) * t0);
+            let x0 = x1_0 + x2_0;
+            let y0 = y1_0 + y2_0;
+
             ctx.moveTo(width / 2 + x0, height / 2 - y0);
 
-            for (let t = 0; t <= 2 * Math.PI * r / Math.gcd(R, r); t += 0.01) {
-                const x = (R - r) * Math.cos(t) + d * Math.cos(((R - r) / r) * t);
-                const y = (R - r) * Math.sin(t) - d * Math.sin(((R - r) / r) * t);
+            // Draw composite curve
+            for (let t = 0; t <= 2 * Math.PI * r1 / Math.gcd(R1, r1); t += 0.01) {
+                const x1 = (R1 - r1) * Math.cos(t) + d1 * Math.cos(((R1 - r1) / r1) * t);
+                const y1 = (R1 - r1) * Math.sin(t) - d1 * Math.sin(((R1 - r1) / r1) * t);
+
+                const x2 = (R2 - r2) * Math.cos(t) + d2 * Math.cos(((R2 - r2) / r2) * t);
+                const y2 = (R2 - r2) * Math.sin(t) - d2 * Math.sin(((R2 - r2) / r2) * t);
+
+                const x = x1 + x2;
+                const y = y1 + y2;
+
                 ctx.lineTo(width / 2 + x, height / 2 - y);
             }
 
@@ -164,17 +198,29 @@
         }
 
         // Event listeners for the scrollbars and color input
-        document.getElementById('R').addEventListener('input', function() {
-            R = parseInt(this.value);
-            document.getElementById('R-value').innerText = this.value;
+        document.getElementById('R1').addEventListener('input', function() {
+            R1 = parseInt(this.value);
+            document.getElementById('R1-value').innerText = this.value;
         });
-        document.getElementById('r').addEventListener('input', function() {
-            r = parseInt(this.value);
-            document.getElementById('r-value').innerText = this.value;
+        document.getElementById('r1').addEventListener('input', function() {
+            r1 = parseInt(this.value);
+            document.getElementById('r1-value').innerText = this.value;
         });
-        document.getElementById('d').addEventListener('input', function() {
-            d = parseInt(this.value);
-            document.getElementById('d-value').innerText = this.value;
+        document.getElementById('d1').addEventListener('input', function() {
+            d1 = parseInt(this.value);
+            document.getElementById('d1-value').innerText = this.value;
+        });
+        document.getElementById('R2').addEventListener('input', function() {
+            R2 = parseInt(this.value);
+            document.getElementById('R2-value').innerText = this.value;
+        });
+        document.getElementById('r2').addEventListener('input', function() {
+            r2 = parseInt(this.value);
+            document.getElementById('r2-value').innerText = this.value;
+        });
+        document.getElementById('d2').addEventListener('input', function() {
+            d2 = parseInt(this.value);
+            document.getElementById('d2-value').innerText = this.value;
         });
         document.getElementById('color').addEventListener('input', function() {
             selectedColor = this.value;
@@ -182,7 +228,7 @@
         });
 
         // Initialize the drawing and the color gradient
-        setInterval(drawHypotrochoid, 100);
+        setInterval(drawHypotrochoids, 100);
         drawColorGradient();
     </script>
 </body>
