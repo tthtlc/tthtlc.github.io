@@ -3,220 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta property="og:title" content="Interactive Geometric Visualizations">
-<meta property="og:description" content="Explore randomly picked interactive webpages featuring dynamic geometry and animations.">
-<meta property="og:image" content="thumbnail.jpg">
-<meta property="og:url" content="http://www.artdeveloper.art">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="manifest" href="/site.webmanifest">
-    <title>Mathematical Arts</title>
+    <title>Explore Files</title>
     <style>
         body {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            background-color: #f0f0f0;
             font-family: Arial, sans-serif;
         }
-
-        .diamond-container {
-            position: relative;
-            width: 900px;
-            height: 900px;
+        .frame-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 20px;
         }
-
+        .frame-item {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+        }
         iframe {
-            position: absolute;
-            width: 300px;
-            height: 300px;
-            border: 1px solid black;
-            background-color: #fff;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-        }
-
-        .top {
-            top: 50px;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        .left {
-            top: 50%;
-            left: 50px;
-            transform: translateY(-50%);
-        }
-
-        .right {
-            top: 50%;
-            right: 50px;
-            transform: translateY(-50%);
-        }
-
-        .bottom {
-            bottom: 50px;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        .filename-top, .filename-left, .filename-right, .filename-bottom {
-            position: absolute;
-            text-align: center;
-        }
-
-        .filename-top {
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        .filename-left {
-            top: 50%;
-            left: -150px;
-            transform: translateY(-50%);
-        }
-
-        .filename-right {
-            top: 50%;
-            right: -150px;
-            transform: translateY(-50%);
-        }
-
-        .filename-bottom {
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        a {
-            font-size: 14px;
-            color: #333;
-            text-decoration: none;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
-
-        /* Centered link at the bottom */
-        .footer-link {
-            /* position: absolute; */
-            bottom: 20px;
-            text-align: center;
             width: 100%;
+            height: 300px;
+            border: none;
         }
-
-        .footer-link a {
-            font-size: 16px;
-            color: #007bff;
-            text-decoration: none;
-        }
-
-        .footer-link a:hover {
-            text-decoration: underline;
+        .label-link {
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: block;
         }
     </style>
-<!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-GEX61LPT08"></script> <script>   window.dataLayer = window.dataLayer || [];   function gtag(){dataLayer.push(arguments);}   gtag('js', new Date());   gtag('config', 'G-GEX61LPT08'); </script> </head>
+</head>
 <body>
-    <!-- Centered link to "index_search.html" at the top -->
-    <div style="width: 100%; text-align: center; margin-top: 20px;">
-        <a href="index_search.html" style="font-size: 20px; color: #007bff; text-decoration: none;">Search Page</a>
-    </div>
-    <br>
-    <div class="diamond-container">
-        <div class="filename filename-top" id="filename1"></div>
-        <iframe class="top" id="iframe1" scrolling="no"></iframe>
 
-        <div class="filename filename-left" id="filename2"></div>
-        <iframe class="left" id="iframe2" scrolling="no"></iframe>
+    <h1>Master List of Explore HTML Files</h1>
+    
+    <!-- Master List of explore.html -->
+    <div id="master-list-container" class="frame-container"></div>
 
-        <div class="filename filename-right" id="filename3"></div>
-        <iframe class="right" id="iframe3" scrolling="no"></iframe>
+    <h2>Randomly Selected HTML Files</h2>
+    
+    <!-- Randomly selected HTML files -->
+    <div id="random-list-container" class="frame-container"></div>
 
-        <div class="filename filename-bottom" id="filename4"></div>
-        <iframe class="bottom" id="iframe4" scrolling="no"></iframe>
-    </div>
-
-    <!-- Centered link to "mobile.html" at the bottom -->   <br>
-
-<!-- Add this div where you want the table to appear -->
-    <br>
-    <div class="footer-link">
-        <a href="index_spa.html">Mobile Phone</a> <br>
-LATEST.TMPL
-    </div>
-    <br>
-    <div id="fileTableContainer"></div>
-    <script> 
-        document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
-
+    <script>
         const htmlFiles = [
 INDEX.TMPL
         ];
 
-        function getRandomFiles(fileList, num) {
-            const shuffled = fileList.sort(() => 0.5 - Math.random());
+        // Function to render a list of HTML files
+        function renderHtmlFiles(fileList, containerId) {
+            const container = document.getElementById(containerId);
+            fileList.forEach(file => {
+                const frameItem = document.createElement('div');
+                frameItem.className = 'frame-item';
+
+                const link = document.createElement('a');
+                link.href = file;
+                link.target = '_blank';
+                link.textContent = file;
+                link.className = 'label-link';
+
+                const iframe = document.createElement('iframe');
+                iframe.src = file;
+
+                frameItem.appendChild(link);
+                frameItem.appendChild(iframe);
+                container.appendChild(frameItem);
+            });
+        }
+
+        // Filter out only the 'explore.html' files for the master list
+        const exploreFiles = htmlFiles.filter(file => file.includes('explore'));
+        renderHtmlFiles(exploreFiles, 'master-list-container');
+
+        // Randomly select 12 other HTML files
+        function getRandomFiles(arr, num) {
+            const shuffled = arr.filter(file => !file.includes('explore')).sort(() => 0.5 - Math.random());
             return shuffled.slice(0, num);
         }
 
-        function loadContentIntoIframe(fileName, iframeId, filenameId) {
-            document.getElementById(iframeId).src = fileName;
-
-            const link = document.createElement('a');
-            link.href = fileName;
-            link.target = '_blank';
-            link.innerText = fileName;
-
-            const filenameDiv = document.getElementById(filenameId);
-            filenameDiv.innerHTML = '';
-            filenameDiv.appendChild(link);
-        }
-    // Function to create and insert the table
-    function createFileTable(files) {
-        const table = document.createElement('table');
-        table.style.width = '100%';
-        table.style.borderCollapse = 'collapse';
-        
-        let row;
-        
-        files.forEach((file, index) => {
-            // Create a new row every four files
-            if (index % 4 === 0) {
-                row = document.createElement('tr');
-                table.appendChild(row);
-            }
-            
-            const cell = document.createElement('td');
-            cell.style.border = '1px solid #ddd';
-            cell.style.padding = '8px';
-            cell.style.textAlign = 'center';
-
-            const link = document.createElement('a');
-            link.href = file;
-            link.target = '_blank';
-            link.innerText = file;
-
-            cell.appendChild(link);
-            row.appendChild(cell);
-        });
-
-        // Append the table to the container div
-        document.getElementById('fileTableContainer').appendChild(table);
-    }
-
-        const selectedFiles = getRandomFiles(htmlFiles, 4);
-        loadContentIntoIframe(selectedFiles[0], 'iframe1', 'filename1');
-        loadContentIntoIframe(selectedFiles[1], 'iframe2', 'filename2');
-        loadContentIntoIframe(selectedFiles[2], 'iframe3', 'filename3');
-        loadContentIntoIframe(selectedFiles[3], 'iframe4', 'filename4');
-
-    // Call the function to create the table with all HTML files
-    createFileTable(htmlFiles);
+        const randomFiles = getRandomFiles(htmlFiles, 12);
+        renderHtmlFiles(randomFiles, 'random-list-container');
     </script>
+
 </body>
 </html>
 
