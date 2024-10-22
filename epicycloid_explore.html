@@ -15,7 +15,7 @@
             margin-top: 10px;
         }
     </style>
-</head>
+<!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-GEX61LPT08"></script> <script>   window.dataLayer = window.dataLayer || [];   function gtag(){dataLayer.push(arguments);}   gtag('js', new Date());   gtag('config', 'G-GEX61LPT08'); </script> </head>
 <body>
     <canvas id="epicycloidCanvas" width="600" height="600"></canvas>
 
@@ -41,6 +41,7 @@
     </div>
 
     <script>
+        document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
         function getGradientColor(baseColor, gradientIndex, totalGradients) {
             const factor = gradientIndex / (totalGradients - 1);
             const r = parseInt(baseColor.slice(1, 3), 16);
