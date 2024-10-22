@@ -7,6 +7,7 @@
     <style>
         body {
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
@@ -18,10 +19,11 @@
             border: 1px solid #ccc;
         }
         .controls {
+            position: absolute;
+            bottom: 20px;
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
+            justify-content: center;
+            gap: 20px;
         }
         .control-group {
             display: flex;
@@ -31,7 +33,9 @@
     </style>
 <!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-GEX61LPT08"></script> <script>   window.dataLayer = window.dataLayer || [];   function gtag(){dataLayer.push(arguments);}   gtag('js', new Date());   gtag('config', 'G-GEX61LPT08'); </script> </head>
 <body>
-    <canvas id="canvas" width="1200" height="1200"></canvas>
+	<a href="https://tthtlc.wordpress.com/2024/10/18/sinusoidal-parajetric-equalition/"> Sinusoidal Parametric Equation </a> <br>
+
+	<canvas id="canvas" width="800" height="800"></canvas> <br> <br>
     <div class="controls">
         <div class="control-group">
             <label for="aaaa">aaaa:</label>
@@ -131,11 +135,6 @@
             cccc = parseFloat(event.target.value);
             updateValueDisplay('cccc', cccc);
         });
-
-        // Redraw curve on mouse release
-        //document.querySelectorAll('input[type="range"]').forEach((slider) => {
-        //    slider.addEventListener('mouseup', drawCurveWithRotation);
-        //});
     </script>
 </body>
 </html>
