@@ -30,20 +30,21 @@
             display: block;
         }
     </style>
-</head>
+<!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-GEX61LPT08"></script> <script>   window.dataLayer = window.dataLayer || [];   function gtag(){dataLayer.push(arguments);}   gtag('js', new Date());   gtag('config', 'G-GEX61LPT08'); </script> </head>
 <body>
 
-    <h1>Master List of Explore HTML Files</h1>
+    <h1>Mathematical Exploration Curves</h1>
     
     <!-- Master List of explore.html -->
     <div id="master-list-container" class="frame-container"></div>
 
-    <h2>Randomly Selected HTML Files</h2>
+    <h2>Randomly Selected Curves</h2>
     
     <!-- Randomly selected HTML files -->
     <div id="random-list-container" class="frame-container"></div>
 
     <script>
+        document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
         const htmlFiles = [
 INDEX.TMPL
         ];
