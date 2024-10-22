@@ -13,9 +13,11 @@
             height: 100vh;
             margin: 0;
             background-color: #f0f0f0;
+            padding-top: 300px; /* Added padding for top spacing */
         }
         canvas {
             border: 1px solid black;
+            margin-top: 20px; /* Adds space below the label */
         }
         .controls {
             margin-top: 20px;
@@ -45,7 +47,8 @@
     </style>
 </head>
 <body>
-    <canvas id="canvas" width="1000" height="1000"></canvas>
+    <h2>This is the result of direct addition of two hypotrochoids on top of each other, i.e., (x, y) = (x_hypotrochoid1, y_hypotrochoid1) + (x_hypotrochoid2, y_hypotrochoid2)</h2>
+    <canvas id="canvas" width="600" height="600"></canvas>
 
     <div class="controls">
         <!-- Curve 1 Controls -->
