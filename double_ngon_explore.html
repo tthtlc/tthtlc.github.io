@@ -30,6 +30,12 @@
         .controls input {
             margin-bottom: 10px;
         }
+        button {
+            margin-top: 10px;
+            padding: 8px 16px;
+            font-size: 16px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -50,7 +56,9 @@
             <input type="range" id="smallRadius" name="smallRadius" min="50" max="250" step="1" value="150">
             <span id="smallRadiusValue">150</span>
         </div>
+        <button id="captureBtn">Capture JPG</button>
     </div>
+
     <script>
 document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
 const canvas = document.getElementById('animationCanvas');
@@ -134,9 +142,15 @@ function drawLines(points1, points2) {
     }
 }
 
+// Function to clear canvas and fill with white background
+function clearCanvasWithBackground() {
+    ctx.fillStyle = 'white'; // Set the background color to white
+    ctx.fillRect(0, 0, canvas.width, canvas.height); // Fill the canvas with white
+}
+
 // Function to animate the polygons
 function animate() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+    clearCanvasWithBackground(); // Clear the canvas with white background
 
     // Get points for both polygons, divided by numDots
     const largePolygonPoints = getPolygonPoints(centerX, centerY, largeRadius, rotationAngleLarge, numSides, numDots);
@@ -152,10 +166,25 @@ function animate() {
     requestAnimationFrame(animate); // Continue the animation
 }
 
+// Capture canvas as JPG and download
+document.getElementById('captureBtn').addEventListener('click', function() {
+    clearCanvasWithBackground(); // Ensure white background is applied before capturing
+
+    // Redraw the polygons onto the white background before capture
+    const largePolygonPoints = getPolygonPoints(centerX, centerY, largeRadius, rotationAngleLarge, numSides, numDots);
+    const smallPolygonPoints = getPolygonPoints(centerX, centerY, smallRadius, rotationAngleSmall, numSides, numDots);
+    drawLines(largePolygonPoints, smallPolygonPoints);
+
+    const dataURL = canvas.toDataURL('image/jpeg', 1.0);
+    const link = document.createElement('a');
+    link.href = dataURL;
+    link.download = 'polygon_animation.jpg';
+    link.click();
+});
+
 // Start the animation
 animate();
     </script>
-
 </body>
 </html>
 
