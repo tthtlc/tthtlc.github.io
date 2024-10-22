@@ -372,6 +372,39 @@
 
         const randomFiles = getRandomFiles(htmlFiles, 12);
         renderHtmlFiles(randomFiles, 'random-list-container');
+
+        // Function to stop the timers inside the iframes
+// Function to stop the timers inside the iframes
+function stopAllFrames() {
+    const iframes = document.querySelectorAll('iframe');
+
+    iframes.forEach(iframe => {
+        const frameWindow = iframe.contentWindow;
+
+        // Check if timeoutId exists and is valid before clearing
+        if (typeof frameWindow.timeoutId !== 'undefined') {
+            frameWindow.clearTimeout(frameWindow.timeoutId);
+        }
+
+        // Check if intervalId exists and is valid before clearing
+        if (typeof frameWindow.intervalId !== 'undefined') {
+            frameWindow.clearInterval(frameWindow.intervalId);
+        }
+
+        // Check if animationFrameId exists and is valid before canceling
+        if (typeof frameWindow.animationFrameId !== 'undefined') {
+            frameWindow.cancelAnimationFrame(frameWindow.animationFrameId);
+        }
+    });
+}
+
+
+        // Attach event listener to stop button
+        //document.getElementById('stopButton').addEventListener('click', stopAllFrames);
+
+        // Example: Automatically stop after 5 seconds
+        setTimeout(stopAllFrames, 1000);
+
     </script>
 
 </body>
