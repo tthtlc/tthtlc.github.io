@@ -1,0 +1,163 @@
+
+https://chatgpt.com/c/6710dd12-7760-8013-bcab-b5d48ae9b3db
+
+// Variation 1
+function parametric1(t) {
+    const aaaa = 7, bbbb = 0.5, cccc = 2;
+    const x = aaaa * Math.cos(bbbb * t) * (Math.sin(bbbb * t) / (1 + Math.pow(2, Math.cos(cccc * t) ** 2)));
+    const y = aaaa * (Math.sin(bbbb * t) / (1 + Math.sin(cccc * t) ** 2));
+    return { x, y };
+}
+
+// Variation 2
+function parametric2(t) {
+    const aaaa = 7, bbbb = 0.6, cccc = 2.1;
+    const x = aaaa * Math.cos(bbbb * t) * (Math.cos(0.5 * t) / (1 + Math.pow(2, Math.cos(cccc * t) ** 3)));
+    const y = aaaa * (Math.sin(bbbb * t) / (1 + Math.cos(cccc * t) ** 2));
+    return { x, y };
+}
+
+// Variation 3
+function parametric3(t) {
+    const aaaa = 7, bbbb = 0.55, cccc = 2.05;
+    const x = aaaa * Math.sin(bbbb * t) * (Math.sin(bbbb * t) / (1 + Math.pow(2, Math.sin(cccc * t) ** 2)));
+    const y = aaaa * (Math.cos(bbbb * t) / (1 + Math.sin(cccc * t) ** 2));
+    return { x, y };
+}
+
+// Variation 4
+function parametric4(t) {
+    const aaaa = 7, bbbb = 0.54, cccc = 2.02;
+    const x = aaaa * Math.cos(bbbb * t) * (Math.sin(bbbb * t) / (1 + Math.pow(2, Math.cos(cccc * t) ** 2)));
+    const y = aaaa * (Math.cos(bbbb * t) / (1 + Math.cos(cccc * t) ** 2));
+    return { x, y };
+}
+
+// Variation 5
+function parametric5(t) {
+    const aaaa = 7, bbbb = 0.58, cccc = 2.08;
+    const x = aaaa * Math.sin(bbbb * t) * (Math.sin(bbbb * t) / (1 + Math.pow(2, Math.sin(cccc * t) ** 3)));
+    const y = aaaa * (Math.cos(bbbb * t) / (1 + Math.sin(cccc * t) ** 3));
+    return { x, y };
+}
+
+// Variation 6
+function parametric6(t) {
+    const aaaa = 7, bbbb = 0.52, cccc = 2.05;
+    const x = aaaa * Math.cos(bbbb * t) * (Math.cos(bbbb * t) / (1 + Math.pow(2, Math.cos(cccc * t) ** 2)));
+    const y = aaaa * (Math.sin(bbbb * t) / (1 + Math.cos(cccc * t) ** 2));
+    return { x, y };
+}
+
+// Variation 7
+function parametric7(t) {
+    const aaaa = 7, bbbb = 0.53, cccc = 2.03;
+    const x = aaaa * Math.cos(bbbb * t) * (Math.sin(bbbb * t) / (1 + Math.pow(2, Math.cos(cccc * t) ** 2)));
+    const y = aaaa * (Math.cos(bbbb * t) / (1 + Math.sin(cccc * t) ** 3));
+    return { x, y };
+}
+
+// Variation 8
+function parametric8(t) {
+    const aaaa = 7, bbbb = 0.51, cccc = 2.01;
+    const x = aaaa * Math.sin(bbbb * t) * (Math.cos(bbbb * t) / (1 + Math.pow(2, Math.sin(cccc * t) ** 2)));
+    const y = aaaa * (Math.cos(bbbb * t) / (1 + Math.sin(cccc * t) ** 2));
+    return { x, y };
+}
+
+// Variation 9
+function parametric9(t) {
+    const aaaa = 7, bbbb = 0.57, cccc = 2.07;
+    const x = aaaa * Math.cos(bbbb * t) * (Math.cos(bbbb * t) / (1 + Math.pow(2, Math.cos(cccc * t) ** 2)));
+    const y = aaaa * (Math.sin(bbbb * t) / (1 + Math.cos(cccc * t) ** 3));
+    return { x, y };
+}
+
+// Variation 10
+function parametric10(t) {
+    const aaaa = 7, bbbb = 0.59, cccc = 2.09;
+    const x = aaaa * Math.sin(bbbb * t) * (Math.sin(bbbb * t) / (1 + Math.pow(2, Math.sin(cccc * t) ** 3)));
+    const y = aaaa * (Math.cos(bbbb * t) / (1 + Math.sin(cccc * t) ** 2));
+    return { x, y };
+}
+
+// Variation 11
+function parametric11(t) {
+    const aaaa = 7, bbbb = 0.55, cccc = 2.05;
+    const x = aaaa * Math.cos(bbbb * t) * (Math.cos(bbbb * t) / (1 + Math.pow(2, Math.cos(cccc * t) ** 2)));
+    const y = aaaa * (Math.sin(bbbb * t) / (1 + Math.sin(cccc * t) ** 2));
+    return { x, y };
+}
+
+// Variation 12
+function parametric12(t) {
+    const aaaa = 7, bbbb = 0.53, cccc = 2.03;
+    const x = aaaa * Math.sin(bbbb * t) * (Math.cos(bbbb * t) / (1 + Math.pow(2, Math.sin(cccc * t) ** 3)));
+    const y = aaaa * (Math.sin(bbbb * t) / (1 + Math.cos(cccc * t) ** 2));
+    return { x, y };
+}
+
+// Variation 13
+function parametric13(t) {
+    const aaaa = 7, bbbb = 0.6, cccc = 2.1;
+    const x = aaaa * Math.cos(bbbb * t) * (Math.sin(bbbb * t) / (1 + Math.pow(2, Math.cos(cccc * t) ** 2)));
+    const y = aaaa * (Math.sin(bbbb * t) / (1 + Math.sin(cccc * t) ** 3));
+    return { x, y };
+}
+
+// Variation 14
+function parametric14(t) {
+    const aaaa = 7, bbbb = 0.52, cccc = 2.02;
+    const x = aaaa * Math.sin(bbbb * t) * (Math.sin(bbbb * t) / (1 + Math.pow(2, Math.sin(cccc * t) ** 2)));
+    const y = aaaa * (Math.cos(bbbb * t) / (1 + Math.cos(cccc * t) ** 2));
+    return { x, y };
+}
+
+// Variation 15
+function parametric15(t) {
+    const aaaa = 7, bbbb = 0.57, cccc = 2.07;
+    const x = aaaa * Math.cos(bbbb * t) * (Math.cos(bbbb * t) / (1 + Math.pow(2, Math.cos(cccc * t) ** 3)));
+    const y = aaaa * (Math.sin(bbbb * t) / (1 + Math.sin(cccc * t) ** 2));
+    return { x, y };
+}
+
+// Variation 16
+function parametric16(t) {
+    const aaaa = 7, bbbb = 0.54, cccc = 2.04;
+    const x = aaaa * Math.sin(bbbb * t) * (Math.sin(bbbb * t) / (1 + Math.pow(2, Math.sin(cccc * t) ** 2)));
+    const y = aaaa * (Math.cos(bbbb * t) / (1 + Math.cos(cccc * t) ** 3));
+    return { x, y };
+}
+
+// Variation 17
+function parametric17(t) {
+    const aaaa = 7, bbbb = 0.58, cccc = 2.08;
+    const x = aaaa * Math.cos(bbbb * t) * (Math.cos(bbbb * t) / (1 + Math.pow(2, Math.cos(cccc * t) ** 2)));
+    const y = aaaa * (Math.sin(bbbb * t) / (1 + Math.sin(cccc * t) ** 3));
+    return { x, y };
+}
+
+// Variation 18
+function parametric18(t) {
+    const aaaa = 7, bbbb = 0.56, cccc = 2.06;
+    const x = aaaa * Math.sin(bbbb * t) * (Math.cos(bbbb * t) / (1 + Math.pow(2, Math.sin(cccc * t) ** 2)));
+    const y = aaaa * (Math.cos(bbbb * t) / (1 + Math.cos(cccc * t) ** 2));
+    return { x, y };
+}
+
+// Variation 19
+function parametric19(t) {
+    const aaaa = 7, bbbb = 0.51, cccc = 2.01;
+    const x = aaaa * Math.cos(bbbb * t) * (Math.sin(bbbb * t) / (1 + Math.pow(2, Math.cos(cccc * t) ** 3)));
+    const y = aaaa * (Math.sin(bbbb * t) / (1 + Math.sin(cccc * t) ** 3));
+    return { x, y };
+}
+
+// Variation 20
+function parametric20(t) {
+    const aaaa = 7, bbbb = 0.55, cccc = 2.05;
+    const x = aaaa * Math.sin(bbbb * t) * (Math.cos(bbbb * t) / (1 + Math.pow(2, Math.sin(cccc * t) ** 2)));
+    const y = aaaa * (Math.cos(bbbb * t) / (1 + Math.cos(cccc * t) ** 3));
+    return { x, y };
+}
+
