@@ -48,6 +48,11 @@
             <input type="range" id="cccc" min="0" max="20" step="0.5" value="3">
             <span id="value-cccc">3</span>
         </div>
+        <div class="control-group">
+            <label for="dddd">DDDD:</label>
+            <input type="range" id="dddd" min="0" max="100" step="0.1" value="2.02">
+            <span id="value-dddd">2.02</span>
+        </div>
     </div>
     <script>
         document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
@@ -63,10 +68,12 @@
         let aaaa = parseFloat(document.getElementById('aaaa').value);
         let bbbb = parseFloat(document.getElementById('bbbb').value);
         let cccc = parseFloat(document.getElementById('cccc').value);
+        let dddd = parseFloat(document.getElementById('dddd').value);
 
         const valueAaaa = document.getElementById('value-aaaa');
         const valueBbbb = document.getElementById('value-bbbb');
         const valueCccc = document.getElementById('value-cccc');
+        const valueDddd = document.getElementById('value-dddd');
 
         // Center the canvas
         ctx.translate(width / 2, height / 2);
@@ -76,11 +83,11 @@
         // Parametric equations
 
         function x(t) {
- 	    return aaaa*Math.cos(bbbb*t)*Math.sin(bbbb*t)/(1+Math.pow(2,(Math.cos(2.02*t)*Math.cos(2.02*t))));
+ 	    return aaaa*Math.cos(bbbb*t)*Math.sin(bbbb*t)/(1+Math.pow(2,(Math.cos(dddd*t)*Math.cos(dddd*t))));
         }
 
         function y(t) {
- 	    return aaaa*Math.sin(bbbb*t)/(1+Math.sin(2.02*t)*Math.sin(2.02*t));
+ 	    return aaaa*Math.sin(bbbb*t)/(1+Math.sin(dddd*t)*Math.sin(dddd*t));
         }
 
         // Draw the parametric curve with rotation
@@ -131,6 +138,11 @@
         document.getElementById('cccc').addEventListener('input', (event) => {
             cccc = parseFloat(event.target.value);
             updateValueDisplay('cccc', cccc);
+        });
+
+        document.getElementById('dddd').addEventListener('input', (event) => {
+            dddd = parseFloat(event.target.value);
+            updateValueDisplay('dddd', dddd);
         });
 
         // Redraw curve on mouse release
