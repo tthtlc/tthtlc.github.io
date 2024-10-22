@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enneper Surface Animation</title>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="enneperCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById("enneperCanvas");
+        const ctx = canvas.getContext("2d");
+
+        // Set canvas dimensions
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        const scale = 80;
+
+        // Parametric equations for Enneper surface
+        function enneperSurface(u, v, n) {
+            const x = u - (Math.pow(u, 2 * n - 1)) / (2 * n - 1) + u * Math.pow(v, 2);
+            const y = v - (Math.pow(v, 2 * n - 1)) / (2 * n - 1) + v * Math.pow(u, 2);
+            const z = Math.pow(u, 2) - Math.pow(v, 2);
+            return [x, y, z];
+        }
+
+        // Projection function to convert 3D coordinates to 2D
+        function project3D(x, y, z) {
+            const d = 500; // Viewer distance
+            const scale = d / (d - z); // Perspective scaling
+            const x2d = centerX + scale * x * 50; // Adjust scaling factor
+            const y2d = centerY - scale * y * 50;
+            return [x2d, y2d];
+        }
+
+        // Function to draw the Enneper surface
+        function drawEnneperSurface(n) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+
+            // Define u and v ranges
+            const uRange = 100;
+            const vRange = 100;
+            const uVals = [];
+            const vVals = [];
+
+            // Generate u and v values between -2 and 2
+            for (let i = 0; i <= uRange; i++) {
+                const u = -2 + (4 * i) / uRange;
+                uVals.push(u);
+            }
+
+            for (let j = 0; j <= vRange; j++) {
+                const v = -2 + (4 * j) / vRange;
+                vVals.push(v);
+            }
+
+            // Loop through u and v values to generate points
+            for (let i = 0; i < uVals.length - 1; i++) {
+                for (let j = 0; j < vVals.length - 1; j++) {
+                    const u1 = uVals[i];
+                    const v1 = vVals[j];
+                    const u2 = uVals[i + 1];
+                    const v2 = vVals[j + 1];
+
+                    // Get the 3D points for each quad
+                    const [x1, y1, z1] = enneperSurface(u1, v1, n);
+                    const [x2, y2, z2] = enneperSurface(u2, v1, n);
+                    const [x3, y3, z3] = enneperSurface(u2, v2, n);
+                    const [x4, y4, z4] = enneperSurface(u1, v2, n);
+
+                    // Project the 3D points to 2D
+                    const [px1, py1] = project3D(x1, y1, z1);
+                    const [px2, py2] = project3D(x2, y2, z2);
+                    const [px3, py3] = project3D(x3, y3, z3);
+                    const [px4, py4] = project3D(x4, y4, z4);
+
+                    // Draw the quadrilateral (a small surface element)
+                    ctx.beginPath();
+                    ctx.moveTo(px1, py1);
+                    ctx.lineTo(px2, py2);
+                    ctx.lineTo(px3, py3);
+                    ctx.lineTo(px4, py4);
+                    ctx.closePath();
+
+                    // Fill with color
+                    ctx.fillStyle = `rgba(0, 150, 255, 0.7)`;
+                    ctx.fill();
+                    ctx.strokeStyle = "black";
+                    ctx.stroke();
+                }
+            }
+        }
+
+        // Animation setup
+        let n = 2; // Start with order 2
+        let increasing = true;
+
+        function animate() {
+            drawEnneperSurface(n);
+
+            // Update n for each frame
+            if (increasing) {
+                n += 0.05;
+                if (n > 9) increasing = false;
+            } else {
+                n -= 0.05;
+                if (n < 2) increasing = true;
+            }
+
+            requestAnimationFrame(animate); // Loop the animation
+        }
+
+        // Start the animation
+        animate();
+
+        // Handle window resize
+        window.addEventListener("resize", () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            drawEnneperSurface(n); // Redraw after resizing
+        });
+    </script>
+</body>
+</html>
+

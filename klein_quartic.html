@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Klein Quartic Pattern</title>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="kleinCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById("kleinCanvas");
+        const ctx = canvas.getContext("2d");
+
+        // Set canvas dimensions
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+
+        // Function to draw a polygon
+        function drawPolygon(x, y, radius, sides, rotation = 0, color = "black") {
+            ctx.beginPath();
+            ctx.moveTo(
+                x + radius * Math.cos(rotation),
+                y + radius * Math.sin(rotation)
+            );
+            for (let i = 1; i <= sides; i++) {
+                ctx.lineTo(
+                    x + radius * Math.cos((i * 2 * Math.PI) / sides + rotation),
+                    y + radius * Math.sin((i * 2 * Math.PI) / sides + rotation)
+                );
+            }
+            ctx.closePath();
+            ctx.strokeStyle = color;
+            ctx.stroke();
+        }
+
+        // Function to generate Klein Quartic pattern
+        function kleinQuarticPattern() {
+            const heptagonRadius = 100;
+            const triangleRadius = heptagonRadius * Math.sin(Math.PI / 3) / Math.sin((2 * Math.PI) / 7);
+
+            const hexColors = [
+                "#ff0000", "#00ff00", "#0000ff",
+                "#ff00ff", "#00ffff", "#ffff00",
+                "#ff6600"
+            ];
+
+            // Draw the central heptagon
+            drawPolygon(centerX, centerY, heptagonRadius, 7, Math.PI / 2, hexColors[0]);
+
+            // Draw surrounding triangles
+            for (let i = 0; i < 7; i++) {
+                const angle = (i * 2 * Math.PI) / 7;
+                const x = centerX + heptagonRadius * Math.cos(angle);
+                const y = centerY + heptagonRadius * Math.sin(angle);
+
+                drawPolygon(x, y, triangleRadius, 3, angle + Math.PI / 7, hexColors[(i + 1) % 7]);
+            }
+        }
+
+        kleinQuarticPattern();
+    </script>
+</body>
+</html>
+
