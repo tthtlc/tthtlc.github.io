@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rotating Gradient Background</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Controls styling */
+        #controls {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 1.2em;
+            display: flex;
+            gap: 1em;
+        }
+
+        /* Content text styling */
+        #content {
+            color: #fff;
+            font-size: 2em;
+            text-align: center;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+    <div id="controls">
+        <label for="color1-picker">Color 1:</label>
+        <input type="color" id="color1-picker" value="#0000ff">
+
+        <label for="color2-picker">Color 2:</label>
+        <input type="color" id="color2-picker" value="#00ffff">
+    </div>
+    <div id="content">Rotating Gradient Background</div>
+
+    <script>
+        const color1Picker = document.getElementById('color1-picker');
+        const color2Picker = document.getElementById('color2-picker');
+
+        let degree = 0;
+        let color1 = color1Picker.value;
+        let color2 = color2Picker.value;
+
+        // Update the gradient background
+        function updateGradient() {
+            // Increment the angle, resetting after full rotation
+            degree = (degree + 5) % 360;
+
+            // Apply the gradient with current degree and fixed colors
+            document.body.style.background = `linear-gradient(${degree}deg, ${color1}, ${color2})`;
+
+            // Repeat the animation
+            requestAnimationFrame(updateGradient);
+        }
+
+        // Start the gradient animation
+        updateGradient();
+
+        // Update colors immediately when color pickers are changed
+        color1Picker.addEventListener("input", () => {
+            color1 = color1Picker.value;
+        });
+        color2Picker.addEventListener("input", () => {
+            color2 = color2Picker.value;
+        });
+    </script>
+</body>
+</html>
+

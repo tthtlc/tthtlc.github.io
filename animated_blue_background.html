@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animated Gradient Background</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Dropdown styling */
+        #controls {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 1.2em;
+        }
+
+        /* Content text styling */
+        #content {
+            color: #fff;
+            font-size: 2em;
+            text-align: center;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+    <div id="controls">
+        <label for="color-mode">Color Mode:</label>
+        <select id="color-mode">
+            <option value="fixed">Fixed Colors</option>
+            <option value="varying">Varying Colors</option>
+        </select>
+    </div>
+    <div id="content">Rotating Gradient Background</div>
+
+    <script>
+        const colorMode = document.getElementById('color-mode');
+        let degree = 0;
+        let color1, color2;
+        let colorChangeCounter = 0; // Counter to slow down color variation
+
+        // Function to generate a random shade of blue
+        function getRandomBlueShade() {
+            const blueValue1 = Math.floor(Math.random() * 256); // Random blue
+            const blueValue2 = Math.floor(Math.random() * 256); // Another random blue
+            return [`rgb(0, 0, ${blueValue1})`, `rgb(0, 0, ${blueValue2})`];
+        }
+
+        // Set initial colors
+        [color1, color2] = getRandomBlueShade();
+
+        // Update the gradient background
+        function updateGradient() {
+            // Increment the angle, resetting after full rotation
+            degree = (degree + 5) % 360;
+
+            // If color mode is set to "varying," update colors every 20 frames
+            if (colorMode.value === "varying") {
+                colorChangeCounter++;
+                if (colorChangeCounter === 400) { // Update colors only every 20 frames
+                    [color1, color2] = getRandomBlueShade();
+                    colorChangeCounter = 0; // Reset the counter
+                }
+            }
+
+            // Apply the gradient with current degree and colors
+            document.body.style.background = `linear-gradient(${degree}deg, ${color1}, ${color2})`;
+
+            // Repeat the animation
+            requestAnimationFrame(updateGradient);
+        }
+
+        // Start the gradient animation
+        updateGradient();
+
+        // Listen for dropdown changes to switch between fixed and varying colors
+        colorMode.addEventListener("change", () => {
+            // Reset colors if switching to fixed mode
+            if (colorMode.value === "fixed") {
+                [color1, color2] = getRandomBlueShade();
+            }
+        });
+    </script>
+</body>
+</html>
+
