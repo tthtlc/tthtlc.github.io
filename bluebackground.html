@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Blue Gradient Background</title>
+    <style>
+        /* Basic reset for the page */
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: Arial, sans-serif;
+            color: #fff;
+        }
+        /* The gradient background will be set in the body element */
+        #content {
+            text-align: center;
+            font-size: 2em;
+        }
+    </style>
+</head>
+<body>
+    <div id="content">Enjoy the random blue gradient!</div>
+
+    <script>
+        // Function to generate a random blue shade in hexadecimal
+        function getRandomBlueShade() {
+            const blueValue = Math.floor(Math.random() * 256); // Generate blue between 0 and 255
+            return `rgb(0, 0, ${blueValue})`; // RGB with random blue
+        }
+
+        // Generate two random blue shades for the gradient
+        const color1 = getRandomBlueShade();
+        const color2 = getRandomBlueShade();
+
+        // Set the random gradient background
+        document.body.style.background = `linear-gradient(45deg, ${color1}, ${color2})`;
+        //document.body.style.background = `radial-gradient(ellipse, #00f, #fff)`;
+    </script>
+</body>
+</html>
+
