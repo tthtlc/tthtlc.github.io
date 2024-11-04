@@ -22,98 +22,101 @@
         .controls {
             display: flex;
             align-items: center;
+            margin-bottom: 10px;
         }
         .controls label {
             margin-right: 10px;
         }
+        #startStopButton {
+            padding: 8px 16px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-left: 20px;
+        }
     </style>
-<!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-GEX61LPT08"></script> <script>   window.dataLayer = window.dataLayer || [];   function gtag(){dataLayer.push(arguments);}   gtag('js', new Date());   gtag('config', 'G-GEX61LPT08'); </script> </head>
+</head>
 <body>
     <canvas id="animationCanvas" width="600" height="600"></canvas>
     <div class="controls">
         <label for="sides">Number of sides:</label>
         <input type="range" id="sides" name="sides" min="3" max="15" step="1" value="5">
         <span id="sidesValue">5</span>
+        <button id="startStopButton">Start</button>
     </div>
     <script>
-document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
-const canvas = document.getElementById('animationCanvas');
-const ctx = canvas.getContext('2d');
-const largeRadius = 200; // Radius of the larger polygon
-const smallRadius = 150; // Radius of the smaller polygon
-const centerX = canvas.width / 2; // Fixed center X
-const centerY = canvas.height / 2; // Fixed center Y
-let rotationAngleLarge = 0;
-let rotationAngleSmall = 0;
-let numSides = 5; // Starting with a pentagon
+        document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
+        const canvas = document.getElementById('animationCanvas');
+        const ctx = canvas.getContext('2d');
+        const largeRadius = 200;
+        const smallRadius = 150;
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        let rotationAngleLarge = 0;
+        let rotationAngleSmall = 0;
+        let numSides = 5;
+        let isAnimating = false;
+        let animationFrameId;
 
-// Update the displayed value of the sides
-const sidesSlider = document.getElementById('sides');
-const sidesValueDisplay = document.getElementById('sidesValue');
-sidesSlider.addEventListener('input', (event) => {
-    numSides = parseInt(event.target.value);
-    sidesValueDisplay.textContent = numSides;
-});
+        const sidesSlider = document.getElementById('sides');
+        const sidesValueDisplay = document.getElementById('sidesValue');
+        const startStopButton = document.getElementById('startStopButton');
 
-// Function to generate points along the edge of a polygon with a variable number of sides
-function getPolygonPoints(centerX, centerY, radius, rotationAngle, numSides) {
-    const points = [];
-    const rotationRadians = rotationAngle * Math.PI / 180; // Convert degrees to radians
+        sidesSlider.addEventListener('input', (event) => {
+            numSides = parseInt(event.target.value);
+            sidesValueDisplay.textContent = numSides;
+        });
 
-    // Angle between adjacent vertices of the polygon
-    const angleStep = (2 * Math.PI) / numSides;
+        function getPolygonPoints(centerX, centerY, radius, rotationAngle, numSides) {
+            const points = [];
+            const rotationRadians = rotationAngle * Math.PI / 180;
+            const angleStep = (2 * Math.PI) / numSides;
 
-    // Generate points along the perimeter
-    for (let i = 0; i < numSides; i++) {
-        const angle = i * angleStep;
+            for (let i = 0; i < numSides; i++) {
+                const angle = i * angleStep;
+                const x = centerX + radius * Math.cos(angle);
+                const y = centerY + radius * Math.sin(angle);
+                const rotatedX = centerX + (x - centerX) * Math.cos(rotationRadians) - (y - centerY) * Math.sin(rotationRadians);
+                const rotatedY = centerY + (x - centerX) * Math.sin(rotationRadians) + (y - centerY) * Math.cos(rotationRadians);
+                points.push({ x: rotatedX, y: rotatedY });
+            }
+            return points;
+        }
 
-        // Coordinates of the vertex
-        const x = centerX + radius * Math.cos(angle);
-        const y = centerY + radius * Math.sin(angle);
+        function drawLines(points1, points2) {
+            for (let i = 0; i < points1.length; i++) {
+                ctx.strokeStyle = i % 2 === 1 ? 'blue' : 'red';
+                ctx.beginPath();
+                ctx.moveTo(points1[i].x, points1[i].y);
+                ctx.lineTo(points2[i].x, points2[i].y);
+                ctx.stroke();
+            }
+        }
 
-        // Apply rotation
-        const rotatedX = centerX + (x - centerX) * Math.cos(rotationRadians) - (y - centerY) * Math.sin(rotationRadians);
-        const rotatedY = centerY + (x - centerX) * Math.sin(rotationRadians) + (y - centerY) * Math.cos(rotationRadians);
+        function animate() {
+            if (!isAnimating) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const largePolygonPoints = getPolygonPoints(centerX, centerY, largeRadius, rotationAngleLarge, numSides);
+            const smallPolygonPoints = getPolygonPoints(centerX, centerY, smallRadius, rotationAngleSmall, numSides);
 
-        points.push({ x: rotatedX, y: rotatedY });
-    }
+            drawLines(largePolygonPoints, smallPolygonPoints);
 
-    return points;
-}
+            rotationAngleLarge = (rotationAngleLarge + 2) % 360;
+            rotationAngleSmall = (rotationAngleSmall - 2) % 360;
 
-// Function to draw lines between points of two polygons
-function drawLines(points1, points2) {
-    for (let i = 0; i < points1.length; i++) {
-        ctx.strokeStyle = i % 2 === 1 ? 'blue' : 'red';
-        ctx.beginPath();
-        ctx.moveTo(points1[i].x, points1[i].y);
-        ctx.lineTo(points2[i].x, points2[i].y);
-        ctx.stroke();
-    }
-}
+            animationFrameId = requestAnimationFrame(animate);
+        }
 
-// Function to animate the polygons
-function animate() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
-
-    // Get points for both polygons
-    const largePolygonPoints = getPolygonPoints(centerX, centerY, largeRadius, rotationAngleLarge, numSides);
-    const smallPolygonPoints = getPolygonPoints(centerX, centerY, smallRadius, rotationAngleSmall, numSides);
-
-    // Draw lines between corresponding points
-    drawLines(largePolygonPoints, smallPolygonPoints);
-
-    // Update rotation angles
-    rotationAngleLarge = (rotationAngleLarge + 2) % 360; // Rotate counterclockwise
-    rotationAngleSmall = (rotationAngleSmall - 2) % 360; // Rotate clockwise
-
-    requestAnimationFrame(animate); // Continue the animation
-}
-
-// Start the animation
-animate();
+        startStopButton.addEventListener('click', () => {
+            isAnimating = !isAnimating;
+            if (isAnimating) {
+                startStopButton.textContent = "Stop";
+                animate();
+            } else {
+                startStopButton.textContent = "Start";
+                cancelAnimationFrame(animationFrameId);
+            }
+        });
     </script>
-
 </body>
 </html>
 
