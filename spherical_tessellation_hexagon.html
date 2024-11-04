@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sphere Tessellation with Hexagons</title>
+    <style>
+        body { margin: 0; overflow: hidden; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <canvas id="sphereCanvas"></canvas>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three/examples/js/controls/OrbitControls.js"></script>
+
+<script>
+// Set up the scene, camera, and renderer
+const canvas = document.getElementById("sphereCanvas");
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
+camera.position.z = 5;
+
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(window.devicePixelRatio);
+
+// Add OrbitControls for easy interaction
+const controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+// Create the sphere geometry and material
+const sphereGeometry = new THREE.SphereGeometry(2, 32, 32);
+const sphereMaterial = new THREE.MeshBasicMaterial({ color: 0xcccccc, wireframe: true });
+const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+scene.add(sphere);
+
+// Function to map hexagons onto the sphere
+function addHexagonalPattern() {
+    const hexRadius = 0.15; // Radius of each hexagon
+    const hexHeight = Math.sqrt(3) * hexRadius;
+    const hexMaterial = new THREE.LineBasicMaterial({ color: 0x0000ff });
+
+    for (let lat = -Math.PI / 2; lat <= Math.PI / 2; lat += hexHeight / 2) {
+        const r = 2 * Math.cos(lat);
+        const y = 2 * Math.sin(lat);
+
+        for (let lon = 0; lon < 2 * Math.PI; lon += hexRadius / r) {
+            // Calculate hexagon center on the sphere
+            const x = r * Math.cos(lon);
+            const z = r * Math.sin(lon);
+
+            const hexGeometry = new THREE.CircleGeometry(hexRadius, 6);
+            hexGeometry.rotateX(Math.PI / 2);
+            hexGeometry.translate(x, y, z);
+
+            const hexOutline = new THREE.LineLoop(hexGeometry, hexMaterial);
+            scene.add(hexOutline);
+        }
+    }
+}
+
+// Call the function to add hexagon pattern
+addHexagonalPattern();
+
+// Render loop
+function animate() {
+    requestAnimationFrame(animate);
+    controls.update();
+    renderer.render(scene, camera);
+}
+
+animate();
+
+// Handle window resize
+window.addEventListener('resize', () => {
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+});
+
+</script>
+</body>
+</html>
+

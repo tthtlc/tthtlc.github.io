@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Parametric Pattern</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: Arial, sans-serif;
+        }
+        #canvas {
+            border: 1px solid black;
+            margin-top: 20px;
+        }
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .slider {
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Interactive Parametric Pattern</h1>
+<canvas id="canvas" width="600" height="600"></canvas>
+
+<div class="controls">
+    <div class="slider">
+        <label for="R">Outer Radius (R): <span id="R-value">100</span></label>
+        <input type="range" id="R" min="10" max="200" value="100">
+    </div>
+    <div class="slider">
+        <label for="r">Inner Radius (r): <span id="r-value">50</span></label>
+        <input type="range" id="r" min="10" max="200" value="50">
+    </div>
+    <div class="slider">
+        <label for="a">Frequency Multiplier (a): <span id="a-value">9</span></label>
+        <input type="range" id="a" min="1" max="20" value="9">
+    </div>
+    <div class="slider">
+        <label for="b">Frequency Multiplier (b): <span id="b-value">14</span></label>
+        <input type="range" id="b" min="1" max="20" value="14">
+    </div>
+    <div class="slider">
+        <label for="phi">Phase Shift (phi): <span id="phi-value">0.785</span></label>
+        <input type="range" id="phi" min="0" max="6.28" step="0.01" value="0.785">
+    </div>
+</div>
+
+<script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    
+    const RSlider = document.getElementById('R');
+    const rSlider = document.getElementById('r');
+    const aSlider = document.getElementById('a');
+    const bSlider = document.getElementById('b');
+    const phiSlider = document.getElementById('phi');
+
+    function drawPattern() {
+        const R = parseFloat(RSlider.value);
+        const r = parseFloat(rSlider.value);
+        const a = parseInt(aSlider.value);
+        const b = parseInt(bSlider.value);
+        const phi = parseFloat(phiSlider.value);
+
+        document.getElementById('R-value').textContent = R;
+        document.getElementById('r-value').textContent = r;
+        document.getElementById('a-value').textContent = a;
+        document.getElementById('b-value').textContent = b;
+        document.getElementById('phi-value').textContent = phi.toFixed(2);
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.beginPath();
+
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        const numPoints = 6000;
+        const tMax = 2 * Math.PI * numPoints;
+
+        for (let i = 0; i <= numPoints; i++) {
+            const t = (i / numPoints) * tMax;
+            const x = centerX + (R * Math.sin(a * t + phi) + r * Math.sin(b * t));
+            const y = centerY + (R * Math.cos(a * t + phi) + r * Math.cos(b * t));
+            if (i === 0) {
+                ctx.moveTo(x, y);
+            } else {
+                ctx.lineTo(x, y);
+            }
+        }
+
+        ctx.strokeStyle = 'purple';
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
+    }
+
+    // Event listeners to redraw on parameter change
+    [RSlider, rSlider, aSlider, bSlider, phiSlider].forEach(slider => {
+        slider.addEventListener('input', drawPattern);
+    });
+
+    // Initial draw
+    drawPattern();
+</script>
+
+</body>
+</html>
+
