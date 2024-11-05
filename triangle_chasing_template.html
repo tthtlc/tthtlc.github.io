@@ -1,0 +1,57 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Triangle with Colored Lines</title>
+</head>
+<body>
+    <canvas id="canvas" width="600" height="600" style="border:1px solid #000;"></canvas>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Triangle vertices
+        const vertexA = { x: 100, y: 500 };
+        const vertexB = { x: 500, y: 500 };
+        const vertexC = { x: 300, y: 100 };
+
+        // Draw the triangle
+        ctx.beginPath();
+        ctx.moveTo(vertexA.x, vertexA.y);
+        ctx.lineTo(vertexB.x, vertexB.y);
+        ctx.lineTo(vertexC.x, vertexC.y);
+        ctx.closePath();
+        ctx.stroke();
+
+        // Function to divide a line into equal parts
+        function divideLine(start, end, parts) {
+            const points = [];
+            for (let i = 0; i <= parts; i++) {
+                const x = start.x + (end.x - start.x) * (i / parts);
+                const y = start.y + (end.y - start.y) * (i / parts);
+                points.push({ x, y });
+            }
+            return points;
+        }
+
+        // Divide sides AB and AC into 60 equal parts
+        const pointsAB = divideLine(vertexA, vertexB, 60);
+        const pointsAC = divideLine(vertexA, vertexC, 60);
+
+        // Draw lines connecting points from pointsAB and pointsAC
+        for (let i = 0; i < 60; i++) {
+            const pointAB = pointsAB[60 - i - 1];
+            const pointAC = pointsAC[i];
+            const hue = i * 6; // Vary hue with index for a gradient effect
+            ctx.strokeStyle = `hsl(${hue}, 100%, 50%)`;
+            ctx.beginPath();
+            ctx.moveTo(pointAB.x, pointAB.y);
+            ctx.lineTo(pointAC.x, pointAC.y);
+            ctx.stroke();
+        }
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interactive Checkbox Text Generator</title>
+</head>
+<body>
+
+<h2>Interactive Checkbox Text Generator</h2>
+
+<!-- Textual Input Box to Display Sequences -->
+<label>
+    Sequence Log:<br>
+    <textarea id="sequenceLog" rows="8" cols="50" readonly></textarea>
+</label>
+
+<!-- Checkboxes with Arbitrary Text Sequence -->
+<div>
+    <label>
+        <input type="checkbox" id="rotationAnimation" data-text="Rotation of object as animation"> Rotation as Animation
+    </label><br>
+
+    <label>
+        <input type="checkbox" id="capturePNG" data-text="generate PNG and save as file logic"> Capture as PNG
+    </label><br>
+    
+    <label>
+        <input type="checkbox" id="captureGIF" data-text="generate GIF Capture (this will require start and end of motion to be entered) and save as file logic"> Capture as GIF
+    </label><br>
+    
+    <label>
+        <input type="checkbox" id="colorGradient" data-text="generate color gradient when drawing lines"> Gradient of Colored Lines
+    </label><br>
+    
+    <label>
+        <input type="checkbox" id="curvearray" data-text="generate points that lies along the curve as an array"> Generate points of curves into an array
+    </label><br>
+    
+    <label>
+        <input type="checkbox" id="joinPoints" data-text="Join Points in Array with Patterns"> Join Points in Array with Patterns
+    </label><br>
+
+    <!-- Point Joining Patterns -->
+    <fieldset>
+        <legend>Point Joining Patterns</legend>
+        <label>
+            <input type="checkbox" id="pattern1" data-text="join points in array such that it follow this pattern:  start of array will connect via a line with end of array, and then 2nd point of array will connect with 2nd last point of array and so on."> Start-End, Forward/Backward
+        </label><br>
+        <label>
+            <input type="checkbox" id="pattern2" data-text="join points in array such that it follow this pattern:  start of array will connect via a line with 20th point of array, where 20 is a number indicating the number of cells offset away from the start of the array, and then 2nd point connect with 21th point, 3rd point connect with 22th point etc."> Start with 20th offset
+            <input type="checkbox" id="pattern3" data-text="join points in array such that it follow this pattern:  start of array will connect via a line with 20th point of array, where 20 is a number indicating the number of cells offset away from the start of the array, and then 2nd point connect with 21th point, 3rd point connect with 22th point, 4th point connect with 23th point and then stop."> Start with 20th offset, but only 4points
+            <input type="checkbox" id="pattern4" data-text="join points in array such that it follow this pattern:  start of array will connect via a line with 20th point of array, where 20 is a number indicating the number of cells offset away from the start of the array"> Start with 20th offset
+            <input type="checkbox" id="pattern2" data-text="Pattern: Start with N Offset"> Start with N Offset
+        </label><br>
+        <label>
+            <input type="checkbox" id="pattern3" data-text="Pattern: Start with Offset in 2nd Array"> Start with Offset in 2nd Array
+        </label><br>
+    </fieldset>
+
+    <!-- Polygon and Polyhedron Choices -->
+    <fieldset>
+        <legend>Polygon & Polyhedron Choices</legend>
+        <label>
+            Polygon:
+            <select id="polygonChoice">
+                <option value="" disabled selected>Select Polygon</option>
+                <option value="triangle" data-text="generate a Triangle Polygon">Triangle</option>
+                <option value="square" data-text="generate a Square Polygon">Square</option>
+                <option value="pentagon" data-text="generate a Pentagon Polygon">Pentagon</option>
+                <option value="hexagon" data-text="generate a Hexagon Polygon">Hexagon</option>
+                <option value="heptagon" data-text="generate a Heptagon Polygon">Heptagon</option>
+                <option value="octagon" data-text="generate a Octagon Polygon">Octagon</option>
+                <option value="nonagon" data-text="generate a Nonagon Polygon">Nonagon</option>
+                <option value="decagon" data-text="generate a Decagon Polygon">Decagon</option>
+                <option value="hendecagon" data-text="generate a Hendecagon Polygon">Hendecagon</option>
+                <option value="dodecagon" data-text="generate a Dodecagon Polygon">Dodecagon</option>
+                <option value="tridecagon" data-text="generate a Tridecagon Polygon">Tridecagon</option>
+                <option value="tetradecagon" data-text="generate a Tetradecagon Polygon">Tetradecagon</option>
+                <option value="pentadecagon" data-text="generate a Pentadecagon Polygon">Pentadecagon</option>
+            </select>
+        </label><br>
+        
+        <label>
+            Polyhedron:
+            <select id="polyhedronChoice">
+                <option value="" disabled selected>Select Polyhedron</option>
+                <option value="tetrahedron" data-text="generate a Tetrahedron">Tetrahedron</option>
+                <option value="cube" data-text="generate a Cube">Cube</option>
+                <option value="octahedron" data-text="generate a Octahedron">Octahedron</option>
+                <option value="dodecahedron" data-text="generate a Dodecahedron">Dodecahedron</option>
+                <option value="icosahedron" data-text="generate a Icosahedron">Icosahedron</option>
+                <option value="truncatedTetrahedron" data-text="generate a Truncated Tetrahedron">Truncated Tetrahedron</option>
+                <option value="truncatedCube" data-text="generate a Truncated Cube">Truncated Cube</option>
+                <option value="truncatedOctahedron" data-text="generate a Truncated Octahedron">Truncated Octahedron</option>
+                <option value="truncatedIcosahedron" data-text="generate a Truncated Icosahedron">Truncated Icosahedron</option>
+                <option value="truncatedDodecahedron" data-text="generate a Truncated Dodecahedron">Truncated Dodecahedron</option>
+                <option value="rhombicDodecahedron" data-text="generate a Rhombic Dodecahedron">Rhombic Dodecahedron</option>
+                <option value="cuboctahedron" data-text="generate a Cuboctahedron">Cuboctahedron</option>
+                <option value="snubCube" data-text="generate a Snub Cube">Snub Cube</option>
+                <option value="snubDodecahedron" data-text="generate a Snub Dodecahedron">Snub Dodecahedron</option>
+                <option value="rhombicTriacontahedron" data-text="generate a Rhombic Triacontahedron">Rhombic Triacontahedron</option>
+            </select>
+        </label>
+    </fieldset>
+</div>
+
+<script>
+    const sequenceLog = document.getElementById('sequenceLog');
+
+    // Function to add or remove text based on checkbox or dropdown selection
+    function updateSequenceLog(text, add) {
+        const currentText = sequenceLog.value.split('\n').filter(Boolean);
+
+        if (add) {
+            if (!currentText.includes(text)) currentText.push(text);
+        } else {
+            const index = currentText.indexOf(text);
+            if (index > -1) currentText.splice(index, 1);
+        }
+        
+        sequenceLog.value = currentText.join('\n');
+    }
+
+    // Event listeners for checkboxes
+    document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+        checkbox.addEventListener('change', (e) => {
+            updateSequenceLog(e.target.getAttribute('data-text'), e.target.checked);
+        });
+    });
+
+    // Event listeners for dropdowns
+    document.querySelectorAll('select').forEach(select => {
+        select.addEventListener('change', (e) => {
+            const optionText = e.target.options[e.target.selectedIndex].getAttribute('data-text');
+            updateSequenceLog(optionText, true);
+        });
+    });
+</script>
+
+</body>
+</html>
+
+
+
+
+labelling the hexagon's center as P0, and P1, P2, P3, P4 to P6 are the different points on the vertex of the hexagon.   now using P0->P1 and P0->P2 as the pair of edge, generate the pattern of lines using the template from below:
+

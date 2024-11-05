@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hexagon with Colored Lines</title>
+</head>
+<body>
+    <canvas id="canvas" width="600" height="600" style="border:1px solid #000;"></canvas>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Hexagon parameters
+        const center = { x: 300, y: 300 };
+        const radius = 200;
+        const parts = 60; // Number of divisions
+
+        // Generate points P0 (center) and P1 to P6 (vertices)
+        const points = [center];
+        for (let i = 0; i < 6; i++) {
+            const angle = (Math.PI / 3) * i;
+            const x = center.x + radius * Math.cos(angle);
+            const y = center.y + radius * Math.sin(angle);
+            points.push({ x, y });
+        }
+
+        // Function to divide a line into equal parts
+        function divideLine(start, end, parts) {
+            const points = [];
+            for (let i = 0; i <= parts; i++) {
+                const x = start.x + (end.x - start.x) * (i / parts);
+                const y = start.y + (end.y - start.y) * (i / parts);
+                points.push({ x, y });
+            }
+            return points;
+        }
+
+        // Draw hexagon outline
+        ctx.beginPath();
+        ctx.moveTo(points[1].x, points[1].y);
+        for (let i = 2; i <= 6; i++) {
+            ctx.lineTo(points[i].x, points[i].y);
+        }
+        ctx.closePath();
+        ctx.stroke();
+
+        // Function to draw connecting lines with color gradient
+        function drawConnectingLines(pointArray1, pointArray2, hueOffset) {
+            for (let i = 0; i < parts; i++) {
+                const point1 = pointArray1[parts - i - 1];
+                const point2 = pointArray2[i];
+                const hue = (i * 6 + hueOffset) % 360; // Offset hue to vary colors
+                ctx.strokeStyle = `hsl(${hue}, 100%, 50%)`;
+                ctx.beginPath();
+                ctx.moveTo(point1.x, point1.y);
+                ctx.lineTo(point2.x, point2.y);
+                ctx.stroke();
+            }
+        }
+
+        // Generate and draw patterns for each adjacent pair
+        for (let i = 1; i <= 6; i++) {
+            const nextIndex = (i % 6) + 1;
+            const points1 = divideLine(points[0], points[i], parts);
+            const points2 = divideLine(points[0], points[nextIndex], parts);
+            drawConnectingLines(points1, points2, i * 60); // Increment hue offset for each pair
+        }
+    </script>
+</body>
+</html>
+
