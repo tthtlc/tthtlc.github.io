@@ -33,7 +33,11 @@
 <!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-GEX61LPT08"></script> <script>   window.dataLayer = window.dataLayer || [];   function gtag(){dataLayer.push(arguments);}   gtag('js', new Date());   gtag('config', 'G-GEX61LPT08'); </script> </head>
 <body>
 
-    <h1>Mathematical Exploration Curves</h1>
+    <h3>
+    <a href="index_search.html"> Index Search </a>
+    </h3>
+
+    <h2>Mathematical Exploration Curves</h2>
     
     <!-- Master List of explore.html -->
     <div id="master-list-container" class="frame-container"></div>
@@ -73,15 +77,16 @@ INDEX.TMPL
 
         // Filter out only the 'explore.html' files for the master list
         const exploreFiles = htmlFiles.filter(file => file.includes('explore'));
-        renderHtmlFiles(exploreFiles, 'master-list-container');
+        const exploreFiles1 = getRandomFiles(exploreFiles, 4);
+        renderHtmlFiles(exploreFiles1, 'master-list-container');
 
         // Randomly select 12 other HTML files
         function getRandomFiles(arr, num) {
-            const shuffled = arr.filter(file => !file.includes('explore')).sort(() => 0.5 - Math.random());
-            return shuffled.slice(0, num);
+            //const shuffled = arr.filter(file => !file.includes('explore')).sort(() => 0.5 - Math.random());
+            return arr.slice(0, num);
         }
 
-        const randomFiles = getRandomFiles(htmlFiles, 12);
+        const randomFiles = getRandomFiles(htmlFiles, 4);
         renderHtmlFiles(randomFiles, 'random-list-container');
     </script>
 
