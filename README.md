@@ -183,7 +183,6 @@
 + ['moving_square.html', ]('moving_square.html', )
 + ['moving_square_rotate.html', ]('moving_square_rotate.html', )
 + ['moving_square_rotate_double.html', ]('moving_square_rotate_double.html', )
-+ ['object_generator.html', ]('object_generator.html', )
 + ['octagon_auto_rotate.html', ]('octagon_auto_rotate.html', )
 + ['ovalellipse.html', ]('ovalellipse.html', )
 + ['parametric_curve1.html', ]('parametric_curve1.html', )

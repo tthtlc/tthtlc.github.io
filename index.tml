@@ -77,16 +77,16 @@ INDEX.TMPL
 
         // Filter out only the 'explore.html' files for the master list
         const exploreFiles = htmlFiles.filter(file => file.includes('explore'));
-        const exploreFiles1 = getRandomFiles(exploreFiles, 4);
+        const exploreFiles1 = getRandomFiles(exploreFiles, 4, 'AAAAAAA');
         renderHtmlFiles(exploreFiles1, 'master-list-container');
 
         // Randomly select 12 other HTML files
-        function getRandomFiles(arr, num) {
-            //const shuffled = arr.filter(file => !file.includes('explore')).sort(() => 0.5 - Math.random());
-            return arr.slice(0, num);
+        function getRandomFiles(arr, num, file_to_exclude) {
+            const shuffled = arr.filter(file => !file.includes(file_to_exclude)).sort(() => 0.5 - Math.random());
+            return shuffled.slice(0, num);
         }
 
-        const randomFiles = getRandomFiles(htmlFiles, 4);
+        const randomFiles = getRandomFiles(htmlFiles, 4, 'explore');
         renderHtmlFiles(randomFiles, 'random-list-container');
     </script>
 
