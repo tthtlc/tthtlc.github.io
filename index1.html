@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Circular Icon Navigation</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .circle-container {
+      position: relative;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .icon {
+      position: absolute;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: #4287f5;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+      transform: translate(-50%, -50%);
+      transition: background 0.3s;
+    }
+    .icon.active {
+      background: #f54242;
+    }
+    .details {
+      margin-top: 20px;
+      text-align: center;
+    }
+    .details ul {
+      list-style: none;
+      padding: 0;
+    }
+    .details ul li {
+      cursor: pointer;
+      color: blue;
+      text-decoration: underline;
+    }
+    .details ul li:hover {
+      color: darkblue;
+    }
+  </style>
+</head>
+<body>
+
+<div class="circle-container" id="circleContainer">
+  <!-- Icons will be generated dynamically here -->
+</div>
+<div class="details" id="detailsContainer">
+  <h3>Details</h3>
+  <div id="detailsContent"></div>
+</div>
+
+<script>
+  const data = {
+    "GeometricPatternsAndShapes": {
+      "PolygonPatterns": {
+        "3gon": [
+          "3gon_around_3gon_animated_color.html",
+          "3gon_around_3gon_animated.html",
+          "3gon_around_3gon.html"
+        ],
+        // More items...
+      },
+      // More categories...
+    },
+    // More main categories...
+  };
+
+  const mainCategories = Object.keys(data);
+  let currentIndex = 0;
+
+  function createIcons() {
+    const circleContainer = document.getElementById("circleContainer");
+    const angleStep = (2 * Math.PI) / mainCategories.length;
+    mainCategories.forEach((category, index) => {
+      const angle = index * angleStep;
+      const x = 150 + Math.cos(angle) * 120;
+      const y = 150 + Math.sin(angle) * 120;
+
+      const icon = document.createElement("div");
+      icon.className = "icon";
+      icon.innerText = category;
+      icon.style.left = `${x}px`;
+      icon.style.top = `${y}px`;
+      icon.dataset.index = index;
+
+      icon.addEventListener("click", () => selectIcon(index));
+
+      circleContainer.appendChild(icon);
+    });
+    updateActiveIcon();
+  }
+
+  function updateActiveIcon() {
+    document.query
+

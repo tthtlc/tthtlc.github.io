@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Circular Icon Navigation</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .circle-container {
+      position: relative;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .icon {
+      position: absolute;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: #4287f5;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+      transform: translate(-50%, -50%);
+      transition: background 0.3s;
+    }
+    .icon.active {
+      background: #f54242;
+    }
+    .details {
+      margin-top: 20px;
+      text-align: center;
+    }
+    .details ul {
+      list-style: none;
+      padding: 0;
+    }
+  </style>
+</head>
+<body>
+
+<div class="circle-container" id="circleContainer">
+  <!-- Icons will be generated dynamically here -->
+</div>
+<div class="details" id="detailsContainer">
+  <h3>Details</h3>
+  <div id="detailsContent"></div>
+</div>
+
+<script>
+data = {
+  "GeometricPatternsAndShapes": {
+    "PolygonPatterns": {
+      "3gon": [
+        "3gon_around_3gon_animated_color.html",
+        "3gon_around_3gon_animated.html",
+        "3gon_around_3gon.html"
+      ],
+      "4gon": [
+        "4gon_around_4gon_animated.html",
+        "4gon_around_4gon.html",
+        "4gon_around_4gon_rotating.html"
+      ],
+      "5gon": [
+        "chasing_5gon_around_5gon.html"
+      ]
+    },
+    "ShapesWithTransformations": {
+      "Chasing": [
+        "chasing_3gon_around_3gon.html",
+        "chasing_4gon.html",
+        "chasing_5gon_around_5gon.html",
+        "chasing_circle.html",
+        "chasing_hexagon_rotating.html"
+      ],
+      "DoubleShapes": [
+        "double3.html",
+        "double_circle.html",
+        "double_hypotrochoid_explore.html",
+        "double_ring_rotate.html",
+        "double_triangle.html"
+      ],
+      "RotatingShapes": [
+        "rotating_cardiod2.html",
+        "rotating_diamond.html",
+        "rotating_circle.html",
+        "rotating_ellipse4.html",
+        "rotating_pentagon_about_pentagon.html",
+        "rotating_polygons.html"
+      ]
+    },
+    "HypotrochoidPatterns": [
+      "hypotrochoid_animate_d1.html",
+      "hypotrochoid_explore.html",
+      "hypotrochoid_rotate5_animated.html",
+      "hypotrochoid_animated_rotate_color.html"
+    ]
+  },
+  "FractalsAndRecurringPatterns": {
+    "Fractals": [
+      "barnsley_fern_fractal.html",
+      "fractal_fern.html",
+      "generalized_vicsek_fractal_multiple.html",
+      "sierpinski_carpet.html",
+      "sierpinski.html",
+      "t_square_fractal2.html",
+      "vicsek_fractal_animate.html"
+    ],
+    "CurvesAndSpirals": {
+      "Lemniscate": [
+        "lemniscate2_fixed.html",
+        "lemniscate_radiating.html",
+        "lemniscate_rotate.html"
+      ],
+      "FigureEights": [
+        "figure_eight_double.html",
+        "figure_eight.html",
+        "figure_eight_rotating.html"
+      ],
+      "Spirals": [
+        "spiral.html",
+        "spiral3_rotating.html",
+        "spiral_triangle.html"
+      ]
+    },
+    "JuliaAndMandelbrot": [
+      "julia_set.html",
+      "mandelbrot.html",
+      "mandelbrot_color.html",
+      "zooming_mandelbrot.html"
+    ]
+  },
+  "BackgroundsAndGradients": {
+    "AnimatedBackgrounds": [
+      "animated_blue_background.html",
+      "animated_color_background.html"
+    ],
+    "ColorGradients": [
+      "color_gradient_template.html",
+      "color_gradient_template2.html"
+    ]
+  },
+  "MiscellaneousMathematicalAndAnimationPatterns": {
+    "Ellipses": [
+      "ellipse_rotating_circle.html",
+      "ellipse_superrotating_circle.html",
+      "ellipse_sliding_circle.html"
+    ],
+    "PetalsAndFlowers": [
+      "flower_in_motion.html",
+      "four_petal.html",
+      "three_petal.html"
+    ],
+    "TorusAndDodecahedron": [
+      "solid_torus.html",
+      "dodecahedron_fixed.html",
+      "truncated_dodecahedron_one_corner.html"
+    ],
+    "MiscellaneousShapes": [
+      "windmill.html",
+      "cardiod.html",
+      "cardiod_line1.html",
+      "mobius_manual_rotating.html"
+    ]
+  },
+  "IndexAndTestingFiles": {
+    "IndexFiles": [
+      "index.html",
+      "index_orig.html",
+      "index_search.html"
+    ],
+    "TestFiles": [
+      "test.html",
+      "test1.html",
+      "test_animated.html"
+    ]
+  }
+};
+
+  const dataOLD = {
+    "GeometricPatternsAndShapes": {
+      "PolygonPatterns": {
+        "3gon": [
+          "3gon_around_3gon_animated_color.html",
+          "3gon_around_3gon_animated.html",
+          "3gon_around_3gon.html"
+        ],
+        // More items...
+      },
+      // More categories...
+    },
+    // More main categories...
+  };
+
+  const mainCategories = Object.keys(data);
+  let currentIndex = 0;
+
+  // Function to create icons in a circular arrangement
+  function createIcons() {
+    const circleContainer = document.getElementById("circleContainer");
+    const angleStep = (2 * Math.PI) / mainCategories.length;
+    mainCategories.forEach((category, index) => {
+      const angle = index * angleStep;
+      const x = 150 + Math.cos(angle) * 120;
+      const y = 150 + Math.sin(angle) * 120;
+
+      const icon = document.createElement("div");
+      icon.className = "icon";
+      icon.innerText = category;
+      icon.style.left = `${x}px`;
+      icon.style.top = `${y}px`;
+      icon.dataset.index = index;
+
+      icon.addEventListener("click", () => selectIcon(index));
+
+      circleContainer.appendChild(icon);
+    });
+    updateActiveIcon();
+  }
+
+  // Update active icon based on the current index
+  function updateActiveIcon() {
+    document.querySelectorAll(".icon").forEach((icon, idx) => {
+      icon.classList.toggle("active", idx === currentIndex);
+    });
+    displayDetails();
+  }
+
+  // Display details for the selected category
+  function displayDetails() {
+    const category = mainCategories[currentIndex];
+    const subCategories = data[category];
+    const detailsContent = document.getElementById("detailsContent");
+    detailsContent.innerHTML = "";
+
+    if (typeof subCategories === 'object') {
+      const list = document.createElement("ul");
+      Object.keys(subCategories).forEach(subCategory => {
+        const listItem = document.createElement("li");
+        listItem.innerText = subCategory;
+        listItem.addEventListener("click", () => displaySubCategoryFiles(subCategory));
+        list.appendChild(listItem);
+      });
+      detailsContent.appendChild(list);
+    } else {
+      detailsContent.innerText = "No additional details available.";
+    }
+  }
+
+  // Display files for a selected subcategory
+  function displaySubCategoryFiles(subCategory) {
+    const category = mainCategories[currentIndex];
+    const files = data[category][subCategory];
+    const detailsContent = document.getElementById("detailsContent");
+    detailsContent.innerHTML = `<h4>${subCategory} Files</h4>`;
+    
+    const list = document.createElement("ul");
+    files.forEach(file => {
+      const listItem = document.createElement("li");
+      listItem.innerText = file;
+      list.appendChild(listItem);
+    });
+    detailsContent.appendChild(list);
+  }
+
+  // Event listener for keyboard navigation
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowRight") {
+      currentIndex = (currentIndex + 1) % mainCategories.length;
+    } else if (e.key === "ArrowLeft") {
+      currentIndex = (currentIndex - 1 + mainCategories.length) % mainCategories.length;
+    }
+    updateActiveIcon();
+  });
+
+  function selectIcon(index) {
+    currentIndex = index;
+    updateActiveIcon();
+  }
+
+  // Initialize icons on the page
+  createIcons();
+</script>
+
+</body>
+</html>
+

@@ -45,7 +45,7 @@
     </style>
 </head>
 <body>
-    <canvas id="canvas" width="600" height="600"></canvas>
+    <canvas id="canvas" width="1200" height="1200"></canvas>
 
     <div class="controls">
         <div class="control-group">
@@ -104,8 +104,8 @@ function drawEpicycloid() {
 
     ctx.beginPath();
     for (let t = 0; t <= 2 * Math.PI * r / Math.gcd(R, r); t += 0.01) {
-        const x = centerX + (R + r) * Math.cos(t) - d * Math.cos((R + r) / r * t);
-        const y = centerY + (R + r) * Math.sin(t) - d * Math.sin((R + r) / r * t);
+        const x = centerX + ((200) * Math.cos(t) - 96 * Math.cos(5 * t)) + (R + r) * Math.cos(t) - d * Math.cos((R + r) / r * t);
+        const y = centerY + (200) * Math.sin(t) - 96 * Math.sin(5 * t) + (R + r) * Math.sin(t) - d * Math.sin((R + r) / r * t);
 
 	if (t/(2*Math.PI) - Math.floor(t/(2*Math.PI)) < 0.001)
         ctx.strokeStyle = colors[colorIndex % colors.length];
