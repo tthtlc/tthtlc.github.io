@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D Spiral Tube with Decreasing Radius</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body style="margin: 0; overflow: hidden;">
+  <script>
+    // Set up scene, camera, and renderer
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    // Define parameters for the spiral tube
+    const spiralLength = 100;
+    const initialRadius = 5;
+    const turns = 10;
+    const radiusDecreaseRate = initialRadius / spiralLength;
+
+    // Create geometry for the spiral tube
+    const points = [];
+    for (let i = 0; i < spiralLength; i++) {
+      const angle = i * (turns * Math.PI * 2 / spiralLength);
+      const radius = initialRadius - (i * radiusDecreaseRate);
+      const x = radius * Math.cos(angle);
+      const y = radius * Math.sin(angle);
+      const z = i * 0.2; // adjust to elongate the spiral along z-axis
+      points.push(new THREE.Vector3(x, y, z));
+    }
+
+    // Create a tube along the defined spiral path
+    const path = new THREE.CatmullRomCurve3(points);
+    const geometry = new THREE.TubeGeometry(path, spiralLength * 4, 0.5, 8, false); // Tube geometry along the path
+    const material = new THREE.MeshBasicMaterial({ color: 0x0077ff, wireframe: true });
+    const tube = new THREE.Mesh(geometry, material);
+    scene.add(tube);
+
+    // Position camera and set the scene
+    camera.position.z = 40;
+
+    // Animation function
+    function animate() {
+      requestAnimationFrame(animate);
+      tube.rotation.x += 0.01;
+      tube.rotation.y += 0.01;
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    // Handle window resize
+    window.addEventListener('resize', () => {
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+    });
+  </script>
+</body>
+</html>
+
