@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>3D Spiral Tube with Decreasing Radius</title>
+  <title>3D Spiral Tube with Pulsating Length</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body style="margin: 0; overflow: hidden;">
@@ -20,21 +20,26 @@
     const initialRadius = 5;
     const turns = 10;
     const radiusDecreaseRate = initialRadius / spiralLength;
+    const baseZSpacing = 0.2;
 
     // Create geometry for the spiral tube
-    const points = [];
-    for (let i = 0; i < spiralLength; i++) {
-      const angle = i * (turns * Math.PI * 2 / spiralLength);
-      const radius = initialRadius - (i * radiusDecreaseRate);
-      const x = radius * Math.cos(angle);
-      const y = radius * Math.sin(angle);
-      const z = i * 0.2; // adjust to elongate the spiral along z-axis
-      points.push(new THREE.Vector3(x, y, z));
+    let points = [];
+    function createSpiralPath(scale = 1) {
+      points = [];
+      for (let i = 0; i < spiralLength; i++) {
+        const angle = i * (turns * Math.PI * 2 / spiralLength);
+        const radius = initialRadius - (i * radiusDecreaseRate);
+        const x = radius * Math.cos(angle);
+        const y = radius * Math.sin(angle);
+        const z = i * baseZSpacing * scale;
+        points.push(new THREE.Vector3(x, y, z));
+      }
+      return new THREE.CatmullRomCurve3(points);
     }
 
-    // Create a tube along the defined spiral path
-    const path = new THREE.CatmullRomCurve3(points);
-    const geometry = new THREE.TubeGeometry(path, spiralLength * 4, 0.5, 8, false); // Tube geometry along the path
+    // Create the initial tube
+    let path = createSpiralPath();
+    let geometry = new THREE.TubeGeometry(path, spiralLength * 4, 0.5, 8, false);
     const material = new THREE.MeshBasicMaterial({ color: 0x0077ff, wireframe: true });
     const tube = new THREE.Mesh(geometry, material);
     scene.add(tube);
@@ -42,11 +47,28 @@
     // Position camera and set the scene
     camera.position.z = 40;
 
+    // Animation variables
+    let scaleFactor = 1;
+    let direction = 0.005;
+
     // Animation function
     function animate() {
       requestAnimationFrame(animate);
+
+      // Change scale factor to animate the tube length
+      scaleFactor += direction;
+      if (scaleFactor > 1.2 || scaleFactor < 0.8) direction *= -1;
+
+      // Update the spiral path with new z values based on scaleFactor
+      path = createSpiralPath(scaleFactor);
+      geometry.dispose(); // Clean up previous geometry
+      geometry = new THREE.TubeGeometry(path, spiralLength * 4, 0.5, 8, false);
+      tube.geometry = geometry; // Update mesh geometry
+
+      // Rotate the tube
       tube.rotation.x += 0.01;
       tube.rotation.y += 0.01;
+
       renderer.render(scene, camera);
     }
     animate();

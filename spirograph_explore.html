@@ -5,17 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Circle Rotating Around a Circle Contour with Trail</title>
   <style>
-    canvas {
-      border: 1px solid black;
-      display: block;
-      margin: 20px auto;
-      position: relative;
-    }
     #container {
       position: relative;
       width: 500px;
       height: 500px;
       margin: auto;
+    }
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      border: 1px solid black;
+      display: block;
     }
     #controls {
       display: flex;
@@ -58,9 +59,6 @@
   
   <div id="controls">
     <label>
-      a: <input type="range" id="aSlider" min="0.5" max="5" step="0.1" value="3">
-    </label>
-    <label>
       bigRadius: <input type="range" id="bigRadiusSlider" min="50" max="250" step="1" value="150">
     </label>
     <label>
@@ -68,83 +66,81 @@
     </label>
   </div>
   
-  <script> 
-    document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
+<script> 
+  document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
+  
+  const canvas = document.getElementById('canvas');
+  const trailCanvas = document.getElementById('trailCanvas');
+  const ctx = canvas.getContext('2d');
+  const trailCtx = trailCanvas.getContext('2d');
+  
+  let bigRadius = parseInt(document.getElementById('bigRadiusSlider').value);
+  let smallRadius = parseInt(document.getElementById('smallRadiusSlider').value);
+  
+  const centerX = canvas.width / 2;
+  const centerY = canvas.height / 2;
+  
+  let angle = 0;
+  let lastPointX, lastPointY;
+
+  // Update values and clear trail on radius change
+  document.getElementById('bigRadiusSlider').addEventListener('input', function() {
+    bigRadius = parseInt(this.value);
+    trailCtx.clearRect(0, 0, trailCanvas.width, trailCanvas.height);  // Clear trail
+  });
+  
+  document.getElementById('smallRadiusSlider').addEventListener('input', function() {
+    smallRadius = parseInt(this.value);
+    trailCtx.clearRect(0, 0, trailCanvas.width, trailCanvas.height);  // Clear trail
+  });
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    const canvas = document.getElementById('canvas');
-    const trailCanvas = document.getElementById('trailCanvas');
-    const ctx = canvas.getContext('2d');
-    const trailCtx = trailCanvas.getContext('2d');
+    // Draw the big circle
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, bigRadius, 0, 2 * Math.PI);
+    ctx.stroke();
     
-    let a = parseFloat(document.getElementById('aSlider').value);
-    let bigRadius = parseInt(document.getElementById('bigRadiusSlider').value);
-    let smallRadius = parseInt(document.getElementById('smallRadiusSlider').value);
+    // Position of the small circle's center as it rotates inside the big circle
+    const smallCenterX = centerX + (bigRadius - smallRadius) * Math.cos(angle);
+    const smallCenterY = centerY + (bigRadius - smallRadius) * Math.sin(angle);
     
-    const centerX = canvas.width / 2;
-    const centerY = canvas.height / 2;
+    // Draw the small circle
+    ctx.beginPath();
+    ctx.arc(smallCenterX, smallCenterY, smallRadius, 0, 2 * Math.PI);
+    ctx.stroke();
     
-    let angle = 0;
-    let lastPointX, lastPointY;
+    // Draw the point on the small circle tracing the contour
+    const pointX = smallCenterX + smallRadius * Math.cos(-(bigRadius / smallRadius - 1) * angle);
+    const pointY = smallCenterY + smallRadius * Math.sin(-(bigRadius / smallRadius - 1) * angle);
+    
+    ctx.beginPath();
+    ctx.arc(pointX, pointY, 3, 0, 2 * Math.PI);
+    ctx.fillStyle = 'red';
+    ctx.fill();
 
-    // Update values based on scrollbars
-    document.getElementById('aSlider').addEventListener('input', function() {
-      a = parseFloat(this.value);
-    });
-    document.getElementById('bigRadiusSlider').addEventListener('input', function() {
-      bigRadius = parseInt(this.value);
-    });
-    document.getElementById('smallRadiusSlider').addEventListener('input', function() {
-      smallRadius = parseInt(this.value);
-    });
-
-    function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      
-      // Draw the big circle
-      ctx.beginPath();
-      ctx.arc(centerX, centerY, bigRadius, 0, 2 * Math.PI);
-      ctx.stroke();
-      
-      // Position of the small circle's center as it rotates inside the big circle
-      const smallCenterX = centerX + (bigRadius - smallRadius) * Math.cos(a * angle);
-      const smallCenterY = centerY + (bigRadius - smallRadius) * Math.sin(a * angle);
-      
-      // Draw the small circle
-      ctx.beginPath();
-      ctx.arc(smallCenterX, smallCenterY, smallRadius, 0, 2 * Math.PI);
-      ctx.stroke();
-      
-      // Draw the point on the small circle tracing the contour
-      const pointX = smallCenterX + smallRadius * Math.cos(-(bigRadius / smallRadius-1) * angle);
-      const pointY = smallCenterY + smallRadius * Math.sin(-(bigRadius / smallRadius-1) * angle);
-      
-      ctx.beginPath();
-      ctx.arc(pointX, pointY, 3, 0, 2 * Math.PI);
-      ctx.fillStyle = 'red';
-      ctx.fill();
-
-      // Draw trail on second canvas
-      if (lastPointX !== undefined && lastPointY !== undefined) {
-        trailCtx.beginPath();
-        trailCtx.moveTo(lastPointX, lastPointY);
-        trailCtx.lineTo(pointX, pointY);
-        trailCtx.strokeStyle = 'red';
-        trailCtx.lineWidth = 1;
-        trailCtx.stroke();
-      }
-
-      // Update last coordinates for trail drawing
-      lastPointX = pointX;
-      lastPointY = pointY;
-
-      // Update the angle for the next frame
-      angle += 2 * Math.PI / 240;
-      
-      requestAnimationFrame(draw);
+    // Draw trail on the trail canvas
+    if (lastPointX !== undefined && lastPointY !== undefined) {
+      trailCtx.beginPath();
+      trailCtx.moveTo(lastPointX, lastPointY);
+      trailCtx.lineTo(pointX, pointY);
+      trailCtx.strokeStyle = 'red';
+      trailCtx.lineWidth = 1;
+      trailCtx.stroke();
     }
+
+    // Update last coordinates for trail drawing
+    lastPointX = pointX;
+    lastPointY = pointY;
+
+    // Update the angle for the next frame
+    angle += 2 * Math.PI / 240;
     
-    draw();
-  </script>
+    requestAnimationFrame(draw);
+  }
+  
+  draw();
+</script>
 </body>
 </html>
-
