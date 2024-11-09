@@ -1,0 +1,99 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Recursive Squares</title>
+    <style>
+        canvas {
+            background-color: #ffffff;
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+<canvas id="canvas"></canvas>
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+// Set canvas size
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+// Function to draw a square
+function drawSquare(x, y, size, angle, depth) {
+    if (depth <= 0) return; // Base case for recursion
+
+    // Save the current context
+    ctx.save();
+
+    // Move to the square's center and rotate
+    ctx.translate(x, y);
+    ctx.rotate((angle * Math.PI) / 180);
+
+    // Draw the square centered at (0, 0)
+    ctx.beginPath();
+    ctx.rect(-size / 2, -size / 2, size, size);
+    ctx.stroke();
+
+    // Restore the context to original state
+    ctx.restore();
+
+    // Calculate the positions of the top-right and top-left corners of the current square
+    const angleRad = (angle * Math.PI) / 180;
+    const halfSize = size / 2;
+
+    // Top-right corner of current square
+    const topRightX = x + halfSize * Math.cos(angleRad) - (-halfSize) * Math.sin(angleRad);
+    const topRightY = y + halfSize * Math.sin(angleRad) + (-halfSize) * Math.cos(angleRad);
+
+    // Top-left corner of current square
+    const topLeftX = x + (-halfSize) * Math.cos(angleRad) - (-halfSize) * Math.sin(angleRad);
+    const topLeftY = y + (-halfSize) * Math.sin(angleRad) + (-halfSize) * Math.cos(angleRad);
+
+    // --- Draw Square B ---
+    // Rotate by additional 30 degrees clockwise
+    const angleB = angle + 30;
+    const angleBRad = (angleB * Math.PI) / 180;
+
+    // Size reduction factor (optional)
+    const sizeB = size * 0.8;
+
+    // Bottom-right corner of square B (which we'll align with top-right corner of square A)
+    // We need to find the center (xB, yB) of square B such that its bottom-right corner aligns with top-right corner of square A
+    const offsetX_B = halfSize * Math.cos(angleBRad) + halfSize * Math.sin(angleBRad);
+    const offsetY_B = halfSize * Math.sin(angleBRad) - halfSize * Math.cos(angleBRad);
+
+    const xB = topRightX - offsetX_B;
+    const yB = topRightY - offsetY_B;
+
+    // Recursive call for square B
+    drawSquare(xB, yB, sizeB, angleB, depth - 1);
+
+    // --- Draw Square C ---
+    // Rotate by additional 60 degrees anticlockwise
+    const angleC = angle - 60;
+    const angleCRad = (angleC * Math.PI) / 180;
+
+    // Size reduction factor (optional)
+    const sizeC = size * 0.8;
+
+    // Bottom-left corner of square C (which we'll align with top-left corner of square A)
+    // We need to find the center (xC, yC) of square C such that its bottom-left corner aligns with top-left corner of square A
+    const offsetX_C = -halfSize * Math.cos(angleCRad) + halfSize * Math.sin(angleCRad);
+    const offsetY_C = -halfSize * Math.sin(angleCRad) - halfSize * Math.cos(angleCRad);
+
+    const xC = topLeftX - offsetX_C;
+    const yC = topLeftY - offsetY_C;
+
+    // Recursive call for square C
+    drawSquare(xC, yC, sizeC, angleC, depth - 1);
+}
+
+// Initial call
+drawSquare(canvas.width / 2, canvas.height / 2, 200, 0, 3);
+</script>
+</body>
+</html>
+

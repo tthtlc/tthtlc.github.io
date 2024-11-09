@@ -1,0 +1,71 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Square Animation</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        canvas {
+            background-color: white;
+            border: 1px solid #ccc;
+        }
+    </style>
+<!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-GEX61LPT08"></script> <script>   window.dataLayer = window.dataLayer || [];   function gtag(){dataLayer.push(arguments);}   gtag('js', new Date());   gtag('config', 'G-GEX61LPT08'); </script> </head>
+<body>
+    <canvas id="canvas" width="600" height="600"></canvas>
+
+<script>
+    const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+    ctx.save();
+    ctx.translate(canvas.width/2, canvas.height/2);
+    //ctx.rotate((angle * Math.PI) / 180);
+    ctx.beginPath();
+
+function drawSquare(x, y, size, angle, depth) {
+    if (depth <= 0) return; // base case for recursion
+
+    // Draw the original square
+    ///ctx.rect(0, 0, size, size);
+    ctx.rect(-size / 2, -size / 2, size, size);
+
+//    // Calculate the bottom-right and bottom-left corners of the square
+//    const bottomRightX = x + (size / 2) * Math.cos((angle * Math.PI) / 180);
+//    const bottomRightY = y + (size / 2) * Math.sin((angle * Math.PI) / 180);
+//    const bottomLeftX = x - (size / 2) * Math.cos((angle * Math.PI) / 180);
+//    const bottomLeftY = y - (size / 2) * Math.sin((angle * Math.PI) / 180);
+//
+//    // Draw square B (clockwise 30 degrees and aligned with bottom-right corner)
+//    const angleB = angle + 30;
+//    const offsetX_B = (size * Math.cos((angleB * Math.PI) / 180)) / 2;
+//    const offsetY_B = (size * Math.sin((angleB * Math.PI) / 180)) / 2;
+//    drawSquare(bottomRightX + offsetX_B, bottomRightY + offsetY_B, size * 0.8, angleB, depth - 1);
+//
+//    // Draw square C (anticlockwise 60 degrees and aligned with bottom-left corner)
+//    const angleC = angle - 60;
+//    const offsetX_C = (size * Math.cos((angleC * Math.PI) / 180)) / 2;
+//    const offsetY_C = (size * Math.sin((angleC * Math.PI) / 180)) / 2;
+      drawSquare(x + size*Math.sin(angle*Math.PI/180)*(Math.sin(angle*Math.PI/180)+Math.cos(angle*Math.PI/180)), y-size*Math.cos(angle*Math.PI/180)*(Math.cos(angle*Math.PI/180) + Math.sin(angle*Math.PI/180)), size*Math.cos(angle*Math.PI/180) , angle, depth - 1);
+}
+
+// Initial call
+drawSquare(0, 0, 100, 30, 4);
+    ctx.stroke();
+    ctx.restore();
+
+</script>
+</body>
+</html>
+
