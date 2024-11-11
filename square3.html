@@ -75,8 +75,8 @@ I'll modify the previous visualization to follow your new rules with the specifi
 
             // Transform corner points to absolute coordinates
             const absoluteTopRight = {
-                x: x + (topRight.x * Math.cos(angle) - topRight.y * Math.sin(angle)),
-                y: y + (topRight.x * Math.sin(angle) + topRight.y * Math.cos(angle))
+                x: x + (topRight.x * Math.cos(angle)) - topRight.y * Math.sin(angle),
+                y: y + (topRight.x * Math.sin(angle)) + 2*topRight.y * Math.cos(angle)
             };
             
             const absoluteTopLeft = {
@@ -86,8 +86,8 @@ I'll modify the previous visualization to follow your new rules with the specifi
 
             // Draw right branch (Square B) - cosine sized
             drawSquare(
-                absoluteTopRight.x,
-                absoluteTopRight.y,
+                x+rightSize*Math.sqrt(2)*Math.sin(angle)*Math.sin(angle-Math.PI/4),
+                y+rightSize*Math.sqrt(2)*Math.sin(angle)*Math.cos(angle-Math.PI/4),
                 rightSize,
                 rightAngle,
                 depth - 1
@@ -95,8 +95,8 @@ I'll modify the previous visualization to follow your new rules with the specifi
 
             // Draw left branch (Square C) - sine sized
             drawSquare(
-                absoluteTopLeft.x,
-                absoluteTopLeft.y,
+                x+leftSize*Math.sqrt(2)*Math.cos(angle)*Math.sin(angle-Math.PI/4),
+                y+leftSize*Math.sqrt(2)*Math.cos(angle)*Math.cos(angle-Math.PI/4),
                 leftSize,
                 leftAngle,
                 depth - 1
