@@ -93,6 +93,23 @@ document.addEventListener("contextmenu", function(event) { event.preventDefault(
 
         drawComplexPattern();
     </script>
+<!-- Gitalk link  -->
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk@latest/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+    <script type="text/javascript">
+    var gitalk = new Gitalk({
+    clientID: 'Ov23lik6o3Yo2WYdVrqa',
+    clientSecret: '8d671f3ce4a778ba75bdb780d7b5227db6aa0b88',
+    repo: 'tthtlc.github.io',
+    owner: 'tthtlc',
+    admin: ['tthtlc'],
+    distractionFreeMode: true,
+    id: 'doublemotion',
+    });
+    gitalk.render('gitalk-container');
+</script>
 </body>
 </html>
 
