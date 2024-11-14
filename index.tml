@@ -90,6 +90,19 @@ INDEX.TMPL
         renderHtmlFiles(randomFiles, 'random-list-container');
     </script>
 
+
+
+
+
+
+<script src="https://utteranc.es/client.js"
+        repo="tthtlc.github.io"
+        issue-term="index.html"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script>
+
 </body>
 </html>
 
