@@ -35,17 +35,24 @@
         .footer-link a:hover { 
             text-decoration: underline; 
         } 
-</style>
-<!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-GEX61LPT08"></script> <script>   window.dataLayer = window.dataLayer || [];   function gtag(){dataLayer.push(arguments);}   gtag('js', new Date());   gtag('config', 'G-GEX61LPT08'); </script> </head>
+    </style>
+    <!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-GEX61LPT08"></script> 
+    <script>   
+        window.dataLayer = window.dataLayer || [];   
+        function gtag(){dataLayer.push(arguments);}   
+        gtag('js', new Date());   
+        gtag('config', 'G-GEX61LPT08'); 
+    </script> 
+</head>
 <body>
     <canvas id="complexLineCanvas" width="600" height="600"></canvas>
     
     <script> 
-document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
+        document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
         const canvas = document.getElementById('complexLineCanvas');
         const ctx = canvas.getContext('2d');
-        const centerX = 3*canvas.width / 4;
-        const centerY = 3*canvas.height / 4;
+        const centerX = 3 * canvas.width / 4;
+        const centerY = 3 * canvas.height / 4;
         const centerX1 = canvas.width / 4;
         const centerY1 = canvas.height / 4;
         const numLines = 60;
@@ -56,33 +63,42 @@ document.addEventListener("contextmenu", function(event) { event.preventDefault(
         let radius2 = 100;
         let angleOffset = 0;
 
+        // Define a 16-color gradient array
+        const colorGradient = [
+            '#ff0000', '#ff7f00', '#ffff00', '#7fff00', '#00ff00', '#00ff7f', '#00ffff', '#007fff',
+            '#0000ff', '#7f00ff', '#ff00ff', '#ff007f', '#ff4d4d', '#ffd700', '#40e0d0', '#ee82ee'
+        ];
+
         // Function to draw the complex pattern
         function drawComplexPattern() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.strokeStyle = '#ffffff';
-            ctx.lineWidth = 0.5;
 
             for (let i = 0; i < numLines; i++) {
                 const angle1 = (i / numLines) * 2 * Math.PI;
                 const angle2 = ((i + 180) / numLines) * 2 * Math.PI;
-                //const x1 = centerX + radius1 * Math.cos(angleMultiplier1 * (angle1 + angleOffset)) * Math.sin(angle2 + angleOffset);
-                //const y1 = centerY + radius1 * Math.sin(angleMultiplier2 * (angle1 + angleOffset)) * Math.sin(angle2 + angleOffset);
-                //const x2 = centerX + radius2 * Math.cos(angle2 + angleOffset) * Math.sin(angle1 + angleOffset);
-                //const y2 = centerY + radius2 * Math.sin(angle2 + angleOffset) * Math.sin(angle1 + angleOffset);
 
-                const x1 = centerX + radius1 * Math.cos(angle1 );
-                const y1 = centerY + radius1 * Math.sin(angle1 );
+                const x1 = centerX + radius1 * Math.cos(angle1);
+                const y1 = centerY + radius1 * Math.sin(angle1);
                 const x2 = centerX1 + radius2 * Math.cos(angle2 + angleOffset);
                 const y2 = centerY1 + radius2 * Math.sin(angle2 + angleOffset);
 
                 ctx.beginPath();
                 ctx.moveTo(x1, y1);
                 ctx.lineTo(x2, y2);
+
+                // Set color based on line index, cycling through the color gradient
+                //ctx.strokeStyle = colorGradient[i % colorGradient.length];
+
+		ctx.strokeStyle = `hsl(${(i / numLines) * 360}, 100%, 50%)    `;
+
+
+
+                ctx.lineWidth = 0.5;
                 ctx.stroke();
             }
 
             // Update parameters to create animation
-            angleOffset += 0.01;
+            angleOffset += 0.02;
             angleMultiplier1 = 2 + Math.sin(angleOffset) * 2;
             angleMultiplier2 = 4 + Math.cos(angleOffset) * 2;
             radius1 = 100 + Math.sin(angleOffset) * 50;
@@ -93,6 +109,25 @@ document.addEventListener("contextmenu", function(event) { event.preventDefault(
 
         drawComplexPattern();
     </script>
+<!-- Gitalk link  -->
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk@latest/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+    <script type="text/javascript">
+    var gitalk = new Gitalk({
+    clientID: 'Ov23lik6o3Yo2WYdVrqa',
+    clientSecret: '8d671f3ce4a778ba75bdb780d7b5227db6aa0b88',
+    repo: 'tthtlc.github.io',
+    owner: 'tthtlc',
+    admin: ['tthtlc'],
+    distractionFreeMode: true,
+    id: 'doublemotion',
+    });
+    gitalk.render('gitalk-container');
+</script>
+
+<!-- Gitalk end -->
 </body>
 </html>
 
