@@ -13,70 +13,145 @@
             margin: 0;
             background-color: #f0f0f0;
         }
+        #container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+        #infoContainer {
+            display: flex;
+            gap: 20px;
+            align-items: start;
+        }
+        #infoBox {
+            width: 200px;
+            padding: 10px;
+            background-color: #ffffff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        #explanation {
+            width: 100%;
+            border: none;
+            resize: none;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.4;
+            color: #333;
+            background-color: transparent;
+            outline: none;
+        }
         canvas {
             background-color: white;
             border: 1px solid #ccc;
         }
+        #parametersLabel {
+            font-family: Arial, sans-serif;
+            font-size: 16px;
+            color: #333;
+        }
     </style>
-<!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-GEX61LPT08"></script> <script>   window.dataLayer = window.dataLayer || [];   function gtag(){dataLayer.push(arguments);}   gtag('js', new Date());   gtag('config', 'G-GEX61LPT08'); </script> </head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-GEX61LPT08"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-GEX61LPT08');
+    </script>
+</head>
 <body>
-    <canvas id="sineWaveCanvas" width="600" height="600"></canvas>
+    <div id="container">
+        <!-- Information Container with Info Box and Canvas -->
+        <div id="infoContainer">
+            <div id="infoBox">
+                <textarea id="explanation" readonly>
+The polar wave equation used is: R = constant + A * sin(B * theta).
+                </textarea>
+            </div>
+
+            <canvas id="sineWaveCanvas" width="600" height="600"></canvas>
+        </div>
+
+        <!-- Label to display generated parameters -->
+        <div id="parametersLabel">Parameters: Core Radius = 0, Amplitude = 0, Frequency = 0</div>
+    </div>
 
     <script>
+        // Prevent right-click context menu
         document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
+
+        // Canvas setup
         const canvas = document.getElementById('sineWaveCanvas');
         const ctx = canvas.getContext('2d');
+        const parametersLabel = document.getElementById('parametersLabel');
 
+        // Initialize variables for the sine wave properties and animation speed
         let phase = 0;
         let core_radius, amplitude, frequency;
         const speed = 2 * Math.PI / 8; // speed of animation
 
+        // Utility function to generate a random integer within a range
         function getRandomInt(min, max) {
             return Math.floor(Math.random() * (max - min + 1)) + min;
         }
 
+        // Generate random values for the sine wave's amplitude and frequency
         function generateRandomParameters() {
             core_radius = getRandomInt(-100, 100); // Example range for core_radius
-            amplitude = getRandomInt(-100, 100);   // Example range for amplitude
-            frequency = getRandomInt(2, 24);      // Example range for frequency
+            amplitude = getRandomInt(-100, 100);   // A in A*sin(Bx)
+            frequency = getRandomInt(2, 24);       // B in A*sin(Bx)
         }
 
+        // Function to update the parameters label with the current values
+        function updateParametersLabel() {
+            parametersLabel.textContent = `radius = ${core_radius} + ${amplitude} * Sin(${frequency} * x) : radius = ${core_radius}, amplitude = ${amplitude}, frequency = ${frequency}`;
+        }
+
+        // Function to draw a sine wave in polar coordinates
         function drawSineWave() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.beginPath();
             const centerX = canvas.width / 2;
             const centerY = canvas.height / 2;
-            
+
+            // Loop to create points on the sine wave around a circle
             for (let theta = 0; theta < 2 * Math.PI; theta += 2 * Math.PI / 300) {
+                // r = amplitude * sin(frequency * theta + phase) + core_radius
                 const r = amplitude * Math.sin((frequency * theta) + phase) + core_radius;
                 const x = centerX + r * Math.cos(theta);
                 const y = centerY + r * Math.sin(theta);
                 ctx.lineTo(x, y);
             }
-            
+
             ctx.strokeStyle = 'blue';
             ctx.lineWidth = 2;
             ctx.stroke();
         }
 
+        // Animation loop
         function animate(iteration = 0) {
             if (iteration < 12) {
-                phase += speed; // Increase phase to move the wave
+                phase += speed; // Increase phase to animate wave
                 drawSineWave();
-                setTimeout(() => animate(iteration + 1), 100); // Pause for 300ms and call animate again
+                setTimeout(() => animate(iteration + 1), 100); // Continue animation
             } else {
-                setTimeout(startAnimation, 500); // Call startAnimation again after 3 seconds
+                setTimeout(startAnimation, 500); // Restart animation after a short delay
             }
         }
 
+        // Initialize the animation
         function startAnimation() {
-            generateRandomParameters(); // Generate new random parameters
-            animate(); // Start the animation with iteration reset to 0
+            generateRandomParameters(); // Generate new random parameters for each cycle
+            updateParametersLabel(); // Update the label with the new parameter values
+            animate(); // Start the animation loop
         }
 
-        startAnimation(); // Start the animation loop
-    </script>    
-    
+        startAnimation(); // Begin the animation when page loads
+    </script>
 </body>
 </html>
 
