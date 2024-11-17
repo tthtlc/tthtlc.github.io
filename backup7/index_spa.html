@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic HTML Loader with Filenames</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .iframe-container {
+            margin-bottom: 20px;
+        }
+        iframe {
+            width: 100%;
+            height: 600px;
+            border: none;
+        }
+        .filename {
+            font-size: 16px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="iframeList"></div>
+
+    <script>
+        // Master list of HTML files (URLs) to load
+        const masterList = [
+'3gon_around_3gon.html', 
+'4gon_around_4gon.html', 
+'4gon_around_4gon_animation.html', 
+'barnsley_fern_fractal.html', 
+'cardiod.html', 
+'cardiod_line.html', 
+'cardiod_line1.html', 
+'cardiod_line2.html', 
+'cardiod_line3.html', 
+'cardiod_line4.html', 
+'chasing_3gon.html', 
+'chasing_3gon_around_3gon.html', 
+'chasing_4gon.html', 
+'chasing_4gon_around_4gon.html', 
+'chasing_5gon_around_5gon.html', 
+'chasing_6gon_around_6gon.html', 
+'chasing_diamond_around_diamond.html', 
+'chasing_hexagon.html', 
+'chasing_hexagon_rotating.html', 
+'chasing_pentagon.html', 
+'chasing_pentagon_rotating.html', 
+'chasing_square.html', 
+'chasing_square_rotating.html', 
+'chasing_triangle.html', 
+'chasing_triangle_rotating.html', 
+'circle.html', 
+'circle_color.html', 
+'circle_cycle.html', 
+'clickme_circle_on_circle.html', 
+'concentric.html', 
+'conway.html', 
+'counter_rotating_sector.html', 
+'cubic.html', 
+'diamond2.html', 
+'diamond3.html', 
+'diamond3_animate.html', 
+'diamond4.html', 
+'diamond4_animate.html', 
+'diamond4_animation.html', 
+'diamond4_random_sector.html', 
+'diamond4_random_sector_translate.html', 
+'diamond4_translate.html', 
+'diamond6.html', 
+'diamond_generalized_animate.html', 
+'diamond_label.html', 
+'dodecahedron.html', 
+'dodecahedron_fixed.html', 
+'dodecahedron_nolabel.html', 
+'double3.html', 
+'double4.html', 
+'double5.html', 
+'double_circle.html', 
+'double_circle_rotating.html', 
+'double_ellipse.html', 
+'double_motion.html', 
+'double_moving.html', 
+'double_moving2.html', 
+'double_ring_rotate.html', 
+'double_ring_rotate_line.html', 
+'double_square.html', 
+'double_square1.html', 
+'double_square_line_rotate.html', 
+'double_triangle.html', 
+'double_triangle1.html', 
+'dragon_curve.html', 
+'dragon_curve_animated.html', 
+'drawsector.html', 
+'ellipse_rotating_circle.html', 
+'ellipse_rotating_circle_line.html', 
+'ellipse_sliding_circle.html', 
+'ellipse_sliding_circle_with_line.html', 
+'ellipse_superrotating_circle.html', 
+'ellipsical_line.html', 
+'ellipsical_line_rotate.html', 
+'enneper.html', 
+'enneper_rotating.html', 
+'enneper_rotating1.html', 
+'figure_eight.html', 
+'figure_eight_double.html', 
+'figure_eight_double_wheel.html', 
+'figure_eight_fifth.html', 
+'figure_eight_radiating.html', 
+'figure_eight_radiating_fixed.html', 
+'figure_eight_rotating.html', 
+'figure_eight_third.html', 
+'five_edged_random_sector.html', 
+'five_rotate_spoke.html', 
+'five_rotate_spoke_sector.html', 
+'flower_in_motion.html', 
+'four_edged_random_sector.html', 
+'four_petal.html', 
+'four_petal_double.html', 
+'four_petal_rotate.html', 
+'fractal_fern.html', 
+'heart3.html', 
+'heart4.html', 
+'heart5.html', 
+'heart6.html', 
+'hexaflake.html', 
+'hexagon_around_hexagon.html', 
+'hexagon_auto_rotate.html', 
+'hexagon_circle.html', 
+'hexagon_circle_full.html', 
+'hexagon_line_rotate.html', 
+'hexagon_rotating_ellipse.html', 
+'hexagon_tessellation.html', 
+'hilbert_curve.html', 
+'icosahedron.html', 
+'icosahedron_centroid.html', 
+'icosahedron_labelled.html', 
+'icosahedron_surface.html', 
+'islamic_spiral.html', 
+'islamic_spiral2.html', 
+'julia_set.html', 
+'klein2_animation.html', 
+'klein2_animation2.html', 
+'klein2_animation3.html', 
+'klein3.html', 
+'koch.html', 
+'koch_snowflake.html', 
+'lemniscate.html', 
+'lemniscate2_fixed.html', 
+'lemniscate2_radiating.html', 
+'lemniscate2_rotate.html', 
+'lemniscate3_rotate.html', 
+'lemniscate5_radiating.html', 
+'lemniscate5_rotate.html', 
+'lemniscate6_radiating.html', 
+'lemniscate6_rotate.html', 
+'lemniscate8_radiating.html', 
+'lemniscate_radiating.html', 
+'lemniscate_random.html', 
+'lemniscate_rotating_four.html', 
+'line_drawing.html', 
+'mandelbrot.html', 
+'mandelbrot_color.html', 
+'mandelbrot_mouse.html', 
+'menger_sponge.html', 
+'mobius.html', 
+'mobius_manual.html', 
+'mobius_manual1.html', 
+'mobius_manual_rotating.html', 
+'mobius_radiating.html', 
+'moving_square.html', 
+'moving_square_rotate.html', 
+'moving_square_rotate_double.html', 
+'octagon_auto_rotate.html', 
+'ovalellipse.html', 
+'pentagon.html', 
+'pentagon1.html', 
+'pentagon_around_pentagon.html', 
+'pentagon_auto_rotate.html', 
+'pentagon_line_rotate.html', 
+'pentagon_line_rotate_gradient.html', 
+'pentagon_star.html', 
+'pentagon_star_full.html', 
+'pentapentagon.html', 
+'pythogarean_tree.html', 
+'pythoras_tree.html', 
+'quart_motion.html', 
+'rotated_ngon.html', 
+'rotated_polygon.html', 
+'rotated_triangle.html', 
+'rotated_triangle1.html', 
+'rotating.html', 
+'rotating_cardiod.html', 
+'rotating_cardiod2.html', 
+'rotating_cardiod_line4.html', 
+'rotating_chasing_3gon.html', 
+'rotating_circle.html', 
+'rotating_circle1.html', 
+'rotating_ellipse.html', 
+'rotating_ellipse2.html', 
+'rotating_ellipse3.html', 
+'rotating_ellipse_group.html', 
+'rotating_ellipse_group_color.html', 
+'rotating_islamic_spiral.html', 
+'rotating_pentagon_about_pentagon.html', 
+'rotating_polygons.html', 
+'rotating_polygons_duo.html', 
+'rotating_polygons_opposite.html', 
+'rotating_polygons_opposite_30canvas.html', 
+'rotating_polygons_opposite_fixed.html', 
+'rotating_polygons_quarter.html', 
+'rotating_polygons_tri.html', 
+'rotating_sector.html', 
+'rotating_spiral.html', 
+'rotating_spoke.html', 
+'sierpinski.html', 
+'sierpinski_carpet.html', 
+'sinsoidal5.html', 
+'sinusoidal.html', 
+'solid_torus.html', 
+'sphere.html', 
+'spherical_sinusoid.html', 
+'spherical_sinusoid1.html', 
+'spherical_sinusoid3.html', 
+'spiral.html', 
+'spiral3_rotating.html', 
+'spiral4.html', 
+'spiral_triangle.html', 
+'spirograph.html', 
+'spirograph_outline.html', 
+'spoke_subspokes.html', 
+'spoke_subspokes1.html', 
+'spoke_subspokes2.html', 
+'square_auto_rotate.html', 
+'square_line_rotate.html', 
+'square_sphere.html', 
+'square_triangle.html', 
+'static_concentric.html', 
+'t_square_fractal2.html', 
+'t_square_fractal_animation.html', 
+'three_edged_random_sector.html', 
+'three_petal.html', 
+'torus.html', 
+'torus2.html', 
+'torus2_rotating.html', 
+'triangle_auto_rotate.html', 
+'triangle_line_rotate.html', 
+'triple_donut.html', 
+'triple_motion.html', 
+'truncated_dodecahedron_one_corner.html', 
+'turtle_forwarding_pattern.html', 
+'turtle_forwarding_pattern3.html', 
+'turtle_forwarding_pattern4.html', 
+'turtle_forwarding_pattern5.html', 
+'two_ellipse.html', 
+'two_petal.html', 
+'twotriangle.html', 
+'vicsek_fractal.html', 
+        ];
+
+        // Function to get a random element from the master list
+        function getRandomHtml() {
+            const randomIndex = Math.floor(Math.random() * masterList.length);
+            return masterList[randomIndex];
+        }
+
+        // Function to load and append an iframe with a random HTML file
+        function loadIframe() {
+            const iframeContainer = document.createElement('div');
+            iframeContainer.classList.add('iframe-container');
+            
+            const url = getRandomHtml();
+            const fileName = url.split('/').pop(); // Extracts the file name from the URL
+
+            // Create and add the filename element above the iframe
+            const fileNameTag = document.createElement('p');
+            fileNameTag.classList.add('filename');
+            fileNameTag.textContent = "Loading: " + fileName;  // Displays the filename
+            
+            const iframe = document.createElement('iframe');
+            iframe.src = url;
+
+            // Append the filename tag and iframe to the container
+            iframeContainer.appendChild(fileNameTag);
+            iframeContainer.appendChild(iframe);
+
+            // Append the container to the main list
+            document.getElementById('iframeList').appendChild(iframeContainer);
+        }
+
+        // Load initial iframes
+        for (let i = 0; i < 3; i++) {
+            loadIframe();
+        }
+
+        // Detect when user scrolls near the bottom of the page and load more iframes
+        window.addEventListener('scroll', () => {
+            const nearBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 100;
+            
+            if (nearBottom) {
+                loadIframe();  // Load one more iframe when the bottom is reached
+            }
+        });
+    </script>
+</body>
+</html>
+

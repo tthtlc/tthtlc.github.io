@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas Animation to GIF</title>
+<!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-GEX61LPT08"></script> <script>   window.dataLayer = window.dataLayer || [];   function gtag(){dataLayer.push(arguments);}   gtag('js', new Date());   gtag('config', 'G-GEX61LPT08'); </script> </head>
+<body>
+    <canvas id="myCanvas" width="400" height="400"></canvas>
+    <button id="generateGif">Generate GIF</button>
+
+    <script src="https://cdn.jsdelivr.net/npm/gif.js/dist/gif.js"></script>
+    <script> 
+document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
+        const canvas = document.getElementById('myCanvas');
+        const ctx = canvas.getContext('2d');
+        const gif = new GIF({
+            workers: 2,
+            quality: 10
+        });
+        
+        let frameCount = 0;
+        let maxFrames = 100; // Set how many frames to capture for the GIF
+
+        // Example animation (simple bouncing ball)
+        let x = 50, y = 50, dx = 2, dy = 2, radius = 20;
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.beginPath();
+            ctx.arc(x, y, radius, 0, Math.PI * 2);
+            ctx.fillStyle = "blue";
+            ctx.fill();
+            ctx.closePath();
+            
+            if (x + dx > canvas.width - radius || x + dx < radius) dx = -dx;
+            if (y + dy > canvas.height - radius || y + dy < radius) dy = -dy;
+            
+            x += dx;
+            y += dy;
+            
+            if (frameCount < maxFrames) {
+                // Add the current frame to the GIF
+                gif.addFrame(canvas, {copy: true, delay: 100});
+                frameCount++;
+                requestAnimationFrame(animate); // Continue the animation
+            }
+        }
+
+        // Start the animation
+        requestAnimationFrame(animate);
+
+        // Generate GIF when the button is clicked
+        document.getElementById('generateGif').addEventListener('click', function() {
+            gif.on('finished', function(blob) {
+                const url = URL.createObjectURL(blob);
+                const img = document.createElement('img');
+                img.src = url;
+                document.body.appendChild(img);
+                
+                // Optionally, download the GIF
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = 'animation.gif';
+                link.click();
+            });
+
+            // Render the GIF
+            gif.render();
+        });
+    </script>
+</body>
+</html>
+
