@@ -45,7 +45,7 @@
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-GEX61LPT08"></script> <script>   window.dataLayer = window.dataLayer || [];   function gtag(){dataLayer.push(arguments);}   gtag('js', new Date());   gtag('config', 'G-GEX61LPT08'); </script>
 </head>
 <body>
-    <div id="abcValue">abc: 0</div>
+    <div id="abcValue"></div>
     <canvas id="figure8Canvas" width="500" height="500"></canvas>
 
     
@@ -80,7 +80,8 @@
             bbb = getRandomInt(1, 10);
 	    } while (aaa==bbb);
             abc = aaa / bbb; // Set abc as aaa/bbb
-            abcValueLabel.textContent = `abc: ${aaa}/${bbb} (${abc.toFixed(2)})`; 
+            abcValueLabel.textContent = `R = A * cos(freq * theta) (freq: ${aaa}/${bbb})`; 
+
         }
 
         // Call updateABC every 2 seconds
