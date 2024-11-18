@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dynamic Complex Line Drawing</title>
+    <title>Psychedelic line drawing</title>
     <style>
         body {
             display: flex;
@@ -46,10 +46,10 @@ document.addEventListener("contextmenu", function(event) { event.preventDefault(
         const ctx = canvas.getContext('2d');
         const centerX = canvas.width / 2;
         const centerY = canvas.height / 2;
-        const numLines = 360;
+        const numLines = 240;
 
         let angleMultiplier1 = 2;
-        let angleMultiplier2 = 4;
+        let angleMultiplier2 = 2;
         let radius1 = 100;
         let radius2 = 100;
         let radius_multiplier = 10;
@@ -70,6 +70,7 @@ document.addEventListener("contextmenu", function(event) { event.preventDefault(
                 const y2 = centerY + radius2 * Math.sin(angle2 + angleOffset) * Math.sin(angle1 + angleOffset);
 
 		ctx.strokeStyle = `hsl(${(i / numLines) * 360}, 100%, 50%)`;
+
                 ctx.beginPath();
                 ctx.moveTo(x1, y1);
                 ctx.lineTo(x2, y2);
@@ -78,13 +79,14 @@ document.addEventListener("contextmenu", function(event) { event.preventDefault(
 
             // Update parameters to create animation
             angleOffset += 0.01;
-            radius_multiplier = 10*Math.sin(angleOffset);
+            radius_multiplier = 3*Math.sin(angleOffset);
             angleMultiplier1 = 2 + Math.sin(angleOffset) * 2;
-            angleMultiplier2 = 4 + Math.cos(angleOffset) * 2;
+            angleMultiplier2 = 2 + Math.cos(angleOffset) * 2;
             radius1 = 100 + Math.sin(angleOffset) * 50;
             radius2 = 100 + Math.cos(angleOffset) * 50;
 
-            requestAnimationFrame(drawComplexPattern);
+            //requestAnimationFrame(drawComplexPattern);
+            setTimeout(drawComplexPattern, 20);
         }
 
         drawComplexPattern();
