@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>3D Hexagon with Mouse Interaction</title>
+    <title>Chasing lines and special effects of running color</title>
     <style>
         body {
             display: flex;
@@ -17,18 +17,20 @@
             border: 1px solid #ccc;
         }
     </style>
-<!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-GEX61LPT08"></script> <script>   window.dataLayer = window.dataLayer || [];   function gtag(){dataLayer.push(arguments);}   gtag('js', new Date());   gtag('config', 'G-GEX61LPT08'); </script> </head>
+</head>
 <body>
     <canvas id="canvas" width="800" height="600"></canvas>
     <script>
         document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
+
         function draw3DHexagon() {
             const canvas = document.getElementById("canvas");
             const ctx = canvas.getContext("2d");
-            const parts = 60;
+            const parts = 30;
             const hexagonPoints = generateHexagonPoints(200);
             let isDragging = false;
             let draggedPoint = null;
+            let offset = 0; // Animation offset
 
             function generateHexagonPoints(radius) {
                 const points = [];
@@ -56,13 +58,6 @@
                 return points;
             }
 
-            function getColorGradient(t) {
-                const red = Math.floor(255 * (1 - t));
-                const green = Math.floor(255 * t);
-                const blue = 150;
-                return `rgb(${red}, ${green}, ${blue})`;
-            }
-
             function drawLines() {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 for (let i = 0; i < hexagonPoints.length; i++) {
@@ -79,7 +74,7 @@
                         ctx.beginPath();
                         ctx.moveTo(startPoint.x + 400, startPoint.y + 300);
                         ctx.lineTo(endPoint.x + 400, endPoint.y + 300);
-                        ctx.strokeStyle = getColorGradient(j / parts);
+                        ctx.strokeStyle = `hsl(${((j + offset) % parts / parts) * 360}, 100%, 50%)`;
                         ctx.stroke();
                     }
                 }
@@ -101,7 +96,6 @@
                 if (isDragging && draggedPoint !== null) {
                     hexagonPoints[draggedPoint].x = event.offsetX - 400;
                     hexagonPoints[draggedPoint].y = event.offsetY - 300;
-                    drawLines();
                 }
             });
 
@@ -110,7 +104,13 @@
                 draggedPoint = null;
             });
 
-            drawLines(); // Initial drawing
+            function animate() {
+                offset++; // Increment offset for animation
+                drawLines();
+                requestAnimationFrame(animate);
+            }
+
+            animate(); // Start animation
         }
 
         draw3DHexagon();
