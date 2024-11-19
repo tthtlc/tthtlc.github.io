@@ -71,6 +71,7 @@
      </div>
     <!-- Master List of explore.html -->
     <div class="canvas-container">
+    <h2>Curves for further exploration </h2>
     <div id="master-list-container" class="frame-container"></div>
 
     <h2>Randomly Selected Curves</h2>
