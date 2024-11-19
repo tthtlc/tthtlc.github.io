@@ -267,6 +267,7 @@
 + ['spiral_tube.html', ]('spiral_tube.html', )
 + ['spiral_tube_explore.html', ]('spiral_tube_explore.html', )
 + ['spirograph.html', ]('spirograph.html', )
++ ['spirograph_ellipse_explore.html', ]('spirograph_ellipse_explore.html', )
 + ['spirograph_explore.html', ]('spirograph_explore.html', )
 + ['spirograph_outline.html', ]('spirograph_outline.html', )
 + ['square1.html', ]('square1.html', )
