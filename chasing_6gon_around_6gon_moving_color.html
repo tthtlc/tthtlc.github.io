@@ -48,6 +48,7 @@ document.addEventListener("contextmenu", function(event) { event.preventDefault(
         const centerY = canvas.height / 2;
         const hexagonRadius = 100;
         const newhexagonRadius = 100;
+        let global_counter = 0;
 
         // Function to calculate a point on the hexagon given an angle
         function gethexagonPoints(centerX, centerY, radius, rotationAngle = 0) {
@@ -130,7 +131,8 @@ document.addEventListener("contextmenu", function(event) { event.preventDefault(
         for (let i = 0; i < points.length; i++) {
             const startPoint = points[i];
             const endPoint = points[(i + 1) % points.length]; // Connect the last point to the first
-	    ctx.strokeStyle = `hsl(${(i / points.length) * 360}, 100%, 50%)`;
+	    ctx.strokeStyle = `hsl(${((i+global_counter)%points.length / points.length) * 360}, 100%, 50%)`;
+	    global_counter += 1;
             ctx.beginPath();
             ctx.moveTo(startPoint.x, startPoint.y);
             ctx.lineTo(endPoint.x, endPoint.y);
