@@ -3,7 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Explore Files</title>
+    <meta property="og:title" content="Interactive Geometric Visualizations">
+    <meta property="og:description" content="Explore randomly picked interactive webpages featuring dynamic geometry and animations.">
+    <meta property="og:image" content="thumbnail.jpg">
+    <meta property="og:url" content="http://www.artdeveloper.art">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <title>Mathematical Art</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -37,18 +44,34 @@
         #gitalk-container {
             width: 600px;
         }
+        /* Style for the horizontal navigation */
+        .nav-links {
+           display: flex;
+           justify-content: center;
+           gap: 20px;
+           margin: 20px 0;
+        }
+        .nav-links a {
+           text-decoration: none;
+           color: #007BFF;
+           font-weight: bold;
+        }
+        .nav-links a:hover {
+           text-decoration: underline;
+        }
     </style>
-<!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-GEX61LPT08"></script> <script>   window.dataLayer = window.dataLayer || [];   function gtag(){dataLayer.push(arguments);}   gtag('js', new Date());   gtag('config', 'G-GEX61LPT08'); </script> </head>
+<!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-GEX61LPT08"></script> <script>   window.dataLayer = window.dataLayer || [];   function gtag(){dataLayer.push(arguments);}   gtag('js', new Date());   gtag('config', 'G-GEX61LPT08'); </script> 
+</head>
 <body>
-
-    <h3>
-    <a href="index_search.html"> Index Search </a>
-    </h3>
-
-    <h2>Mathematical Exploration Curves</h2>
-    
+     <!-- Horizontal navigation -->
+     <div class="nav-links">
+         <a href="index_search.html">Index Search</a>
+         <a href="index_todo.html">To Do List</a>
+         <a href="index_discussion.html">Discussion</a>
+     </div>
     <!-- Master List of explore.html -->
     <div class="canvas-container">
+    <h2>Curves for further exploration </h2>
     <div id="master-list-container" class="frame-container"></div>
 
     <h2>Randomly Selected Curves</h2>
