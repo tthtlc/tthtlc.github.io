@@ -1,0 +1,86 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Capture Animation as GIF</title>
+  <style>
+    canvas {
+      border: 1px solid black;
+      display: block;
+      margin: 20px auto;
+    }
+    button {
+      display: block;
+      margin: 10px auto;
+      padding: 10px 20px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="animationCanvas" width="400" height="300"></canvas>
+  <button id="captureGif">Capture as GIF</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.js"></script>
+  <script>
+    const canvas = document.getElementById('animationCanvas');
+    const ctx = canvas.getContext('2d');
+    const captureButton = document.getElementById('captureGif');
+    const gif = new GIF({ workers: 2, quality: 10 });
+
+    let x = 50, y = 150, dx = 2; // Initial position and speed
+    let recording = false;
+    let animationFrame;
+
+    function draw() {
+      // Clear canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw a circle
+      ctx.beginPath();
+      ctx.arc(x, y, 20, 0, Math.PI * 2);
+      ctx.fillStyle = "blue";
+      ctx.fill();
+      ctx.closePath();
+
+      // Update position
+      x += dx;
+      if (x > canvas.width - 20 || x < 20) dx = -dx;
+
+      // Add frame to GIF if recording
+      if (recording) {
+        gif.addFrame(canvas, { copy: true, delay: 20 });
+      }
+
+      // Loop animation
+      animationFrame = requestAnimationFrame(draw);
+    }
+
+    captureButton.addEventListener('click', () => {
+      if (!recording) {
+        recording = true;
+        gif.frames = []; // Reset frames
+        setTimeout(() => {
+          recording = false;
+          gif.render();
+        }, 3000); // Record for 3 seconds
+      }
+    });
+
+    gif.on('finished', function(blob) {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'animation.gif';
+      a.textContent = "Download GIF";
+      a.style.display = "block";
+      a.style.textAlign = "center";
+      document.body.appendChild(a);
+    });
+
+    draw(); // Start animation
+  </script>
+</body>
+</html>
+
