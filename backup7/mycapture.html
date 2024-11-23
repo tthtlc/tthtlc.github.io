@@ -27,7 +27,7 @@
     const canvas = document.getElementById('animationCanvas');
     const ctx = canvas.getContext('2d');
     const captureButton = document.getElementById('captureGif');
-    const gif = new GIF({ workers: 2, quality: 10 });
+    const gif = new GIF({ workers: 2, workerScript: "/js/gif.worker.js", quality: 10 });
 
     let x = 50, y = 150, dx = 2; // Initial position and speed
     let recording = false;
