@@ -27,9 +27,41 @@
             height: 600px;
             border: none;
         }
+        .canvas-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+         }
+        #gitalk-container {
+            width: 600px;
+        }
+        /* Style for the horizontal navigation */
+        .nav-links {
+           display: flex;
+           justify-content: center;
+           gap: 20px;
+           margin: 20px 0;
+        }
+        .nav-links a {
+           text-decoration: none;
+           color: #007BFF;
+           font-weight: bold;
+        }
+        .nav-links a:hover {
+           text-decoration: underline;
+        }
     </style>
-<!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-GEX61LPT08"></script> <script>   window.dataLayer = window.dataLayer || [];   function gtag(){dataLayer.push(arguments);}   gtag('js', new Date());   gtag('config', 'G-GEX61LPT08'); </script> </head>
+<!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-GEX61LPT08"></script> <script>   window.dataLayer = window.dataLayer || [];   function gtag(){dataLayer.push(arguments);}   gtag('js', new Date());   gtag('config', 'G-GEX61LPT08'); </script> 
+</head>
 <body>
+     <!-- Horizontal navigation -->
+     <div class="nav-links">
+         <a href="/">Main</a>
+         <a href="index_search.html">Index Search</a>
+         <a href="index_todo.html">To Do List</a>
+         <a href="index_discussion.html">Discussion</a>
+         <a href="index_all.html">List All</a>
+     </div>
     <div id="iframeList"></div>
 
     <script> 
