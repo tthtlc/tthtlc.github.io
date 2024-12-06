@@ -51,6 +51,7 @@
     <script>
         document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
 
+
 const canvas = document.getElementById("wavyLinesCanvas");
 const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
@@ -80,10 +81,11 @@ function drawCircleWithWavyLines(x, y, radius, options) {
         }
         ctx.closePath();
 
-        // Set stroke style with blur effect
-        ctx.strokeStyle = `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 0.5 + 0.5})`;
-        ctx.shadowBlur = 15; // Add blur effect
-        ctx.shadowColor = ctx.strokeStyle; // Shadow matches line color
+        // Set stroke style with enhanced blur effect
+        const color = `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 0.99 + 0.99})`;
+        ctx.strokeStyle = color;
+        ctx.shadowBlur = Math.round(Math.random()*255); // Increase blur effect significantly
+        ctx.shadowColor = color; // Shadow matches line color
         ctx.stroke();
     }
 }
@@ -97,7 +99,7 @@ function randomWavyCircle() {
         waveCount: Math.random() * 10 + 2, // Number of waves along the circle
         amplitude: Math.random() * 20 + 5, // Height of the waves
         frequency: Math.random() * 2 * Math.PI, // Frequency offset between lines
-        lineCount: Math.random() * 5 + 3 // Number of wavy lines
+        lineCount: Math.random() * 5 + 5 // Increase number of wavy lines for layering
     };
 
     drawCircleWithWavyLines(x, y, radius, options);
@@ -109,7 +111,7 @@ function generateArt() {
     for (let i = 0; i < 20; i++) {
         randomWavyCircle();
     }
-    setTimeout(generateArt, 2000);
+    setTimeout(generateArt, 2000); // Refresh and redraw after 2 seconds
 }
 
 // Resize canvas on window resize
@@ -121,6 +123,7 @@ window.addEventListener("resize", () => {
 
 // Generate initial art
 generateArt();
+
 
 
 </script>
