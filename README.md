@@ -330,5 +330,7 @@
 + ['vicsek_fractal_multiple.html', ]('vicsek_fractal_multiple.html', )
 + ['vortex2_explore.html', ]('vortex2_explore.html', )
 + ['vortex_explore.html', ]('vortex_explore.html', )
++ ['wavylines.html', ]('wavylines.html', )
++ ['wavylines2.html', ]('wavylines2.html', )
 + ['windmill.html', ]('windmill.html', )
 + ['zooming_mandelbrot.html', ]('zooming_mandelbrot.html', )
