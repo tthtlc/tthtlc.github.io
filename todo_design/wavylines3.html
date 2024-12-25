@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wavy Lines (v2) </title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        canvas {
+            border: 1px solid black;
+        }
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .control-group {
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+        }
+        .control-group label {
+            margin-right: 10px;
+        }
+        .color-spectrum {
+            margin: 10px 0;
+            width: 300px;
+        }
+        input[type="range"] {
+            width: 200px;
+        }
+        .value-label {
+            margin-left: 10px;
+            font-weight: bold;
+        }
+    </style>
+<!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-GEX61LPT08"></script> <script>   window.dataLayer = window.dataLayer || [];   function gtag(){dataLayer.push(arguments);}   gtag('js', new Date());   gtag('config', 'G-GEX61LPT08'); </script> </head>
+<body>
+
+<canvas id="wavyLinesCanvas"></canvas>
+
+    <script>
+        document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
+
+const canvas = document.getElementById("wavyLinesCanvas");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+// Set dark background
+function clearCanvas() {
+    ctx.fillStyle = "#000"; // Dark background color
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+}
+
+function drawCandleLight(x, y, radius, options) {
+    const { flickerIntensity, gradientColors } = options;
+
+    // Create radial gradient for candle light
+    const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
+    gradientColors.forEach((color, index) => {
+        gradient.addColorStop(index / (gradientColors.length - 1), color);
+    });
+
+    // Draw gradient as the candle light
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, Math.PI * 2);
+    ctx.fillStyle = gradient;
+    ctx.fill();
+
+    // Simulate flickering by adjusting radius slightly
+    const flicker = Math.random() * flickerIntensity - flickerIntensity / 2;
+    return radius + flicker;
+}
+
+function generateCandleLight() {
+    clearCanvas();
+    const x = canvas.width / 2;
+    const y = canvas.height / 2;
+    const baseRadius = 100; // Base radius for the candle light
+
+    const options = {
+        flickerIntensity: 500, // Intensity of the flickering effect
+        gradientColors: ["rgba(255, 200, 0, 1)", "rgba(255, 150, 0, 0.6)", "rgba(0, 0, 0, 0)"] // Gradient colors
+    };
+
+    // Animate the candle light
+    function animate() {
+        const radius = drawCandleLight(x, y, baseRadius, options);
+        setTimeout(animate, 100); // Adjust timing for smoother flicker
+    }
+
+    animate();
+}
+
+// Resize canvas on window resize
+window.addEventListener("resize", () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    generateCandleLight();
+});
+
+// Generate candle light effect
+generateCandleLight();
+
+</script>
+</body>
+</html>
+

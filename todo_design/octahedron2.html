@@ -1,0 +1,88 @@
+Let me try a completely different approach to create a proper octahedron:
+
+
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Octahedron</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .scene {
+            width: 200px;
+            height: 200px;
+            perspective: 600px;
+        }
+        .octahedron {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            animation: rotate 10s infinite linear;
+        }
+        .face {
+            position: absolute;
+            left: 50px;
+            top: 50px;
+            width: 0;
+            height: 0;
+            border-left: 50px solid transparent;
+            border-right: 50px solid transparent;
+            border-bottom: 86.6px solid rgba(0, 128, 255, 0.7);
+            transform-origin: 50% 57.7%;
+        }
+        
+        /* Top vertex faces */
+        .face:nth-child(1) { transform: rotateY(0deg) rotateX(54.73deg) translateZ(50px); }
+        .face:nth-child(2) { transform: rotateY(90deg) rotateX(54.73deg) translateZ(50px); }
+        .face:nth-child(3) { transform: rotateY(180deg) rotateX(54.73deg) translateZ(50px); }
+        .face:nth-child(4) { transform: rotateY(270deg) rotateX(54.73deg) translateZ(50px); }
+
+        /* Bottom vertex faces */
+        .face:nth-child(5) { transform: rotateY(0deg) rotateX(-125.27deg) translateZ(50px); }
+        .face:nth-child(6) { transform: rotateY(90deg) rotateX(-125.27deg) translateZ(50px); }
+        .face:nth-child(7) { transform: rotateY(180deg) rotateX(-125.27deg) translateZ(50px); }
+        .face:nth-child(8) { transform: rotateY(270deg) rotateX(-125.27deg) translateZ(50px); }
+
+        @keyframes rotate {
+            from { transform: rotateY(0deg) rotateX(35.264deg) rotateZ(45deg); }
+            to { transform: rotateY(360deg) rotateX(35.264deg) rotateZ(45deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="scene">
+        <div class="octahedron">
+            <div class="face"></div>
+            <div class="face"></div>
+            <div class="face"></div>
+            <div class="face"></div>
+            <div class="face"></div>
+            <div class="face"></div>
+            <div class="face"></div>
+            <div class="face"></div>
+        </div>
+    </div>
+</body>
+</html>
+
+```
+
+Key changes in this version:
+1. Used the exact octahedron dihedral angle of 109.47° (reflected in the complementary angles used)
+2. Positioned faces using more precise mathematical angles and translations
+3. Adjusted the transform origin to match the geometric center
+4. Modified the rotation animation to better show the 3D structure
+5. Adjusted the size and proportions of the triangular faces
+
+Let me know if you still see issues with the rendering, and I'll continue to refine it.

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rotating Lemniscate</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        canvas {
+            background-color: white;
+            border: 1px solid black;
+        }
+        #abcValue {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+        .footer-link { 
+            position: absolute; 
+            bottom: 20px; 
+            text-align: center; 
+            width: 100%; 
+        } 
+        .footer-link a { 
+            font-size: 16px; 
+            color: #007bff; 
+            text-decoration: none; 
+        } 
+        .footer-link a:hover { 
+            text-decoration: underline; 
+        } 
+    </style>
+</head>
+<body>
+    <div id="abcValue"></div>
+    <canvas id="figure8Canvas" width="500" height="500"></canvas>
+    
+    <script>
+        const canvas = document.getElementById('figure8Canvas');
+        const ctx = canvas.getContext('2d');
+        const abcValueLabel = document.getElementById('abcValue');
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        const scale = 100; // Scaling factor
+        const parts = 300; // Number of segments
+        const step = 2 * Math.PI / parts; // Step size for theta
+
+        let abc = 1 / 2; // Initial frequency ratio
+        let angle = 0; // Initial rotation angle
+        const delay = 30; // Delay between animation frames (ms)
+        const rotationSpeed = 0.04; // Speed of rotation
+
+        // Function to generate random integers
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        // Function to update abc value
+        function updateABC() {
+            let aaa, bbb;
+            do {
+                aaa = getRandomInt(1, 10);
+                bbb = getRandomInt(1, 10);
+            } while (aaa === bbb);
+            abc = aaa / bbb;
+            abcValueLabel.textContent = `R = A * cos(freq * theta) + B * cos(2 * freq * theta) (freq: ${aaa}/${bbb})`;
+        }
+
+        // Update abc value every 2 seconds
+        setInterval(updateABC, 2000);
+
+        // Function to draw the rotating figure-eight
+        function drawFigure8(abc) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.save();
+
+            // Rotate the canvas
+            ctx.translate(centerX, centerY);
+            ctx.rotate(angle);
+            ctx.translate(-centerX, -centerY);
+
+            ctx.beginPath();
+
+            for (let theta = 0; theta <= 2 * Math.PI; theta += step) {
+                const r = scale * Math.cos(abc * theta); // Lemniscate radius
+                const x = r * Math.cos(theta);
+                const y = r * Math.sin(theta);
+
+                if (theta === 0) {
+                    ctx.moveTo(centerX + x, centerY + y);
+                } else {
+                    ctx.lineTo(centerX + x, centerY + y);
+                }
+            }
+
+            ctx.strokeStyle = 'blue';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            ctx.restore();
+        }
+
+        // Animation function
+        function animateFigure8() {
+            drawFigure8(abc);
+            angle += rotationSpeed;
+            setTimeout(animateFigure8, delay); // Recursively call the animation
+        }
+
+        // Start the animation
+        animateFigure8();
+    </script>
+</body>
+</html>
+

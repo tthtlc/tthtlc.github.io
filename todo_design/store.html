@@ -1,0 +1,133 @@
+https://chatgpt.com/c/673b859a-5358-8013-94bd-dc9af695fcf6
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parametric Equation Visualization with Rotation</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        canvas {
+            background-color: white;
+            border: 1px solid #ccc;
+        }
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .save-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .save-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <a href="https://tthtlc.wordpress.com/2024/10/18/sinusoidal-parajetric-equalition/">Sinusoidal Parametric Equation</a><br>
+
+    <canvas id="canvas" width="800" height="800"></canvas><br><br>
+    <div class="controls">
+        <div class="control-group">
+            <label for="aaaa">aaaa:</label>
+            <input type="range" id="aaaa" min="1" max="10" step="0.1" value="5">
+            <span id="value-aaaa">5</span>
+        </div>
+        <div class="control-group">
+            <label for="bbbb">bbbb:</label>
+            <input type="range" id="bbbb" min="1" max="10" step="0.1" value="5">
+            <span id="value-bbbb">5</span>
+        </div>
+        <div class="control-group">
+            <label for="cccc">cccc:</label>
+            <input type="range" id="cccc" min="1" max="10" step="0.1" value="5">
+            <span id="value-cccc">5</span>
+        </div>
+    </div>
+    <button class="save-button" id="saveButton">Save Curve</button>
+    <script>
+        const filename = location.pathname.split('/').pop(); // Get current filename
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const width = canvas.width;
+        const height = canvas.height;
+        const scale = 60;
+
+        let aaaa = parseFloat(document.getElementById('aaaa').value);
+        let bbbb = parseFloat(document.getElementById('bbbb').value);
+        let cccc = parseFloat(document.getElementById('cccc').value);
+
+        ctx.translate(width / 2, height / 2); // Center the canvas
+
+        // Save current parameters to localStorage
+        function saveToLocalStorage() {
+            const data = {
+                aaaa: parseFloat(document.getElementById('aaaa').value),
+                bbbb: parseFloat(document.getElementById('bbbb').value),
+                cccc: parseFloat(document.getElementById('cccc').value),
+                timestamp: new Date().toISOString(),
+            };
+
+            let storedData = JSON.parse(localStorage.getItem('userChoices')) || {};
+            if (!storedData[filename]) {
+                storedData[filename] = [];
+            }
+            storedData[filename].push(data);
+            localStorage.setItem('userChoices', JSON.stringify(storedData));
+
+            alert("Curve parameters saved successfully!");
+        }
+
+        // Add event listener to the Save button
+        document.getElementById('saveButton').addEventListener('click', saveToLocalStorage);
+
+        // Update value display and variables
+        function updateValueDisplay(id, value) {
+            document.getElementById(`value-${id}`).textContent = value;
+        }
+
+        // Event listeners for sliders to update values dynamically
+        document.getElementById('aaaa').addEventListener('input', (event) => {
+            aaaa = parseFloat(event.target.value);
+            updateValueDisplay('aaaa', aaaa);
+        });
+
+        document.getElementById('bbbb').addEventListener('input', (event) => {
+            bbbb = parseFloat(event.target.value);
+            updateValueDisplay('bbbb', bbbb);
+        });
+
+        document.getElementById('cccc').addEventListener('input', (event) => {
+            cccc = parseFloat(event.target.value);
+            updateValueDisplay('cccc', cccc);
+        });
+
+        // Existing draw functions remain unchanged
+    </script>
+</body>
+</html>
+
