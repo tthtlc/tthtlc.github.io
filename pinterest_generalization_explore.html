@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Composite Hypotrochoid Curves</title>
+    <title>Pinterests Curve 1</title>
     <style>
         body {
             display: flex;
@@ -47,42 +47,37 @@
     </style>
 <!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-GEX61LPT08"></script> <script>   window.dataLayer = window.dataLayer || [];   function gtag(){dataLayer.push(arguments);}   gtag('js', new Date());   gtag('config', 'G-GEX61LPT08'); </script> </head>
 <body>
-    <h2>This is the result of direct addition of two hypotrochoids on top of each other, i.e., (x, y) = (x_hypotrochoid1, y_hypotrochoid1) + (x_hypotrochoid2, y_hypotrochoid2)</h2>
+	<h2>This is generalization of: <a href="https://www.pinterest.com/pin/333759022403645338">(x=3/2cos(t) + 1/3sin(125t) y=3/2sin(t)+1/3cos(251t)) </a></h2>
     <canvas id="canvas" width="600" height="600"></canvas>
 
     <div class="controls">
         <!-- Curve 1 Controls -->
         <div class="control-group">
             <label for="R1">R1 (Outer radius 1):</label>
-            <input type="range" id="R1" min="50" max="300" value="240">
-            <span id="R1-value" class="value-label">240</span>
+            <input type="range" id="R1" min="50" max="300" value="140">
+            <span id="R1-value" class="value-label">140</span>
         </div>
         <div class="control-group">
-            <label for="r1">r1 (Inner radius 1):</label>
-            <input type="range" id="r1" min="10" max="150" value="40">
-            <span id="r1-value" class="value-label">40</span>
+            <label for="r1">ratio1:</label>
+            <input type="range" id="r1" min="1" max="150" value="3">
+            <span id="r1-value" class="value-label">3</span>
         </div>
-        <div class="control-group">
-            <label for="d1">d1 (Distance 1):</label>
-            <input type="range" id="d1" min="10" max="150" value="150">
-            <span id="d1-value" class="value-label">150</span>
-        </div>
-        
         <!-- Curve 2 Controls -->
         <div class="control-group">
-            <label for="R2">R2 (Outer radius 2):</label>
-            <input type="range" id="R2" min="50" max="300" value="240">
-            <span id="R2-value" class="value-label">240</span>
+            <label for="r2">ratio2:</label>
+            <input type="range" id="r2" min="1" max="150" value="2">
+            <span id="r2-value" class="value-label">2</span>
         </div>
         <div class="control-group">
-            <label for="r2">r2 (Inner radius 2):</label>
-            <input type="range" id="r2" min="10" max="150" value="40">
-            <span id="r2-value" class="value-label">40</span>
+            <label for="d1">d1:</label>
+            <input type="range" id="d1" min="1" max="300" value="125">
+            <span id="d1-value" class="value-label">125</span>
         </div>
+        
         <div class="control-group">
-            <label for="d2">d2 (Distance 2):</label>
-            <input type="range" id="d2" min="10" max="150" value="150">
-            <span id="d2-value" class="value-label">150</span>
+            <label for="d2">d2:</label>
+            <input type="range" id="d2" min="10" max="300" value="251">
+            <span id="d2-value" class="value-label">251</span>
         </div>
 
         <div class="control-group">
@@ -101,8 +96,8 @@
         const gradientCtx = gradientCanvas.getContext('2d');
 
         // Parameters for two curves
-        let R1 = 240, r1 = 40, d1 = 150;
-        let R2 = 240, r2 = 40, d2 = 150;
+        let R1 = 140, r1 = 3, d1 = 125, d2=251;
+        let r2 = 2;
         let rotationAngle = 0;
        	let steps = 2*Math.PI/3600;
         let selectedColor = '#0000ff';
@@ -131,9 +126,10 @@
 
             // Draw composite curve
             for (let t = 0; t <= 2 * Math.PI * r1 / Math.gcd(R1, r1); t += steps) {
-
-		x=R1*(r1/r2*Math.cos(t)+r2/r1*Math.sin(d1*t));
-		y=R1*(r1/r2*Math.sin(t)+r2/r1*Math.cos((d1+(251-125))*t));
+	        // https://www.pinterest.com/pin/333759022403645338/
+		// x=3/2cos(t) + 1/3sin(125t) y=3/2sin(t)+1/3cos(251t)
+		x=R1*(r1/r2*Math.cos(t)+1/3*Math.sin(d1*t));
+		y=R1*(r1/r2*Math.sin(t)+1/3*Math.cos(d2*t));
 
 		if (t==0) 
             		ctx.moveTo(width / 2 + x, height / 2 - y);
@@ -203,10 +199,6 @@
         document.getElementById('d1').addEventListener('input', function() {
             d1 = parseInt(this.value);
             document.getElementById('d1-value').innerText = this.value;
-        });
-        document.getElementById('R2').addEventListener('input', function() {
-            R2 = parseInt(this.value);
-            document.getElementById('R2-value').innerText = this.value;
         });
         document.getElementById('r2').addEventListener('input', function() {
             r2 = parseInt(this.value);
