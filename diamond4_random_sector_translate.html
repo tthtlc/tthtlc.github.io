@@ -52,7 +52,7 @@
         const tx = canvas.width / 10;
         const ty = canvas.height / 10;
         const sideLength = 100;
-        const mycolor = 'Black';
+        let mycolor = 'Black';
         let nnn30 = Math.floor(Math.random() * 360) + 1; // Random number between 3 and 12
         let nnn120 = Math.floor(Math.random() * 360) + 1; // Random number between 3 and 12
         let angle30 = toRadians(nnn30);
@@ -119,11 +119,14 @@
             let { p1, p2, p3, p4 } = calculateDiamondPoints(x, y, tx, ty);
 
             // Rotate and draw the diamond multiple times based on nnn
+	    let counter = 0;
             for (let rotateAngle = 0; rotateAngle < 360; rotateAngle += 360 / nnn) {
+		counter = (counter + 1)%nnn;
                 const rotatedP1 = rotatePoint(p1.x, p1.y, x, y, rotateAngle);
                 const rotatedP2 = rotatePoint(p2.x, p2.y, x, y, rotateAngle);
                 const rotatedP3 = rotatePoint(p3.x, p3.y, x, y, rotateAngle);
                 const rotatedP4 = rotatePoint(p4.x, p4.y, x, y, rotateAngle);
+		mycolor = `hsl(${(counter / nnn) * 360}, 100%, 50%)`;
                 drawDiamond(rotatedP1, rotatedP2, rotatedP3, rotatedP4, mycolor);
             }
         }

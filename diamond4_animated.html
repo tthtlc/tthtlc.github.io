@@ -44,7 +44,7 @@ document.addEventListener("contextmenu", function(event) { event.preventDefault(
             const startX = canvas.width / 2;
             const startY = canvas.height / 2;
             const sideLength = 100;
-            const mycolor = 'Black';
+            let mycolor = 'Black';
 
             function toRadians(deg) {
                 return deg * (Math.PI / 180);
@@ -93,11 +93,15 @@ document.addEventListener("contextmenu", function(event) { event.preventDefault(
 
                 const { p1, p2, p3, p4 } = calculateDiamondPoints(x, y, angle30, angle120);
 
+		let counter = 0;
                 for (let rotateAngle = 0; rotateAngle < 360; rotateAngle += 360 / nnn) {
+		    counter = (counter + 1 ) % nnn;
                     const rotatedP1 = rotatePoint(p1.x, p1.y, x, y, rotateAngle);
                     const rotatedP2 = rotatePoint(p2.x, p2.y, x, y, rotateAngle);
                     const rotatedP3 = rotatePoint(p3.x, p3.y, x, y, rotateAngle);
                     const rotatedP4 = rotatePoint(p4.x, p4.y, x, y, rotateAngle);
+		    mycolor = `hsl(${(counter / nnn) * 360}, 100%, 50%)`;
+
                     drawDiamond(rotatedP1, rotatedP2, rotatedP3, rotatedP4, mycolor);
                 }
             }
