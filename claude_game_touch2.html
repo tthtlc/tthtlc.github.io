@@ -12,8 +12,8 @@
 
     #gameContainer {
       position: relative;
-      width: 600px;
-      height: 400px;
+      width: 150px;
+      height: 200px;
       border: 2px solid black;
       margin: 20px auto;
       overflow: hidden;
@@ -22,16 +22,16 @@
     
     #ball {
       position: absolute;
-      width: 20px;
-      height: 20px;
+      width: 6px;
+      height: 6px;
       background-color: red;
       border-radius: 50%;
     }
     
     .paddle {
       position: absolute;
-      width: 10px;
-      height: 80px;
+      width: 4px;
+      height: 30px;
       background-color: blue;
       touch-action: none;
     }
@@ -46,38 +46,39 @@
 
     .score {
       text-align: center;
-      font-size: 24px;
-      margin: 10px;
+      font-size: 16px;
+      margin: 5px;
     }
 
     .hits {
       text-align: center;
-      font-size: 18px;
-      margin: 10px;
+      font-size: 14px;
+      margin: 5px;
       color: #666;
     }
 
     .controls {
       text-align: center;
-      margin: 20px;
+      margin: 10px;
     }
 
     .instructions {
       text-align: center;
-      margin: 20px;
+      margin: 10px;
       font-family: monospace;
+      font-size: 12px;
     }
   </style>
 </head>
 <body>
   <div class="score">Left: <span id="leftScore">0</span> | Right: <span id="rightScore">0</span></div>
-  <div class="hits">Left Paddle Hits: <span id="leftHits">0</span> | Right Paddle Hits: <span id="rightHits">0</span></div>
+  <div class="hits">Left Hits: <span id="leftHits">0</span> | Right: <span id="rightHits">0</span></div>
   <div class="controls">
-    Ball Speed: <input type="range" id="speedControl" min="1" max="10" value="3">
-    <span id="speedValue">3</span>
+    Speed: <input type="range" id="speedControl" min="1" max="10" value="2" style="width: 100px">
+    <span id="speedValue">2</span>
   </div>
   <div class="instructions">
-    Use keyboard (R/F for left, U/J for right) or touch/drag paddles
+    Use R/F for left, U/J for right<br>or touch/drag paddles
   </div>
   <div id="gameContainer">
     <div id="ball"></div>
@@ -97,14 +98,14 @@
     const leftHitsElement = document.getElementById('leftHits');
     const rightHitsElement = document.getElementById('rightHits');
 
-    let ballX = 300;
-    let ballY = 200;
-    let baseSpeed = 3;
+    let ballX = 75;
+    let ballY = 100;
+    let baseSpeed = 2;
     let ballSpeedX = baseSpeed;
     let ballSpeedY = baseSpeed;
-    let leftPaddleY = 160;
-    let rightPaddleY = 160;
-    let paddleSpeed = 10;
+    let leftPaddleY = 85;
+    let rightPaddleY = 85;
+    let paddleSpeed = 5;
     let leftScore = 0;
     let rightScore = 0;
     let leftHits = 0;
@@ -117,7 +118,6 @@
     leftPaddle.style.top = leftPaddleY + 'px';
     rightPaddle.style.top = rightPaddleY + 'px';
 
-    // Touch event handlers
     function handleTouchStart(e) {
       e.preventDefault();
       const containerRect = container.getBoundingClientRect();
@@ -126,7 +126,6 @@
         const touchX = touch.clientX - containerRect.left;
         const touchY = touch.clientY - containerRect.top;
         
-        // Determine which paddle to control based on touch position
         if (touchX < containerRect.width / 2) {
           activeTouches.set(touch.identifier, 'left');
           updatePaddlePosition(touchY, 'left');
@@ -158,7 +157,7 @@
     }
 
     function updatePaddlePosition(touchY, paddle) {
-      const newY = Math.max(0, Math.min(320, touchY - 40));
+      const newY = Math.max(0, Math.min(170, touchY - 15));
       if (paddle === 'left') {
         leftPaddleY = newY;
         leftPaddle.style.top = newY + 'px';
@@ -168,7 +167,6 @@
       }
     }
 
-    // Add touch event listeners
     container.addEventListener('touchstart', handleTouchStart, { passive: false });
     container.addEventListener('touchmove', handleTouchMove, { passive: false });
     container.addEventListener('touchend', handleTouchEnd, { passive: false });
@@ -181,61 +179,55 @@
       ballSpeedY = ballSpeedY > 0 ? baseSpeed : -baseSpeed;
     });
 
-    // Keep keyboard controls
     document.addEventListener('keydown', function(e) {
       switch(e.key.toLowerCase()) {
-        case 'r': // Left paddle up
+        case 'r':
           leftPaddleY = Math.max(0, leftPaddleY - paddleSpeed);
           leftPaddle.style.top = leftPaddleY + 'px';
           break;
-        case 'f': // Left paddle down
-          leftPaddleY = Math.min(320, leftPaddleY + paddleSpeed);
+        case 'f':
+          leftPaddleY = Math.min(170, leftPaddleY + paddleSpeed);
           leftPaddle.style.top = leftPaddleY + 'px';
           break;
-        case 'u': // Right paddle up
+        case 'u':
           rightPaddleY = Math.max(0, rightPaddleY - paddleSpeed);
           rightPaddle.style.top = rightPaddleY + 'px';
           break;
-        case 'j': // Right paddle down
-          rightPaddleY = Math.min(320, rightPaddleY + paddleSpeed);
+        case 'j':
+          rightPaddleY = Math.min(170, rightPaddleY + paddleSpeed);
           rightPaddle.style.top = rightPaddleY + 'px';
           break;
       }
     });
 
     function update() {
-      // Move ball
       ballX += ballSpeedX;
       ballY += ballSpeedY;
 
-      // Check for collision with top and bottom walls
-      if (ballY <= 0 || ballY >= 380) {
+      if (ballY <= 0 || ballY >= 194) {
         ballSpeedY = -ballSpeedY;
       }
 
-      // Check for collision with paddles
-      if (ballX <= 10 && ballY >= leftPaddleY && ballY <= leftPaddleY + 80) {
+      if (ballX <= 4 && ballY >= leftPaddleY && ballY <= leftPaddleY + 30) {
         ballSpeedX = baseSpeed;
         leftHits++;
         leftHitsElement.textContent = leftHits;
-      } else if (ballX >= 570 && ballY >= rightPaddleY && ballY <= rightPaddleY + 80) {
+      } else if (ballX >= 140 && ballY >= rightPaddleY && ballY <= rightPaddleY + 30) {
         ballSpeedX = -baseSpeed;
         rightHits++;
         rightHitsElement.textContent = rightHits;
       }
 
-      // Check for scoring
       if (ballX <= 0) {
         rightScore++;
         rightScoreElement.textContent = rightScore;
         resetBall();
-      } else if (ballX >= 580) {
+      } else if (ballX >= 144) {
         leftScore++;
         leftScoreElement.textContent = leftScore;
         resetBall();
       }
 
-      // Update ball position
       ball.style.left = ballX + 'px';
       ball.style.top = ballY + 'px';
 
@@ -243,8 +235,8 @@
     }
 
     function resetBall() {
-      ballX = 300;
-      ballY = 200;
+      ballX = 75;
+      ballY = 100;
       ballSpeedX = Math.random() > 0.5 ? baseSpeed : -baseSpeed;
       ballSpeedY = baseSpeed;
     }
