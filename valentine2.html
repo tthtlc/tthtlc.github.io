@@ -1,0 +1,94 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Floating Hearts</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: black;
+        }
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <script>
+        const canvas = document.getElementById("canvas");
+        const ctx = canvas.getContext("2d");
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        let hearts = [];
+        
+        function randomColor() {
+            return `hsl(${Math.random() * 360}, 100%, 60%)`;
+        }
+        
+        function Heart(x, y) {
+            this.x = x;
+            this.y = y;
+            this.size = Math.random() * 10 + 5;
+            this.color = randomColor();
+            this.velocityX = (Math.random() - 0.5) * 2;
+            this.velocityY = (Math.random() - 0.5) * 2;
+            this.life = 100;
+        }
+        
+        Heart.prototype.draw = function() {
+            ctx.fillStyle = this.color;
+            ctx.beginPath();
+            ctx.moveTo(this.x, this.y);
+            ctx.bezierCurveTo(
+                this.x - this.size, this.y - this.size, 
+                this.x - this.size * 2, this.y + this.size / 2, 
+                this.x, this.y + this.size * 2
+            );
+            ctx.bezierCurveTo(
+                this.x + this.size * 2, this.y + this.size / 2, 
+                this.x + this.size, this.y - this.size, 
+                this.x, this.y
+            );
+            ctx.fill();
+        };
+        
+        Heart.prototype.update = function() {
+            this.x += this.velocityX;
+            this.y += this.velocityY;
+            this.life--;
+        };
+        
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            hearts = hearts.filter(h => h.life > 0);
+            hearts.forEach(h => {
+                h.update();
+                h.draw();
+            });
+            requestAnimationFrame(animate);
+        }
+        
+        window.addEventListener("mousemove", (e) => {
+            for (let i = 0; i < 5; i++) {
+                hearts.push(new Heart(e.clientX, e.clientY));
+            }
+        });
+        
+        window.addEventListener("resize", () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+        
+        animate();
+    </script>
+</body>
+</html>
+
