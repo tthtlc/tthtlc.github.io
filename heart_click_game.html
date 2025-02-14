@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heart Click Game</title>
+    <style>
+        body {
+            position: relative;
+            background-color: #f8f9fa;
+            overflow: hidden;
+            margin: 0;
+            height: 100vh;
+        }
+        .heart {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+        }
+        .controls {
+            position: fixed;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+        }
+        .stats {
+            position: fixed;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+            display: flex;
+            gap: 10px;
+            font-size: 18px;
+        }
+        .remaining {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="stats">
+        <span>Clicked: <span id="clickedCount">0</span></span>
+        <span class="remaining">Remaining: <span id="remainingCount">0</span></span>
+    </div>
+    <div class="controls">
+        <label>Speed: </label>
+        <input type="range" id="speedControl" min="500" max="3000" value="1500">
+    </div>
+
+    <script>
+        const colors = ['red', 'blue', 'green', 'purple', 'orange'];
+        let heartInterval = 1500;
+        let hearts = [];
+        let clickedCount = 0;
+
+        function updateStats() {
+            document.getElementById("clickedCount").textContent = clickedCount;
+            document.getElementById("remainingCount").textContent = hearts.length;
+        }
+
+        function createHeart() {
+            if (hearts.length >= 10) {
+                alert("Game Over! Too many hearts on screen.");
+                location.reload();
+                return;
+            }
+
+            let numHearts = Math.floor(Math.random() * 4) + 1;
+            for (let i = 0; i < numHearts; i++) {
+                let heart = document.createElement('div');
+                heart.classList.add('heart');
+                heart.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                heart.style.top = Math.random() * (window.innerHeight - 50) + 'px';
+                heart.style.left = Math.random() * (window.innerWidth - 50) + 'px';
+                heart.style.clipPath = "polygon(50% 15%, 61% 3%, 75% 0, 88% 6%, 100% 19%, 100% 37%, 91% 54%, 75% 74%, 50% 100%, 25% 74%, 9% 54%, 0 37%, 0 19%, 12% 6%, 25% 0, 39% 3%)";
+                document.body.appendChild(heart);
+                hearts.push(heart);
+                updateStats();
+                heart.onclick = () => {
+                    heart.remove();
+                    hearts = hearts.filter(h => h !== heart);
+                    clickedCount++;
+                    updateStats();
+                };
+            }
+        }
+
+        function updateSpeed() {
+            heartInterval = document.getElementById("speedControl").value;
+            clearInterval(heartSpawner);
+            heartSpawner = setInterval(createHeart, heartInterval);
+        }
+
+        document.getElementById("speedControl").addEventListener("input", updateSpeed);
+        let heartSpawner = setInterval(createHeart, heartInterval);
+    </script>
+</body>
+</html>
+

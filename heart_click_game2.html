@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heart Clicker Game</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: #222;
+            font-family: Arial, sans-serif;
+            color: white;
+        }
+        .heart {
+            position: absolute;
+            cursor: pointer;
+            z-index: 1000;
+        }
+        #game-ui {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.7);
+            padding: 15px;
+            border-radius: 10px;
+            z-index: 2000;
+            width: 300px;
+        }
+        #score {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        #hearts-left {
+            margin-bottom: 10px;
+        }
+        #speed-control {
+            width: 100%;
+            margin: 10px 0;
+        }
+        #game-over {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.8);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            display: none;
+            z-index: 3000;
+        }
+        #restart-btn {
+            background: #e74c3c;
+            border: none;
+            padding: 10px 20px;
+            color: white;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        #center-display {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 1500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+        }
+        #center-counter {
+            font-size: 120px;
+            color: rgba(255, 255, 255, 0.5);
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(255,105,180,0.7);
+            transition: all 0.2s ease;
+        }
+        #remaining-counter {
+            font-size: 120px;
+            color: rgba(255, 50, 50, 0.5);
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(255, 50, 50, 0.7);
+            transition: all 0.2s ease;
+        }
+        .counter-label {
+            position: absolute;
+            bottom: -30px;
+            font-size: 18px;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <div id="center-display">
+        <div style="position: relative;">
+            <div id="center-counter">0</div>
+            <div class="counter-label">Clicked</div>
+        </div>
+        <div style="position: relative;">
+            <div id="remaining-counter">0</div>
+            <div class="counter-label">Remaining</div>
+        </div>
+    </div>
+    
+    <div id="game-ui">
+        <div id="score">Score: 0</div>
+        <div id="hearts-left">Hearts on screen: 0/10</div>
+        <label for="speed-control">Generation Speed:</label>
+        <input type="range" id="speed-control" min="1000" max="10000" value="5000">
+        <div id="speed-value">Current speed: 1 heart per 5000ms</div>
+    </div>
+    
+    <div id="game-over">
+        <h1>Game Over!</h1>
+        <p id="final-score">Your score: 0</p>
+        <button id="restart-btn">Play Again</button>
+    </div>
+    
+    <script>
+        const body = document.querySelector('body');
+        const scoreDisplay = document.getElementById('score');
+        const centerCounter = document.getElementById('center-counter');
+        const remainingCounter = document.getElementById('remaining-counter');
+        const heartsLeftDisplay = document.getElementById('hearts-left');
+        const speedControl = document.getElementById('speed-control');
+        const speedValueDisplay = document.getElementById('speed-value');
+        const gameOverScreen = document.getElementById('game-over');
+        const finalScoreDisplay = document.getElementById('final-score');
+        const restartBtn = document.getElementById('restart-btn');
+        
+        let score = 0;
+        let heartCount = 0;
+        let heartsOnScreen = 0;
+        let generationInterval;
+        let gameActive = true;
+        
+        // Function to generate a random color
+        function getRandomColor() {
+            const hue = Math.floor(Math.random() * 360);
+            return `hsl(${hue}, 100%, 65%)`;
+        }
+        
+        // Function to create a heart
+        function createHeart() {
+            if (!gameActive || heartsOnScreen >= 10) return;
+            
+            const heart = document.createElement('div');
+            heart.className = 'heart';
+            
+            const size = Math.random() * 30 + 20;
+            const color = getRandomColor();
+            
+            // Random position within viewport
+            const x = Math.random() * (window.innerWidth - size);
+            const y = Math.random() * (window.innerHeight - size);
+            
+            const svg = `
+                <svg width="${size}" height="${size}" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path fill="${color}" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                </svg>
+            `;
+            
+            heart.innerHTML = svg;
+            heart.id = `heart-${heartCount++}`;
+            
+            heart.style.left = `${x}px`;
+            heart.style.top = `${y}px`;
+            
+            // Click event to remove heart
+            heart.addEventListener('click', () => {
+                if (!gameActive) return;
+                
+                heart.remove();
+                heartsOnScreen--;
+                updateCounters();
+                
+                // Increase score
+                score++;
+                
+                // Flash effect for center counter
+                centerCounter.style.transform = 'scale(1.3)';
+                centerCounter.style.color = 'rgba(255, 255, 255, 0.9)';
+                centerCounter.style.textShadow = '0 0 20px rgba(255,105,180,0.9)';
+                
+                setTimeout(() => {
+                    centerCounter.style.transform = 'scale(1)';
+                    centerCounter.style.color = 'rgba(255, 255, 255, 0.5)';
+                    centerCounter.style.textShadow = '0 0 10px rgba(255,105,180,0.7)';
+                }, 200);
+            });
+            
+            body.appendChild(heart);
+            heartsOnScreen++;
+            updateCounters();
+            
+            // Flash effect for remaining counter
+            remainingCounter.style.transform = 'scale(1.3)';
+            remainingCounter.style.color = 'rgba(255, 50, 50, 0.9)';
+            remainingCounter.style.textShadow = '0 0 20px rgba(255, 50, 50, 0.9)';
+            
+            setTimeout(() => {
+                remainingCounter.style.transform = 'scale(1)';
+                remainingCounter.style.color = 'rgba(255, 50, 50, 0.5)';
+                remainingCounter.style.textShadow = '0 0 10px rgba(255, 50, 50, 0.7)';
+            }, 200);
+            
+            // Check if max hearts reached
+            if (heartsOnScreen >= 10) {
+                endGame();
+            }
+        }
+        
+        // Update all counters and displays
+        function updateCounters() {
+            scoreDisplay.textContent = `Score: ${score}`;
+            centerCounter.textContent = score;
+            remainingCounter.textContent = heartsOnScreen;
+            heartsLeftDisplay.textContent = `Hearts on screen: ${heartsOnScreen}/10`;
+        }
+        
+        // End the game
+        function endGame() {
+            gameActive = false;
+            clearInterval(generationInterval);
+            
+            finalScoreDisplay.textContent = `Your score: ${score}`;
+            gameOverScreen.style.display = 'block';
+        }
+        
+        // Start/restart the game
+        function startGame() {
+            // Clear any existing hearts
+            document.querySelectorAll('.heart').forEach(h => h.remove());
+            
+            // Reset game state
+            score = 0;
+            heartsOnScreen = 0;
+            gameActive = true;
+            
+            // Update displays
+            updateCounters();
+            
+            // Hide game over screen
+            gameOverScreen.style.display = 'none';
+            
+            // Start heart generation
+            updateGenerationInterval();
+        }
+        
+        // Update the generation interval based on speed control
+        function updateGenerationInterval() {
+            if (generationInterval) {
+                clearInterval(generationInterval);
+            }
+            
+            const speed = parseInt(speedControl.value);
+            speedValueDisplay.textContent = `Current speed: 1 heart per ${speed}ms`;
+            
+            generationInterval = setInterval(() => {
+                // Generate 1-3 hearts
+                const numHeartsToGenerate = Math.floor(Math.random() * 3) + 1;
+                for (let i = 0; i < numHeartsToGenerate; i++) {
+                    if (heartsOnScreen < 10) {
+                        createHeart();
+                    }
+                }
+            }, speed);
+        }
+        
+        // Event listeners
+        speedControl.addEventListener('input', updateGenerationInterval);
+        restartBtn.addEventListener('click', startGame);
+        
+        // Initialize the game
+        startGame();
+    </script>
+</body>
+</html>
