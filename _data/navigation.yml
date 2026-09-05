@@ -1,0 +1,14 @@
+# Site navigation shown in the Minimal Mistakes masthead.
+main:
+  - title: "Home"
+    url: /
+  - title: "Search"
+    url: /index_search.html
+  - title: "To Do"
+    url: /index_todo.html
+  - title: "Discussion"
+    url: /index_discussion.html
+  - title: "Random Picks"
+    url: /index_spa.html
+  - title: "All Visualizations"
+    url: /index_all.html

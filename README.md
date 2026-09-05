@@ -1,3 +1,20 @@
+# Mathematical Art
+
+Interactive geometric visualizations, curves, fractals and animations.
+
+This site is built with [Jekyll](https://jekyllrb.com/) and the
+[Minimal Mistakes](https://mmistakes.github.io/minimal-mistakes/) theme
+(`remote_theme: mmistakes/minimal-mistakes@4.28.1`) and deployed on GitHub Pages.
+
+## Adding a visualization
+
+1. Drop the self-contained `.html` file at the repository root (or a subfolder).
+2. Add its path to `_data/visualizations.yml`.
+3. The shell pages (`/`, `/index_search.html`, `/index_spa.html`, `/index_all.html`)
+   generate their file lists from that data file at build time.
+
+## Visualizations
+
 + ['3gon_around_3gon.html', ]('3gon_around_3gon.html', )
 + ['3gon_around_3gon_animated.html', ]('3gon_around_3gon_animated.html', )
 + ['3gon_around_3gon_animated_color.html', ]('3gon_around_3gon_animated_color.html', )
