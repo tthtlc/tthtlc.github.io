@@ -1,0 +1,65 @@
+# -----------------------------------------------------------------------------
+# Site settings
+# -----------------------------------------------------------------------------
+title: "Mathematical Art"
+title_separator: "|"
+subtitle: "Interactive geometric visualizations"
+description: "Interactive geometric visualizations, curves, fractals and animations."
+name: "Mathematical Art"
+
+# The canonical base URL where this site is served (GitHub Pages).
+url: "https://tthtlc.github.io"
+repository: "tthtlc/tthtlc.github.io"
+
+# Open Graph / social image used as the default preview thumbnail.
+og_image: "/thumbnail.jpg"
+
+# -----------------------------------------------------------------------------
+# Theme
+# -----------------------------------------------------------------------------
+# Pin Minimal Mistakes to the requested release via the remote-theme method,
+# which is the supported path for GitHub Pages.
+remote_theme: mmistakes/minimal-mistakes@4.28.1
+
+# -----------------------------------------------------------------------------
+# Build settings
+# -----------------------------------------------------------------------------
+markdown: kramdown
+# No custom permalink style: pages keep their file paths (e.g. /index_search.html),
+# preserving all existing URLs.
+timezone: Etc/UTC
+
+# jekyll-include-cache is required by Minimal Mistakes (its `include_cached`
+# tag). It is in the GitHub Pages plugin allowlist, so the Gemfile declares it
+# and it is activated here.
+plugins:
+  - jekyll-include-cache
+
+# -----------------------------------------------------------------------------
+# Defaults
+# -----------------------------------------------------------------------------
+# All pages with front matter get the single-column Minimal Mistakes layout.
+# Static files (the ~500 self-contained visualization HTML documents) are copied
+# through untouched and are NOT affected by these defaults.
+defaults:
+  - scope:
+      path: ""
+      type: pages
+    values:
+      layout: single
+      author_profile: false
+      comments: false
+      share: false
+      show_date: false
+      read_time: false
+      classes: wide
+
+# -----------------------------------------------------------------------------
+# Exclusions
+# -----------------------------------------------------------------------------
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor
+  - README.md
