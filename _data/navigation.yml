@@ -2,6 +2,8 @@
 main:
   - title: "Home"
     url: /
+  - title: "Gallery"
+    url: /index_gallery.html
   - title: "Search"
     url: /index_search.html
   - title: "To Do"
