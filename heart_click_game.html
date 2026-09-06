@@ -44,6 +44,29 @@
         .remaining {
             color: red;
         }
+        .overlay {
+            position: fixed;
+            inset: 0;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 10;
+        }
+        .overlay-card {
+            background: white;
+            padding: 30px 40px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.3);
+        }
+        .overlay-card button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -55,26 +78,50 @@
         <label>Speed: </label>
         <input type="range" id="speedControl" min="500" max="3000" value="1500">
     </div>
+    <div id="gameOverOverlay" class="overlay">
+        <div class="overlay-card">
+            <h1>Game Over!</h1>
+            <p>Too many hearts on screen.</p>
+            <button onclick="resetGame()">Play Again</button>
+        </div>
+    </div>
 
     <script>
         const colors = ['red', 'blue', 'green', 'purple', 'orange'];
         let heartInterval = 1500;
         let hearts = [];
         let clickedCount = 0;
+        let gameOver = false;
 
         function updateStats() {
             document.getElementById("clickedCount").textContent = clickedCount;
             document.getElementById("remainingCount").textContent = hearts.length;
         }
 
+        function endGame() {
+            gameOver = true;
+            clearInterval(heartSpawner);
+            document.getElementById("gameOverOverlay").style.display = "flex";
+        }
+
+        function resetGame() {
+            hearts.forEach(h => h.remove());
+            hearts = [];
+            clickedCount = 0;
+            gameOver = false;
+            updateStats();
+            document.getElementById("gameOverOverlay").style.display = "none";
+            heartSpawner = setInterval(createHeart, heartInterval);
+        }
+
         function createHeart() {
+            if (gameOver) return;
             if (hearts.length >= 10) {
-                alert("Game Over! Too many hearts on screen.");
-                location.reload();
+                endGame();
                 return;
             }
 
-            let numHearts = Math.floor(Math.random() * 4) + 1;
+            let numHearts = Math.min(Math.floor(Math.random() * 4) + 1, 10 - hearts.length);
             for (let i = 0; i < numHearts; i++) {
                 let heart = document.createElement('div');
                 heart.classList.add('heart');
@@ -95,6 +142,7 @@
         }
 
         function updateSpeed() {
+            if (gameOver) return;
             heartInterval = document.getElementById("speedControl").value;
             clearInterval(heartSpawner);
             heartSpawner = setInterval(createHeart, heartInterval);
