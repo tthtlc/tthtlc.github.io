@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The 5:1 Ellipse</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --paper:#F2F4F8; --panel:#FFFFFF; --canvas:#FBFCFE;
+  --ink:#1F2430; --muted:#67707F; --line:#E3E7EF;
+  --accent:#3157D5; --trace:#D97706;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#12151B; --panel:#191D26; --canvas:#14171E;
+    --ink:#E8EBF3; --muted:#8F97A8; --line:#262C39;
+    --accent:#7E9BFF; --trace:#EBA44F;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#12151B; --panel:#191D26; --canvas:#14171E;
+  --ink:#E8EBF3; --muted:#8F97A8; --line:#262C39;
+  --accent:#7E9BFF; --trace:#EBA44F;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.55 'Instrument Sans',system-ui,-apple-system,'Segoe UI',sans-serif;}
+.wrap{max-width:1280px;margin:0 auto;padding:34px 20px 52px;}
+header{margin-bottom:24px;max-width:680px;}
+.eyebrow{margin:0 0 8px;font:500 11px/1.4 'IBM Plex Mono',ui-monospace,Menlo,monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);}
+h1{margin:0 0 8px;font-size:28px;font-weight:700;letter-spacing:-.015em;text-wrap:balance;}
+.lede{margin:0;color:var(--muted);max-width:60ch;}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px;align-items:start;}
+@media (max-width:860px){.layout{grid-template-columns:minmax(0,1fr)}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:0 1px 2px rgba(15,23,42,.05);}
+.stage-card{padding:10px 10px 0;}
+.stage{position:relative;width:100%;aspect-ratio:4/3;min-height:340px;}
+canvas{position:absolute;inset:0;width:100%;height:100%;display:block;border-radius:10px;background:var(--canvas);}
+.readout{display:flex;gap:10px;flex-wrap:wrap;padding:12px 4px 14px;}
+.chip{flex:1 1 0;min-width:120px;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:8px 12px 9px;}
+.chip .k{display:block;margin-bottom:2px;font:500 10px/1.4 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);}
+.chip .v{font:600 19px/1.2 'IBM Plex Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums;color:var(--ink);}
+.chip .v.hl{color:var(--trace);}
+.panel{padding:20px 20px 22px;}
+.sec{margin:0 0 14px;padding-bottom:8px;border-bottom:1px solid var(--line);font:600 11px/1.4 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);}
+.sec:not(:first-child){margin-top:22px;}
+.row{display:grid;grid-template-columns:1fr auto;align-items:baseline;gap:4px 12px;margin-bottom:16px;}
+.row .name{font-size:14.5px;font-weight:500;}
+.row .name .unit{color:var(--muted);font-size:12.5px;font-weight:400;}
+.row .val{font:600 13px/1 'IBM Plex Mono',ui-monospace,monospace;color:var(--accent);}
+input[type=range]{grid-column:1/-1;width:100%;margin:0;accent-color:var(--accent);}
+.btns{display:flex;gap:8px;margin-top:2px;}
+button{font:600 14px/1 'Instrument Sans',system-ui,sans-serif;padding:10px 16px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer;transition:border-color .15s,filter .15s;}
+button:hover{border-color:var(--muted);}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--paper);}
+button.primary:hover{filter:brightness(1.07);}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+.checks{display:grid;gap:12px;}
+.checks label{display:flex;gap:10px;align-items:center;font-size:14.5px;cursor:pointer;}
+.checks input{width:16px;height:16px;margin:0;accent-color:var(--accent);}
+footer{margin-top:20px;color:var(--muted);font-size:13.5px;max-width:60ch;}
+footer code{font:500 12.5px/1.6 'IBM Plex Mono',ui-monospace,monospace;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:1px 6px;}
+footer p{margin:0 0 6px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Interactive geometry</p>
+    <h1>The 5:1 Ellipse</h1>
+    <p class="lede">An ellipse with a constant major axis spins about its center, while its minor axis oscillates between two values &mdash; at a rate you set, measured in cycles per revolution.</p>
+  </header>
+  <div class="layout">
+    <section class="card stage-card">
+      <div class="stage"><canvas id="scene"></canvas></div>
+      <div class="readout">
+        <div class="chip"><span class="k">Rotation</span><span class="v" id="rotOut">0.0&deg;</span></div>
+        <div class="chip"><span class="k">Minor axis</span><span class="v" id="bOut">90.0 px</span></div>
+        <div class="chip"><span class="k">Ratio</span><span class="v hl" id="ratioOut">5 : 1</span></div>
+      </div>
+    </section>
+    <aside class="card panel">
+      <h2 class="sec">Axes</h2>
+      <div class="row">
+        <label class="name" for="aIn">Semi-major axis <em>a</em> <span class="unit">&middot; constant</span></label>
+        <output class="val" id="aOut">150 px</output>
+        <input type="range" id="aIn" min="40" max="220" step="1" value="150">
+      </div>
+      <div class="row">
+        <label class="name" for="bMinIn">Minor axis lower <em>b<sub>1</sub></em></label>
+        <output class="val" id="bMinOut">45 px</output>
+        <input type="range" id="bMinIn" min="10" max="200" step="1" value="45">
+      </div>
+      <div class="row">
+        <label class="name" for="bMaxIn">Minor axis upper <em>b<sub>2</sub></em></label>
+        <output class="val" id="bMaxOut">90 px</output>
+        <input type="range" id="bMaxIn" min="10" max="220" step="1" value="90">
+      </div>
+      <h2 class="sec">Motion</h2>
+      <div class="row">
+        <label class="name" for="ratioIn">Cycles per revolution <em>n</em></label>
+        <output class="val" id="ratioVal">5 : 1</output>
+        <input type="range" id="ratioIn" min="0.5" max="24" step="0.5" value="5">
+      </div>
+      <div class="row">
+        <label class="name" for="rpmIn">Rotation speed</label>
+        <output class="val" id="rpmOut">18 rpm</output>
+        <input type="range" id="rpmIn" min="2" max="120" step="1" value="18">
+      </div>
+      <div class="btns">
+        <button id="btnPlay" class="primary">Pause</button>
+        <button id="btnReset">Reset</button>
+      </div>
+      <h2 class="sec">Display</h2>
+      <div class="checks">
+        <label><input type="checkbox" id="axesChk" checked> Show axes</label>
+        <label><input type="checkbox" id="traceChk" checked> Show trace of the minor-axis tip</label>
+      </div>
+    </aside>
+  </div>
+  <footer>
+    <p><code>b(&theta;) = (b<sub>1</sub> + b<sub>2</sub>) / 2 + (b<sub>2</sub> &minus; b<sub>1</sub>) / 2 &middot; cos <em>n</em>&theta;</code></p>
+    <p>The orange trace follows the tip of the minor axis and never fades: because <em>b</em> completes <em>n</em> cycles per revolution, it inscribes an <em>n</em>-petal flower (when <em>n</em> is a whole number) while the major axis <em>a</em> stays fixed.</p>
+  </footer>
+</div>
+<script>
+const TRACE_ALPHA = 0.5, BATCH = 240;
+const $ = id => document.getElementById(id);
+const canvas = $('scene'), ctx = canvas.getContext('2d');
+const stage = document.querySelector('.stage');
+const aIn = $('aIn'), aOut = $('aOut'),
+      bMinIn = $('bMinIn'), bMinOut = $('bMinOut'),
+      bMaxIn = $('bMaxIn'), bMaxOut = $('bMaxOut'),
+      ratioIn = $('ratioIn'), ratioVal = $('ratioVal'), ratioOut = $('ratioOut'),
+      rpmIn = $('rpmIn'), rpmOut = $('rpmOut'),
+      btnPlay = $('btnPlay'), btnReset = $('btnReset'),
+      axesChk = $('axesChk'), traceChk = $('traceChk'),
+      rotOut = $('rotOut'), bOut = $('bOut');
+
+const S = { a:150, bMin:45, bMax:90, rpm:18, ratio:5,
+            paused: matchMedia('(prefers-reduced-motion: reduce)').matches,
+            showAxes:true, showTrace:true };
+btnPlay.textContent = S.paused ? 'Play' : 'Pause';
+
+aIn.addEventListener('input', () => {
+  S.a = +aIn.value; aOut.textContent = S.a + ' px';
+  if (S.bMax > S.a) { S.bMax = S.a; bMaxIn.value = S.a; bMaxOut.textContent = S.a + ' px'; }
+});
+bMinIn.addEventListener('input', () => {
+  S.bMin = +bMinIn.value; bMinOut.textContent = S.bMin + ' px';
+  if (S.bMax < S.bMin) { S.bMax = S.bMin; bMaxIn.value = S.bMin; bMaxOut.textContent = S.bMin + ' px'; }
+});
+bMaxIn.addEventListener('input', () => {
+  S.bMax = Math.min(+bMaxIn.value, S.a);
+  bMaxIn.value = S.bMax; bMaxOut.textContent = S.bMax + ' px';
+  if (S.bMin > S.bMax) { S.bMin = S.bMax; bMinIn.value = S.bMax; bMinOut.textContent = S.bMax + ' px'; }
+});
+function fmtRatio(n) { return (n % 1 === 0 ? n : n.toFixed(1)) + ' : 1'; }
+ratioIn.addEventListener('input', () => {
+  S.ratio = +ratioIn.value;
+  ratioVal.textContent = fmtRatio(S.ratio);
+  ratioOut.textContent = fmtRatio(S.ratio);
+});
+rpmIn.addEventListener('input', () => { S.rpm = +rpmIn.value; rpmOut.textContent = S.rpm + ' rpm'; });
+btnPlay.addEventListener('click', () => { S.paused = !S.paused; btnPlay.textContent = S.paused ? 'Play' : 'Pause'; });
+btnReset.addEventListener('click', () => { t = 0; trail.length = 0; tctx.clearRect(0, 0, W, H); });
+axesChk.addEventListener('change', () => S.showAxes = axesChk.checked);
+traceChk.addEventListener('change', () => S.showTrace = traceChk.checked);
+
+let W = 0, H = 0, cx = 0, cy = 0, sc = 1;
+function resize() {
+  const r = stage.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  W = r.width; H = r.height;
+  canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  cx = W / 2; cy = H / 2;
+  const m = Math.min(30, Math.max(14, Math.min(W, H) * 0.045));
+  sc = Math.max(0.05, (Math.min(W, H) / 2 - m) / S.a);
+  if (traceCanvas) { sizeTrace(); replayTrace(); }
+}
+const traceCanvas = document.createElement('canvas');
+const tctx = traceCanvas.getContext('2d');
+new ResizeObserver(resize).observe(stage);
+resize();
+
+const hexRgb = h => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
+const rgba = (h, a) => { const [r, g, b] = hexRgb(h); return 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')'; };
+let pal = {};
+function readPal() {
+  const cs = getComputedStyle(document.documentElement);
+  pal = {
+    accent: cs.getPropertyValue('--accent').trim(),
+    trace: cs.getPropertyValue('--trace').trim(),
+    muted: cs.getPropertyValue('--muted').trim(),
+    ink: cs.getPropertyValue('--ink').trim()
+  };
+  if (traceCanvas) replayTrace();
+}
+readPal();
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', readPal);
+new MutationObserver(readPal).observe(document.documentElement, { attributes:true, attributeFilter:['data-theme'] });
+
+let t = 0, last = null;
+const trail = [];
+const th = tt => 2 * Math.PI * (S.rpm / 60) * tt;
+const bAt = tv => (S.bMax + S.bMin) / 2 + (S.bMax - S.bMin) / 2 * Math.cos(S.ratio * tv);
+
+function sizeTrace() {
+  const dpr = window.devicePixelRatio || 1;
+  traceCanvas.width = canvas.width;
+  traceCanvas.height = canvas.height;
+  tctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  tctx.lineWidth = 2; tctx.lineCap = 'round'; tctx.lineJoin = 'round';
+}
+function replayTrace() {
+  sizeTrace();
+  tctx.clearRect(0, 0, W, H);
+  if (trail.length < 2) return;
+  tctx.strokeStyle = rgba(pal.trace, TRACE_ALPHA);
+  tctx.beginPath();
+  for (let i = 0; i < trail.length; i++) {
+    const p = trail[i];
+    const x = cx - Math.sin(p.th) * p.b * sc;
+    const y = cy + Math.cos(p.th) * p.b * sc;
+    if (i % BATCH === 0) {
+      if (i) tctx.stroke();
+      tctx.beginPath(); tctx.moveTo(x, y);
+    } else {
+      tctx.lineTo(x, y);
+    }
+  }
+  tctx.stroke();
+}
+
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+  const tv = th(t), b = bAt(tv);
+  const ux = Math.cos(tv), uy = Math.sin(tv), vx = -uy, vy = ux;
+
+  if (S.showTrace) ctx.drawImage(traceCanvas, 0, 0, W, H);
+
+  const N = 220;
+  ctx.beginPath();
+  for (let i = 0; i <= N; i++) {
+    const ph = i / N * 2 * Math.PI;
+    const ex = cx + (S.a * Math.cos(ph) * ux - b * Math.sin(ph) * vx) * sc;
+    const ey = cy + (S.a * Math.cos(ph) * uy + b * Math.sin(ph) * vy) * sc;
+    if (i) ctx.lineTo(ex, ey); else ctx.moveTo(ex, ey);
+  }
+  ctx.closePath();
+  ctx.fillStyle = rgba(pal.accent, 0.12);
+  ctx.fill();
+  ctx.lineWidth = 2.5;
+  ctx.strokeStyle = pal.accent;
+  ctx.stroke();
+
+  if (S.showAxes) {
+    ctx.setLineDash([5, 6]);
+    ctx.lineWidth = 1.4;
+    ctx.strokeStyle = rgba(pal.muted, 0.9);
+    ctx.beginPath();
+    ctx.moveTo(cx - S.a * ux * sc, cy - S.a * uy * sc);
+    ctx.lineTo(cx + S.a * ux * sc, cy + S.a * uy * sc);
+    ctx.stroke();
+    ctx.strokeStyle = rgba(pal.accent, 0.55);
+    ctx.beginPath();
+    ctx.moveTo(cx - b * vx * sc, cy - b * vy * sc);
+    ctx.lineTo(cx + b * vx * sc, cy + b * vy * sc);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  ctx.fillStyle = rgba(pal.ink, 0.55);
+  ctx.beginPath(); ctx.arc(cx, cy, 3, 0, 2 * Math.PI); ctx.fill();
+  if (S.showTrace) {
+    ctx.fillStyle = pal.trace;
+    ctx.beginPath(); ctx.arc(cx + b * vx * sc, cy + b * vy * sc, 4.5, 0, 2 * Math.PI); ctx.fill();
+  }
+
+  const deg = ((tv * 180 / Math.PI) % 360 + 360) % 360;
+  rotOut.textContent = deg.toFixed(1) + '°';
+  bOut.textContent = b.toFixed(1) + ' px';
+}
+
+function frame(ms) {
+  const s = ms / 1000;
+  if (last === null) last = s;
+  let dt = Math.min(s - last, 0.1);
+  last = s;
+  if (!S.paused && dt > 0) {
+    const f = S.rpm / 60;
+    const n = Math.max(1, Math.ceil(dt * f * 360));
+    tctx.strokeStyle = rgba(pal.trace, TRACE_ALPHA);
+    for (let i = 1; i <= n; i++) {
+      const tt = t + dt * i / n, tv = th(tt), bb = bAt(tv);
+      const px = cx - Math.sin(tv) * bb * sc, py = cy + Math.cos(tv) * bb * sc;
+      if (trail.length) {
+        const q = trail[trail.length - 1];
+        tctx.beginPath();
+        tctx.moveTo(cx - Math.sin(q.th) * q.b * sc, cy + Math.cos(q.th) * q.b * sc);
+        tctx.lineTo(px, py);
+        tctx.stroke();
+      }
+      trail.push({ th: tv, b: bb });
+    }
+    t += dt;
+  }
+  draw();
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
