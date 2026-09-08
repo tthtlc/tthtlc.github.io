@@ -1,0 +1,17 @@
+<header class="ma-masthead">
+  <div class="ma-masthead-inner">
+    <div class="ma-masthead-top">
+      <div>
+        <h1 class="ma-title"><a href="/">Mathematical <span class="ma-title-accent">Art</span></a></h1>
+        <p class="ma-subtitle">Interactive geometric visualizations</p>
+      </div>
+    </div>
+    <nav class="ma-nav" aria-label="Primary">
+      {% for item in site.data.navigation.main %}
+      {%- assign is_active = false -%}
+      {%- if item.url == page.url -%}{%- assign is_active = true -%}{%- endif -%}
+      <a href="{{ item.url }}"{% if is_active %} class="ma-nav-current"{% endif %}>{{ item.title }}</a>
+      {% endfor %}
+    </nav>
+  </div>
+</header>
