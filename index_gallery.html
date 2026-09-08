@@ -1,263 +1,72 @@
 ---
+layout: none
 title: "Gallery"
 ---
-<div id="gallery-root">
-  <header class="gallery-hero">
-    <h1>Mathematical Art Gallery</h1>
-    <p>
-      {{ site.data.visualization_categories.size }} topics ·
-      {{ site.data.visualizations.size }} interactive pages — every card below is a
-      <em>live snapshot</em> of the real page. Click any card to open the full
-      visualization in a new tab.
-    </p>
-  </header>
+<!DOCTYPE html>
+<html lang="en">
+{% include monograph-head.html %}
+<body>
+{% include monograph-masthead.html %}
 
-  <nav class="cat-nav" aria-label="Categories">
-    {% for cat in site.data.visualization_categories %}
-    <a class="cat-pill" href="#{{ cat.slug }}">{{ cat.emoji }} {{ cat.name }}<span class="pill-count">{{ cat.items.size }}</span></a>
-    {% endfor %}
-  </nav>
-
-  <div class="gallery-search">
-    <input id="gallery-filter" type="search"
-           placeholder="Filter {{ site.data.visualizations.size }} pages — try “hypotrochoid”, “mandelbrot”, “interactive”…"
-           aria-label="Filter visualizations">
-    <span id="gallery-filter-count" class="filter-count" hidden></span>
-  </div>
-
-  {% for cat in site.data.visualization_categories %}
-  <section class="cat-section accent-{{ forloop.index0 | modulo: 8 }}" id="{{ cat.slug }}"
-           data-catname="{{ cat.name | escape }}">
-    <div class="cat-heading">
-      <span class="cat-badge">{{ cat.emoji }}</span>
-      <div>
-        <h2>{{ cat.name }} <span class="cat-count">{{ cat.items.size }}</span></h2>
-        <p class="cat-desc">{{ cat.description }}</p>
-      </div>
-    </div>
-
-    <div class="card-grid">
-      {% for item in cat.items %}
-      <article class="card"
-               data-search="{{ item.file | escape }} {{ item.title | escape }} {{ cat.name | escape }} {{ item.tags | join: ' ' | escape }}">
-        <a class="card-link" href="{{ item.file }}" target="_blank" rel="noopener"
-           title="{{ item.title | escape }} — open full page">
-          <div class="snap">
-            <iframe data-src="{{ item.file }}" width="800" height="600"
-                    title="{{ item.title | escape }} preview" loading="lazy"></iframe>
-            <span class="snap-open">Open ↗</span>
-          </div>
-          <div class="card-body">
-            <h3>{{ item.title }}</h3>
-            <div class="card-tags">
-              {% for tag in item.tags %}<span class="tag">{{ tag }}</span>{% endfor %}
-            </div>
-            <code class="card-file">{{ item.file }}</code>
-          </div>
-        </a>
-      </article>
-      {% endfor %}
-    </div>
-  </section>
-  {% endfor %}
-
-  <p id="gallery-no-results" hidden>No pages match “<span id="gallery-no-results-query"></span>”.</p>
-
-  <footer class="gallery-footer">
-    <p>
-      Categories are generated from <code>_data/visualizations.yml</code> by
-      <code>scripts/categorize_visualizations.py</code> — re-run it after adding new pages.
-    </p>
-  </footer>
+<div class="ma-frontispiece">
+  <h1>Mathematical Art Gallery</h1>
+  <p class="ma-lede">{{ site.data.visualization_categories.size }} topics · {{ site.data.visualizations.size }} interactive pages — every card below is a live snapshot of the real page. Click any card to open the full visualization.</p>
 </div>
 
-<button id="gallery-top" aria-label="Back to top">↑</button>
+<nav class="ma-pills" aria-label="Categories">
+  {% for cat in site.data.visualization_categories %}
+  <a class="ma-pill" href="#{{ cat.slug }}">{{ cat.name }} <span class="ma-pill-count">{{ cat.items.size }}</span></a>
+  {% endfor %}
+</nav>
 
-<style>
-  #gallery-root {
-    --bg: #0b0f1a;
-    --surface: #141b2d;
-    --surface-2: #1b2439;
-    --text: #e8ecf5;
-    --muted: #93a0bb;
-    --border: #26314d;
-    max-width: 1150px;
-    margin: 0 auto;
-    padding: 2.2rem 1rem 3rem;
-    color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  }
+<div class="ma-search">
+  <input id="gallery-filter" type="search"
+         placeholder="Filter {{ site.data.visualizations.size }} pages — try “hypotrochoid”, “mandelbrot”, “interactive”…"
+         aria-label="Filter visualizations">
+  <span id="gallery-filter-count" class="ma-count" hidden></span>
+</div>
 
-  /* ---------- hero ---------- */
-  .gallery-hero {
-    text-align: center;
-    padding: 2rem 1rem 1.4rem;
-    background: radial-gradient(ellipse 70% 90% at 50% -10%, #233055 0%, transparent 70%);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    margin-bottom: 1.6rem;
-  }
-  .gallery-hero h1 {
-    font-size: 2rem;
-    margin: 0 0 0.6rem;
-    background: linear-gradient(90deg, #7dd3fc, #a5b4fc, #f0abfc);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
-  .gallery-hero p { color: var(--muted); max-width: 620px; margin: 0 auto; line-height: 1.6; }
+{% for cat in site.data.visualization_categories %}
+<section class="ma-section" id="{{ cat.slug }}" data-catname="{{ cat.name | escape }}">
+  <div class="ma-section-head">
+    <h2>{{ cat.name }}</h2>
+    <span class="ma-count">{{ cat.items.size }}</span>
+  </div>
+  <p class="ma-section-note">{{ cat.description }}</p>
+  <div class="ma-figure-grid">
+    {% for item in cat.items %}
+    <article class="ma-figure" data-search="{{ item.file | escape }} {{ item.title | escape }} {{ cat.name | escape }} {{ item.tags | join: ' ' | escape }}">
+      <a class="ma-figure-link" href="{{ item.file }}" target="_blank" rel="noopener" title="{{ item.title | escape }} — open full page">
+        <div class="ma-plate">
+          <iframe data-src="{{ item.file }}" loading="lazy" title="{{ item.title | escape }} preview"></iframe>
+          <span class="ma-plate-open">Open</span>
+        </div>
+        <div class="ma-figure-body">
+          <div class="ma-figure-title">{{ item.title }}</div>
+          {% if item.tags.size > 0 %}<div class="ma-tags">{% for tag in item.tags %}<span class="ma-tag">{{ tag }}</span>{% endfor %}</div>{% endif %}
+          <div class="ma-figure-file">Fig. {{ forloop.index }} · {{ item.file }}</div>
+        </div>
+      </a>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% endfor %}
 
-  /* ---------- category pill nav ---------- */
-  .cat-nav {
-    display: flex; flex-wrap: wrap; gap: 0.45rem; justify-content: center;
-    margin-bottom: 1.4rem;
-  }
-  .cat-pill {
-    display: inline-flex; align-items: center; gap: 0.4rem;
-    padding: 0.32rem 0.8rem; border-radius: 999px;
-    background: var(--surface); border: 1px solid var(--border);
-    color: var(--text); text-decoration: none; font-size: 0.82rem;
-    transition: transform .15s ease, border-color .15s ease, background .15s ease;
-  }
-  .cat-pill:hover { transform: translateY(-2px); border-color: #4f6aa8; background: var(--surface-2); }
-  .pill-count {
-    background: #2b3a5e; color: #bcd0ff; border-radius: 999px;
-    padding: 0 0.45rem; font-size: 0.72rem; font-variant-numeric: tabular-nums;
-  }
+<p id="gallery-no-results" class="ma-empty ma-hidden">No pages match “<span id="gallery-no-results-query"></span>”.</p>
 
-  /* ---------- search ---------- */
-  .gallery-search { display: flex; gap: 0.75rem; align-items: center; margin-bottom: 1.6rem; }
-  #gallery-filter {
-    flex: 1; padding: 0.65rem 1rem; border-radius: 10px;
-    border: 1px solid var(--border); background: var(--surface); color: var(--text);
-    font-size: 0.95rem;
-  }
-  #gallery-filter:focus { outline: none; border-color: #5b7fd4; box-shadow: 0 0 0 3px rgba(91,127,212,.25); }
-  .filter-count { color: var(--muted); font-size: 0.85rem; white-space: nowrap; }
+<button id="gallery-top" aria-label="Back to top"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 15l7-7 7 7"/></svg></button>
 
-  /* ---------- category sections ---------- */
-  .cat-section {
-    margin: 2.6rem 0 1rem;
-    padding: 1.5rem 1.2rem 1.8rem;
-    background: linear-gradient(180deg, var(--surface) 0%, transparent 260px);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    scroll-margin-top: 1rem;
-  }
-  .cat-heading { display: flex; gap: 1rem; align-items: flex-start; margin-bottom: 0.4rem; }
-  .cat-badge {
-    flex: none; width: 3rem; height: 3rem; display: grid; place-items: center;
-    font-size: 1.6rem; border-radius: 12px;
-    background: color-mix(in srgb, var(--accent) 18%, var(--surface));
-    border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
-  }
-  .cat-heading h2 { margin: 0; font-size: 1.35rem; }
-  .cat-count {
-    font-size: 0.8rem; vertical-align: middle; color: var(--muted);
-    background: var(--surface-2); border-radius: 999px; padding: 0.1rem 0.55rem;
-  }
-  .cat-desc { color: var(--muted); margin: 0.35rem 0 1rem; max-width: 62ch; line-height: 1.55; }
-
-  /* per-category accent palette */
-  .accent-0 { --accent: #60a5fa; }  /* blue     */
-  .accent-1 { --accent: #34d399; }  /* green    */
-  .accent-2 { --accent: #f472b6; }  /* pink     */
-  .accent-3 { --accent: #fbbf24; }  /* amber    */
-  .accent-4 { --accent: #a78bfa; }  /* violet   */
-  .accent-5 { --accent: #22d3ee; }  /* cyan     */
-  .accent-6 { --accent: #fb7185; }  /* rose     */
-  .accent-7 { --accent: #4ade80; }  /* lime     */
-
-  /* ---------- cards ---------- */
-  .card-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(215px, 1fr));
-    gap: 1rem;
-  }
-  .card {
-    background: var(--surface-2);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    overflow: hidden;
-    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
-  }
-  .card:hover {
-    transform: translateY(-4px);
-    border-color: var(--accent);
-    box-shadow: 0 10px 26px rgba(0,0,0,.45), 0 0 0 1px color-mix(in srgb, var(--accent) 35%, transparent);
-  }
-  .card-link { display: block; text-decoration: none; color: inherit; }
-
-  /* live snapshot: 800x600 iframe scaled 0.25 -> 200x150 */
-  .snap {
-    position: relative;
-    height: 150px;
-    overflow: hidden;
-    background: #fff;               /* most pages draw on light canvas */
-    border-bottom: 1px solid var(--border);
-  }
-  .snap iframe {
-    position: absolute; top: 0; left: 50%;
-    transform: translateX(-50%) scale(0.25);
-    transform-origin: top center;
-    border: 0;
-    pointer-events: none;           /* click goes to the card link */
-  }
-  .snap-open {
-    position: absolute; right: 0.5rem; bottom: 0.5rem;
-    padding: 0.2rem 0.6rem; border-radius: 8px;
-    background: rgba(11,15,26,.82); color: #fff; font-size: 0.75rem;
-    opacity: 0; transform: translateY(4px);
-    transition: opacity .18s ease, transform .18s ease;
-  }
-  .card:hover .snap-open { opacity: 1; transform: translateY(0); }
-
-  .card-body { padding: 0.7rem 0.8rem 0.8rem; }
-  .card-body h3 {
-    margin: 0 0 0.45rem; font-size: 0.88rem; line-height: 1.35;
-    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
-    overflow: hidden; min-height: 2.4em;
-  }
-  .card-tags { display: flex; flex-wrap: wrap; gap: 0.3rem; min-height: 1.2rem; margin-bottom: 0.45rem; }
-  .tag {
-    font-size: 0.68rem; padding: 0.1rem 0.5rem; border-radius: 999px;
-    background: color-mix(in srgb, var(--accent) 16%, var(--surface));
-    color: color-mix(in srgb, var(--accent) 70%, #fff);
-    border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
-  }
-  .card-file {
-    display: block; font-size: 0.7rem; color: var(--muted);
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
-
-  /* ---------- footer / misc ---------- */
-  .gallery-footer { text-align: center; color: var(--muted); font-size: 0.82rem; margin-top: 3rem; }
-  #gallery-no-results { text-align: center; color: var(--muted); padding: 2rem; }
-  #gallery-top {
-    position: fixed; right: 1.2rem; bottom: 1.2rem; z-index: 30;
-    width: 2.6rem; height: 2.6rem; border-radius: 50%;
-    border: 1px solid var(--border); background: var(--surface-2); color: var(--text);
-    font-size: 1.1rem; cursor: pointer; opacity: 0; pointer-events: none;
-    transition: opacity .2s ease;
-  }
-  #gallery-top.visible { opacity: .9; pointer-events: auto; }
-  #gallery-top:hover { opacity: 1; }
-  .card.hidden, .cat-section.hidden { display: none; }
-  html { scroll-behavior: smooth; }
-</style>
+{% include monograph-footer.html %}
 
 <script>
   (function () {
-    // ---------- lazy-load live snapshots only when near the viewport ----------
-    var frames = document.querySelectorAll('.snap iframe[data-src]');
+    var frames = document.querySelectorAll('.ma-plate iframe[data-src]');
     if ('IntersectionObserver' in window) {
       var io = new IntersectionObserver(function (entries) {
         entries.forEach(function (entry) {
           if (entry.isIntersecting) {
-            var f = entry.target;
-            f.src = f.dataset.src;
-            f.removeAttribute('data-src');
-            io.unobserve(f);
+            var f = entry.target; f.src = f.dataset.src; f.removeAttribute('data-src'); io.unobserve(f);
           }
         });
       }, { rootMargin: '600px 0px' });
@@ -266,7 +75,6 @@ title: "Gallery"
       frames.forEach(function (f) { f.src = f.dataset.src; });
     }
 
-    // ---------- filter by title, filename, tags or category ----------
     var input = document.getElementById('gallery-filter');
     var count = document.getElementById('gallery-filter-count');
     var noResults = document.getElementById('gallery-no-results');
@@ -274,32 +82,31 @@ title: "Gallery"
 
     input.addEventListener('input', function () {
       var q = input.value.trim().toLowerCase();
-      var sections = document.querySelectorAll('.cat-section');
+      var sections = document.querySelectorAll('.ma-section');
       var visible = 0;
 
       sections.forEach(function (section) {
-        var cards = section.querySelectorAll('.card');
+        var cards = section.querySelectorAll('.ma-figure');
         var shown = 0;
         cards.forEach(function (card) {
-          var hit = !q || card.dataset.search.toLowerCase().indexOf(q) !== -1;
-          card.classList.toggle('hidden', !hit);
+          var hit = !q || (card.dataset.search || '').toLowerCase().indexOf(q) !== -1;
+          card.classList.toggle('ma-hidden', !hit);
           if (hit) { shown++; visible++; }
         });
-        section.classList.toggle('hidden', shown === 0);
+        section.classList.toggle('ma-hidden', shown === 0);
       });
 
       if (q) {
         count.hidden = false;
         count.textContent = visible + ' page' + (visible === 1 ? '' : 's');
-        noResults.hidden = visible > 0;
+        noResults.classList.toggle('ma-hidden', visible > 0);
         noResultsQuery.textContent = input.value;
       } else {
         count.hidden = true;
-        noResults.hidden = true;
+        noResults.classList.add('ma-hidden');
       }
     });
 
-    // ---------- back-to-top button ----------
     var topBtn = document.getElementById('gallery-top');
     window.addEventListener('scroll', function () {
       topBtn.classList.toggle('visible', window.scrollY > 600);
@@ -309,3 +116,5 @@ title: "Gallery"
     });
   })();
 </script>
+</body>
+</html>

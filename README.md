@@ -9,8 +9,18 @@ This site is built with [Jekyll](https://jekyllrb.com/) and the
 ## Adding a visualization
 
 1. Drop the self-contained `.html` file at the repository root (or a subfolder).
-2. Add its path to `_data/visualizations.yml`.
-3. The shell pages (`/`, `/index_search.html`, `/index_spa.html`, `/index_all.html`)
+2. Add the shared stylesheet as the first line inside `<head>` so the page inherits
+   the site's Monograph skin:
+
+   ```html
+   <link rel="stylesheet" href="/assets/math-art.css">
+   ```
+
+   Place it before the page's own `<style>` — the page's inline styles then still win
+   where they differ, while the shared base (serif type, paper ground, hairline plate
+   frame) carries through.
+3. Add its path to `_data/visualizations.yml`.
+4. The shell pages (`/`, `/index_search.html`, `/index_spa.html`, `/index_all.html`)
    generate their file lists from that data file at build time.
 
 ## Visualizations

@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <link rel="stylesheet" href="/assets/math-art.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dynamic Complex Line Drawing</title>
@@ -24,9 +25,7 @@
             background-color: #333;
             margin-bottom: 20px;
         }
-        #gitalk-container {
-            width: 600px;
-        }
+        
     </style>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-GEX61LPT08"></script>
@@ -40,7 +39,7 @@
 <body>
     <div class="canvas-container">
         <canvas id="complexLineCanvas" width="600" height="600"></canvas>
-        <div id="gitalk-container"></div>
+        
     </div>
     
     <script>
@@ -91,23 +90,6 @@
         drawComplexPattern();
     </script>
 
-    <!-- Gitalk link -->
-    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
-    <script src="https://unpkg.com/gitalk@latest/dist/gitalk.min.js"></script>
-    <!-- Include md5 library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-md5/2.10.0/js/md5.min.js"></script>
-    <script type="text/javascript">
-        var gitalk = new Gitalk({
-            clientID: 'Ov23lixOB0KjXtg08eAj',
-            clientSecret: 'a3a33cad9733049a39849d54e99e69f70f69d1c1',
-            repo: 'tthtlc.github.io',
-            owner: 'tthtlc',
-            admin: ['tthtlc'],
-            distractionFreeMode: true,
-    	    id: md5(location.pathname),
-        });
-        gitalk.render('gitalk-container');
-    </script>
-</body>
+    </body>
 </html>
 

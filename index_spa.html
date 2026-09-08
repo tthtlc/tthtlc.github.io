@@ -1,76 +1,49 @@
 ---
+layout: none
 title: "Random Picks"
 ---
+<!DOCTYPE html>
+<html lang="en">
+{% include monograph-head.html %}
+<body>
+{% include monograph-masthead.html %}
+
+<section class="ma-section">
+  <div class="ma-section-head">
+    <h2>Random picks</h2>
+  </div>
+  <p class="ma-section-note">Scroll for more — each figure is chosen at random from the collection.</p>
+</section>
+
 <div id="iframeList"></div>
 
-<style>
-    .iframe-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center; /* Center content horizontally */
-        margin-bottom: 40px; /* Space between containers */
-    }
-    .filename {
-        font-size: 18px;
-        font-weight: bold;
-        text-align: center;
-        margin: 10px 0;
-    }
-    iframe {
-        width: 80%;  /* Set width of iframe to 80% of viewport width */
-        height: 600px;
-        border: none;
-    }
-</style>
+{% include monograph-footer.html %}
 
 <script>
-document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
-    // Master list of HTML files (URLs) to load
-    const masterList = [
-{% for f in site.data.visualizations %}'{{ f }}',
-{% endfor %}    ];
+  document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
+  const masterList = [{% for f in site.data.visualizations %}'{{ f }}',{% endfor %}];
 
-    // Function to get a random element from the master list
-    function getRandomHtml() {
-        const randomIndex = Math.floor(Math.random() * masterList.length);
-        return masterList[randomIndex];
-    }
+  function getRandomHtml() {
+    return masterList[Math.floor(Math.random() * masterList.length)];
+  }
 
-    // Function to load and append an iframe with a random HTML file
-    function loadIframe() {
-        const iframeContainer = document.createElement('div');
-        iframeContainer.classList.add('iframe-container');
+  function loadIframe() {
+    const url = getRandomHtml();
+    const fileName = url.split('/').pop();
+    const wrap = document.createElement('div');
+    wrap.className = 'ma-wide';
+    wrap.innerHTML =
+      '<p class="ma-wide-caption">Figure · <a href="' + url + '" target="_blank" rel="noopener">' + fileName + '</a></p>' +
+      '<iframe src="' + url + '" title="' + fileName + '"></iframe>';
+    document.getElementById('iframeList').appendChild(wrap);
+  }
 
-        const url = getRandomHtml();
-        const fileName = url.split('/').pop(); // Extracts the file name from the URL
+  for (let i = 0; i < 3; i++) { loadIframe(); }
 
-        // Create and add the filename element above the iframe as a hyperlink
-        const fileNameTag = document.createElement('p');
-        fileNameTag.classList.add('filename');
-        fileNameTag.innerHTML = `Loading: <a href="${url}">${fileName}</a>`;  // Hyperlinked filename
-
-        const iframe = document.createElement('iframe');
-        iframe.src = url;
-
-        // Append the filename tag and iframe to the container
-        iframeContainer.appendChild(fileNameTag);
-        iframeContainer.appendChild(iframe);
-
-        // Append the container to the main list
-        document.getElementById('iframeList').appendChild(iframeContainer);
-    }
-
-    // Load initial iframes
-    for (let i = 0; i < 3; i++) {
-        loadIframe();
-    }
-
-    // Detect when user scrolls near the bottom of the page and load more iframes
-    window.addEventListener('scroll', () => {
-        const nearBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 100;
-
-        if (nearBottom) {
-            loadIframe();  // Load one more iframe when the bottom is reached
-        }
-    });
+  window.addEventListener('scroll', () => {
+    const nearBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 200;
+    if (nearBottom) { loadIframe(); }
+  });
 </script>
+</body>
+</html>

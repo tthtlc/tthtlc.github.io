@@ -1,77 +1,47 @@
 ---
+layout: none
 title: "All Visualizations"
 ---
+<!DOCTYPE html>
+<html lang="en">
+{% include monograph-head.html %}
+<body>
+{% include monograph-masthead.html %}
+
+<section class="ma-section">
+  <div class="ma-section-head">
+    <h2>All visualizations</h2>
+  </div>
+  <p class="ma-section-note">Every figure in the collection, in order. Scroll to load more.</p>
+</section>
+
 <div id="iframeList"></div>
 
-<style>
-    .iframe-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center; /* Center content horizontally */
-        margin-bottom: 40px; /* Space between containers */
-    }
-    .filename {
-        font-size: 18px;
-        font-weight: bold;
-        text-align: center;
-        margin: 10px 0;
-    }
-    iframe {
-        width: 80%;  /* Set width of iframe to 80% of viewport width */
-        height: 600px;
-        border: none;
-    }
-</style>
+{% include monograph-footer.html %}
 
 <script>
-    // Master list of HTML files (URLs) to load
-    const masterList = [
-{% for f in site.data.visualizations %}'{{ f }}',
-{% endfor %}    ];
+  const masterList = [{% for f in site.data.visualizations %}'{{ f }}',{% endfor %}];
+  let loadIndex = 0;
 
-    let loadIndex = 0; // Keeps track of the current file to load
+  function loadIframe() {
+    if (loadIndex >= masterList.length) { return; }
+    const url = masterList[loadIndex];
+    const fileName = url.split('/').pop();
+    const wrap = document.createElement('div');
+    wrap.className = 'ma-wide';
+    wrap.innerHTML =
+      '<p class="ma-wide-caption">Figure ' + (loadIndex + 1) + ' · <a href="' + url + '" target="_blank" rel="noopener">' + fileName + '</a></p>' +
+      '<iframe src="' + url + '" loading="lazy" title="' + fileName + '"></iframe>';
+    document.getElementById('iframeList').appendChild(wrap);
+    loadIndex++;
+  }
 
-    // Function to load and append an iframe with the next HTML file
-    function loadIframe() {
-        if (loadIndex >= masterList.length) {
-            return; // Stop if all files are loaded
-        }
+  for (let i = 0; i < 3; i++) { loadIframe(); }
 
-        const iframeContainer = document.createElement('div');
-        iframeContainer.classList.add('iframe-container');
-
-        const url = masterList[loadIndex]; // Get the next file to load
-        const fileName = url.split('/').pop(); // Extract the file name from the URL
-
-        // Create and add the filename element above the iframe as a hyperlink
-        const fileNameTag = document.createElement('p');
-        fileNameTag.classList.add('filename');
-        fileNameTag.innerHTML = `Loading: <a href="${url}" target="_blank">${fileName}</a>`; // Hyperlinked filename
-
-        const iframe = document.createElement('iframe');
-        iframe.src = url;
-
-        // Append the filename tag and iframe to the container
-        iframeContainer.appendChild(fileNameTag);
-        iframeContainer.appendChild(iframe);
-
-        // Append the container to the main list
-        document.getElementById('iframeList').appendChild(iframeContainer);
-
-        loadIndex++; // Move to the next file in the list
-    }
-
-    // Load initial iframes
-    for (let i = 0; i < 3; i++) {
-        loadIframe();
-    }
-
-    // Detect when user scrolls near the bottom of the page and load more iframes
-    window.addEventListener('scroll', () => {
-        const nearBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 100;
-
-        if (nearBottom) {
-            loadIframe(); // Load one more iframe when the bottom is reached
-        }
-    });
+  window.addEventListener('scroll', () => {
+    const nearBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 200;
+    if (nearBottom) { loadIframe(); }
+  });
 </script>
+</body>
+</html>

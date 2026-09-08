@@ -1,47 +1,28 @@
 ---
+layout: none
 title: "To Do"
 ---
-<div class="canvas-container">
-<div id="master-list-container" class="frame-container"></div>
+<!DOCTYPE html>
+<html lang="en">
+{% include monograph-head.html %}
+<body>
+{% include monograph-masthead.html %}
 
-<div id="gitalk-container"></div>
-</div>
+<section class="ma-section">
+  <div class="ma-section-head">
+    <h2>To Do</h2>
+  </div>
+  <p class="ma-section-note">Figures in progress — explore pages being worked on.</p>
+  <div id="master-list-container" class="ma-figure-grid"></div>
+</section>
 
-<style>
-    .frame-container {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 10px;
-        margin-top: 20px;
-    }
-    .frame-item {
-        border: 1px solid #ccc;
-        padding: 10px;
-        text-align: center;
-    }
-    iframe {
-        width: 100%;
-        height: 300px;
-        border: none;
-    }
-    .label-link {
-        font-weight: bold;
-        margin-bottom: 10px;
-        display: block;
-    }
-    .canvas-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-     }
-    #gitalk-container {
-        width: 600px;
-    }
-</style>
+<div class="ma-notes">{% include gitalk.html %}</div>
+
+{% include monograph-footer.html %}
 
 <script>
-    document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
-    const htmlFiles = [
+  document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
+  const htmlFiles = [
 'chopstick_explore.html',
 'double_hypotrochoid_explore.html',
 'double_hypotrochoid_moving_offset_explore.html',
@@ -67,61 +48,48 @@ title: "To Do"
 'triangle_sinusoidal_moving_color_background_explore.html',
 'triangle_sinusoidal_moving_color_explore.html',
 'vortex_explore.html',
-    ];
+  ];
 
-    // Function to render a list of HTML files
-    function renderHtmlFiles(fileList, containerId) {
-        const container = document.getElementById(containerId);
-        fileList.forEach(file => {
-            const frameItem = document.createElement('div');
-            frameItem.className = 'frame-item';
-
-            const link = document.createElement('a');
-            link.href = file;
-            link.target = '_blank';
-            link.textContent = file;
-            link.className = 'label-link';
-
-            const iframe = document.createElement('iframe');
-            iframe.src = file;
-
-            frameItem.appendChild(link);
-            frameItem.appendChild(iframe);
-            container.appendChild(frameItem);
+  function pretty(f) {
+    return f.replace(/\.html$/, '').replace(/[_-]/g, ' ').replace(/\b\w/g, function (c) { return c.toUpperCase(); });
+  }
+  function renderHtmlFiles(fileList, containerId) {
+    const container = document.getElementById(containerId);
+    fileList.forEach((file, idx) => {
+      const fig = document.createElement('div');
+      fig.className = 'ma-figure';
+      const a = document.createElement('a');
+      a.className = 'ma-figure-link';
+      a.href = file;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.innerHTML =
+        '<div class="ma-plate"><iframe data-src="' + file + '" loading="lazy" title="' + file + ' preview"></iframe><span class="ma-plate-open">Open</span></div>' +
+        '<div class="ma-figure-body"><div class="ma-figure-title">' + pretty(file) + '</div>' +
+        '<div class="ma-figure-file">Fig. ' + (idx + 1) + ' · ' + file + '</div></div>';
+      fig.appendChild(a);
+      container.appendChild(fig);
+    });
+    const frames = container.querySelectorAll('iframe[data-src]');
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) {
+            const f = e.target; f.src = f.dataset.src; f.removeAttribute('data-src'); io.unobserve(f);
+          }
         });
+      }, { rootMargin: '400px 0px' });
+      frames.forEach(function (f) { io.observe(f); });
+    } else {
+      frames.forEach(function (f) { f.src = f.dataset.src; });
     }
+  }
 
-    // Filter out only the 'explore.html' files for the master list
-    //const exploreFiles = htmlFiles.filter(file => file.includes('explore'));
-    const exploreFiles1 = getRandomFiles(htmlFiles, 8, 'AAAAAAA');
-    renderHtmlFiles(exploreFiles1, 'master-list-container');
+  function getRandomFiles(arr, num, ex) {
+    return arr.filter(f => !f.includes(ex)).sort(() => 0.5 - Math.random()).slice(0, num);
+  }
 
-    // Randomly select 12 other HTML files
-    function getRandomFiles(arr, num, file_to_exclude) {
-        const shuffled = arr.filter(file => !file.includes(file_to_exclude)).sort(() => 0.5 - Math.random());
-        return shuffled.slice(0, num);
-    }
-
+  renderHtmlFiles(getRandomFiles(htmlFiles, 8, 'AAAAAAA'), 'master-list-container');
 </script>
-
-<!-- Gitalk link  -->
-<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
-<script src="https://unpkg.com/gitalk@latest/dist/gitalk.min.js"></script>
-<!-- Include md5 library -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-md5/2.10.0/js/md5.min.js"></script>
-
-<div id="gitalk-container"></div>
-<script type="text/javascript">
-var gitalk = new Gitalk({
-clientID: 'Ov23lixOB0KjXtg08eAj',
-clientSecret: 'a3a33cad9733049a39849d54e99e69f70f69d1c1',
-repo: 'tthtlc.github.io',
-owner: 'tthtlc',
-admin: ['tthtlc'],
-distractionFreeMode: true,
-id: md5(location.pathname),
-});
-gitalk.render('gitalk-container');
-</script>
-
-<!-- Gitalk end -->
+</body>
+</html>

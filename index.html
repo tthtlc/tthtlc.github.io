@@ -1,113 +1,92 @@
 ---
+layout: none
+title: "Mathematical Art"
 ---
-<div class="canvas-container">
-<h1>Mathematical Art</h1>
-<p>Explore randomly picked interactive webpages featuring dynamic geometry and animations.</p>
-<p><a href="/index_gallery.html" style="display:inline-block; padding:10px 22px; background:#0b1020; color:#fff; border-radius:8px; text-decoration:none; font-weight:bold;">🗂 Browse the full gallery — {{ site.data.visualizations.size }} pages by topic →</a></p>
+<!DOCTYPE html>
+<html lang="en">
+{% include monograph-head.html %}
+<body>
+{% include monograph-masthead.html %}
 
-<h2>Curves for further exploration</h2>
-<div id="master-list-container" class="frame-container"></div>
-
-<h2>Randomly Selected Curves</h2>
-
-<!-- Randomly selected HTML files -->
-<div id="random-list-container" class="frame-container"></div>
-<div id="gitalk-container"></div>
+<div class="ma-frontispiece">
+  <h1>Mathematical <em>Art</em></h1>
+  <p class="ma-lede">A collection of interactive webpages — dynamic geometry, curves, fractals, and animations — each a working figure you can open and play.</p>
+  <div class="ma-actions">
+    <a class="ma-action ma-action-primary" href="/index_gallery.html">Browse the full gallery — {{ site.data.visualizations.size }} pages by topic →</a>
+    <a class="ma-action" href="/index_search.html">Search the collection</a>
+  </div>
+  <div class="ma-ornament" aria-hidden="true"><span class="ma-diamond"></span></div>
 </div>
 
-<style>
-    .frame-container {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 10px;
-        margin-top: 20px;
-    }
-    .frame-item {
-        border: 1px solid #ccc;
-        padding: 10px;
-        text-align: center;
-    }
-    iframe {
-        width: 100%;
-        height: 300px;
-        border: none;
-    }
-    .label-link {
-        font-weight: bold;
-        margin-bottom: 10px;
-        display: block;
-    }
-    .canvas-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-     }
-    #gitalk-container {
-        width: 600px;
-    }
-</style>
+<section class="ma-section">
+  <div class="ma-section-head">
+    <h2>Curves for further exploration</h2>
+  </div>
+  <div id="master-list-container" class="ma-figure-grid"></div>
+</section>
+
+<section class="ma-section">
+  <div class="ma-section-head">
+    <h2>Randomly selected curves</h2>
+  </div>
+  <div id="random-list-container" class="ma-figure-grid"></div>
+</section>
+
+<div class="ma-notes">{% include gitalk.html %}</div>
+
+{% include monograph-footer.html %}
 
 <script>
-    document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
-    const htmlFiles = [
-{% for f in site.data.visualizations %}'{{ f }}',
-{% endfor %}    ];
+  document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
+  const htmlFiles = [{% for f in site.data.visualizations %}'{{ f }}',{% endfor %}];
 
-    // Function to render a list of HTML files
-    function renderHtmlFiles(fileList, containerId) {
-        const container = document.getElementById(containerId);
-        fileList.forEach(file => {
-            const frameItem = document.createElement('div');
-            frameItem.className = 'frame-item';
-
-            const link = document.createElement('a');
-            link.href = file;
-            link.target = '_blank';
-            link.textContent = file;
-            link.className = 'label-link';
-
-            const iframe = document.createElement('iframe');
-            iframe.src = file;
-
-            frameItem.appendChild(link);
-            frameItem.appendChild(iframe);
-            container.appendChild(frameItem);
+  function lazyLoad(root) {
+    const frames = root.querySelectorAll('iframe[data-src]');
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) {
+            const f = e.target; f.src = f.dataset.src; f.removeAttribute('data-src'); io.unobserve(f);
+          }
         });
+      }, { rootMargin: '400px 0px' });
+      frames.forEach(function (f) { io.observe(f); });
+    } else {
+      frames.forEach(function (f) { f.src = f.dataset.src; });
     }
+  }
 
-    // Filter out only the 'explore.html' files for the master list
-    const exploreFiles = htmlFiles.filter(file => file.includes('explore'));
-    const exploreFiles1 = getRandomFiles(exploreFiles, 4, 'AAAAAAA');
-    renderHtmlFiles(exploreFiles1, 'master-list-container');
+  function pretty(f) {
+    return f.replace(/\.html$/, '').replace(/[_-]/g, ' ').replace(/\b\w/g, function (c) { return c.toUpperCase(); });
+  }
+  function renderHtmlFiles(fileList, containerId) {
+    const container = document.getElementById(containerId);
+    fileList.forEach(function (file, idx) {
+      const fig = document.createElement('div');
+      fig.className = 'ma-figure';
+      const a = document.createElement('a');
+      a.className = 'ma-figure-link';
+      a.href = file;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.innerHTML =
+        '<div class="ma-plate"><iframe data-src="' + file + '" loading="lazy" title="' + file + ' preview"></iframe><span class="ma-plate-open">Open</span></div>' +
+        '<div class="ma-figure-body"><div class="ma-figure-title">' + pretty(file) + '</div>' +
+        '<div class="ma-figure-file">Fig. ' + (idx + 1) + ' · ' + file + '</div></div>';
+      fig.appendChild(a);
+      container.appendChild(fig);
+    });
+    lazyLoad(container);
+  }
 
-    // Randomly select 12 other HTML files
-    function getRandomFiles(arr, num, file_to_exclude) {
-        const shuffled = arr.filter(file => !file.includes(file_to_exclude)).sort(() => 0.5 - Math.random());
-        return shuffled.slice(0, num);
-    }
+  function getRandomFiles(arr, num, ex) {
+    return arr.filter(function (f) { return !f.includes(ex); })
+              .sort(function () { return 0.5 - Math.random(); })
+              .slice(0, num);
+  }
 
-    const randomFiles = getRandomFiles(htmlFiles, 4, 'explore');
-    renderHtmlFiles(randomFiles, 'random-list-container');
+  renderHtmlFiles(getRandomFiles(htmlFiles.filter(function (f) { return f.includes('explore'); }), 4, 'AAAAAAA'), 'master-list-container');
+  renderHtmlFiles(getRandomFiles(htmlFiles.filter(function (f) { return !f.includes('explore'); }), 4, 'explore'), 'random-list-container');
 </script>
-
-<!-- Gitalk link  -->
-<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
-<script src="https://unpkg.com/gitalk@latest/dist/gitalk.min.js"></script>
-<!-- Include md5 library -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-md5/2.10.0/js/md5.min.js"></script>
-
-<div id="gitalk-container"></div>
-<script type="text/javascript">
-var gitalk = new Gitalk({
-clientID: 'Ov23lixOB0KjXtg08eAj',
-clientSecret: 'a3a33cad9733049a39849d54e99e69f70f69d1c1',
-repo: 'tthtlc.github.io',
-owner: 'tthtlc',
-admin: ['tthtlc'],
-distractionFreeMode: true,
-id: md5(location.pathname),
-});
-gitalk.render('gitalk-container');
-</script>
-
-<!-- Gitalk end -->
+</body>
+</html>
