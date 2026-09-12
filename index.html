@@ -31,6 +31,40 @@ title: "Mathematical Art"
 
 <section class="ma-section">
   <div class="ma-section-head">
+    <h2>Featured — Boy's Surfaces</h2>
+    <span class="ma-count">2</span>
+  </div>
+  <p class="ma-section-note">Two new interactive minimal surfaces, now a class of their own in the gallery. Drag to rotate and scroll to zoom.</p>
+  <div id="featured-grid" class="ma-figure-grid">
+    <article class="ma-figure">
+      <a class="ma-figure-link" href="interactive_boy_surface.html" target="_blank" rel="noopener" title="Interactive Boy's Surface — open full page">
+        <div class="ma-plate">
+          <iframe data-src="interactive_boy_surface.html" loading="lazy" title="Interactive Boy's Surface preview"></iframe>
+          <span class="ma-plate-open">Open</span>
+        </div>
+        <div class="ma-figure-body">
+          <div class="ma-figure-title">Interactive Boy's Surface</div>
+          <div class="ma-figure-file">interactive_boy_surface.html</div>
+        </div>
+      </a>
+    </article>
+    <article class="ma-figure">
+      <a class="ma-figure-link" href="interactive_boy_surface_gradient_mesh.html" target="_blank" rel="noopener" title="Interactive Boy's Surface — Gradient Mesh — open full page">
+        <div class="ma-plate">
+          <iframe data-src="interactive_boy_surface_gradient_mesh.html" loading="lazy" title="Interactive Boy's Surface — Gradient Mesh preview"></iframe>
+          <span class="ma-plate-open">Open</span>
+        </div>
+        <div class="ma-figure-body">
+          <div class="ma-figure-title">Interactive Boy's Surface — Gradient Mesh</div>
+          <div class="ma-figure-file">interactive_boy_surface_gradient_mesh.html</div>
+        </div>
+      </a>
+    </article>
+  </div>
+</section>
+
+<section class="ma-section">
+  <div class="ma-section-head">
     <h2>Curves for further exploration</h2>
   </div>
   <div id="master-list-container" class="ma-figure-grid"></div>
@@ -98,6 +132,7 @@ title: "Mathematical Art"
 
   renderHtmlFiles(getRandomFiles(htmlFiles.filter(function (f) { return f.includes('explore'); }), 4, 'AAAAAAA'), 'master-list-container');
   renderHtmlFiles(getRandomFiles(htmlFiles.filter(function (f) { return !f.includes('explore'); }), 4, 'explore'), 'random-list-container');
+  lazyLoad(document.getElementById('featured-grid'));
 </script>
 </body>
 </html>

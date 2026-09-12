@@ -48,6 +48,10 @@ CATEGORIES = [
      "Platonic solids, Möbius strips and tessellations.",
      [r"enneper", r"klein", r"torus", r"sphere", r"spherical", r"icosahedron",
       r"dodecahedron", r"rhombic", r"mobius", r"tessellation"]),
+    ("minimal-surfaces", "Minimal Surfaces", "🫧",
+     "Soap-film-like minimal surfaces and their immersions — Boy's surface and "
+     "other zero-mean-curvature forms rendered as interactive meshes.",
+     [r"boy", r"gyroid", r"schwarz", r"neovius", r"minimal"]),
     ("waves", "Waves & Oscillations", "🌊",
      "Sine waves, square waves and sinusoidal ribbons — oscillation drawn in "
      "animated color.",
@@ -93,7 +97,7 @@ CATEGORIES = [
 ]
 
 TAG_RULES = [
-    (r"explore", "Interactive"),
+    (r"explore|interactive", "Interactive"),
     (r"_game", "Game"),
     (r"animated|animate", "Animated"),
     (r"rotating|rotate|revolving", "Rotating"),

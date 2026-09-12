@@ -739,8 +739,12 @@
     title: Resizable Rhombic Dodecahedron
     tags: []
   - file: rhombicIcosahedron.html
-    title: Rhombic Icosahedron with Vertex Indices
+    title: Rhombic Icosahedron — Random Tumble
     tags: []
+  - file: rotating_rhombic_icosahedron.html
+    title: Rotating Rhombic Icosahedron
+    tags:
+    - Rotating
   - file: sinusoidal_on_sphere_explore.html
     title: Cardioid Shape
     tags:
@@ -782,6 +786,21 @@
   - file: truncated_dodecahedron_one_corner.html
     title: Truncated Dodecahedron Line Graphics
     tags: []
+- name: Minimal Surfaces
+  slug: minimal-surfaces
+  emoji: 🫧
+  description: Soap-film-like minimal surfaces and their immersions — Boy's surface and other zero-mean-curvature
+    forms rendered as interactive meshes.
+  items:
+  - file: interactive_boy_surface.html
+    title: Interactive Boy's Surface
+    tags:
+    - Interactive
+  - file: interactive_boy_surface_gradient_mesh.html
+    title: Interactive Boy's Surface — Gradient Mesh
+    tags:
+    - Interactive
+    - Gradient
 - name: Waves & Oscillations
   slug: waves
   emoji: 🌊
@@ -1320,6 +1339,10 @@
   emoji: 📦
   description: Test pages and one-off experiments that don't fit elsewhere.
   items:
+  - file: rotating_zonohedra.html
+    title: Rotating Zonohedra
+    tags:
+    - Rotating
   - file: square1.html
     title: Square Animation
     tags: []
