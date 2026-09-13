@@ -1,0 +1,29 @@
+---
+layout: none
+---
+<!DOCTYPE html>
+<html lang="en">
+{% include monograph-head.html %}
+{% if page.mathjax %}
+<script>window.MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] } };</script>
+<script type="text/javascript" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+{% endif %}
+{% include blog-styles.html %}
+<body>
+{% include monograph-masthead.html %}
+<main class="ma-article">
+  <header class="ma-article-head">
+    <p class="ma-article-kicker">{{ page.date | date: "%d %B %Y" }}{% if page.categories %} · {{ page.categories | join: " · " }}{% endif %}{% if page.tags %} · {{ page.tags | join: " · " }}{% endif %}</p>
+    <h1 class="ma-article-title">{{ page.title }}</h1>
+    {% if page.excerpt %}<p class="ma-article-excerpt">{{ page.excerpt }}</p>{% endif %}
+  </header>
+  <div class="ma-article-body">
+    {{ content }}
+  </div>
+  <footer class="ma-article-foot">
+    <p><a href="/blog/">← All posts</a> · <a href="/feed.xml">RSS</a></p>
+  </footer>
+</main>
+{% include monograph-footer.html %}
+</body>
+</html>

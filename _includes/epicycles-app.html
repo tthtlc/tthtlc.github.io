@@ -1,0 +1,389 @@
+<div class="ma-app">
+  <div class="ma-app-row">
+    <div class="ma-app-stage">
+      <div class="ma-app-stack"><canvas id="epiStatic"></canvas><canvas id="epiTrace"></canvas></div>
+    </div>
+    <div class="ma-app-panel">
+      <h3>Controls</h3>
+      <div class="ma-app-row2"><span class="lbl">arms&nbsp;N</span><input id="epiN" type="range" min="1" max="3" step="1" value="3"><b class="val" id="epiNv">3</b></div>
+      <fieldset class="arm" id="epiarm0"><legend>Arm 0</legend>
+        <div class="ma-app-row2"><span class="lbl">length&nbsp;r₀</span><input id="epir0" type="range" min="0" max="240" step="2" value="110"><b class="val" id="epir0v">110</b></div>
+        <div class="ma-app-row2"><span class="lbl">rate&nbsp;ω₀</span><input id="epiw0" type="range" min="-6" max="6" step="0.5" value="1"><b class="val" id="epiw0v">1</b></div>
+      </fieldset>
+      <fieldset class="arm" id="epiarm1"><legend>Arm 1</legend>
+        <div class="ma-app-row2"><span class="lbl">length&nbsp;r₁</span><input id="epir1" type="range" min="0" max="240" step="2" value="55"><b class="val" id="epir1v">55</b></div>
+        <div class="ma-app-row2"><span class="lbl">rate&nbsp;ω₁</span><input id="epiw1" type="range" min="-6" max="6" step="0.5" value="2"><b class="val" id="epiw1v">2</b></div>
+      </fieldset>
+      <fieldset class="arm" id="epiarm2"><legend>Arm 2</legend>
+        <div class="ma-app-row2"><span class="lbl">length&nbsp;r₂</span><input id="epir2" type="range" min="0" max="240" step="2" value="27"><b class="val" id="epir2v">27</b></div>
+        <div class="ma-app-row2"><span class="lbl">rate&nbsp;ω₂</span><input id="epiw2" type="range" min="-6" max="6" step="0.5" value="3"><b class="val" id="epiw2v">3</b></div>
+      </fieldset>
+      <fieldset class="draw"><legend>Drawing</legend>
+        <div class="ma-app-row2"><span class="lbl">speed</span><input id="epispeed" type="range" min="0.2" max="4" step="0.1" value="1"><b class="val" id="epispeedv">1.0×</b></div>
+        <div class="ma-app-row2"><span class="lbl">trail</span><input id="epitrail" type="range" min="0.01" max="0.2" step="0.005" value="0.04"><b class="val" id="epitrailv">0.04</b></div>
+      </fieldset>
+      <p class="hint">Example curves — all closed except “Open √2”:</p>
+      <div class="presets" id="epipresets"></div>
+      <div id="epiformula"></div>
+      <p class="hint">A negative ω is a clockwise arm — the epi-/hypo-trochoid switch. All phases are pinned to φₖ = 0, so every trace starts at its rightmost point.</p>
+    </div>
+  </div>
+  <div id="epistatus"></div>
+</div>
+<style>
+  .ma-app { margin: 1.8rem 0 2.2rem; }
+  .ma-app-row { display: flex; gap: 22px; flex-wrap: wrap; align-items: flex-start; }
+  .ma-app-stage { flex: 1 1 560px; max-width: 780px; }
+  .ma-app-stack { position: relative; width: 100%; aspect-ratio: 1; }
+  .ma-app-stack canvas { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 10px; background: #233a30; box-shadow: 0 8px 28px rgba(29, 38, 32, 0.22); }
+  .ma-app-panel { flex: 0 0 330px; max-width: 100%; background: var(--paper-deep); border: 1px solid var(--hairline); border-radius: 10px; padding: 14px 16px 16px; font-size: 14.5px; }
+  .ma-app-panel h3 { margin: 2px 0 10px; font-size: 17px; }
+  .ma-app-row2 { display: flex; align-items: center; gap: 8px; margin: 7px 0; }
+  .ma-app-row2 .lbl { flex: 0 0 64px; }
+  .ma-app-row2 input[type=range] { flex: 1; accent-color: var(--gilt-deep); }
+  .ma-app-row2 b.val { flex: 0 0 54px; text-align: right; font-family: var(--mono); font-size: 12.5px; color: var(--ink-soft); }
+  .ma-app-panel fieldset { border: 1px solid var(--hairline); border-radius: 8px; margin: 10px 0; padding: 8px 12px 10px; }
+  .ma-app-panel fieldset legend { font-weight: 600; font-size: 13.5px; padding: 0 6px; color: var(--ink-soft); }
+  .ma-app-panel fieldset.off { opacity: .38; pointer-events: none; }
+  .ma-app-panel .presets { display: flex; flex-wrap: wrap; gap: 7px; margin: 10px 0 8px; }
+  .ma-app-panel button.preset { font-family: var(--serif); font-size: 13px; background: var(--cloth); color: var(--cloth-ink); border: 0; border-radius: 6px; padding: 6px 11px; cursor: pointer; transition: background .15s; }
+  .ma-app-panel button.preset:hover { background: var(--cloth-deep); }
+  .ma-app-panel .hint { font-size: 12.5px; color: var(--marginalia); margin: 8px 2px 0; }
+  #epiformula { margin: 10px 2px 2px; font-family: var(--mono); font-size: 12.5px; color: var(--ink-soft); word-break: break-all; }
+  #epistatus { margin: 14px 0 0; background: var(--paper-deep); border: 1px solid var(--hairline); border-radius: 10px; padding: 10px 16px; font-size: 14.5px; color: var(--ink-soft); line-height: 1.5; }
+  #epistatus b { color: var(--gilt-deep); }
+  @media (max-width: 900px) { .ma-app-panel { flex: 1 1 100%; } }
+</style>
+<script>
+(function () {
+  'use strict';
+  document.addEventListener('contextmenu', function (event) { event.preventDefault(); });
+
+  var W = 780, H = 780, cx = W / 2, cy = H / 2;
+  var BG = '35, 58, 48';              /* #233a30 — cloth-deep */
+  var OPEN_SPAN = 64 * Math.PI;       /* how long an open curve animates before restarting */
+
+  var sCv = document.getElementById('epiStatic');
+  var tCv = document.getElementById('epiTrace');
+  sCv.width = W; sCv.height = H;
+  tCv.width = W; tCv.height = H;
+  var sctx = sCv.getContext('2d');
+  var tctx = tCv.getContext('2d');
+
+  var params = {
+    N: 3,
+    r: [110, 55, 27],
+    w: [1, 2, 3],
+    irr: [false, false, false],      /* arm with an irrational rate (set only by the Open-√2 preset) */
+    speed: 1,
+    trail: 0.04
+  };
+
+  var palette = [];
+  for (var i = 0; i < 360; i++) palette.push('hsl(' + i + ', 85%, 62%)');
+
+  var scale = 1;
+
+  function $e(id) { return document.getElementById(id); }
+
+  function fit() {
+    var sum = 0;
+    for (var k = 0; k < params.N; k++) sum += params.r[k];
+    scale = sum < 1e-9 ? 1 : Math.min(1, (H / 2 - 60) / sum);
+  }
+
+  function gcd(a, b) { return b ? gcd(b, a % b) : a; }
+
+  /* Closure arithmetic. Slider rates are multiples of 1/2: omega_k = p_k / 2,
+     fundamental period T = 2 pi L / g with L = lcm of denominators and g = gcd
+     of numerators. Irrational rates (the sqrt-2 preset) never close. */
+  function closureInfo() {
+    for (var k = 0; k < params.N; k++) {
+      if (params.irr[k]) return { closed: false, irrIdx: k };
+    }
+    var L = 1, p = [];
+    for (var k2 = 0; k2 < params.N; k2++) {
+      var v = params.w[k2];
+      if (Math.abs(v - Math.round(v)) > 1e-9) L = 2;
+      p.push(Math.round(v * 2));
+    }
+    var g = 0;
+    for (var k3 = 0; k3 < p.length; k3++) g = gcd(g, Math.abs(p[k3]));
+    if (g === 0) return { closed: true, degenerate: true };
+    var n = [], d = 0, sym = 0;
+    for (var k4 = 0; k4 < p.length; k4++) { n.push(p[k4] / g); d = gcd(d, Math.abs(p[k4] / g)); }
+    for (var k5 = 1; k5 < n.length; k5++) sym = gcd(sym, Math.abs(n[k5] - n[0]));
+    return { closed: true, T: 2 * Math.PI * L / g, n: n, d: d, sym: sym, L: L, g: g };
+  }
+
+  function pointAt(t, out) {
+    var x = 0, y = 0;
+    for (var k = 0; k < params.N; k++) {
+      var a = params.w[k] * t;
+      x += params.r[k] * Math.cos(a);
+      y += params.r[k] * Math.sin(a);
+      if (out) out.push({ x: cx + x * scale, y: cy + y * scale });
+    }
+    return { x: cx + x * scale, y: cy + y * scale };
+  }
+
+  /* The faint chalk layer: the complete figure over one fundamental period. */
+  function drawStatic() {
+    sctx.clearRect(0, 0, W, H);
+    var info = closureInfo();
+    var T = info.closed ? (info.degenerate ? 0 : info.T) : OPEN_SPAN;
+    var sum = 0;
+    for (var k = 0; k < params.N; k++) sum += params.r[k];
+    sctx.beginPath();
+    sctx.arc(cx, cy, Math.min(sum * scale, H / 2 - 4), 0, 2 * Math.PI);
+    sctx.strokeStyle = 'rgba(236, 231, 214, 0.10)';
+    sctx.lineWidth = 1;
+    sctx.stroke();
+    if (T <= 0) {
+      var p0 = pointAt(0);
+      sctx.beginPath();
+      sctx.arc(p0.x, p0.y, 3, 0, 2 * Math.PI);
+      sctx.fillStyle = 'rgba(236, 231, 214, 0.5)';
+      sctx.fill();
+      return;
+    }
+    var steps = Math.max(2, Math.round(T / (2 * Math.PI) * 360));
+    sctx.beginPath();
+    for (var i = 0; i <= steps; i++) {
+      var p = pointAt(i / steps * T);
+      if (i === 0) sctx.moveTo(p.x, p.y); else sctx.lineTo(p.x, p.y);
+    }
+    sctx.strokeStyle = 'rgba(236, 231, 214, 0.30)';
+    sctx.lineWidth = 1.2;
+    sctx.stroke();
+  }
+
+  var t = 0, hue = 0, prev = null;
+
+  function resetAnim() {
+    t = 0; hue = 0; prev = null;
+    tctx.clearRect(0, 0, W, H);
+  }
+
+  /* The Ptolemy chain: orbit circles, rods, joints, and the glowing pen. */
+  function drawArms() {
+    var joints = [{ x: cx, y: cy }];
+    var tip = pointAt(t, joints);
+    tctx.save();
+    for (var k = 0; k < params.N; k++) {
+      var c = joints[k], e = joints[k + 1];
+      if (params.r[k] > 0.5) {
+        tctx.beginPath();
+        tctx.arc(c.x, c.y, params.r[k] * scale, 0, 2 * Math.PI);
+        tctx.strokeStyle = 'rgba(236, 231, 214, 0.15)';
+        tctx.lineWidth = 1;
+        tctx.stroke();
+      }
+      tctx.beginPath();
+      tctx.moveTo(c.x, c.y);
+      tctx.lineTo(e.x, e.y);
+      tctx.strokeStyle = 'rgba(236, 231, 214, 0.55)';
+      tctx.lineWidth = 1.6;
+      tctx.stroke();
+      tctx.beginPath();
+      tctx.arc(e.x, e.y, 3, 0, 2 * Math.PI);
+      tctx.fillStyle = 'rgba(236, 231, 214, 0.9)';
+      tctx.fill();
+    }
+    tctx.beginPath();
+    tctx.arc(cx, cy, 2.5, 0, 2 * Math.PI);
+    tctx.fillStyle = 'rgba(236, 231, 214, 0.5)';
+    tctx.fill();
+    tctx.shadowColor = '#e3cd92';
+    tctx.shadowBlur = 16;
+    tctx.beginPath();
+    tctx.arc(tip.x, tip.y, 5.5, 0, 2 * Math.PI);
+    tctx.fillStyle = '#c9994a';
+    tctx.fill();
+    tctx.restore();
+    tctx.beginPath();
+    tctx.arc(tip.x, tip.y, 2.2, 0, 2 * Math.PI);
+    tctx.fillStyle = '#f6f3ea';
+    tctx.fill();
+  }
+
+  /* One frame: fade the old trail, stroke the new segment in the current
+     hue, and redraw the arm chain. Colour = age = the moving gradient. */
+  function frame() {
+    var info = closureInfo();
+    var ds = 0.05 * params.speed;
+    var sub = Math.max(1, Math.ceil(ds / 0.04));
+    var st = ds / sub;
+    tctx.fillStyle = 'rgba(' + BG + ', ' + params.trail + ')';
+    tctx.fillRect(0, 0, W, H);
+    if (!prev) prev = pointAt(t);
+    tctx.strokeStyle = palette[Math.floor(hue) % 360];
+    tctx.lineWidth = 2;
+    tctx.lineCap = 'round';
+    tctx.lineJoin = 'round';
+    tctx.beginPath();
+    tctx.moveTo(prev.x, prev.y);
+    var wrapped = false;
+    for (var i = 0; i < sub; i++) {
+      t += st;
+      if (info.closed) {
+        if (info.degenerate) break;
+        if (t >= info.T) t -= info.T;
+      } else if (t > OPEN_SPAN) {
+        t = 0; wrapped = true; break;
+      }
+      var p = pointAt(t);
+      tctx.lineTo(p.x, p.y);
+      prev = p;
+    }
+    tctx.stroke();
+    if (wrapped) prev = pointAt(0);
+    hue = (hue + 1.4) % 360;
+    drawArms();
+    requestAnimationFrame(frame);
+  }
+
+  function fmtW(k) {
+    if (params.irr[k]) return '√2 ≈ 1.414';
+    var v = params.w[k];
+    return Math.abs(v - Math.round(v)) < 1e-9 ? String(v) : v.toFixed(1);
+  }
+
+  function updateStatus() {
+    var el = $e('epistatus');
+    var info = closureInfo();
+    var k, sum, rest;
+    if (info.degenerate) {
+      el.innerHTML = '<b>Degenerate.</b> Every rate is 0, so z(t) is constant — the trace is a single point.';
+      return;
+    }
+    if (!info.closed) {
+      sum = 0; rest = 0;
+      for (k = 0; k < params.N; k++) sum += params.r[k];
+      for (k = 1; k < params.N; k++) rest += params.r[k];
+      var rIn = Math.max(0, params.r[0] - rest);
+      el.innerHTML = '<b>Open curve.</b> ω<sub>' + info.irrIdx + '</sub> = √2 is irrational, so the rate ratio ω<sub>' + info.irrIdx + '</sub>/ω<sub>0</sub> ∉ ℚ: the figure never closes and the pen fills the annulus ' + rIn + ' ≤ ρ ≤ ' + sum + ' densely — an ergodic linear flow on a torus.';
+      return;
+    }
+    var qn = 2 * info.L, qd = info.g, gg = gcd(qn, qd);
+    qn /= gg; qd /= gg;
+    var Ts = qn === 1 ? 'π' : (qd === 1 ? qn + 'π' : qn + 'π/' + qd);
+    var bits = ['<b>Closed.</b> Period T = ' + Ts + (info.d > 1 ? ' (the parametrization repeats after T/' + info.d + ')' : '')];
+    var wraps = [];
+    for (k = 0; k < params.N; k++) wraps.push('arm ' + k + ' wraps ' + info.n[k] + '× per period');
+    bits.push(wraps.join(' · '));
+    if (info.sym > 1) bits.push('the figure has ' + info.sym + '-fold rotational symmetry');
+    var others = 0;
+    for (k = 1; k < params.N; k++) others += params.r[k];
+    if (params.N > 1 && params.r[0] > others && info.n[0] !== 0) {
+      bits.push('arm 0 dominates (' + params.r[0] + ' > ' + others + '), so the curve winds ' + info.n[0] + '× around the centre');
+    }
+    el.innerHTML = bits.join(' · ');
+  }
+
+  function updateFormula() {
+    var terms = [];
+    for (var k = 0; k < params.N; k++) {
+      var r = params.r[k];
+      if (r === 0) continue;
+      var w = params.w[k], ws;
+      if (params.irr[k]) ws = 'i·√2 t';
+      else if (w === 1) ws = 'it';
+      else if (w === -1) ws = '−it';
+      else {
+        var aw = Math.abs(w);
+        var wv = Math.abs(aw - Math.round(aw)) < 1e-9 ? String(aw) : aw.toFixed(1);
+        ws = (w > 0 ? 'i·' : '−i·') + wv + 't';
+      }
+      terms.push(r + 'e^{' + ws + '}');
+    }
+    $e('epiformula').textContent = 'z(t) = ' + (terms.length ? terms.join(' + ') : '0');
+  }
+
+  function syncSliders() {
+    $e('epiN').value = params.N;
+    $e('epiNv').textContent = params.N;
+    for (var k = 0; k < 3; k++) {
+      var box = $e('epiarm' + k);
+      if (k >= params.N) box.classList.add('off'); else box.classList.remove('off');
+      $e('epir' + k).value = params.r[k];
+      $e('epir' + k + 'v').textContent = params.r[k];
+      $e('epiw' + k).value = params.irr[k] ? 1.5 : params.w[k];
+      $e('epiw' + k + 'v').textContent = fmtW(k);
+    }
+    $e('epispeed').value = params.speed;
+    $e('epispeedv').textContent = params.speed.toFixed(1) + '×';
+    $e('epitrail').value = params.trail;
+    $e('epitrailv').textContent = params.trail.toFixed(2);
+  }
+
+  function refresh() {
+    fit();
+    drawStatic();
+    resetAnim();
+    updateStatus();
+    updateFormula();
+  }
+
+  var presets = [
+    { name: 'Circle', title: 'N = 1 · z = r·e^(it) · r = 150, ω = 1', N: 1, r: [150, 0, 0], w: [1, 2, 3] },
+    { name: 'Cardioid', title: 'r = (120, 60), ω = (1, 2) — one cusp, T = 2π', N: 2, r: [120, 60, 0], w: [1, 2, 3] },
+    { name: 'Nephroid', title: 'r = (120, 40), ω = (1, 3) — two cusps, T = 2π', N: 2, r: [120, 40, 0], w: [1, 3, 3] },
+    { name: 'Deltoid', title: 'r = (90, 45), ω = (1, −2) — three cusps, T = 2π', N: 2, r: [90, 45, 0], w: [1, -2, 0] },
+    { name: 'Astroid', title: 'r = (90, 30), ω = (1, −3) — four cusps, T = 2π', N: 2, r: [90, 30, 0], w: [1, -3, 0] },
+    { name: 'Rose (3-petal)', title: 'r = (65, 65), ω = (2, −1) — ρ = 2r·|cos 3θ|, T = 2π', N: 2, r: [65, 65, 0], w: [2, -1, 0] },
+    { name: '3-Arm Harmonic', title: 'r = (110, 55, 27), ω = (1, 2, 3) — nested lobes, T = 2π', N: 3, r: [110, 55, 27], w: [1, 2, 3] },
+    { name: 'Tusi Line', title: 'r = (70, 70), ω = (1, −1) — z = 2r·cos t, a straight segment', N: 2, r: [70, 70, 0], w: [1, -1, 0] },
+    { name: 'Open √2', title: 'r = (80, 50), ω = (1, √2) — irrational ratio, dense annulus', N: 2, r: [80, 50, 0], w: [1, Math.SQRT2, 0], irr: [false, true, false] }
+  ];
+
+  function applyPreset(p) {
+    params.N = p.N;
+    params.r = p.r.slice();
+    params.w = p.w.slice();
+    params.irr = (p.irr || [false, false, false]).slice();
+    syncSliders();
+    refresh();
+  }
+
+  $e('epiN').addEventListener('input', function () {
+    params.N = parseInt(this.value, 10);
+    syncSliders(); refresh();
+  });
+  for (var k = 0; k < 3; k++) {
+    (function (k) {
+      $e('epir' + k).addEventListener('input', function () {
+        params.r[k] = parseInt(this.value, 10);
+        refresh();
+      });
+      $e('epiw' + k).addEventListener('input', function () {
+        params.w[k] = parseFloat(this.value);
+        params.irr[k] = false;
+        refresh();
+      });
+    })(k);
+  }
+  $e('epispeed').addEventListener('input', function () {
+    params.speed = parseFloat(this.value);
+    $e('epispeedv').textContent = params.speed.toFixed(1) + '×';
+  });
+  $e('epitrail').addEventListener('input', function () {
+    params.trail = parseFloat(this.value);
+    $e('epitrailv').textContent = params.trail.toFixed(2);
+  });
+
+  var presetBox = $e('epipresets');
+  presets.forEach(function (p) {
+    var b = document.createElement('button');
+    b.className = 'preset';
+    b.textContent = p.name;
+    b.title = p.title;
+    b.addEventListener('click', function () { applyPreset(p); });
+    presetBox.appendChild(b);
+  });
+
+  syncSliders();
+  refresh();
+  requestAnimationFrame(frame);
+})();
+</script>

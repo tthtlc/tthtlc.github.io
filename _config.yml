@@ -31,9 +31,16 @@ timezone: Etc/UTC
 
 # jekyll-include-cache is required by Minimal Mistakes (its `include_cached`
 # tag). It is in the GitHub Pages plugin allowlist, so the Gemfile declares it
-# and it is activated here.
+# and it is activated here. jekyll-feed and jekyll-sitemap are also on the
+# allowlist and power the blog (RSS at /feed.xml).
 plugins:
   - jekyll-include-cache
+  - jekyll-feed
+  - jekyll-sitemap
+
+# RSS feed settings (jekyll-feed).
+feed:
+  posts_limit: 20
 
 # -----------------------------------------------------------------------------
 # Defaults
@@ -53,6 +60,19 @@ defaults:
       show_date: false
       read_time: false
       classes: wide
+  # Blog posts: markdown articles in _posts/, listed on /blog/. A post opts
+  # into MathJax with `mathjax: true` in its front matter.
+  - scope:
+      path: ""
+      type: posts
+    values:
+      layout: post
+      permalink: /blog/:year/:month/:day/:title/
+      author_profile: false
+      comments: false
+      share: false
+      show_date: false
+      read_time: false
 
 # -----------------------------------------------------------------------------
 # Exclusions
