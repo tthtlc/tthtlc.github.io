@@ -1,4 +1,7 @@
 # Jekyll build output and caches
+.claude/
+.impeccable/
+.github/
 _site/
 .jekyll-cache/
 .jekyll-metadata

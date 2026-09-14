@@ -1,0 +1,280 @@
+/*  https://mathworld.wolfram.com/GoldenIsozonohedron.html */
+
+
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 12.1' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[      9387,        269]
+NotebookOptionsPosition[      7725,        233]
+NotebookOutlinePosition[      8064,        248]
+CellTagsIndexPosition[      8021,        245]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell["Golden Isozonohedron", "Title",ExpressionUUID->"02436c68-7a52-4759-8d9b-2c1fb49fa9a3"],
+
+Cell[CellGroupData[{
+
+Cell["Author", "Subsection",ExpressionUUID->"428d9ebb-bde8-432e-be43-740c809c9a4d"],
+
+Cell["\<\
+Eric W. Weisstein
+January 2, 2019\
+\>", "Text",ExpressionUUID->"3df75720-862f-4732-8119-e709fc2b12c4"],
+
+Cell[TextData[{
+ "This notebook downloaded from ",
+ ButtonBox["http://mathworld.wolfram.com/notebooks/Polyhedra/\
+GoldenIsozonohedron.nb",
+  BaseStyle->"Hyperlink",
+  ButtonData:>{
+    URL["http://mathworld.wolfram.com/notebooks/Polyhedra/GoldenIsozonohedron.\
+nb"], None}],
+ "."
+}], "Text",ExpressionUUID->"b5a3685a-b2f1-4f00-82d8-0dcc75cb3372"],
+
+Cell[TextData[{
+ "For more information, see Eric's ",
+ StyleBox["MathWorld",
+  FontSlant->"Italic"],
+ " entry ",
+ ButtonBox["http://mathworld.wolfram.com/GoldenIsozonohedron.html",
+  BaseStyle->"Hyperlink",
+  ButtonData:>{
+    URL["http://mathworld.wolfram.com/GoldenIsozonohedron.html"], None}],
+ "."
+}], "Text",ExpressionUUID->"116e910c-5b7e-4c72-9e46-b49c75692744"],
+
+Cell["\<\
+\[Copyright]2019 Wolfram Research, Inc. except for portions noted otherwise\
+\>", "Text",ExpressionUUID->"4e39b4f9-1ac6-4c64-bc43-90ac1d1bcb35"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Isozonohedra", "Section",ExpressionUUID->"991e2aac-803b-417c-91ca-84985c08da07"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"PolyhedronFaces", "[", "poly_Polyhedron", "]"}], ":=", 
+  RowBox[{"poly", "[", 
+   RowBox[{"[", "2", "]"}], "]"}]}]], "Input",
+ CellLabel->"In[2]:=",ExpressionUUID->"f93ad600-909d-427f-a501-5162eddb03af"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"GoldenIsozonohedronQ", "[", 
+   RowBox[{"poly_Polyhedron", ",", 
+    RowBox[{"prec_:", "20"}], ",", 
+    RowBox[{"opts___", "?", "OptionQ"}]}], "]"}], ":=", 
+  RowBox[{"Module", "[", 
+   RowBox[{
+    RowBox[{"{", "\[IndentingNewLine]", 
+     RowBox[{
+      RowBox[{"verts", "=", 
+       RowBox[{"PolyhedronCoordinates", "[", "poly", "]"}]}], ",", 
+      "\[IndentingNewLine]", 
+      RowBox[{"faces", "=", 
+       RowBox[{"PolyhedronFaces", "[", "poly", "]"}]}], ",", 
+      "\[IndentingNewLine]", "diagonals", ",", "\[IndentingNewLine]", 
+      RowBox[{"debug", "=", 
+       RowBox[{
+        RowBox[{"Debug", "/.", 
+         RowBox[{"{", "opts", "}"}]}], "/.", 
+        RowBox[{"Debug", "\[Rule]", "False"}]}]}]}], "\[IndentingNewLine]", 
+     "}"}], ",", "\[IndentingNewLine]", 
+    RowBox[{
+     RowBox[{"If", "[", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"Union", "[", 
+         RowBox[{"Length", "/@", "faces"}], "]"}], "=!=", 
+        RowBox[{"{", "4", "}"}]}], ",", 
+       RowBox[{"Return", "[", "False", "]"}]}], "]"}], ";", 
+     "\[IndentingNewLine]", 
+     RowBox[{"If", "[", 
+      RowBox[{"debug", ",", 
+       RowBox[{"Print", "[", "faces", "]"}]}], "]"}], ";", 
+     "\[IndentingNewLine]", 
+     RowBox[{"diagonals", "=", 
+      RowBox[{"Quiet", "[", 
+       RowBox[{
+        RowBox[{"Map", "[", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"EuclideanDistance", "@@", "#"}], "&"}], ",", 
+          RowBox[{
+           RowBox[{
+            RowBox[{
+             RowBox[{"Transpose", "[", 
+              RowBox[{"Partition", "[", 
+               RowBox[{"#", ",", "2"}], "]"}], "]"}], "&"}], "/@", "faces"}], 
+           "/.", 
+           RowBox[{"i_Integer", "\[RuleDelayed]", 
+            RowBox[{"verts", "[", 
+             RowBox[{"[", "i", "]"}], "]"}]}]}], ",", 
+          RowBox[{"{", "2", "}"}]}], "]"}], ",", 
+        RowBox[{"{", 
+         RowBox[{"N", "::", "meprec"}], "}"}]}], "]"}]}], ";", 
+     "\[IndentingNewLine]", 
+     RowBox[{"If", "[", 
+      RowBox[{"debug", ",", 
+       RowBox[{"Print", "[", "diagonals", "]"}]}], "]"}], ";", 
+     "\[IndentingNewLine]", 
+     RowBox[{"Equal", "@@", 
+      RowBox[{"Prepend", "[", 
+       RowBox[{
+        RowBox[{"Divide", "@@@", 
+         RowBox[{"(", 
+          RowBox[{"Sort", "/@", 
+           RowBox[{"N", "[", 
+            RowBox[{"diagonals", ",", "prec"}], "]"}]}], ")"}]}], ",", 
+        RowBox[{"N", "[", 
+         RowBox[{
+          RowBox[{"1", "/", "GoldenRatio"}], ",", "prec"}], "]"}]}], 
+       "]"}]}]}]}], "\[IndentingNewLine]", "]"}]}]], "Input",
+ CellLabel->"In[3]:=",ExpressionUUID->"0b0a24c5-1304-401f-a635-e72f1b39396c"],
+
+Cell["\<\
+Note: these include RhombicHexecontahedron, which fails to be a zonohedron \
+because its faces are not centrally symmetric\
+\>", "Text",ExpressionUUID->"16b64ab3-fad6-4290-845d-320d7e120fd1"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"giz", "=", 
+  RowBox[{"Monitor", "[", 
+   RowBox[{
+    RowBox[{"Select", "[", 
+     RowBox[{
+      RowBox[{"PolyhedronData", "[", "All", "]"}], ",", 
+      RowBox[{
+       RowBox[{"Check", "[", 
+        RowBox[{
+         RowBox[{"GoldenIsozonohedronQ", "[", 
+          RowBox[{"PolyhedronData", "[", 
+           RowBox[{
+            RowBox[{"poly", "=", "#"}], ",", "\"\<Polyhedron\>\""}], "]"}], 
+          "]"}], ",", 
+         RowBox[{"Print", "[", "#", "]"}]}], "]"}], "&"}]}], "]"}], ",", 
+    "poly"}], "]"}]}]], "Input",
+ CellLabel->"In[5]:=",ExpressionUUID->"9317b114-704f-441d-b358-def62fb34f45"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{"\<\"AcuteGoldenRhombohedron\"\>", 
+   ",", "\<\"BilinskiDodecahedron\"\>", 
+   ",", "\<\"ObtuseGoldenRhombohedron\"\>", 
+   ",", "\<\"RhombicHexecontahedron\"\>", ",", "\<\"RhombicIcosahedron\"\>", 
+   ",", "\<\"RhombicTriacontahedron\"\>"}], "}"}]], "Output",
+ CellLabel->"Out[5]=",ExpressionUUID->"cffc0784-37dd-4214-90ce-8871003e2938"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"TextGrid", "[", 
+  RowBox[{
+   RowBox[{"Sort", "[", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"PolyhedronData", "[", 
+         RowBox[{"#", ",", "\"\<FaceCount\>\""}], "]"}], ",", "#"}], "}"}], 
+      "&"}], "/@", "giz"}], "]"}], ",", 
+   RowBox[{"Alignment", "\[Rule]", 
+    RowBox[{"{", 
+     RowBox[{"{", 
+      RowBox[{"Decimal", ",", "Left"}], "}"}], "}"}]}], ",", 
+   RowBox[{"Dividers", "\[Rule]", "All"}]}], "]"}]], "Input",
+ CellLabel->"In[8]:=",ExpressionUUID->"86e490b5-9097-4bdb-87c3-97a5af5d1070"],
+
+Cell[BoxData[
+ TagBox[GridBox[{
+    {"6", Cell[
+     "AcuteGoldenRhombohedron",ExpressionUUID->
+      "f1d6226d-3c0d-41d1-b03c-3bbe63b607d7"]},
+    {"6", Cell[
+     "ObtuseGoldenRhombohedron",ExpressionUUID->
+      "4da7ba47-e72d-4e99-b4b0-e88df8ded60b"]},
+    {"12", Cell[
+     "BilinskiDodecahedron",ExpressionUUID->
+      "f952b503-5cc2-40fb-a7d8-70ca52153bc5"]},
+    {"20", Cell[
+     "RhombicIcosahedron",ExpressionUUID->
+      "2f054775-f52d-42ff-8b8a-8c203e4e1e30"]},
+    {"30", Cell[
+     "RhombicTriacontahedron",ExpressionUUID->
+      "0354f0e2-3e77-4d48-8d98-187b43ae01da"]},
+    {"60", Cell[
+     "RhombicHexecontahedron",ExpressionUUID->
+      "7b4a6674-e8a6-4381-8ad0-2a14ff0ce860"]}
+   },
+   AutoDelete->False,
+   GridBoxAlignment->{"Columns" -> {Decimal, Left}},
+   GridBoxDividers->{"Columns" -> {{True}}, "Rows" -> {{True}}},
+   GridBoxItemSize->{"Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}}],
+  "TextGrid"]], "Output",
+ CellLabel->"Out[8]=",ExpressionUUID->"adc8a9b1-ca30-4fc9-92d7-c7982e395b8a"]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]]
+},
+WindowSize->{808, 873},
+WindowMargins->{{44, Automatic}, {0, Automatic}},
+FrontEndVersion->"12.1 for Mac OS X x86 (64-bit) (December 5, 2018)",
+StyleDefinitions->"Default.nb"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[580, 22, 92, 0, 98, "Title",ExpressionUUID->"02436c68-7a52-4759-8d9b-2c1fb49fa9a3"],
+Cell[CellGroupData[{
+Cell[697, 26, 83, 0, 54, "Subsection",ExpressionUUID->"428d9ebb-bde8-432e-be43-740c809c9a4d"],
+Cell[783, 28, 112, 3, 58, "Text",ExpressionUUID->"3df75720-862f-4732-8119-e709fc2b12c4"],
+Cell[898, 33, 346, 9, 58, "Text",ExpressionUUID->"b5a3685a-b2f1-4f00-82d8-0dcc75cb3372"],
+Cell[1247, 44, 368, 10, 35, "Text",ExpressionUUID->"116e910c-5b7e-4c72-9e46-b49c75692744"],
+Cell[1618, 56, 154, 2, 35, "Text",ExpressionUUID->"4e39b4f9-1ac6-4c64-bc43-90ac1d1bcb35"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[1809, 63, 86, 0, 67, "Section",ExpressionUUID->"991e2aac-803b-417c-91ca-84985c08da07"],
+Cell[1898, 65, 239, 5, 30, "Input",ExpressionUUID->"f93ad600-909d-427f-a501-5162eddb03af"],
+Cell[2140, 72, 2671, 72, 304, "Input",ExpressionUUID->"0b0a24c5-1304-401f-a635-e72f1b39396c"],
+Cell[4814, 146, 201, 3, 58, "Text",ExpressionUUID->"16b64ab3-fad6-4290-845d-320d7e120fd1"],
+Cell[CellGroupData[{
+Cell[5040, 153, 629, 17, 94, "Input",ExpressionUUID->"9317b114-704f-441d-b358-def62fb34f45"],
+Cell[5672, 172, 378, 7, 56, "Output",ExpressionUUID->"cffc0784-37dd-4214-90ce-8871003e2938"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[6087, 184, 572, 16, 52, "Input",ExpressionUUID->"86e490b5-9097-4bdb-87c3-97a5af5d1070"],
+Cell[6662, 202, 1023, 26, 148, "Output",ExpressionUUID->"adc8a9b1-ca30-4fc9-92d7-c7982e395b8a"]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]]
+}
+]
+*)
+
