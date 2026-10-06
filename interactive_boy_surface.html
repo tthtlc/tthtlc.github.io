@@ -193,15 +193,28 @@
         }
       }
 
-      function shadeColor(nx, ny, nz, depth) {
+      function shadeColor(nx, ny, nz, depth, cx, cy, cz) {
         const light = normalize([0.38, -0.52, 0.76]);
         const diffuse = Math.max(0, nx*light[0] + ny*light[1] + nz*light[2]);
-        const ambient = 0.22;
-        const value = Math.min(1, ambient + diffuse*0.78 + Math.max(0, depth)*0.025);
-        const r = Math.round(45 + 160*value);
-        const g = Math.round(93 + 154*value);
-        const b = Math.round(125 + 130*value);
-        return `rgb(${r},${g},${b})`;
+        // Camera sits at the origin looking down +z, so the view direction
+        // at a surface point is the negative of its position.
+        const view = normalize([-cx, -cy, -cz]);
+        const facing = Math.max(0, nx*view[0] + ny*view[1] + nz*view[2]);
+        // Blinn–Phong specular lobe — curved regions glint as they rotate.
+        const hx = light[0] + view[0], hy = light[1] + view[1], hz = light[2] + view[2];
+        const hl = Math.hypot(hx, hy, hz) || 1;
+        const spec = Math.pow(Math.max(0, (nx*hx + ny*hy + nz*hz) / hl), 32);
+        // Fresnel rim light — strongest where the surface turns away from
+        // the viewer, which traces the silhouette contour.
+        const rim = Math.pow(1 - facing, 2.8);
+        // Atmospheric depth cue: far parts sink toward the background tone.
+        const fog = Math.min(0.5, Math.max(0, depth - zoom - 0.15) * 0.13);
+        const lit = Math.min(1, 0.20 + diffuse*0.64 + spec*0.52 + rim*0.30);
+        let r = 45 + 160*lit;
+        let g = 93 + 154*lit;
+        let b = 125 + 130*lit;
+        r += (8 - r)*fog; g += (14 - g)*fog; b += (26 - b)*fog;
+        return `rgb(${Math.round(r)},${Math.round(g)},${Math.round(b)})`;
       }
 
       function render() {
@@ -232,7 +245,10 @@
           if (n < 1e-9) continue;
           nx /= n; ny /= n; nz /= n;
           const depth = (a.z+b.z+c.z)/3;
-          drawFaces.push({a,b,c,nx,ny,nz,depth});
+          const cx = (a.rx+b.rx+c.rx)/3;
+          const cy = (a.ry+b.ry+c.ry)/3;
+          const cz = (a.rz+b.rz+c.rz)/3;
+          drawFaces.push({a,b,c,nx,ny,nz,depth,cx,cy,cz});
         }
         drawFaces.sort((p,q) => q.depth-p.depth);
 
@@ -240,7 +256,7 @@
         for (const f of drawFaces) {
           ctx.beginPath();
           ctx.moveTo(f.a.x,f.a.y); ctx.lineTo(f.b.x,f.b.y); ctx.lineTo(f.c.x,f.c.y); ctx.closePath();
-          ctx.fillStyle = shadeColor(f.nx, f.ny, f.nz, 5-f.depth);
+          ctx.fillStyle = shadeColor(f.nx, f.ny, f.nz, f.depth, f.cx, f.cy, f.cz);
           ctx.fill();
           if (showWireframe) {
             ctx.strokeStyle = 'rgba(224,244,255,0.17)';
