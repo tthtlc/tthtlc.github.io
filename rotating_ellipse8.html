@@ -66,6 +66,10 @@
         <input type="range" id="speedSlider" min="1" max="720" step="1" value="80">
         <span id="speedValue">80</span>
     </label>
+    <label>Max rotation (deg):
+        <input type="range" id="maxAngleSlider" min="0" max="36000" step="360" value="3600">
+        <span id="maxAngleValue">3600</span>
+    </label>
     <button id="clearBtn">Clear lines</button>
     <button id="savePngBtn">Save PNG</button>
 </div>
@@ -158,9 +162,21 @@
         speedValue.textContent = rotationSpeed;
     });
 
+    // Maximum accumulated rotation angle in degrees, after which the
+    // drawing stops (0 = never stop). Lines already drawn stay on the
+    // canvas; raising the slider resumes drawing from where it left off.
+    let maxAngle = 3600;
+    const maxAngleInput = document.getElementById("maxAngleSlider");
+    const maxAngleValue = document.getElementById("maxAngleValue");
+    maxAngleInput.addEventListener("input", function() {
+        maxAngle = parseFloat(maxAngleInput.value);
+        maxAngleValue.textContent = maxAngle === 0 ? "∞" : maxAngle;
+    });
+
     document.getElementById("clearBtn").addEventListener("click", function() {
         offCtx.fillStyle = "white";
         offCtx.fillRect(0, 0, OFF_SIZE, OFF_SIZE);
+        angle = 0; // restart the drawing from the beginning
     });
 
     // After "Save PNG" is clicked, the parameter summary is printed on the
@@ -170,11 +186,13 @@
     const PARAM_DISPLAY_MS = 5000;
 
     function drawParams(targetCtx, w, h) {
+        const stopped = maxAngle !== 0 && angle >= maxAngle;
         const lines = [
             "m = " + sineCycles + ", n = " + ellipseRotations + ", ratio m:n = " + sineCycles + ":" + ellipseRotations,
             "r1 = " + r1.toFixed(2) + ", r2 = " + r2.toFixed(2),
             "major axis = " + majorAxisFraction + "% of half viewport diagonal",
             "rotation speed = " + rotationSpeed + " deg/s",
+            "max rotation = " + (maxAngle === 0 ? "∞ (never stops)" : maxAngle + " deg") + (stopped ? " — stopped" : ""),
             "minorAxis(t) = a * (r1 + r2 * sin(t * (m/n) * pi/180)), hue = t mod 360",
             "angle = " + angle.toFixed(1) + " deg"
         ];
@@ -216,27 +234,31 @@
         const dt = Math.min((now - lastTime) / 1000, 0.1);
         lastTime = now;
 
-        // Do not clear: every previously drawn line is kept.
-        // The minor axis length follows a sinusoidal curve between
-        // (r1 - r2) and (r1 + r2) of the major axis, completing `sineCycles`
-        // sine cycles per `ellipseRotations` full rotations of the ellipse.
-        let minorAxis = offMajorAxis * (r1 + r2 * Math.sin((angle * (sineCycles / ellipseRotations) * Math.PI) / 180));
-        minorAxis = Math.max(0, Math.min(offMajorAxis, minorAxis));
+        // Stop drawing new lines once the accumulated rotation reaches the
+        // maximum (0 = never stop); lines already drawn stay on the canvas.
+        if (maxAngle === 0 || angle < maxAngle) {
+            // Do not clear: every previously drawn line is kept. The minor
+            // axis length follows a sinusoid between (r1 - r2) and (r1 + r2)
+            // of the major axis, completing `sineCycles` sine cycles per
+            // `ellipseRotations` full rotations of the ellipse.
+            let minorAxis = offMajorAxis * (r1 + r2 * Math.sin((angle * (sineCycles / ellipseRotations) * Math.PI) / 180));
+            minorAxis = Math.max(0, Math.min(offMajorAxis, minorAxis));
 
-        // Line color cycles through the hue wheel once per full ellipse
-        // rotation (periodic in the angle), so the accumulated figure picks
-        // up a symmetric, rainbow-tinted appearance.
-        offCtx.strokeStyle = "hsl(" + (angle % 360) + ", 85%, 55%)";
+            // Line color cycles through the hue wheel once per full ellipse
+            // rotation (periodic in the angle), so the accumulated figure picks
+            // up a symmetric, rainbow-tinted appearance.
+            offCtx.strokeStyle = "hsl(" + (angle % 360) + ", 85%, 55%)";
 
-        offCtx.save();
-        offCtx.translate(offCenter, offCenter);
-        offCtx.rotate((angle * Math.PI) / 180);
-        offCtx.beginPath();
-        offCtx.ellipse(0, 0, offMajorAxis, minorAxis, 0, 0, 2 * Math.PI);
-        offCtx.stroke();
-        offCtx.restore();
+            offCtx.save();
+            offCtx.translate(offCenter, offCenter);
+            offCtx.rotate((angle * Math.PI) / 180);
+            offCtx.beginPath();
+            offCtx.ellipse(0, 0, offMajorAxis, minorAxis, 0, 0, 2 * Math.PI);
+            offCtx.stroke();
+            offCtx.restore();
 
-        angle += rotationSpeed * dt;
+            angle += rotationSpeed * dt;
+        }
 
         // Blit the accumulated drawing, scaled so the major axis is
         // majorAxisFraction of half the viewport diagonal, keeping the
