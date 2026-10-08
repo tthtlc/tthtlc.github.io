@@ -278,11 +278,30 @@ html { scrollbar-color: var(--hairline-strong) var(--paper); }
 }
 .ma-action.ma-action-primary:hover { background: var(--gilt-bright); border-color: var(--gilt-bright); color: var(--ink); }
 
-/* Featured page of the week — a single spotlight card in the frontispiece */
+/* Featured page of the week — spotlight cards in the frontispiece */
 .ma-featured {
-  max-width: 360px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  justify-content: center;
+  max-width: 780px;
   margin: 0 auto 2rem;
   text-align: left;
+}
+.ma-featured-heading {
+  flex: 1 1 100%;
+  margin: 0 0 0.25rem;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--ink);
+  text-align: center;
+}
+.ma-featured a.ma-featured-link {
+  display: block;
+  flex: 1 1 320px;
+  max-width: 360px;
+  text-decoration: none;
+  color: inherit;
   background: var(--paper-deep);
   border: 1px solid var(--hairline);
   border-radius: 10px;
@@ -290,12 +309,11 @@ html { scrollbar-color: var(--hairline-strong) var(--paper); }
   box-shadow: 0 4px 16px rgba(29, 38, 32, 0.08);
   transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
 }
-.ma-featured:hover {
+.ma-featured a.ma-featured-link:hover {
   transform: translateY(-3px);
   border-color: var(--gilt);
   box-shadow: 0 12px 28px rgba(29, 38, 32, 0.14);
 }
-.ma-featured a.ma-featured-link { display: block; text-decoration: none; color: inherit; }
 .ma-featured-plate {
   position: relative;
   height: 180px;
@@ -320,7 +338,7 @@ html { scrollbar-color: var(--hairline-strong) var(--paper); }
   opacity: 0; transform: translateY(4px);
   transition: opacity 0.18s ease, transform 0.18s ease;
 }
-.ma-featured:hover .ma-featured-open { opacity: 1; transform: translateY(0); }
+.ma-featured a.ma-featured-link:hover .ma-featured-open { opacity: 1; transform: translateY(0); }
 .ma-featured-body { padding: 0.75rem 0.9rem 0.9rem; }
 .ma-featured-title {
   margin: 0 0 0.3rem;
