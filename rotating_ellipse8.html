@@ -67,6 +67,7 @@
         <span id="speedValue">80</span>
     </label>
     <button id="clearBtn">Clear lines</button>
+    <button id="savePngBtn">Save PNG</button>
 </div>
 <script>
   document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
@@ -158,6 +159,50 @@
         offCtx.fillRect(0, 0, OFF_SIZE, OFF_SIZE);
     });
 
+    // After "Save PNG" is clicked, the parameter summary is printed on the
+    // screen canvas in micro font at the bottom and stays visible for a
+    // short while; the saved PNG captures the canvas while it is visible.
+    let showParamsUntil = 0;
+    const PARAM_DISPLAY_MS = 5000;
+
+    function drawParams(targetCtx, w, h) {
+        const lines = [
+            "m = " + sineCycles + ", n = " + ellipseRotations + ", ratio m:n = " + sineCycles + ":" + ellipseRotations,
+            "r1 = " + r1.toFixed(2) + ", r2 = " + r2.toFixed(2),
+            "major axis = " + majorAxisFraction + "% of half viewport diagonal",
+            "rotation speed = " + rotationSpeed + " deg/s",
+            "minorAxis(t) = a * (r1 + r2 * sin(t * (m/n) * pi/180)), hue = t mod 360",
+            "angle = " + angle.toFixed(1) + " deg"
+        ];
+        const fontPx = Math.max(10, Math.round(Math.min(w, h) / 80)); // micro font
+        const lineH = fontPx * 1.45;
+        const pad = fontPx * 0.6;
+        const bandH = lines.length * lineH + 2 * pad;
+        targetCtx.font = fontPx + "px monospace";
+        targetCtx.fillStyle = "rgba(255, 255, 255, 0.85)"; // legible over the curves
+        targetCtx.fillRect(0, h - bandH, w, bandH);
+        targetCtx.fillStyle = "#222";
+        targetCtx.textBaseline = "middle";
+        lines.forEach(function(line, i) {
+            targetCtx.fillText(line, pad, h - bandH + pad + lineH * (i + 0.5));
+        });
+    }
+
+    document.getElementById("savePngBtn").addEventListener("click", function() {
+        // Print the parameters onto the screen canvas, then save a copy of
+        // the canvas screenshot (curves + micro-font parameters at the
+        // bottom) as a PNG output file.
+        showParamsUntil = performance.now() + PARAM_DISPLAY_MS;
+        drawParams(ctx, canvas.width, canvas.height);
+        const link = document.createElement("a");
+        link.download = "rotating_ellipse8_m" + sineCycles + "_n" + ellipseRotations +
+            "_r1_" + r1.toFixed(2) + "_r2_" + r2.toFixed(2) + ".png";
+        link.href = canvas.toDataURL("image/png");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    });
+
     let angle = 0;
     let lastTime = performance.now();
 
@@ -201,6 +246,12 @@
             canvas.height / 2 - scale * OFF_SIZE / 2);
         ctx.drawImage(offscreen, 0, 0);
         ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+        // Redraw the parameter summary every frame while it is displayed,
+        // so it stays on top of the freshly blitted curves.
+        if (now < showParamsUntil) {
+            drawParams(ctx, canvas.width, canvas.height);
+        }
 
         requestAnimationFrame(drawRotatedEllipse);
     }
