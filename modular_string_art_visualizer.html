@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-950 text-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modular String Art & Multiplier Visualizer</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* Custom Scrollbar Styles */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.6);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(51, 65, 85, 0.8);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(71, 85, 105, 1);
+    }
+    canvas {
+      touch-action: none;
+    }
+    .slider-thumb-custom::-webkit-slider-thumb {
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+    }
+  </style>
+</head>
+<body class="h-full flex flex-col font-sans overflow-hidden bg-slate-950 text-slate-200 antialiased selection:bg-cyan-500 selection:text-white">
+
+  <header class="flex-shrink-0 border-b border-slate-800/80 bg-slate-900/90 backdrop-blur-md px-4 py-3 flex items-center justify-between z-20 shadow-md">
+    <div class="flex items-center space-x-3">
+      <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+        <i class="fa-solid fa-compass-drafting text-white text-lg font-bold"></i>
+      </div>
+      <div>
+        <h1 class="text-base font-bold bg-gradient-to-r from-cyan-400 via-indigo-300 to-pink-400 bg-clip-text text-transparent">
+          Modular Circle & String Art Visualizer
+        </h1>
+        <p class="text-xs text-slate-400 hidden sm:block">Mapping <span class="text-cyan-400 font-mono font-semibold">x → (n + k · x) mod N</span></p>
+      </div>
+    </div>
+
+    <!-- Quick Preset Buttons -->
+    <div class="flex items-center space-x-2">
+      <div class="hidden md:flex space-x-1.5 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs">
+        <button id="btnPresetCustom" class="px-2.5 py-1 rounded-lg bg-cyan-950/80 text-cyan-300 font-medium border border-cyan-800/50 hover:bg-cyan-900/80 transition">
+          Requested (N=720, n=0, k=3.0)
+        </button>
+        <button id="btnPresetCardioid" class="px-2.5 py-1 rounded-lg hover:bg-slate-800 transition text-slate-300 hover:text-cyan-400">
+          Cardioid (k=2.0)
+        </button>
+        <button id="btnPresetNephroid" class="px-2.5 py-1 rounded-lg hover:bg-slate-800 transition text-slate-300 hover:text-cyan-400">
+          Nephroid (k=3.0)
+        </button>
+        <button id="btnPresetHalfStep" class="px-2.5 py-1 rounded-lg hover:bg-slate-800 transition text-slate-300 hover:text-cyan-400">
+          Half-Step (k=3.5)
+        </button>
+        <button id="btnPresetStar" class="px-2.5 py-1 rounded-lg hover:bg-slate-800 transition text-slate-300 hover:text-cyan-400">
+          Star Mandala (k=181.0)
+        </button>
+      </div>
+
+      <button id="btnToggleSidebar" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition lg:hidden" title="Toggle Sidebar">
+        <i class="fa-solid fa-sliders"></i>
+      </button>
+    </div>
+  </header>
+
+  <div class="flex-1 flex overflow-hidden relative">
+
+    <main class="flex-1 relative flex items-center justify-center bg-slate-950 overflow-hidden select-none">
+
+      <!-- Live Mathematical Formula Display -->
+      <div class="absolute top-4 left-4 z-10 pointer-events-none bg-slate-900/80 backdrop-blur-md px-3.5 py-2.5 rounded-xl border border-slate-800/90 text-xs font-mono space-y-1 shadow-xl">
+        <div class="flex items-center space-x-2">
+          <span class="text-slate-400">Formula:</span>
+          <span class="text-cyan-400 font-bold text-sm">x → (<span id="dispNVal">0</span> + <span id="dispKVal">3.0</span> × x) % <span id="dispTotalPoints">720</span></span>
+        </div>
+        <div class="flex items-center justify-between text-[11px] text-slate-400 pt-0.5 border-t border-slate-800/60">
+          <span>Total Points: <strong id="dispTotalPointsCount" class="text-slate-200">720</strong></span>
+          <span class="ml-3">Step Increments: <strong class="text-indigo-400">+0.5</strong></span>
+        </div>
+      </div>
+
+      <!-- Canvas Navigation Controls -->
+      <div class="absolute bottom-4 left-4 z-10 flex items-center space-x-2 bg-slate-900/85 backdrop-blur-md p-1.5 rounded-2xl border border-slate-800 shadow-2xl">
+        <button id="btnZoomIn" class="w-8 h-8 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 flex items-center justify-center transition" title="Zoom In">
+          <i class="fa-solid fa-plus text-xs"></i>
+        </button>
+        <button id="btnZoomOut" class="w-8 h-8 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 flex items-center justify-center transition" title="Zoom Out">
+          <i class="fa-solid fa-minus text-xs"></i>
+        </button>
+        <button id="btnResetView" class="w-8 h-8 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 flex items-center justify-center transition" title="Reset Camera View">
+          <i class="fa-solid fa-rotate text-xs"></i>
+        </button>
+        <div class="h-4 w-px bg-slate-800 mx-1"></div>
+        <button id="btnPlayPause" class="px-3.5 h-8 rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-600 text-white font-semibold text-xs flex items-center space-x-2 shadow-lg shadow-cyan-500/20 hover:opacity-90 transition">
+          <i id="playIcon" class="fa-solid fa-play text-xs"></i>
+          <span id="playText">Animate (+0.5)</span>
+        </button>
+      </div>
+
+      <!-- Main Canvas Element -->
+      <canvas id="canvas" class="w-full h-full cursor-grab active:cursor-grabbing"></canvas>
+
+      <!-- Hover Tooltip -->
+      <div id="tooltip" class="absolute pointer-events-none hidden bg-slate-900/95 text-slate-100 text-xs px-3.5 py-2 rounded-xl border border-cyan-500/50 backdrop-blur-md shadow-2xl font-mono z-30"></div>
+    </main>
+
+    <aside id="sidebar" class="w-88 border-l border-slate-800/80 bg-slate-900/95 backdrop-blur-xl flex flex-col z-20 transition-all duration-300 absolute lg:relative right-0 h-full max-lg:translate-x-full shadow-2xl lg:shadow-none w-80 sm:w-88">
+      
+      <div class="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-900">
+        <h2 class="font-bold text-sm text-slate-200 flex items-center space-x-2">
+          <i class="fa-solid fa-sliders text-cyan-400"></i>
+          <span>Parameter Scrollbars & Controls</span>
+        </h2>
+        <button id="btnCloseSidebar" class="lg:hidden text-slate-400 hover:text-white p-1">
+          <i class="fa-solid fa-xmark text-base"></i>
+        </button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto p-4 space-y-5 text-xs">
+
+        <!-- CORE PARAMETER SLIDERS (N, n, k) -->
+        <div class="bg-slate-950/70 rounded-2xl p-3.5 border border-slate-800/80 space-y-4 shadow-inner">
+          <h3 class="font-semibold text-cyan-400 flex items-center justify-between border-b border-slate-800/80 pb-1.5">
+            <span>Mathematical Parameters</span>
+            <i class="fa-solid fa-calculator text-slate-500"></i>
+          </h3>
+
+          <!-- Total Divisions (N) -->
+          <div class="space-y-1.5">
+            <div class="flex justify-between items-center text-slate-300">
+              <label for="inputTotalPoints" class="font-medium">Total Divisions (N)</label>
+              <span id="valTotalPoints" class="font-mono text-cyan-400 font-bold bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-800/40">720</span>
+            </div>
+            <input type="range" id="inputTotalPoints" min="10" max="1440" step="1" value="720"
+              class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-500 slider-thumb-custom">
+            <div class="flex justify-between text-[10px] text-slate-500 font-mono">
+              <span>10</span>
+              <span>720</span>
+              <span>1440</span>
+            </div>
+          </div>
+
+          <!-- Start Offset (n) -->
+          <div class="space-y-1.5">
+            <div class="flex justify-between items-center text-slate-300">
+              <label for="inputOffsetN" class="font-medium">Start Offset (n)</label>
+              <span id="valOffsetN" class="font-mono text-cyan-400 font-bold bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-800/40">0</span>
+            </div>
+            <input type="range" id="inputOffsetN" min="0" max="719" step="1" value="0"
+              class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-500 slider-thumb-custom">
+            <div class="flex justify-between text-[10px] text-slate-500 font-mono">
+              <span>0</span>
+              <span id="labelMaxOffset">719</span>
+            </div>
+          </div>
+
+          <!-- Step Multiplier (k) with STRICT +0.5 Steps -->
+          <div class="space-y-2 bg-slate-900/90 p-2.5 rounded-xl border border-indigo-500/30">
+            <div class="flex justify-between items-center">
+              <label for="inputMultiplier" class="font-medium text-indigo-300 flex items-center space-x-1.5">
+                <span>Step Multiplier (k)</span>
+                <span class="text-[10px] bg-indigo-950 text-indigo-400 px-1.5 py-0.5 rounded border border-indigo-800/50 font-mono">+0.5 Steps</span>
+              </label>
+              <span id="valMultiplier" class="font-mono text-indigo-300 font-extrabold text-sm bg-indigo-950/80 px-2 py-0.5 rounded border border-indigo-700/60 shadow-sm">3.0</span>
+            </div>
+
+            <div class="flex items-center space-x-2">
+              <button id="btnStepMinus" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 font-mono font-bold text-slate-200 rounded-lg border border-slate-700 transition flex-shrink-0" title="Decrement k by 0.5">
+                -0.5
+              </button>
+
+              <input type="range" id="inputMultiplier" min="0" max="100" step="0.5" value="3.0"
+                class="flex-1 h-2.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500 slider-thumb-custom">
+
+              <button id="btnStepPlus" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 font-mono font-bold text-slate-200 rounded-lg border border-slate-700 transition flex-shrink-0" title="Increment k by 0.5">
+                +0.5
+              </button>
+            </div>
+
+            <div class="flex justify-between text-[10px] text-slate-500 font-mono">
+              <span>0.0</span>
+              <span>50.0</span>
+              <span>100.0</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ANIMATION ENGINE CONTROLS -->
+        <div class="bg-slate-950/70 rounded-2xl p-3.5 border border-slate-800/80 space-y-3">
+          <h3 class="font-semibold text-indigo-400 flex items-center justify-between border-b border-slate-800/80 pb-1.5">
+            <span>Animation Engine</span>
+            <i class="fa-solid fa-circle-play text-slate-500"></i>
+          </h3>
+
+          <div class="space-y-1">
+            <label class="text-slate-300 font-medium block">Animated Parameter</label>
+            <select id="selectAnimTarget" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-200 focus:outline-none focus:border-indigo-500 font-medium">
+              <option value="multiplier" selected>Multiplier (k) [+0.5 per tick]</option>
+              <option value="offset">Offset (n)</option>
+              <option value="both">Both (k & n)</option>
+            </select>
+          </div>
+
+          <div class="space-y-1.5">
+            <div class="flex justify-between text-slate-300">
+              <label for="inputAnimInterval" class="font-medium">Tick Delay (Speed)</label>
+              <span id="valAnimInterval" class="font-mono text-indigo-400 font-semibold">200 ms</span>
+            </div>
+            <input type="range" id="inputAnimInterval" min="30" max="1000" step="10" value="200"
+              class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500">
+            <div class="flex justify-between text-[10px] text-slate-500 font-mono">
+              <span>Fast (30ms)</span>
+              <span>Slow (1s)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- STYLING & COLOR PALETTE OPTIONS -->
+        <div class="bg-slate-950/70 rounded-2xl p-3.5 border border-slate-800/80 space-y-3">
+          <h3 class="font-semibold text-pink-400 flex items-center justify-between border-b border-slate-800/80 pb-1.5">
+            <span>Visual Themes & Aesthetics</span>
+            <i class="fa-solid fa-palette text-slate-500"></i>
+          </h3>
+
+          <div class="space-y-1">
+            <label class="text-slate-300 font-medium block">Color Palette</label>
+            <select id="selectColorTheme" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-200 focus:outline-none focus:border-pink-500">
+              <option value="neon" selected>Neon Cyberpunk</option>
+              <option value="rainbow">Spectrum Rainbow</option>
+              <option value="gold">Royal Gold</option>
+              <option value="emerald">Emerald Forest</option>
+              <option value="fire">Solar Flare</option>
+              <option value="monochrome">Monochrome</option>
+            </select>
+          </div>
+
+          <div class="space-y-1">
+            <div class="flex justify-between text-slate-300">
+              <label for="inputOpacity" class="font-medium">Line Opacity</label>
+              <span id="valOpacity" class="font-mono text-pink-400 font-semibold">65%</span>
+            </div>
+            <input type="range" id="inputOpacity" min="0.05" max="1" step="0.05" value="0.65"
+              class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-pink-500">
+          </div>
+
+          <div class="space-y-1">
+            <div class="flex justify-between text-slate-300">
+              <label for="inputLineWidth" class="font-medium">Line Width</label>
+              <span id="valLineWidth" class="font-mono text-pink-400 font-semibold">1.2px</span>
+            </div>
+            <input type="range" id="inputLineWidth" min="0.2" max="5" step="0.1" value="1.2"
+              class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-pink-500">
+          </div>
+
+          <div class="flex items-center justify-between pt-1">
+            <span class="text-slate-300 font-medium">Glow / Bloom Effect</span>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" id="chkGlowEffect" class="sr-only peer" checked>
+              <div class="w-9 h-5 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-pink-500"></div>
+            </label>
+          </div>
+        </div>
+
+        <!-- LABELS & DOTS OPTIONS -->
+        <div class="bg-slate-950/70 rounded-2xl p-3.5 border border-slate-800/80 space-y-3">
+          <h3 class="font-semibold text-amber-400 flex items-center justify-between border-b border-slate-800/80 pb-1.5">
+            <span>Perimeter Dots & Labels</span>
+            <i class="fa-solid fa-tags text-slate-500"></i>
+          </h3>
+
+          <div class="flex items-center justify-between">
+            <span class="text-slate-300 font-medium">Draw Perimeter Points</span>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" id="chkShowDots" class="sr-only peer" checked>
+              <div class="w-9 h-5 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"></div>
+            </label>
+          </div>
+
+          <div class="flex items-center justify-between">
+            <span class="text-slate-300 font-medium">Display Numeric Labels</span>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" id="chkShowLabels" class="sr-only peer" checked>
+              <div class="w-9 h-5 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"></div>
+            </label>
+          </div>
+
+          <div class="space-y-1">
+            <label class="text-slate-300 font-medium block">Label Density</label>
+            <select id="selectLabelInterval" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-200 focus:outline-none focus:border-amber-500">
+              <option value="1">Every Point (1)</option>
+              <option value="10">Every 10th Point</option>
+              <option value="30" selected>Every 30th Point</option>
+              <option value="60">Every 60th Point</option>
+              <option value="90">Quarterly (90)</option>
+            </select>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="p-3 border-t border-slate-800 bg-slate-950 text-[11px] text-slate-400 text-center">
+        Scroll / Touch Drag on Canvas to Pan & Zoom
+      </div>
+
+    </aside>
+  </div>
+
+  <script>
+    // State Management
+    const state = {
+      totalPoints: 720,  // N (10 to 1440)
+      offsetN: 0,        // n (0 to N-1)
+      multiplierK: 3.0,  // k (Strictly in steps of 0.5)
+
+      colorTheme: 'neon',
+      opacity: 0.65,
+      lineWidth: 1.2,
+      glowEffect: true,
+      showDots: true,
+      showLabels: true,
+      labelInterval: 30,
+
+      isAnimating: false,
+      animTarget: 'multiplier',
+      animIntervalMs: 200,
+      lastTickTime: 0,
+
+      zoom: 1.0,
+      panX: 0,
+      panY: 0,
+      isDragging: false,
+      dragStartX: 0,
+      dragStartY: 0,
+
+      hoveredIndex: -1
+    };
+
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const tooltip = document.getElementById('tooltip');
+
+    // UI Elements
+    const inputTotalPoints = document.getElementById('inputTotalPoints');
+    const inputOffsetN = document.getElementById('inputOffsetN');
+    const inputMultiplier = document.getElementById('inputMultiplier');
+    const btnStepMinus = document.getElementById('btnStepMinus');
+    const btnStepPlus = document.getElementById('btnStepPlus');
+    const labelMaxOffset = document.getElementById('labelMaxOffset');
+
+    const inputAnimInterval = document.getElementById('inputAnimInterval');
+    const selectAnimTarget = document.getElementById('selectAnimTarget');
+    const selectColorTheme = document.getElementById('selectColorTheme');
+    const inputOpacity = document.getElementById('inputOpacity');
+    const inputLineWidth = document.getElementById('inputLineWidth');
+    const chkGlowEffect = document.getElementById('chkGlowEffect');
+    const chkShowDots = document.getElementById('chkShowDots');
+    const chkShowLabels = document.getElementById('chkShowLabels');
+    const selectLabelInterval = document.getElementById('selectLabelInterval');
+
+    // Display Labels
+    const valTotalPoints = document.getElementById('valTotalPoints');
+    const valOffsetN = document.getElementById('valOffsetN');
+    const valMultiplier = document.getElementById('valMultiplier');
+    const valAnimInterval = document.getElementById('valAnimInterval');
+    const valOpacity = document.getElementById('valOpacity');
+    const valLineWidth = document.getElementById('valLineWidth');
+
+    const dispNVal = document.getElementById('dispNVal');
+    const dispKVal = document.getElementById('dispKVal');
+    const dispTotalPoints = document.getElementById('dispTotalPoints');
+    const dispTotalPointsCount = document.getElementById('dispTotalPointsCount');
+
+    const btnPlayPause = document.getElementById('btnPlayPause');
+    const playIcon = document.getElementById('playIcon');
+    const playText = document.getElementById('playText');
+    const btnZoomIn = document.getElementById('btnZoomIn');
+    const btnZoomOut = document.getElementById('btnZoomOut');
+    const btnResetView = document.getElementById('btnResetView');
+    const btnToggleSidebar = document.getElementById('btnToggleSidebar');
+    const btnCloseSidebar = document.getElementById('btnCloseSidebar');
+    const sidebar = document.getElementById('sidebar');
+
+    function getLineColor(index, total, theme, alpha) {
+      const t = index / total;
+      switch (theme) {
+        case 'rainbow':
+          return `hsla(${t * 360}, 85%, 60%, ${alpha})`;
+        case 'neon':
+          return `hsla(${180 + t * 140}, 90%, 60%, ${alpha})`;
+        case 'gold':
+          return `hsla(${35 + t * 25}, 95%, ${45 + Math.sin(t * Math.PI) * 20}%, ${alpha})`;
+        case 'emerald':
+          return `hsla(${140 + t * 40}, 80%, 55%, ${alpha})`;
+        case 'fire':
+          return `hsla(${t * 50}, 100%, 55%, ${alpha})`;
+        case 'monochrome':
+        default:
+          return `hsla(210, 20%, ${40 + Math.abs(Math.sin(t * Math.PI * 2)) * 50}%, ${alpha})`;
+      }
+    }
+
+    // Canvas Resizing Helper
+    function resizeCanvas() {
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      render();
+    }
+    window.addEventListener('resize', resizeCanvas);
+
+    function render() {
+      const dpr = window.devicePixelRatio || 1;
+      const width = canvas.width;
+      const height = canvas.height;
+
+      ctx.save();
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.fillStyle = '#020617';
+      ctx.fillRect(0, 0, width, height);
+      ctx.restore();
+
+      const centerX = width / 2 + state.panX * dpr;
+      const centerY = height / 2 + state.panY * dpr;
+      const baseRadius = Math.min(width, height) * 0.38 * state.zoom;
+
+      ctx.save();
+      ctx.translate(centerX, centerY);
+
+      // Outer Boundary Circle
+      ctx.beginPath();
+      ctx.arc(0, 0, baseRadius, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(51, 65, 85, 0.6)';
+      ctx.lineWidth = 1.5 * dpr;
+      ctx.stroke();
+
+      const N = state.totalPoints;
+      const points = [];
+
+      for (let i = 0; i < N; i++) {
+        const angle = (i / N) * Math.PI * 2 - Math.PI / 2;
+        points.push({
+          x: baseRadius * Math.cos(angle),
+          y: baseRadius * Math.sin(angle),
+          angle
+        });
+      }
+
+      ctx.lineWidth = state.lineWidth * dpr;
+      ctx.shadowBlur = state.glowEffect ? 8 * dpr : 0;
+
+      // Draw Connection Lines: x -> (n + k * x) mod N
+      for (let x = 0; x < N; x++) {
+        const targetExact = (state.offsetN + state.multiplierK * x) % N;
+        const targetAngle = (targetExact / N) * Math.PI * 2 - Math.PI / 2;
+        const targetX = baseRadius * Math.cos(targetAngle);
+        const targetY = baseRadius * Math.sin(targetAngle);
+
+        const strokeColor = getLineColor(x, N, state.colorTheme, state.opacity);
+        ctx.strokeStyle = strokeColor;
+        if (state.glowEffect) ctx.shadowColor = strokeColor;
+
+        ctx.beginPath();
+        ctx.moveTo(points[x].x, points[x].y);
+        ctx.lineTo(targetX, targetY);
+        ctx.stroke();
+      }
+
+      ctx.shadowBlur = 0;
+
+      // Draw Perimeter Dots and Numbered Labels
+      const interval = parseInt(state.labelInterval, 10);
+      for (let i = 0; i < N; i++) {
+        const p = points[i];
+        const isHovered = (i === state.hoveredIndex);
+
+        if (state.showDots || isHovered) {
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, (isHovered ? 5.5 : 2) * dpr, 0, Math.PI * 2);
+          ctx.fillStyle = isHovered ? '#38bdf8' : 'rgba(148, 163, 184, 0.7)';
+          ctx.fill();
+        }
+
+        if (state.showLabels && (i % interval === 0 || isHovered)) {
+          const labelOffset = (18 + (isHovered ? 5 : 0)) * dpr;
+          const lx = (baseRadius + labelOffset) * Math.cos(p.angle);
+          const ly = (baseRadius + labelOffset) * Math.sin(p.angle);
+
+          ctx.font = `${isHovered ? 'bold 12px' : '10px'} monospace`;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillStyle = isHovered ? '#38bdf8' : 'rgba(203, 213, 225, 0.8)';
+          ctx.fillText(i.toString(), lx, ly);
+        }
+      }
+
+      ctx.restore();
+    }
+
+    // Helper to sanitize k to exact 0.5 increments
+    function setMultiplier(val) {
+      let rounded = Math.round(val * 2) / 2;
+      if (rounded < 0) rounded = 0;
+      if (rounded > 100) rounded = 100;
+
+      state.multiplierK = rounded;
+      inputMultiplier.value = rounded;
+      
+      const formatted = rounded.toFixed(1);
+      valMultiplier.textContent = formatted;
+      dispKVal.textContent = formatted;
+      render();
+    }
+
+    inputTotalPoints.addEventListener('input', (e) => {
+      state.totalPoints = parseInt(e.target.value, 10);
+      valTotalPoints.textContent = state.totalPoints;
+      dispTotalPoints.textContent = state.totalPoints;
+      dispTotalPointsCount.textContent = state.totalPoints;
+
+      // Update max limit for offset slider
+      const maxOffset = state.totalPoints - 1;
+      inputOffsetN.max = maxOffset;
+      labelMaxOffset.textContent = maxOffset;
+      if (state.offsetN > maxOffset) {
+        state.offsetN = maxOffset;
+        inputOffsetN.value = maxOffset;
+        valOffsetN.textContent = maxOffset;
+        dispNVal.textContent = maxOffset;
+      }
+      render();
+    });
+
+    inputOffsetN.addEventListener('input', (e) => {
+      state.offsetN = parseInt(e.target.value, 10);
+      valOffsetN.textContent = state.offsetN;
+      dispNVal.textContent = state.offsetN;
+      render();
+    });
+
+    // Multiplier slider with step="0.5"
+    inputMultiplier.addEventListener('input', (e) => {
+      setMultiplier(parseFloat(e.target.value));
+    });
+
+    // Step Modifier Buttons (-0.5 / +0.5)
+    btnStepMinus.addEventListener('click', () => {
+      setMultiplier(state.multiplierK - 0.5);
+    });
+
+    btnStepPlus.addEventListener('click', () => {
+      setMultiplier(state.multiplierK + 0.5);
+    });
+
+    inputAnimInterval.addEventListener('input', (e) => {
+      state.animIntervalMs = parseInt(e.target.value, 10);
+      valAnimInterval.textContent = `${state.animIntervalMs} ms`;
+    });
+
+    selectAnimTarget.addEventListener('change', (e) => { state.animTarget = e.target.value; });
+    selectColorTheme.addEventListener('change', (e) => { state.colorTheme = e.target.value; render(); });
+
+    inputOpacity.addEventListener('input', (e) => {
+      state.opacity = parseFloat(e.target.value);
+      valOpacity.textContent = Math.round(state.opacity * 100) + '%';
+      render();
+    });
+
+    inputLineWidth.addEventListener('input', (e) => {
+      state.lineWidth = parseFloat(e.target.value);
+      valLineWidth.textContent = state.lineWidth.toFixed(1) + 'px';
+      render();
+    });
+
+    chkGlowEffect.addEventListener('change', (e) => { state.glowEffect = e.target.checked; render(); });
+    chkShowDots.addEventListener('change', (e) => { state.showDots = e.target.checked; render(); });
+    chkShowLabels.addEventListener('change', (e) => { state.showLabels = e.target.checked; render(); });
+    selectLabelInterval.addEventListener('change', (e) => { state.labelInterval = parseInt(e.target.value, 10); render(); });
+
+    function animateLoop(now) {
+      if (state.isAnimating) {
+        if (!state.lastTickTime) state.lastTickTime = now;
+        const elapsed = now - state.lastTickTime;
+
+        if (elapsed >= state.animIntervalMs) {
+          state.lastTickTime = now;
+
+          if (state.animTarget === 'multiplier' || state.animTarget === 'both') {
+            let nextK = state.multiplierK + 0.5;
+            if (nextK > 100) nextK = 0;
+            setMultiplier(nextK);
+          }
+
+          if (state.animTarget === 'offset' || state.animTarget === 'both') {
+            state.offsetN = (state.offsetN + 1) % state.totalPoints;
+            inputOffsetN.value = state.offsetN;
+            valOffsetN.textContent = state.offsetN;
+            dispNVal.textContent = state.offsetN;
+            render();
+          }
+        }
+      }
+      requestAnimationFrame(animateLoop);
+    }
+
+    btnPlayPause.addEventListener('click', () => {
+      state.isAnimating = !state.isAnimating;
+      playIcon.className = state.isAnimating ? 'fa-solid fa-pause text-xs' : 'fa-solid fa-play text-xs';
+      playText.textContent = state.isAnimating ? 'Pause' : 'Animate (+0.5)';
+      if (state.isAnimating) state.lastTickTime = performance.now();
+    });
+
+    // Preset Applicator
+    function applyPreset(n, k, points = 720) {
+      state.totalPoints = points;
+      inputTotalPoints.value = points;
+      valTotalPoints.textContent = points;
+      dispTotalPoints.textContent = points;
+      dispTotalPointsCount.textContent = points;
+
+      const maxOffset = points - 1;
+      inputOffsetN.max = maxOffset;
+      labelMaxOffset.textContent = maxOffset;
+
+      state.offsetN = n;
+      inputOffsetN.value = n;
+      valOffsetN.textContent = n;
+      dispNVal.textContent = n;
+
+      setMultiplier(k);
+    }
+
+    document.getElementById('btnPresetCustom').addEventListener('click', () => applyPreset(0, 3.0, 720));
+    document.getElementById('btnPresetCardioid').addEventListener('click', () => applyPreset(0, 2.0));
+    document.getElementById('btnPresetNephroid').addEventListener('click', () => applyPreset(0, 3.0));
+    document.getElementById('btnPresetHalfStep').addEventListener('click', () => applyPreset(0, 3.5));
+    document.getElementById('btnPresetStar').addEventListener('click', () => applyPreset(0, 181.0, 720));
+
+    btnZoomIn.addEventListener('click', () => { state.zoom *= 1.2; render(); });
+    btnZoomOut.addEventListener('click', () => { state.zoom /= 1.2; render(); });
+    btnResetView.addEventListener('click', () => { state.zoom = 1.0; state.panX = 0; state.panY = 0; render(); });
+
+    canvas.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      state.zoom *= e.deltaY < 0 ? 1.1 : 0.9;
+      render();
+    }, { passive: false });
+
+    canvas.addEventListener('mousedown', (e) => {
+      state.isDragging = true;
+      state.dragStartX = e.clientX - state.panX;
+      state.dragStartY = e.clientY - state.panY;
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (state.isDragging) {
+        state.panX = e.clientX - state.dragStartX;
+        state.panY = e.clientY - state.dragStartY;
+        render();
+        return;
+      }
+
+      // Point hover logic
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      const mouseX = (e.clientX - rect.left) * dpr;
+      const mouseY = (e.clientY - rect.top) * dpr;
+
+      const centerX = canvas.width / 2 + state.panX * dpr;
+      const centerY = canvas.height / 2 + state.panY * dpr;
+      const radius = Math.min(canvas.width, canvas.height) * 0.38 * state.zoom;
+
+      const N = state.totalPoints;
+      let closestIdx = -1;
+      let minDistance = 22 * dpr;
+
+      for (let i = 0; i < N; i++) {
+        const angle = (i / N) * Math.PI * 2 - Math.PI / 2;
+        const px = centerX + radius * Math.cos(angle);
+        const py = centerY + radius * Math.sin(angle);
+        const dist = Math.hypot(mouseX - px, mouseY - py);
+        if (dist < minDistance) {
+          minDistance = dist;
+          closestIdx = i;
+        }
+      }
+
+      if (closestIdx !== state.hoveredIndex) {
+        state.hoveredIndex = closestIdx;
+        if (closestIdx !== -1) {
+          const targetExact = (state.offsetN + state.multiplierK * closestIdx) % N;
+          tooltip.style.display = 'block';
+          tooltip.style.left = `${e.clientX - rect.left + 15}px`;
+          tooltip.style.top = `${e.clientY - rect.top + 15}px`;
+          tooltip.innerHTML = `Point <span class="text-cyan-400 font-bold">${closestIdx}</span> → Target <span class="text-pink-400 font-bold">${targetExact.toFixed(1)}</span>`;
+        } else {
+          tooltip.style.display = 'none';
+        }
+        render();
+      }
+    });
+
+    window.addEventListener('mouseup', () => { state.isDragging = false; });
+    btnToggleSidebar.addEventListener('click', () => sidebar.classList.toggle('max-lg:translate-x-full'));
+    btnCloseSidebar.addEventListener('click', () => sidebar.classList.add('max-lg:translate-x-full'));
+
+    window.onload = () => {
+      resizeCanvas();
+      requestAnimationFrame(animateLoop);
+    };
+  </script>
+</body>
+</html>
