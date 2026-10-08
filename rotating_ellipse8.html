@@ -102,16 +102,20 @@
     let ellipseRotations = 1;
     const sineCyclesInput = document.getElementById("sineCycles");
     const rotationsInput = document.getElementById("rotations");
+    const sineCyclesValue = document.getElementById("sineCyclesValue");
+    const rotationsValue = document.getElementById("rotationsValue");
     const ratioValue = document.getElementById("ratioValue");
     function updateRatioDisplay() {
         ratioValue.textContent = "Ratio m : n = " + sineCycles + " : " + ellipseRotations;
     }
     sineCyclesInput.addEventListener("input", function() {
         sineCycles = parseInt(sineCyclesInput.value, 10);
+        sineCyclesValue.textContent = sineCycles;
         updateRatioDisplay();
     });
     rotationsInput.addEventListener("input", function() {
         ellipseRotations = parseInt(rotationsInput.value, 10);
+        rotationsValue.textContent = ellipseRotations;
         updateRatioDisplay();
     });
 
