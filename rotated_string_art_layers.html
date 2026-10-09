@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-950 text-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rotated String Art Layers — Modular Circle Visualizer</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* Custom Scrollbar Styles */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.6);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(51, 65, 85, 0.8);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(71, 85, 105, 1);
+    }
+    canvas {
+      touch-action: none;
+    }
+    .slider-thumb-custom::-webkit-slider-thumb {
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+    }
+  </style>
+</head>
+<body class="h-full flex flex-col font-sans overflow-hidden bg-slate-950 text-slate-200 antialiased selection:bg-cyan-500 selection:text-white">
+
+  <header class="flex-shrink-0 border-b border-slate-800/80 bg-slate-900/90 backdrop-blur-md px-4 py-3 flex items-center justify-between z-20 shadow-md">
+    <div class="flex items-center space-x-3">
+      <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+        <i class="fa-solid fa-compass-drafting text-white text-lg font-bold"></i>
+      </div>
+      <div>
+        <h1 class="text-base font-bold bg-gradient-to-r from-cyan-400 via-indigo-300 to-pink-400 bg-clip-text text-transparent">
+          Rotated String Art Layers
+        </h1>
+        <p class="text-xs text-slate-400 hidden sm:block">Same mapping <span class="text-cyan-400 font-mono font-semibold">x → (n + k · x) mod N</span> overlaid, rotated left &amp; right</p>
+      </div>
+    </div>
+
+    <!-- Quick Preset Buttons -->
+    <div class="flex items-center space-x-2">
+      <div class="hidden md:flex space-x-1.5 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs">
+        <button id="btnPresetRequested" class="px-2.5 py-1 rounded-lg bg-cyan-950/80 text-cyan-300 font-medium border border-cyan-800/50 hover:bg-cyan-900/80 transition">
+          Requested (±20°, ±40°, ±60°)
+        </button>
+        <button id="btnPresetSingle" class="px-2.5 py-1 rounded-lg hover:bg-slate-800 transition text-slate-300 hover:text-cyan-400">
+          Original Only
+        </button>
+        <button id="btnPresetDense" class="px-2.5 py-1 rounded-lg hover:bg-slate-800 transition text-slate-300 hover:text-cyan-400">
+          Dense (k=2, ±30° ×3)
+        </button>
+      </div>
+
+      <button id="btnToggleSidebar" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition lg:hidden" title="Toggle Sidebar">
+        <i class="fa-solid fa-sliders"></i>
+      </button>
+    </div>
+  </header>
+
+  <div class="flex-1 flex overflow-hidden relative">
+
+    <main class="flex-1 relative flex items-center justify-center bg-slate-950 overflow-hidden select-none">
+
+      <!-- Live Mathematical Formula Display -->
+      <div class="absolute top-4 left-4 z-10 pointer-events-none bg-slate-900/80 backdrop-blur-md px-3.5 py-2.5 rounded-xl border border-slate-800/90 text-xs font-mono space-y-1 shadow-xl">
+        <div class="flex items-center space-x-2">
+          <span class="text-slate-400">Formula:</span>
+          <span class="text-cyan-400 font-bold text-sm">x → (<span id="dispNVal">0</span> + <span id="dispKVal">3.0</span> × x) % <span id="dispTotalPoints">180</span></span>
+        </div>
+        <div class="flex items-center justify-between text-[11px] text-slate-400 pt-0.5 border-t border-slate-800/60">
+          <span>Rotations: <strong id="dispRotations" class="text-pink-400">0°, ±20°, ±40°, ±60°</strong></span>
+        </div>
+      </div>
+
+      <!-- Layer Legend -->
+      <div class="absolute top-4 right-4 z-10 bg-slate-900/85 backdrop-blur-md px-3.5 py-2.5 rounded-xl border border-slate-800/90 text-xs shadow-xl w-44">
+        <div class="flex items-center justify-between mb-1.5">
+          <span class="font-semibold text-slate-200">Layers</span>
+          <i class="fa-solid fa-layer-group text-cyan-400"></i>
+        </div>
+        <div id="legendList" class="space-y-1 max-h-56 overflow-y-auto"></div>
+      </div>
+
+      <!-- Canvas Navigation Controls -->
+      <div class="absolute bottom-4 left-4 z-10 flex items-center space-x-2 bg-slate-900/85 backdrop-blur-md p-1.5 rounded-2xl border border-slate-800 shadow-2xl">
+        <button id="btnZoomIn" class="w-8 h-8 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 flex items-center justify-center transition" title="Zoom In">
+          <i class="fa-solid fa-plus text-xs"></i>
+        </button>
+        <button id="btnZoomOut" class="w-8 h-8 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 flex items-center justify-center transition" title="Zoom Out">
+          <i class="fa-solid fa-minus text-xs"></i>
+        </button>
+        <button id="btnResetView" class="w-8 h-8 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 flex items-center justify-center transition" title="Reset Camera View">
+          <i class="fa-solid fa-rotate text-xs"></i>
+        </button>
+        <div class="h-4 w-px bg-slate-800 mx-1"></div>
+        <button id="btnSavePng" class="px-3.5 h-8 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-600 text-white font-semibold text-xs flex items-center space-x-2 shadow-lg shadow-emerald-500/20 hover:opacity-90 transition">
+          <i class="fa-solid fa-camera text-xs"></i>
+          <span>Save PNG</span>
+        </button>
+      </div>
+
+      <!-- Main Canvas Element -->
+      <canvas id="canvas" class="w-full h-full cursor-grab active:cursor-grabbing"></canvas>
+    </main>
+
+    <aside id="sidebar" class="w-80 sm:w-96 border-l border-slate-800/80 bg-slate-900/95 backdrop-blur-xl flex flex-col z-20 transition-all duration-300 absolute lg:relative right-0 h-full max-lg:translate-x-full shadow-2xl lg:shadow-none">
+
+      <div class="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-900">
+        <h2 class="font-bold text-sm text-slate-200 flex items-center space-x-2">
+          <i class="fa-solid fa-sliders text-cyan-400"></i>
+          <span>Parameter Scrollbars & Controls</span>
+        </h2>
+        <button id="btnCloseSidebar" class="lg:hidden text-slate-400 hover:text-white p-1">
+          <i class="fa-solid fa-xmark text-base"></i>
+        </button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto p-4 space-y-5 text-xs">
+
+        <!-- CORE PARAMETER SLIDERS (N, n, k) -->
+        <div class="bg-slate-950/70 rounded-2xl p-3.5 border border-slate-800/80 space-y-4 shadow-inner">
+          <h3 class="font-semibold text-cyan-400 flex items-center justify-between border-b border-slate-800/80 pb-1.5">
+            <span>Mathematical Parameters</span>
+            <i class="fa-solid fa-calculator text-slate-500"></i>
+          </h3>
+
+          <!-- Total Divisions (N) -->
+          <div class="space-y-1.5">
+            <div class="flex justify-between items-center text-slate-300">
+              <label for="inputTotalPoints" class="font-medium">Total Divisions (N)</label>
+              <span id="valTotalPoints" class="font-mono text-cyan-400 font-bold bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-800/40">180</span>
+            </div>
+            <input type="range" id="inputTotalPoints" min="10" max="1440" step="1" value="180"
+              class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-500 slider-thumb-custom">
+            <div class="flex justify-between text-[10px] text-slate-500 font-mono">
+              <span>10</span>
+              <span>180</span>
+              <span>1440</span>
+            </div>
+          </div>
+
+          <!-- Start Offset (n) -->
+          <div class="space-y-1.5">
+            <div class="flex justify-between items-center text-slate-300">
+              <label for="inputOffsetN" class="font-medium">Start Offset (n)</label>
+              <span id="valOffsetN" class="font-mono text-cyan-400 font-bold bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-800/40">0</span>
+            </div>
+            <input type="range" id="inputOffsetN" min="0" max="719" step="1" value="0"
+              class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-500 slider-thumb-custom">
+            <div class="flex justify-between text-[10px] text-slate-500 font-mono">
+              <span>0</span>
+              <span id="labelMaxOffset">719</span>
+            </div>
+          </div>
+
+          <!-- Step Multiplier (k) with STRICT +0.5 Steps -->
+          <div class="space-y-2 bg-slate-900/90 p-2.5 rounded-xl border border-indigo-500/30">
+            <div class="flex justify-between items-center">
+              <label for="inputMultiplier" class="font-medium text-indigo-300 flex items-center space-x-1.5">
+                <span>Step Multiplier (k)</span>
+                <span class="text-[10px] bg-indigo-950 text-indigo-400 px-1.5 py-0.5 rounded border border-indigo-800/50 font-mono">+0.5 Steps</span>
+              </label>
+              <span id="valMultiplier" class="font-mono text-indigo-300 font-extrabold text-sm bg-indigo-950/80 px-2 py-0.5 rounded border border-indigo-700/60 shadow-sm">3.0</span>
+            </div>
+
+            <div class="flex items-center space-x-2">
+              <button id="btnStepMinus" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 font-mono font-bold text-slate-200 rounded-lg border border-slate-700 transition flex-shrink-0" title="Decrement k by 0.5">
+                -0.5
+              </button>
+
+              <input type="range" id="inputMultiplier" min="0" max="100" step="0.5" value="3.0"
+                class="flex-1 h-2.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500 slider-thumb-custom">
+
+              <button id="btnStepPlus" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 font-mono font-bold text-slate-200 rounded-lg border border-slate-700 transition flex-shrink-0" title="Increment k by 0.5">
+                +0.5
+              </button>
+            </div>
+
+            <div class="flex justify-between text-[10px] text-slate-500 font-mono">
+              <span>0.0</span>
+              <span>50.0</span>
+              <span>100.0</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ROTATIONAL LAYER CONTROLS -->
+        <div class="bg-slate-950/70 rounded-2xl p-3.5 border border-slate-800/80 space-y-3">
+          <h3 class="font-semibold text-pink-400 flex items-center justify-between border-b border-slate-800/80 pb-1.5">
+            <span>Rotational Layers</span>
+            <i class="fa-solid fa-rotate text-slate-500"></i>
+          </h3>
+
+          <div class="space-y-1.5">
+            <div class="flex justify-between text-slate-300">
+              <label for="inputRotStep" class="font-medium">Rotation Step</label>
+              <span id="valRotStep" class="font-mono text-pink-400 font-semibold">20°</span>
+            </div>
+            <input type="range" id="inputRotStep" min="0" max="120" step="1" value="20"
+              class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-pink-500">
+            <div class="flex justify-between text-[10px] text-slate-500 font-mono">
+              <span>0°</span>
+              <span>60°</span>
+              <span>120°</span>
+            </div>
+          </div>
+
+          <div class="space-y-1.5">
+            <div class="flex justify-between text-slate-300">
+              <label for="inputRotPairs" class="font-medium">Left/Right Pairs</label>
+              <span id="valRotPairs" class="font-mono text-pink-400 font-semibold">3</span>
+            </div>
+            <input type="range" id="inputRotPairs" min="0" max="6" step="1" value="3"
+              class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-pink-500">
+            <div class="flex justify-between text-[10px] text-slate-500 font-mono">
+              <span>0 (original only)</span>
+              <span>6 (±6 steps)</span>
+            </div>
+            <p class="text-[10px] text-slate-500 leading-snug pt-1">
+              Each pair adds one copy rotated <span class="font-mono text-slate-400">m × step</span> to the left and one to the right, for m = 1 … pairs. Default (±20°, ±40°, ±60°) = step 20°, pairs 3.
+            </p>
+          </div>
+        </div>
+
+        <!-- STYLING OPTIONS -->
+        <div class="bg-slate-950/70 rounded-2xl p-3.5 border border-slate-800/80 space-y-3">
+          <h3 class="font-semibold text-amber-400 flex items-center justify-between border-b border-slate-800/80 pb-1.5">
+            <span>Visual Styling</span>
+            <i class="fa-solid fa-palette text-slate-500"></i>
+          </h3>
+
+          <div class="space-y-1">
+            <div class="flex justify-between text-slate-300">
+              <label for="inputOpacity" class="font-medium">Line Opacity</label>
+              <span id="valOpacity" class="font-mono text-amber-400 font-semibold">60%</span>
+            </div>
+            <input type="range" id="inputOpacity" min="0.05" max="1" step="0.05" value="0.60"
+              class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-amber-500">
+          </div>
+
+          <div class="space-y-1">
+            <div class="flex justify-between text-slate-300">
+              <label for="inputLineWidth" class="font-medium">Line Width</label>
+              <span id="valLineWidth" class="font-mono text-amber-400 font-semibold">1.1px</span>
+            </div>
+            <input type="range" id="inputLineWidth" min="0.2" max="5" step="0.1" value="1.1"
+              class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-amber-500">
+          </div>
+
+          <div class="flex items-center justify-between pt-1">
+            <span class="text-slate-300 font-medium">Glow / Bloom Effect</span>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" id="chkGlowEffect" class="sr-only peer" checked>
+              <div class="w-9 h-5 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"></div>
+            </label>
+          </div>
+
+          <div class="flex items-center justify-between">
+            <span class="text-slate-300 font-medium">Perimeter Dots</span>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" id="chkShowDots" class="sr-only peer" checked>
+              <div class="w-9 h-5 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"></div>
+            </label>
+          </div>
+
+          <div class="flex items-center justify-between">
+            <span class="text-slate-300 font-medium">Numeric Labels</span>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" id="chkShowLabels" class="sr-only peer">
+              <div class="w-9 h-5 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"></div>
+            </label>
+          </div>
+        </div>
+
+        <!-- SAVED PNG GALLERY -->
+        <div class="bg-slate-950/70 rounded-2xl p-3.5 border border-slate-800/80 space-y-3">
+          <h3 class="font-semibold text-emerald-400 flex items-center justify-between border-b border-slate-800/80 pb-1.5">
+            <span>Saved PNGs</span>
+            <i class="fa-solid fa-images text-slate-500"></i>
+          </h3>
+
+          <button id="btnSavePngSidebar" class="w-full px-3 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-600 text-white font-semibold text-xs flex items-center justify-center space-x-2 shadow-lg shadow-emerald-500/20 hover:opacity-90 transition">
+            <i class="fa-solid fa-camera text-xs"></i>
+            <span>Save Current Drawing as PNG</span>
+          </button>
+
+          <p class="text-[10px] text-slate-500 leading-snug">
+            The PNG captures the canvas with the micro-font parameter summary printed at the bottom-left. Commit the downloaded files to the repo and they will appear here automatically (fetched via the GitHub API).
+          </p>
+
+          <div id="galleryItems" class="grid grid-cols-2 gap-2"></div>
+        </div>
+
+      </div>
+
+      <div class="p-3 border-t border-slate-800 bg-slate-950 text-[11px] text-slate-400 text-center">
+        Scroll / Touch Drag on Canvas to Pan &amp; Zoom
+      </div>
+
+    </aside>
+  </div>
+
+  <script>
+    // State Management
+    const state = {
+      totalPoints: 180,  // N (10 to 1440)
+      offsetN: 0,        // n (0 to N-1)
+      multiplierK: 3.0,  // k (Strictly in steps of 0.5)
+
+      rotStepDeg: 20,    // angular step between successive rotations
+      rotPairs: 3,       // how many left/right pairs (±step, ±2·step, …)
+
+      opacity: 0.60,
+      lineWidth: 1.1,
+      glowEffect: true,
+      showDots: true,
+      showLabels: false,
+
+      layerVisible: {},  // layer key -> boolean
+
+      zoom: 1.0,
+      panX: 0,
+      panY: 0,
+      isDragging: false,
+      dragStartX: 0,
+      dragStartY: 0
+    };
+
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+
+    // UI Elements
+    const inputTotalPoints = document.getElementById('inputTotalPoints');
+    const inputOffsetN = document.getElementById('inputOffsetN');
+    const inputMultiplier = document.getElementById('inputMultiplier');
+    const btnStepMinus = document.getElementById('btnStepMinus');
+    const btnStepPlus = document.getElementById('btnStepPlus');
+    const labelMaxOffset = document.getElementById('labelMaxOffset');
+
+    const inputRotStep = document.getElementById('inputRotStep');
+    const inputRotPairs = document.getElementById('inputRotPairs');
+    const inputOpacity = document.getElementById('inputOpacity');
+    const inputLineWidth = document.getElementById('inputLineWidth');
+    const chkGlowEffect = document.getElementById('chkGlowEffect');
+    const chkShowDots = document.getElementById('chkShowDots');
+    const chkShowLabels = document.getElementById('chkShowLabels');
+
+    // Display Labels
+    const valTotalPoints = document.getElementById('valTotalPoints');
+    const valOffsetN = document.getElementById('valOffsetN');
+    const valMultiplier = document.getElementById('valMultiplier');
+    const valRotStep = document.getElementById('valRotStep');
+    const valRotPairs = document.getElementById('valRotPairs');
+    const valOpacity = document.getElementById('valOpacity');
+    const valLineWidth = document.getElementById('valLineWidth');
+
+    const dispNVal = document.getElementById('dispNVal');
+    const dispKVal = document.getElementById('dispKVal');
+    const dispTotalPoints = document.getElementById('dispTotalPoints');
+    const dispRotations = document.getElementById('dispRotations');
+    const legendList = document.getElementById('legendList');
+
+    const btnZoomIn = document.getElementById('btnZoomIn');
+    const btnZoomOut = document.getElementById('btnZoomOut');
+    const btnResetView = document.getElementById('btnResetView');
+    const btnToggleSidebar = document.getElementById('btnToggleSidebar');
+    const btnCloseSidebar = document.getElementById('btnCloseSidebar');
+    const sidebar = document.getElementById('sidebar');
+
+    const btnSavePng = document.getElementById('btnSavePng');
+    const btnSavePngSidebar = document.getElementById('btnSavePngSidebar');
+    const galleryItems = document.getElementById('galleryItems');
+
+    // Build the layer list: the original figure plus m×step rotations to the
+    // left and to the right for m = 1 … rotPairs.
+    // Screen angles increase CLOCKWISE (canvas y points down), so a rotation
+    // "to the left" (counterclockwise) is a NEGATIVE angle shift.
+    function buildLayers() {
+      const layers = [
+        { key: 'base', label: '0° (original)', angleRad: 0, hue: 185 }
+      ];
+      // Distinct hue per left/right pair, alternating warm/cool.
+      const huePairs = [[320, 140], [30, 270], [55, 350], [200, 10], [100, 250], [160, 290]];
+      for (let m = 1; m <= state.rotPairs; m++) {
+        const deg = state.rotStepDeg * m;
+        const [hueL, hueR] = huePairs[(m - 1) % huePairs.length];
+        layers.push({ key: `l${m}`, label: `${deg}° left`,  angleRad: -deg * Math.PI / 180, hue: hueL });
+        layers.push({ key: `r${m}`, label: `${deg}° right`, angleRad:  deg * Math.PI / 180, hue: hueR });
+      }
+      for (const layer of layers) {
+        if (state.layerVisible[layer.key] === undefined) state.layerVisible[layer.key] = true;
+      }
+      return layers;
+    }
+
+    // Rebuild the clickable legend chips (one checkbox per layer).
+    function rebuildLegend() {
+      legendList.innerHTML = '';
+      for (const layer of buildLayers()) {
+        const label = document.createElement('label');
+        label.className = 'flex items-center space-x-2 cursor-pointer px-1.5 py-0.5 rounded-lg hover:bg-slate-800/70 transition';
+        label.innerHTML = `
+          <input type="checkbox" class="accent-cyan-500" ${state.layerVisible[layer.key] ? 'checked' : ''}>
+          <span class="w-3 h-3 rounded-full flex-shrink-0" style="background: hsl(${layer.hue}, 90%, 60%); box-shadow: 0 0 8px hsl(${layer.hue}, 90%, 60%)"></span>
+          <span class="font-mono text-[11px] text-slate-300">${layer.label}</span>`;
+        label.querySelector('input').addEventListener('change', (e) => {
+          state.layerVisible[layer.key] = e.target.checked;
+          render();
+        });
+        legendList.appendChild(label);
+      }
+    }
+
+    // Update the rotation summary text in the formula overlay.
+    function updateRotationDisplay() {
+      let text = '0°';
+      for (let m = 1; m <= state.rotPairs; m++) {
+        const deg = state.rotStepDeg * m;
+        text += `, ±${deg}°`;
+      }
+      dispRotations.textContent = text;
+    }
+
+    // Canvas Resizing Helper
+    function resizeCanvas() {
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      render();
+    }
+    window.addEventListener('resize', resizeCanvas);
+
+    function render() {
+      const dpr = window.devicePixelRatio || 1;
+      const width = canvas.width;
+      const height = canvas.height;
+
+      ctx.save();
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.fillStyle = '#020617';
+      ctx.fillRect(0, 0, width, height);
+      ctx.restore();
+
+      const centerX = width / 2 + state.panX * dpr;
+      const centerY = height / 2 + state.panY * dpr;
+      const baseRadius = Math.min(width, height) * 0.38 * state.zoom;
+
+      ctx.save();
+      ctx.translate(centerX, centerY);
+
+      // Outer Boundary Circle (shared by every layer)
+      ctx.beginPath();
+      ctx.arc(0, 0, baseRadius, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(51, 65, 85, 0.6)';
+      ctx.lineWidth = 1.5 * dpr;
+      ctx.stroke();
+
+      const N = state.totalPoints;
+      const layers = buildLayers();
+
+      ctx.lineWidth = state.lineWidth * dpr;
+
+      // Draw Connection Lines: x -> (n + k * x) mod N, for every rotated copy.
+      // Each copy is the identical drawing, with its two endpoint angles
+      // shifted by the layer's rotation (angleRad).
+      for (const layer of layers) {
+        if (!state.layerVisible[layer.key]) continue;
+
+        const strokeColor = `hsla(${layer.hue}, 90%, 60%, ${state.opacity})`;
+        ctx.strokeStyle = strokeColor;
+        if (state.glowEffect) {
+          ctx.shadowBlur = 6 * dpr;
+          ctx.shadowColor = strokeColor;
+        }
+
+        for (let x = 0; x < N; x++) {
+          const targetExact = (state.offsetN + state.multiplierK * x) % N;
+          const a1 = (x / N) * Math.PI * 2 - Math.PI / 2 + layer.angleRad;
+          const a2 = (targetExact / N) * Math.PI * 2 - Math.PI / 2 + layer.angleRad;
+
+          ctx.beginPath();
+          ctx.moveTo(baseRadius * Math.cos(a1), baseRadius * Math.sin(a1));
+          ctx.lineTo(baseRadius * Math.cos(a2), baseRadius * Math.sin(a2));
+          ctx.stroke();
+        }
+      }
+
+      ctx.shadowBlur = 0;
+
+      // Draw Perimeter Dots and Numbered Labels (shared circle, drawn once)
+      for (let i = 0; i < N; i++) {
+        const angle = (i / N) * Math.PI * 2 - Math.PI / 2;
+        const px = baseRadius * Math.cos(angle);
+        const py = baseRadius * Math.sin(angle);
+
+        if (state.showDots) {
+          ctx.beginPath();
+          ctx.arc(px, py, 2 * dpr, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(148, 163, 184, 0.7)';
+          ctx.fill();
+        }
+
+        if (state.showLabels && i % 30 === 0) {
+          const labelOffset = 18 * dpr;
+          const lx = (baseRadius + labelOffset) * Math.cos(angle);
+          const ly = (baseRadius + labelOffset) * Math.sin(angle);
+
+          ctx.font = '10px monospace';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillStyle = 'rgba(203, 213, 225, 0.8)';
+          ctx.fillText(i.toString(), lx, ly);
+        }
+      }
+
+      ctx.restore();
+    }
+
+    // --- Save PNG with micro-font parameter summary -------------------------
+    // After "Save PNG" is clicked, the parameter summary is printed on the
+    // canvas in micro font at the bottom-left and stays visible for a short
+    // while; the saved PNG captures the canvas while it is visible.
+    let showParamsUntil = 0;
+    const PARAM_DISPLAY_MS = 5000;
+
+    function buildParamLines() {
+      let rotationsText = '0°';
+      for (let m = 1; m <= state.rotPairs; m++) {
+        rotationsText += `, ±${state.rotStepDeg * m}°`;
+      }
+      return [
+        `N = ${state.totalPoints}, n = ${state.offsetN}, k = ${state.multiplierK.toFixed(1)}   [x → (n + k·x) mod N]`,
+        `rotations = ${rotationsText}   (step = ${state.rotStepDeg}°, pairs = ${state.rotPairs})`,
+        `opacity = ${Math.round(state.opacity * 100)}%, line width = ${state.lineWidth.toFixed(1)}px, glow = ${state.glowEffect ? 'on' : 'off'}`,
+        `zoom = ${state.zoom.toFixed(2)}, pan = (${Math.round(state.panX)}, ${Math.round(state.panY)})`
+      ];
+    }
+
+    function drawParams() {
+      const w = canvas.width;
+      const h = canvas.height;
+      const lines = buildParamLines();
+
+      const fontPx = Math.max(10, Math.round(Math.min(w, h) / 80)); // micro font
+      const lineH = fontPx * 1.45;
+      const pad = fontPx * 0.6;
+      const bandH = lines.length * lineH + 2 * pad;
+
+      // Draw in raw canvas pixels (not affected by pan/zoom transforms).
+      ctx.save();
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.font = fontPx + 'px monospace';
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.85)'; // legible over the dark art
+      ctx.fillRect(0, h - bandH, w, bandH);
+      ctx.fillStyle = '#111827';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'middle';
+      lines.forEach(function (line, i) {
+        ctx.fillText(line, pad, h - bandH + pad + lineH * (i + 0.5));
+      });
+      ctx.restore();
+    }
+
+    function savePng() {
+      // Print the parameters onto the canvas, then save a copy of the canvas
+      // (art + micro-font parameter summary at the bottom-left) as a PNG.
+      render();
+      drawParams();
+      showParamsUntil = performance.now() + PARAM_DISPLAY_MS;
+
+      const link = document.createElement('a');
+      link.download = 'rotated_string_art_layers_N' + state.totalPoints +
+          '_n' + state.offsetN +
+          '_k' + state.multiplierK.toFixed(1) +
+          '_step' + state.rotStepDeg +
+          '_pairs' + state.rotPairs + '.png';
+      link.href = canvas.toDataURL('image/png');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      // Remove the summary from the screen after a short while.
+      setTimeout(() => { if (performance.now() >= showParamsUntil) render(); }, PARAM_DISPLAY_MS);
+    }
+
+    btnSavePng.addEventListener('click', savePng);
+    btnSavePngSidebar.addEventListener('click', savePng);
+
+    // --- Right-side gallery: all saved "rotated_string_art_layers_" PNGs ---
+    // Lists the repo contents through the GitHub API so every committed
+    // "rotated_string_art_layers_*.png" shows up without editing this file.
+    function renderGallery(items) {
+      galleryItems.innerHTML = '';
+      if (!items.length) {
+        const empty = document.createElement('div');
+        empty.className = 'col-span-2 text-slate-500 text-center py-3';
+        empty.textContent = 'No saved PNGs yet.';
+        galleryItems.appendChild(empty);
+        return;
+      }
+      items.forEach(function (item) {
+        const wrap = document.createElement('a');
+        wrap.href = item.url;
+        wrap.target = '_blank';
+        wrap.rel = 'noopener';
+        wrap.title = 'Open ' + item.name;
+        wrap.className = 'group block rounded-lg overflow-hidden border border-slate-800 hover:border-cyan-500/60 transition bg-slate-900/60';
+
+        const img = document.createElement('img');
+        img.src = item.url;
+        img.alt = item.name;
+        img.loading = 'lazy';
+        img.className = 'w-full h-16 object-cover';
+        wrap.appendChild(img);
+
+        const label = document.createElement('div');
+        label.className = 'px-1.5 py-1 text-[9px] font-mono text-slate-400 truncate group-hover:text-cyan-300';
+        label.textContent = item.name;
+        wrap.appendChild(label);
+
+        galleryItems.appendChild(wrap);
+      });
+    }
+
+    function loadGallery() {
+      fetch('https://api.github.com/repos/tthtlc/tthtlc.github.io/contents/')
+        .then(function (response) {
+          if (!response.ok) { throw new Error('HTTP ' + response.status); }
+          return response.json();
+        })
+        .then(function (files) {
+          if (!Array.isArray(files)) { throw new Error('unexpected response'); }
+          const items = files
+            .filter(function (f) {
+              return f.type === 'file' &&
+                  f.name.indexOf('rotated_string_art_layers_') === 0 &&
+                  f.name.slice(-4).toLowerCase() === '.png';
+            })
+            .map(function (f) { return { name: f.name, url: f.download_url }; })
+            .sort(function (a, b) { return a.name < b.name ? -1 : 1; });
+          renderGallery(items);
+        })
+        .catch(function () {
+          renderGallery([]);
+        });
+    }
+
+    // Helper to sanitize k to exact 0.5 increments
+    function setMultiplier(val) {
+      let rounded = Math.round(val * 2) / 2;
+      if (rounded < 0) rounded = 0;
+      if (rounded > 100) rounded = 100;
+
+      state.multiplierK = rounded;
+      inputMultiplier.value = rounded;
+
+      const formatted = rounded.toFixed(1);
+      valMultiplier.textContent = formatted;
+      dispKVal.textContent = formatted;
+      render();
+    }
+
+    inputTotalPoints.addEventListener('input', (e) => {
+      state.totalPoints = parseInt(e.target.value, 10);
+      valTotalPoints.textContent = state.totalPoints;
+      dispTotalPoints.textContent = state.totalPoints;
+
+      // Update max limit for offset slider
+      const maxOffset = state.totalPoints - 1;
+      inputOffsetN.max = maxOffset;
+      labelMaxOffset.textContent = maxOffset;
+      if (state.offsetN > maxOffset) {
+        state.offsetN = maxOffset;
+        inputOffsetN.value = maxOffset;
+        valOffsetN.textContent = maxOffset;
+        dispNVal.textContent = maxOffset;
+      }
+      render();
+    });
+
+    inputOffsetN.addEventListener('input', (e) => {
+      state.offsetN = parseInt(e.target.value, 10);
+      valOffsetN.textContent = state.offsetN;
+      dispNVal.textContent = state.offsetN;
+      render();
+    });
+
+    // Multiplier slider with step="0.5"
+    inputMultiplier.addEventListener('input', (e) => {
+      setMultiplier(parseFloat(e.target.value));
+    });
+
+    // Step Modifier Buttons (-0.5 / +0.5)
+    btnStepMinus.addEventListener('click', () => {
+      setMultiplier(state.multiplierK - 0.5);
+    });
+
+    btnStepPlus.addEventListener('click', () => {
+      setMultiplier(state.multiplierK + 0.5);
+    });
+
+    inputRotStep.addEventListener('input', (e) => {
+      state.rotStepDeg = parseInt(e.target.value, 10);
+      valRotStep.textContent = `${state.rotStepDeg}°`;
+      updateRotationDisplay();
+      rebuildLegend();
+      render();
+    });
+
+    inputRotPairs.addEventListener('input', (e) => {
+      state.rotPairs = parseInt(e.target.value, 10);
+      valRotPairs.textContent = state.rotPairs;
+      updateRotationDisplay();
+      rebuildLegend();
+      render();
+    });
+
+    inputOpacity.addEventListener('input', (e) => {
+      state.opacity = parseFloat(e.target.value);
+      valOpacity.textContent = Math.round(state.opacity * 100) + '%';
+      render();
+    });
+
+    inputLineWidth.addEventListener('input', (e) => {
+      state.lineWidth = parseFloat(e.target.value);
+      valLineWidth.textContent = state.lineWidth.toFixed(1) + 'px';
+      render();
+    });
+
+    chkGlowEffect.addEventListener('change', (e) => { state.glowEffect = e.target.checked; render(); });
+    chkShowDots.addEventListener('change', (e) => { state.showDots = e.target.checked; render(); });
+    chkShowLabels.addEventListener('change', (e) => { state.showLabels = e.target.checked; render(); });
+
+    // Preset Applicator
+    function applyPreset(points, n, k, stepDeg, pairs) {
+      state.totalPoints = points;
+      inputTotalPoints.value = points;
+      valTotalPoints.textContent = points;
+      dispTotalPoints.textContent = points;
+
+      const maxOffset = points - 1;
+      inputOffsetN.max = maxOffset;
+      labelMaxOffset.textContent = maxOffset;
+
+      state.offsetN = n;
+      inputOffsetN.value = n;
+      valOffsetN.textContent = n;
+      dispNVal.textContent = n;
+
+      state.rotStepDeg = stepDeg;
+      inputRotStep.value = stepDeg;
+      valRotStep.textContent = `${stepDeg}°`;
+
+      state.rotPairs = pairs;
+      inputRotPairs.value = pairs;
+      valRotPairs.textContent = pairs;
+
+      updateRotationDisplay();
+      rebuildLegend();
+      setMultiplier(k);
+    }
+
+    document.getElementById('btnPresetRequested').addEventListener('click', () => applyPreset(180, 0, 3.0, 20, 3));
+    document.getElementById('btnPresetSingle').addEventListener('click', () => applyPreset(180, 0, 3.0, 20, 0));
+    document.getElementById('btnPresetDense').addEventListener('click', () => applyPreset(180, 0, 2.0, 30, 3));
+
+    btnZoomIn.addEventListener('click', () => { state.zoom *= 1.2; render(); });
+    btnZoomOut.addEventListener('click', () => { state.zoom /= 1.2; render(); });
+    btnResetView.addEventListener('click', () => { state.zoom = 1.0; state.panX = 0; state.panY = 0; render(); });
+
+    canvas.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      state.zoom *= e.deltaY < 0 ? 1.1 : 0.9;
+      render();
+    }, { passive: false });
+
+    canvas.addEventListener('mousedown', (e) => {
+      state.isDragging = true;
+      state.dragStartX = e.clientX - state.panX;
+      state.dragStartY = e.clientY - state.panY;
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (state.isDragging) {
+        state.panX = e.clientX - state.dragStartX;
+        state.panY = e.clientY - state.dragStartY;
+        render();
+      }
+    });
+
+    window.addEventListener('mouseup', () => { state.isDragging = false; });
+    btnToggleSidebar.addEventListener('click', () => sidebar.classList.toggle('max-lg:translate-x-full'));
+    btnCloseSidebar.addEventListener('click', () => sidebar.classList.add('max-lg:translate-x-full'));
+
+    window.onload = () => {
+      updateRotationDisplay();
+      rebuildLegend();
+      resizeCanvas();
+      loadGallery();
+    };
+  </script>
+</body>
+</html>
