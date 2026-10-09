@@ -346,63 +346,6 @@
       font-size: 12px;
     }
 
-    .note {
-      margin: 0 0 10px;
-      font-size: 11px;
-      line-height: 1.5;
-      color: var(--muted);
-    }
-
-    .gallery {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-    }
-
-    .gallery a {
-      display: block;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      overflow: hidden;
-      background: #0b0b2a;
-      text-decoration: none;
-      transition: border-color 0.15s ease;
-    }
-
-    .gallery a:hover {
-      border-color: var(--accent);
-    }
-
-    .gallery img {
-      display: block;
-      width: 100%;
-      height: 64px;
-      object-fit: cover;
-    }
-
-    .gallery .gname {
-      display: block;
-      padding: 4px 6px;
-      font-family: ui-monospace, monospace;
-      font-size: 9px;
-      color: var(--muted);
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .gallery a:hover .gname {
-      color: var(--accent);
-    }
-
-    .gallery-empty {
-      grid-column: 1 / -1;
-      padding: 12px 0;
-      text-align: center;
-      font-size: 12px;
-      color: var(--muted);
-    }
-
     #status {
       margin: 12px 0 0;
       min-height: 1.2em;
@@ -572,30 +515,7 @@
 
         <div class="buttons">
           <button id="animate" class="primary">Animate</button>
-          <button id="draw">Draw instantly</button>
-          <button id="reset">Reset</button>
-          <button id="download">Save PNG</button>
         </div>
-
-        <section class="section">
-          <h3>
-            <span>Saved PNGs</span>
-            <i class="fa-solid fa-images"></i>
-          </h3>
-
-          <button id="btnSavePngSidebar" class="save">
-            <i class="fa-solid fa-camera"></i>
-            <span>Save Current Drawing as PNG</span>
-          </button>
-
-          <p class="note">
-            The PNG captures the canvas with the micro-font parameter summary
-            printed at the bottom. Commit the downloaded files to the repo and
-            they will appear here automatically (fetched via the GitHub API).
-          </p>
-
-          <div id="galleryItems" class="gallery"></div>
-        </section>
 
         <p id="status" role="status" aria-live="polite"></p>
       </div>
@@ -614,7 +534,6 @@
     const stage = document.getElementById("stage");
     const equationElement = document.getElementById("formula");
     const statusElement = document.getElementById("status");
-    const galleryItems = document.getElementById("galleryItems");
 
     const defaults = {
       fx: 110,
@@ -857,14 +776,6 @@
       });
     }
 
-    function reset() {
-      for (const [key, value] of Object.entries(defaults)) {
-        controls[key].value = value;
-      }
-
-      drawInstantly();
-    }
-
     // --- Save PNG with micro-font parameter summary ------------------------
     // After "Save PNG" is clicked, the parameter summary is printed on the
     // canvas in micro font at the bottom and stays visible for a short
@@ -938,64 +849,6 @@
       statusElement.textContent = "PNG saved with parameter summary.";
     }
 
-    // --- Right-side gallery: all saved "spider_waves_" PNGs ----------------
-    // Lists the repo contents through the GitHub API so every committed
-    // "spider_waves_*.png" shows up without editing this file.
-    function renderGallery(items) {
-      galleryItems.innerHTML = "";
-      if (!items.length) {
-        const empty = document.createElement("div");
-        empty.className = "gallery-empty";
-        empty.textContent = "No saved PNGs yet.";
-        galleryItems.appendChild(empty);
-        return;
-      }
-      items.forEach(function (item) {
-        const wrap = document.createElement("a");
-        wrap.href = item.url;
-        wrap.target = "_blank";
-        wrap.rel = "noopener";
-        wrap.title = "Open " + item.name;
-        wrap.className = "gallery-item";
-
-        const img = document.createElement("img");
-        img.src = item.url;
-        img.alt = item.name;
-        img.loading = "lazy";
-        wrap.appendChild(img);
-
-        const label = document.createElement("span");
-        label.className = "gname";
-        label.textContent = item.name;
-        wrap.appendChild(label);
-
-        galleryItems.appendChild(wrap);
-      });
-    }
-
-    function loadGallery() {
-      fetch("https://api.github.com/repos/tthtlc/tthtlc.github.io/contents/")
-        .then(function (response) {
-          if (!response.ok) { throw new Error("HTTP " + response.status); }
-          return response.json();
-        })
-        .then(function (files) {
-          if (!Array.isArray(files)) { throw new Error("unexpected response"); }
-          const items = files
-            .filter(function (f) {
-              return f.type === "file" &&
-                f.name.indexOf("spider_waves_") === 0 &&
-                f.name.slice(-4).toLowerCase() === ".png";
-            })
-            .map(function (f) { return { name: f.name, url: f.download_url }; })
-            .sort(function (a, b) { return a.name < b.name ? -1 : 1; });
-          renderGallery(items);
-        })
-        .catch(function () {
-          renderGallery([]);
-        });
-    }
-
     // --- Wiring -------------------------------------------------------------
     for (const control of Object.values(controls)) {
       control.addEventListener("input", scheduleRedraw);
@@ -1003,18 +856,6 @@
 
     document.getElementById("animate")
       .addEventListener("click", animate);
-
-    document.getElementById("draw")
-      .addEventListener("click", drawInstantly);
-
-    document.getElementById("reset")
-      .addEventListener("click", reset);
-
-    document.getElementById("download")
-      .addEventListener("click", savePng);
-
-    document.getElementById("btnSavePngSidebar")
-      .addEventListener("click", savePng);
 
     document.getElementById("btnSavePngStage")
       .addEventListener("click", savePng);
@@ -1031,7 +872,6 @@
     const resizeObserver = new ResizeObserver(scheduleRedraw);
     resizeObserver.observe(stage);
 
-    loadGallery();
     drawInstantly();
   </script>
 </body>
