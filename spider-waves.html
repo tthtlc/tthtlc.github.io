@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Spider Waves — Parametric Curve Generator</title>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      color-scheme: dark;
+      --background: #080064;
+      --page: #080818;
+      --panel: #111038;
+      --panel-deep: rgba(8, 0, 100, 0.45);
+      --text: #edf5ff;
+      --muted: #aebbd3;
+      --accent: #00e5ff;
+      --border: #34335d;
+      --button: #242347;
+      --button-hover: #353368;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      height: 100%;
+    }
+
+    body {
+      margin: 0;
+      background: var(--page);
+      color: var(--text);
+      font-family: system-ui, sans-serif;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ---------- Header ---------- */
+    header {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(17, 16, 56, 0.92);
+      z-index: 30;
+    }
+
+    .header-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .logo {
+      width: 36px;
+      height: 36px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #00e5ff, #4f46e5);
+      color: white;
+      font-size: 17px;
+      box-shadow: 0 0 12px rgba(0, 229, 255, 0.35);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 700;
+      background: linear-gradient(90deg, #00e5ff, #a5b4fc, #f472b6);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .subtitle {
+      margin: 2px 0 0;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .icon-btn {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--button);
+      color: var(--text);
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    .icon-btn:hover {
+      background: var(--button-hover);
+    }
+
+    #btnToggleSidebar,
+    #btnCloseSidebar {
+      display: none;
+    }
+
+    /* ---------- Layout: stage + right-hand sidebar ---------- */
+    .app {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .stage {
+      flex: 1;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--background);
+      overflow: hidden;
+    }
+
+    canvas {
+      display: block;
+    }
+
+    /* Live formula overlay (top-left of the stage) */
+    .formula {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      z-index: 10;
+      pointer-events: none;
+      max-width: calc(100% - 32px);
+      overflow: hidden;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: rgba(17, 16, 56, 0.85);
+      font-family: Georgia, serif;
+      font-size: 13px;
+      line-height: 1.7;
+      color: var(--accent);
+      white-space: nowrap;
+    }
+
+    /* Floating Save PNG button (bottom-left of the stage) */
+    .stage-toolbar {
+      position: absolute;
+      bottom: 16px;
+      left: 16px;
+      z-index: 10;
+    }
+
+    /* ---------- Sidebar ---------- */
+    .sidebar {
+      width: 340px;
+      max-width: 85vw;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      background: var(--panel);
+      border-left: 1px solid var(--border);
+      z-index: 20;
+    }
+
+    .sidebar-head {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .sidebar-head h2 {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .sidebar-head h2 i {
+      color: var(--accent);
+      margin-right: 8px;
+    }
+
+    .sidebar-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+    }
+
+    .section {
+      margin-bottom: 16px;
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: var(--panel-deep);
+    }
+
+    .section h3 {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 0 0 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .section h3 i {
+      color: #64748b;
+      font-size: 12px;
+    }
+
+    .field {
+      margin-bottom: 14px;
+    }
+
+    .field:last-child {
+      margin-bottom: 0;
+    }
+
+    .field-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 6px;
+    }
+
+    .field-head label {
+      font-size: 13px;
+    }
+
+    .value {
+      font-family: ui-monospace, monospace;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent);
+      background: rgba(0, 229, 255, 0.08);
+      border: 1px solid rgba(0, 229, 255, 0.3);
+      border-radius: 6px;
+      padding: 2px 8px;
+      white-space: nowrap;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    .range-hints {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 2px;
+      font-family: ui-monospace, monospace;
+      font-size: 10px;
+      color: var(--muted);
+    }
+
+    .color-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .color-field label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .color-field input[type="color"] {
+      width: 100%;
+      height: 34px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: transparent;
+      cursor: pointer;
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    button {
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--button);
+      color: var(--text);
+      font: inherit;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: var(--button-hover);
+    }
+
+    button.primary {
+      background: #00576b;
+      border-color: #0089a5;
+    }
+
+    button.save {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: none;
+      background: linear-gradient(135deg, #10b981, #0891b2);
+      color: white;
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+    }
+
+    button.save:hover {
+      opacity: 0.9;
+      background: linear-gradient(135deg, #10b981, #0891b2);
+    }
+
+    .stage-toolbar button.save {
+      padding: 9px 14px;
+      border-radius: 12px;
+      font-size: 12px;
+    }
+
+    .note {
+      margin: 0 0 10px;
+      font-size: 11px;
+      line-height: 1.5;
+      color: var(--muted);
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .gallery a {
+      display: block;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      background: #0b0b2a;
+      text-decoration: none;
+      transition: border-color 0.15s ease;
+    }
+
+    .gallery a:hover {
+      border-color: var(--accent);
+    }
+
+    .gallery img {
+      display: block;
+      width: 100%;
+      height: 64px;
+      object-fit: cover;
+    }
+
+    .gallery .gname {
+      display: block;
+      padding: 4px 6px;
+      font-family: ui-monospace, monospace;
+      font-size: 9px;
+      color: var(--muted);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .gallery a:hover .gname {
+      color: var(--accent);
+    }
+
+    .gallery-empty {
+      grid-column: 1 / -1;
+      padding: 12px 0;
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    #status {
+      margin: 12px 0 0;
+      min-height: 1.2em;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .sidebar-foot {
+      flex-shrink: 0;
+      padding: 10px 16px;
+      border-top: 1px solid var(--border);
+      font-size: 11px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    /* ---------- Popup behaviour on smaller screens ---------- */
+    /* Below 1024px the sidebar slides in over the stage as a popup panel,
+       exactly like the right-hand panel of rotated_string_art_layers.html. */
+    @media (max-width: 1023px) {
+      #btnToggleSidebar,
+      #btnCloseSidebar {
+        display: flex;
+      }
+
+      .sidebar {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+        box-shadow: -8px 0 24px rgba(0, 0, 0, 0.45);
+      }
+
+      .sidebar.open {
+        transform: translateX(0);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="header-title">
+      <div class="logo">
+        <i class="fa-solid fa-circle-nodes"></i>
+      </div>
+      <div>
+        <h1>Spider Waves</h1>
+        <p class="subtitle">
+          A single parametric curve with a woven, web-like appearance —
+          adjust the frequencies and amplitude to explore its geometry.
+        </p>
+      </div>
+    </div>
+
+    <button id="btnToggleSidebar" class="icon-btn" title="Toggle Sidebar">
+      <i class="fa-solid fa-sliders"></i>
+    </button>
+  </header>
+
+  <div class="app">
+    <main class="stage" id="stage">
+      <div id="formula" class="formula"></div>
+
+      <div class="stage-toolbar">
+        <button id="btnSavePngStage" class="save">
+          <i class="fa-solid fa-camera"></i>
+          <span>Save PNG</span>
+        </button>
+      </div>
+
+      <canvas id="canvas" role="img" aria-label="Spider Waves parametric curve"></canvas>
+    </main>
+
+    <aside id="sidebar" class="sidebar" aria-label="Parameter controls">
+      <div class="sidebar-head">
+        <h2>
+          <i class="fa-solid fa-sliders"></i>
+          <span>Parameter Scrollbars &amp; Controls</span>
+        </h2>
+        <button id="btnCloseSidebar" class="icon-btn" title="Close Sidebar">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="sidebar-body">
+        <section class="section">
+          <h3>
+            <span>Curve Parameters</span>
+            <i class="fa-solid fa-calculator"></i>
+          </h3>
+
+          <div class="field">
+            <div class="field-head">
+              <label for="fx">X frequency</label>
+              <span id="fxValue" class="value">110</span>
+            </div>
+            <input id="fx" type="range" min="1" max="200" step="1" value="110">
+            <div class="range-hints"><span>1</span><span>200</span></div>
+          </div>
+
+          <div class="field">
+            <div class="field-head">
+              <label for="fy">Y frequency</label>
+              <span id="fyValue" class="value">112</span>
+            </div>
+            <input id="fy" type="range" min="1" max="200" step="1" value="112">
+            <div class="range-hints"><span>1</span><span>200</span></div>
+          </div>
+
+          <div class="field">
+            <div class="field-head">
+              <label for="divisor">Amplitude divisor</label>
+              <span id="divisorValue" class="value">1.4</span>
+            </div>
+            <input id="divisor" type="range" min="0.5" max="4" step="0.05" value="1.4">
+            <div class="range-hints"><span>0.5</span><span>4</span></div>
+          </div>
+
+          <div class="field">
+            <div class="field-head">
+              <label for="power">Y sine power</label>
+              <span id="powerValue" class="value">3</span>
+            </div>
+            <input id="power" type="range" min="1" max="7" step="2" value="3">
+            <div class="range-hints"><span>1</span><span>7</span></div>
+          </div>
+
+          <div class="field">
+            <div class="field-head">
+              <label for="samples">Samples</label>
+              <span id="samplesValue" class="value">80,000</span>
+            </div>
+            <input id="samples" type="range" min="10000" max="120000" step="5000" value="80000">
+            <div class="range-hints"><span>10k</span><span>120k</span></div>
+          </div>
+
+          <div class="field">
+            <div class="field-head">
+              <label for="width">Line width</label>
+              <span id="widthValue" class="value">0.55</span>
+            </div>
+            <input id="width" type="range" min="0.2" max="2" step="0.05" value="0.55">
+            <div class="range-hints"><span>0.2</span><span>2</span></div>
+          </div>
+        </section>
+
+        <section class="section">
+          <h3>
+            <span>Visual Styling</span>
+            <i class="fa-solid fa-palette"></i>
+          </h3>
+
+          <div class="color-grid">
+            <div class="color-field">
+              <label for="lineColor">Curve color</label>
+              <input id="lineColor" type="color" value="#00e5ff">
+            </div>
+            <div class="color-field">
+              <label for="bgColor">Background color</label>
+              <input id="bgColor" type="color" value="#080064">
+            </div>
+          </div>
+        </section>
+
+        <div class="buttons">
+          <button id="animate" class="primary">Animate</button>
+          <button id="draw">Draw instantly</button>
+          <button id="reset">Reset</button>
+          <button id="download">Save PNG</button>
+        </div>
+
+        <section class="section">
+          <h3>
+            <span>Saved PNGs</span>
+            <i class="fa-solid fa-images"></i>
+          </h3>
+
+          <button id="btnSavePngSidebar" class="save">
+            <i class="fa-solid fa-camera"></i>
+            <span>Save Current Drawing as PNG</span>
+          </button>
+
+          <p class="note">
+            The PNG captures the canvas with the micro-font parameter summary
+            printed at the bottom. Commit the downloaded files to the repo and
+            they will appear here automatically (fetched via the GitHub API).
+          </p>
+
+          <div id="galleryItems" class="gallery"></div>
+        </section>
+
+        <p id="status" role="status" aria-live="polite"></p>
+      </div>
+
+      <div class="sidebar-foot">
+        Adjust any scrollbar to redraw the curve instantly.
+      </div>
+    </aside>
+  </div>
+
+  <script>
+    "use strict";
+
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+    const stage = document.getElementById("stage");
+    const equationElement = document.getElementById("formula");
+    const statusElement = document.getElementById("status");
+    const galleryItems = document.getElementById("galleryItems");
+
+    const defaults = {
+      fx: 110,
+      fy: 112,
+      divisor: 1.4,
+      power: 3,
+      samples: 80000,
+      width: 0.55,
+      lineColor: "#00e5ff",
+      bgColor: "#080064"
+    };
+
+    const controls = Object.fromEntries(
+      Object.keys(defaults).map(id => [
+        id,
+        document.getElementById(id)
+      ])
+    );
+
+    let points = new Float64Array(0);
+    let plot = { size: 0, center: 0, scale: 0 };
+
+    let animationId = null;
+    let redrawId = null;
+    let animationToken = 0;
+    let lastDrawn = 0;
+
+    function getParameters() {
+      return {
+        fx: Number(controls.fx.value),
+        fy: Number(controls.fy.value),
+        divisor: Number(controls.divisor.value),
+        power: Number(controls.power.value),
+        samples: Number(controls.samples.value),
+        width: Number(controls.width.value),
+        lineColor: controls.lineColor.value,
+        bgColor: controls.bgColor.value
+      };
+    }
+
+    // Round a slider value to at most two decimals, trimming trailing zeros
+    // (0.05-step values can accumulate floating-point noise).
+    function formatDivisor(d) {
+      return String(Math.round(d * 100) / 100);
+    }
+
+    function updateLabels(p) {
+      for (const key of [
+        "fx", "fy", "divisor", "power", "samples", "width"
+      ]) {
+        const value = key === "samples"
+          ? p[key].toLocaleString()
+          : key === "divisor"
+            ? formatDivisor(p[key])
+            : String(p[key]);
+
+        document.getElementById(key + "Value").textContent = value;
+      }
+
+      equationElement.innerHTML = `
+        <div>
+          x(t) = cos(t) + (1/${formatDivisor(p.divisor)}) cos(${p.fx}t)
+        </div>
+        <div>
+          y(t) = sin(t) + (1/${formatDivisor(p.divisor)})
+          sin<sup>${p.power}</sup>(${p.fy}t)
+        </div>
+        <div>0 ≤ t ≤ 2π</div>
+      `;
+
+      stage.style.backgroundColor = p.bgColor;
+    }
+
+    function resizeCanvas() {
+      // Fit a square canvas inside the stage, leaving a small margin.
+      const size = Math.max(
+        1,
+        Math.floor(Math.min(stage.clientWidth, stage.clientHeight) - 32)
+      );
+      const dpr = window.devicePixelRatio || 1;
+
+      canvas.width = Math.round(size * dpr);
+      canvas.height = Math.round(size * dpr);
+      canvas.style.width = size + "px";
+      canvas.style.height = size + "px";
+
+      // Draw in CSS-pixel coordinates while retaining HiDPI sharpness.
+      ctx.setTransform(
+        canvas.width / size, 0,
+        0, canvas.height / size,
+        0, 0
+      );
+
+      plot.size = size;
+      plot.center = size / 2;
+    }
+
+    function generatePoints(p) {
+      const amplitude = 1 / p.divisor;
+      const result = new Float64Array((p.samples + 1) * 2);
+
+      for (let i = 0; i <= p.samples; i++) {
+        const t = (i / p.samples) * Math.PI * 2;
+
+        result[2 * i] =
+          Math.cos(t) + amplitude * Math.cos(p.fx * t);
+
+        result[2 * i + 1] =
+          Math.sin(t) +
+          amplitude * Math.pow(Math.sin(p.fy * t), p.power);
+      }
+
+      // Make the final point exactly coincide with the first.
+      result[2 * p.samples] = result[0];
+      result[2 * p.samples + 1] = result[1];
+
+      // Both coordinates lie within ±(1 + amplitude).
+      plot.scale = (plot.size * 0.46) / (1 + amplitude);
+
+      return result;
+    }
+
+    function clearCanvas(p) {
+      ctx.fillStyle = p.bgColor;
+      ctx.fillRect(0, 0, plot.size, plot.size);
+
+      ctx.strokeStyle = p.lineColor;
+      ctx.lineWidth = p.width;
+      ctx.lineJoin = "round";
+      ctx.lineCap = "round";
+    }
+
+    function screenX(index) {
+      return plot.center + points[2 * index] * plot.scale;
+    }
+
+    function screenY(index) {
+      // Canvas y increases downward; mathematical y increases upward.
+      return plot.center - points[2 * index + 1] * plot.scale;
+    }
+
+    function strokeRange(start, end) {
+      if (end <= start) return;
+
+      ctx.beginPath();
+      ctx.moveTo(screenX(start), screenY(start));
+
+      for (let i = start + 1; i <= end; i++) {
+        ctx.lineTo(screenX(i), screenY(i));
+      }
+
+      ctx.stroke();
+    }
+
+    function stopAnimation() {
+      animationToken++;
+
+      if (animationId !== null) {
+        cancelAnimationFrame(animationId);
+        animationId = null;
+      }
+
+      document.getElementById("animate").textContent = "Animate";
+    }
+
+    function prepare() {
+      const p = getParameters();
+
+      updateLabels(p);
+      resizeCanvas();
+      points = generatePoints(p);
+      clearCanvas(p);
+      lastDrawn = 0;
+
+      return p;
+    }
+
+    function drawInstantly() {
+      stopAnimation();
+
+      const p = prepare();
+      strokeRange(0, p.samples);
+      lastDrawn = p.samples;
+
+      statusElement.textContent =
+        `Rendered ${p.samples.toLocaleString()} line segments.`;
+    }
+
+    function animate() {
+      if (animationId !== null) {
+        stopAnimation();
+        statusElement.textContent =
+          "Animation stopped. Click Animate to restart.";
+        return;
+      }
+
+      stopAnimation();
+
+      const p = prepare();
+      const token = animationToken;
+      const duration = 8000;
+      let startTime;
+
+      document.getElementById("animate").textContent = "Stop";
+
+      function frame(time) {
+        if (token !== animationToken) return;
+
+        if (startTime === undefined) startTime = time;
+
+        const progress = Math.min((time - startTime) / duration, 1);
+        const nextIndex = Math.floor(progress * p.samples);
+
+        strokeRange(lastDrawn, nextIndex);
+        lastDrawn = nextIndex;
+
+        statusElement.textContent =
+          `Drawing: ${Math.round(progress * 100)}%`;
+
+        if (progress < 1) {
+          animationId = requestAnimationFrame(frame);
+        } else {
+          animationId = null;
+          document.getElementById("animate").textContent = "Animate";
+          statusElement.textContent = "Animation complete.";
+        }
+      }
+
+      animationId = requestAnimationFrame(frame);
+    }
+
+    function scheduleRedraw() {
+      stopAnimation();
+
+      if (redrawId !== null) return;
+
+      redrawId = requestAnimationFrame(() => {
+        redrawId = null;
+        drawInstantly();
+      });
+    }
+
+    function reset() {
+      for (const [key, value] of Object.entries(defaults)) {
+        controls[key].value = value;
+      }
+
+      drawInstantly();
+    }
+
+    // --- Save PNG with micro-font parameter summary ------------------------
+    // After "Save PNG" is clicked, the parameter summary is printed on the
+    // canvas in micro font at the bottom and stays visible for a short
+    // while; the saved PNG captures the canvas while it is visible.
+    let showParamsUntil = 0;
+    const PARAM_DISPLAY_MS = 5000;
+
+    function buildParamLines(p) {
+      const d = formatDivisor(p.divisor);
+      return [
+        `x(t) = cos(t) + (1/${d}) cos(${p.fx}t),   ` +
+        `y(t) = sin(t) + (1/${d}) sin^${p.power}(${p.fy}t)`,
+        `fx = ${p.fx}, fy = ${p.fy}, divisor = ${d}, power = ${p.power}`,
+        `samples = ${p.samples.toLocaleString()}, line width = ${p.width}px`,
+        `curve color = ${p.lineColor}, background = ${p.bgColor}`
+      ];
+    }
+
+    function drawParams(p) {
+      const w = canvas.width;
+      const h = canvas.height;
+      const lines = buildParamLines(p);
+
+      const fontPx = Math.max(10, Math.round(Math.min(w, h) / 80)); // micro font
+      const lineH = fontPx * 1.45;
+      const pad = fontPx * 0.6;
+      const bandH = lines.length * lineH + 2 * pad;
+
+      // Draw in raw canvas pixels (bypasses the HiDPI CSS-pixel transform).
+      ctx.save();
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.font = fontPx + "px monospace";
+      ctx.fillStyle = "rgba(255, 255, 255, 0.85)"; // legible over the dark art
+      ctx.fillRect(0, h - bandH, w, bandH);
+      ctx.fillStyle = "#111827";
+      ctx.textAlign = "left";
+      ctx.textBaseline = "middle";
+      lines.forEach(function (line, i) {
+        ctx.fillText(line, pad, h - bandH + pad + lineH * (i + 0.5));
+      });
+      ctx.restore();
+    }
+
+    function savePng() {
+      // Export the complete curve, even if animation was in progress, then
+      // print the parameters and save a copy of the canvas (art + micro-font
+      // parameter summary at the bottom) as a PNG.
+      stopAnimation();
+
+      const p = prepare();
+      strokeRange(0, p.samples);
+      lastDrawn = p.samples;
+      drawParams(p);
+      showParamsUntil = performance.now() + PARAM_DISPLAY_MS;
+
+      const link = document.createElement("a");
+      link.download = "spider_waves_fx" + p.fx +
+        "_fy" + p.fy +
+        "_div" + formatDivisor(p.divisor) +
+        "_pow" + p.power + ".png";
+      link.href = canvas.toDataURL("image/png");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      // Remove the summary from the screen after a short while.
+      setTimeout(() => {
+        if (performance.now() >= showParamsUntil) drawInstantly();
+      }, PARAM_DISPLAY_MS);
+
+      statusElement.textContent = "PNG saved with parameter summary.";
+    }
+
+    // --- Right-side gallery: all saved "spider_waves_" PNGs ----------------
+    // Lists the repo contents through the GitHub API so every committed
+    // "spider_waves_*.png" shows up without editing this file.
+    function renderGallery(items) {
+      galleryItems.innerHTML = "";
+      if (!items.length) {
+        const empty = document.createElement("div");
+        empty.className = "gallery-empty";
+        empty.textContent = "No saved PNGs yet.";
+        galleryItems.appendChild(empty);
+        return;
+      }
+      items.forEach(function (item) {
+        const wrap = document.createElement("a");
+        wrap.href = item.url;
+        wrap.target = "_blank";
+        wrap.rel = "noopener";
+        wrap.title = "Open " + item.name;
+        wrap.className = "gallery-item";
+
+        const img = document.createElement("img");
+        img.src = item.url;
+        img.alt = item.name;
+        img.loading = "lazy";
+        wrap.appendChild(img);
+
+        const label = document.createElement("span");
+        label.className = "gname";
+        label.textContent = item.name;
+        wrap.appendChild(label);
+
+        galleryItems.appendChild(wrap);
+      });
+    }
+
+    function loadGallery() {
+      fetch("https://api.github.com/repos/tthtlc/tthtlc.github.io/contents/")
+        .then(function (response) {
+          if (!response.ok) { throw new Error("HTTP " + response.status); }
+          return response.json();
+        })
+        .then(function (files) {
+          if (!Array.isArray(files)) { throw new Error("unexpected response"); }
+          const items = files
+            .filter(function (f) {
+              return f.type === "file" &&
+                f.name.indexOf("spider_waves_") === 0 &&
+                f.name.slice(-4).toLowerCase() === ".png";
+            })
+            .map(function (f) { return { name: f.name, url: f.download_url }; })
+            .sort(function (a, b) { return a.name < b.name ? -1 : 1; });
+          renderGallery(items);
+        })
+        .catch(function () {
+          renderGallery([]);
+        });
+    }
+
+    // --- Wiring -------------------------------------------------------------
+    for (const control of Object.values(controls)) {
+      control.addEventListener("input", scheduleRedraw);
+    }
+
+    document.getElementById("animate")
+      .addEventListener("click", animate);
+
+    document.getElementById("draw")
+      .addEventListener("click", drawInstantly);
+
+    document.getElementById("reset")
+      .addEventListener("click", reset);
+
+    document.getElementById("download")
+      .addEventListener("click", savePng);
+
+    document.getElementById("btnSavePngSidebar")
+      .addEventListener("click", savePng);
+
+    document.getElementById("btnSavePngStage")
+      .addEventListener("click", savePng);
+
+    // Popup sidebar (smaller screens): slide the panel in and out.
+    const sidebar = document.getElementById("sidebar");
+
+    document.getElementById("btnToggleSidebar")
+      .addEventListener("click", () => sidebar.classList.toggle("open"));
+
+    document.getElementById("btnCloseSidebar")
+      .addEventListener("click", () => sidebar.classList.remove("open"));
+
+    const resizeObserver = new ResizeObserver(scheduleRedraw);
+    resizeObserver.observe(stage);
+
+    loadGallery();
+    drawInstantly();
+  </script>
+</body>
+</html>

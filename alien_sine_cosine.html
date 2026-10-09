@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Spider Waves — Parametric Curve Generator</title>
+
+  <style>
+    :root {
+      color-scheme: dark;
+      --background: #080064;
+      --panel: #111038;
+      --text: #edf5ff;
+      --muted: #aebbd3;
+      --accent: #00e5ff;
+      --border: #34335d;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: #080818;
+      color: var(--text);
+      font-family: system-ui, sans-serif;
+    }
+
+    main {
+      width: min(1180px, 100%);
+      margin: auto;
+      padding: 24px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    .intro {
+      margin: 0 0 24px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 300px;
+      gap: 20px;
+      align-items: start;
+    }
+
+    .preview,
+    .controls {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    .preview {
+      background: var(--background);
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      aspect-ratio: 1;
+    }
+
+    .equations {
+      padding: 0 18px 20px;
+      color: var(--accent);
+      text-align: center;
+      font-family: Georgia, serif;
+      font-size: clamp(14px, 2vw, 20px);
+      line-height: 1.7;
+      overflow-wrap: anywhere;
+    }
+
+    .controls {
+      padding: 20px;
+      background: var(--panel);
+    }
+
+    h2 {
+      margin-top: 0;
+      font-size: 18px;
+    }
+
+    .field {
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    output {
+      color: var(--accent);
+      font-variant-numeric: tabular-nums;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    input[type="color"] {
+      width: 100%;
+      height: 36px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: transparent;
+      cursor: pointer;
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 22px;
+    }
+
+    button {
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #242347;
+      color: var(--text);
+      font: inherit;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #353368;
+    }
+
+    button.primary {
+      background: #00576b;
+      border-color: #0089a5;
+    }
+
+    .note,
+    #status {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    #status {
+      min-height: 2em;
+      margin-bottom: 0;
+    }
+
+    @media (max-width: 800px) {
+      main {
+        padding: 14px;
+      }
+
+      .layout {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main>
+    <h1>Spider Waves</h1>
+    <p class="intro">
+      A single parametric curve with a woven, web-like appearance.
+      Adjust the frequencies and amplitude to explore its geometry.
+    </p>
+
+    <div class="layout">
+      <section class="preview" aria-label="Curve preview">
+        <canvas
+          id="canvas"
+          role="img"
+          aria-label="Spider Waves parametric curve"
+        ></canvas>
+
+        <div id="equations" class="equations"></div>
+      </section>
+
+      <aside class="controls">
+        <h2>Curve parameters</h2>
+
+        <div class="field">
+          <label for="fx">
+            X frequency
+            <output id="fxValue" for="fx"></output>
+          </label>
+          <input id="fx" type="range"
+                 min="1" max="200" step="1" value="110">
+        </div>
+
+        <div class="field">
+          <label for="fy">
+            Y frequency
+            <output id="fyValue" for="fy"></output>
+          </label>
+          <input id="fy" type="range"
+                 min="1" max="200" step="1" value="112">
+        </div>
+
+        <div class="field">
+          <label for="divisor">
+            Amplitude divisor
+            <output id="divisorValue" for="divisor"></output>
+          </label>
+          <input id="divisor" type="range"
+                 min="0.5" max="4" step="0.05" value="1.4">
+        </div>
+
+        <div class="field">
+          <label for="power">
+            Y sine power
+            <output id="powerValue" for="power"></output>
+          </label>
+          <input id="power" type="range"
+                 min="1" max="7" step="2" value="3">
+        </div>
+
+        <div class="field">
+          <label for="samples">
+            Samples
+            <output id="samplesValue" for="samples"></output>
+          </label>
+          <input id="samples" type="range"
+                 min="10000" max="120000" step="5000" value="80000">
+        </div>
+
+        <div class="field">
+          <label for="width">
+            Line width
+            <output id="widthValue" for="width"></output>
+          </label>
+          <input id="width" type="range"
+                 min="0.2" max="2" step="0.05" value="0.55">
+        </div>
+
+        <div class="field">
+          <label for="lineColor">Curve color</label>
+          <input id="lineColor" type="color" value="#00e5ff">
+        </div>
+
+        <div class="field">
+          <label for="bgColor">Background color</label>
+          <input id="bgColor" type="color" value="#080064">
+        </div>
+
+        <div class="buttons">
+          <button id="animate" class="primary">Animate</button>
+          <button id="draw">Draw instantly</button>
+          <button id="reset">Reset</button>
+          <button id="download">Save PNG</button>
+        </div>
+
+        <p class="note">
+          The parameter runs from 0 to 2π. The sine power is restricted
+          to odd integers. More samples produce a smoother curve.
+        </p>
+
+        <p id="status" role="status" aria-live="polite"></p>
+      </aside>
+    </div>
+  </main>
+
+  <script>
+    "use strict";
+
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+    const equationElement = document.getElementById("equations");
+    const statusElement = document.getElementById("status");
+
+    const defaults = {
+      fx: 110,
+      fy: 112,
+      divisor: 1.4,
+      power: 3,
+      samples: 80000,
+      width: 0.55,
+      lineColor: "#00e5ff",
+      bgColor: "#080064"
+    };
+
+    const controls = Object.fromEntries(
+      Object.keys(defaults).map(id => [
+        id,
+        document.getElementById(id)
+      ])
+    );
+
+    let points = new Float64Array(0);
+    let plot = { size: 0, center: 0, scale: 0 };
+
+    let animationId = null;
+    let redrawId = null;
+    let animationToken = 0;
+    let lastDrawn = 0;
+
+    function getParameters() {
+      return {
+        fx: Number(controls.fx.value),
+        fy: Number(controls.fy.value),
+        divisor: Number(controls.divisor.value),
+        power: Number(controls.power.value),
+        samples: Number(controls.samples.value),
+        width: Number(controls.width.value),
+        lineColor: controls.lineColor.value,
+        bgColor: controls.bgColor.value
+      };
+    }
+
+    function updateLabels(p) {
+      for (const key of [
+        "fx", "fy", "divisor", "power", "samples", "width"
+      ]) {
+        const value = key === "samples"
+          ? p[key].toLocaleString()
+          : String(p[key]);
+
+        document.getElementById(key + "Value").value = value;
+      }
+
+      equationElement.innerHTML = `
+        <div>
+          x(t) = cos(t) + (1/${p.divisor}) cos(${p.fx}t)
+        </div>
+        <div>
+          y(t) = sin(t) + (1/${p.divisor})
+          sin<sup>${p.power}</sup>(${p.fy}t)
+        </div>
+        <div>0 ≤ t ≤ 2π</div>
+      `;
+
+      document.querySelector(".preview").style.backgroundColor =
+        p.bgColor;
+    }
+
+    function resizeCanvas() {
+      const size = canvas.getBoundingClientRect().width;
+      const dpr = window.devicePixelRatio || 1;
+
+      canvas.width = Math.round(size * dpr);
+      canvas.height = Math.round(size * dpr);
+
+      // Draw in CSS-pixel coordinates while retaining HiDPI sharpness.
+      ctx.setTransform(
+        canvas.width / size, 0,
+        0, canvas.height / size,
+        0, 0
+      );
+
+      plot.size = size;
+      plot.center = size / 2;
+    }
+
+    function generatePoints(p) {
+      const amplitude = 1 / p.divisor;
+      const result = new Float64Array((p.samples + 1) * 2);
+
+      for (let i = 0; i <= p.samples; i++) {
+        const t = (i / p.samples) * Math.PI * 2;
+
+        result[2 * i] =
+          Math.cos(t) + amplitude * Math.cos(p.fx * t);
+
+        result[2 * i + 1] =
+          Math.sin(t) +
+          amplitude * Math.pow(Math.sin(p.fy * t), p.power);
+      }
+
+      // Make the final point exactly coincide with the first.
+      result[2 * p.samples] = result[0];
+      result[2 * p.samples + 1] = result [ppl-ai-file-upload.s3.amazonaws](https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/attachments/images/13148127/a7930252-62d4-4e8e-9d8c-189aaad0a8ed/image.jpg);
+
+      // Both coordinates lie within ±(1 + amplitude).
+      plot.scale = (plot.size * 0.46) / (1 + amplitude);
+
+      return result;
+    }
+
+    function clearCanvas(p) {
+      ctx.fillStyle = p.bgColor;
+      ctx.fillRect(0, 0, plot.size, plot.size);
+
+      ctx.strokeStyle = p.lineColor;
+      ctx.lineWidth = p.width;
+      ctx.lineJoin = "round";
+      ctx.lineCap = "round";
+    }
+
+    function screenX(index) {
+      return plot.center + points[2 * index] * plot.scale;
+    }
+
+    function screenY(index) {
+      // Canvas y increases downward; mathematical y increases upward.
+      return plot.center - points[2 * index + 1] * plot.scale;
+    }
+
+    function strokeRange(start, end) {
+      if (end <= start) return;
+
+      ctx.beginPath();
+      ctx.moveTo(screenX(start), screenY(start));
+
+      for (let i = start + 1; i <= end; i++) {
+        ctx.lineTo(screenX(i), screenY(i));
+      }
+
+      ctx.stroke();
+    }
+
+    function stopAnimation() {
+      animationToken++;
+
+      if (animationId !== null) {
+        cancelAnimationFrame(animationId);
+        animationId = null;
+      }
+
+      document.getElementById("animate").textContent = "Animate";
+    }
+
+    function prepare() {
+      const p = getParameters();
+
+      updateLabels(p);
+      resizeCanvas();
+      points = generatePoints(p);
+      clearCanvas(p);
+      lastDrawn = 0;
+
+      return p;
+    }
+
+    function drawInstantly() {
+      stopAnimation();
+
+      const p = prepare();
+      strokeRange(0, p.samples);
+      lastDrawn = p.samples;
+
+      statusElement.textContent =
+        `Rendered ${p.samples.toLocaleString()} line segments.`;
+    }
+
+    function animate() {
+      if (animationId !== null) {
+        stopAnimation();
+        statusElement.textContent =
+          "Animation stopped. Click Animate to restart.";
+        return;
+      }
+
+      stopAnimation();
+
+      const p = prepare();
+      const token = animationToken;
+      const duration = 8000;
+      let startTime;
+
+      document.getElementById("animate").textContent = "Stop";
+
+      function frame(time) {
+        if (token !== animationToken) return;
+
+        if (startTime === undefined) startTime = time;
+
+        const progress = Math.min((time - startTime) / duration, 1);
+        const nextIndex = Math.floor(progress * p.samples);
+
+        strokeRange(lastDrawn, nextIndex);
+        lastDrawn = nextIndex;
+
+        statusElement.textContent =
+          `Drawing: ${Math.round(progress * 100)}%`;
+
+        if (progress < 1) {
+          animationId = requestAnimationFrame(frame);
+        } else {
+          animationId = null;
+          document.getElementById("animate").textContent = "Animate";
+          statusElement.textContent = "Animation complete.";
+        }
+      }
+
+      animationId = requestAnimationFrame(frame);
+    }
+
+    function scheduleRedraw() {
+      stopAnimation();
+
+      if (redrawId !== null) return;
+
+      redrawId = requestAnimationFrame(() => {
+        redrawId = null;
+        drawInstantly();
+      });
+    }
+
+    function reset() {
+      for (const [key, value] of Object.entries(defaults)) {
+        controls[key].value = value;
+      }
+
+      drawInstantly();
+    }
+
+    function downloadPNG() {
+      // Export the complete curve, even if animation was in progress.
+      drawInstantly();
+
+      canvas.toBlob(blob => {
+        if (!blob) {
+          statusElement.textContent = "PNG export failed.";
+          return;
+        }
+
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+
+        link.href = url;
+        link.download = "spider-waves.png";
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+
+        setTimeout(() => URL.revokeObjectURL(url), 10000);
+        statusElement.textContent = "PNG exported.";
+      }, "image/png");
+    }
+
+    for (const control of Object.values(controls)) {
+      control.addEventListener("input", scheduleRedraw);
+    }
+
+    document.getElementById("animate")
+      .addEventListener("click", animate);
+
+    document.getElementById("draw")
+      .addEventListener("click", drawInstantly);
+
+    document.getElementById("reset")
+      .addEventListener("click", reset);
+
+    document.getElementById("download")
+      .addEventListener("click", downloadPNG);
+
+    const resizeObserver = new ResizeObserver(scheduleRedraw);
+    resizeObserver.observe(canvas);
+
+    drawInstantly();
+  </script>
+</body>
+</html>
