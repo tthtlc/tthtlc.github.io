@@ -78,7 +78,7 @@
           <span class="text-cyan-400 font-bold text-sm">x → (<span id="dispNVal">0</span> + <span id="dispKVal">3.0</span> × x) % <span id="dispTotalPoints">180</span></span>
         </div>
         <div class="flex items-center justify-between text-[11px] text-slate-400 pt-0.5 border-t border-slate-800/60">
-          <span>Rotations: <strong id="dispRotations" class="text-pink-400">0°, ±20°, ±40°, ±60°</strong></span>
+          <span>Rotations: <strong id="dispRotations" class="text-pink-400">0°, ±30°, ±60°</strong></span>
         </div>
       </div>
 
@@ -163,26 +163,26 @@
             </div>
           </div>
 
-          <!-- Step Multiplier (k) with STRICT +0.5 Steps -->
+          <!-- Step Multiplier (k) with STRICT 1 Steps -->
           <div class="space-y-2 bg-slate-900/90 p-2.5 rounded-xl border border-indigo-500/30">
             <div class="flex justify-between items-center">
               <label for="inputMultiplier" class="font-medium text-indigo-300 flex items-center space-x-1.5">
                 <span>Step Multiplier (k)</span>
-                <span class="text-[10px] bg-indigo-950 text-indigo-400 px-1.5 py-0.5 rounded border border-indigo-800/50 font-mono">+0.5 Steps</span>
+                <span class="text-[10px] bg-indigo-950 text-indigo-400 px-1.5 py-0.5 rounded border border-indigo-800/50 font-mono">+1 Steps</span>
               </label>
-              <span id="valMultiplier" class="font-mono text-indigo-300 font-extrabold text-sm bg-indigo-950/80 px-2 py-0.5 rounded border border-indigo-700/60 shadow-sm">3.0</span>
+              <span id="valMultiplier" class="font-mono text-indigo-300 font-extrabold text-sm bg-indigo-950/80 px-2 py-0.5 rounded border border-indigo-700/60 shadow-sm">2.0</span>
             </div>
 
             <div class="flex items-center space-x-2">
-              <button id="btnStepMinus" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 font-mono font-bold text-slate-200 rounded-lg border border-slate-700 transition flex-shrink-0" title="Decrement k by 0.5">
-                -0.5
+              <button id="btnStepMinus" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 font-mono font-bold text-slate-200 rounded-lg border border-slate-700 transition flex-shrink-0" title="Decrement k by 1">
+               -1 
               </button>
 
-              <input type="range" id="inputMultiplier" min="0" max="100" step="0.5" value="3.0"
+              <input type="range" id="inputMultiplier" min="0" max="50" step="1" value="2.0"
                 class="flex-1 h-2.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500 slider-thumb-custom">
 
-              <button id="btnStepPlus" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 font-mono font-bold text-slate-200 rounded-lg border border-slate-700 transition flex-shrink-0" title="Increment k by 0.5">
-                +0.5
+              <button id="btnStepPlus" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 font-mono font-bold text-slate-200 rounded-lg border border-slate-700 transition flex-shrink-0" title="Increment k by 1">
+                +1
               </button>
             </div>
 
@@ -204,9 +204,9 @@
           <div class="space-y-1.5">
             <div class="flex justify-between text-slate-300">
               <label for="inputRotStep" class="font-medium">Rotation Step</label>
-              <span id="valRotStep" class="font-mono text-pink-400 font-semibold">20°</span>
+              <span id="valRotStep" class="font-mono text-pink-400 font-semibold">30°</span>
             </div>
-            <input type="range" id="inputRotStep" min="0" max="120" step="1" value="20"
+            <input type="range" id="inputRotStep" min="0" max="120" step="1" value="30"
               class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-pink-500">
             <div class="flex justify-between text-[10px] text-slate-500 font-mono">
               <span>0°</span>
@@ -218,16 +218,16 @@
           <div class="space-y-1.5">
             <div class="flex justify-between text-slate-300">
               <label for="inputRotPairs" class="font-medium">Left/Right Pairs</label>
-              <span id="valRotPairs" class="font-mono text-pink-400 font-semibold">3</span>
+              <span id="valRotPairs" class="font-mono text-pink-400 font-semibold">2</span>
             </div>
-            <input type="range" id="inputRotPairs" min="0" max="6" step="1" value="3"
+            <input type="range" id="inputRotPairs" min="0" max="6" step="1" value="2"
               class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-pink-500">
             <div class="flex justify-between text-[10px] text-slate-500 font-mono">
               <span>0 (original only)</span>
               <span>6 (±6 steps)</span>
             </div>
             <p class="text-[10px] text-slate-500 leading-snug pt-1">
-              Each pair adds one copy rotated <span class="font-mono text-slate-400">m × step</span> to the left and one to the right, for m = 1 … pairs. Default (±20°, ±40°, ±60°) = step 20°, pairs 3.
+              Each pair adds one copy rotated <span class="font-mono text-slate-400">m × step</span> to the left and one to the right, for m = 1 … pairs. Default (±30°, ±60°) = step 30°, pairs 2.
             </p>
           </div>
         </div>
@@ -289,11 +289,6 @@
             <i class="fa-solid fa-images text-slate-500"></i>
           </h3>
 
-          <button id="btnSavePngSidebar" class="w-full px-3 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-600 text-white font-semibold text-xs flex items-center justify-center space-x-2 shadow-lg shadow-emerald-500/20 hover:opacity-90 transition">
-            <i class="fa-solid fa-camera text-xs"></i>
-            <span>Save Current Drawing as PNG</span>
-          </button>
-
           <p class="text-[10px] text-slate-500 leading-snug">
             The PNG captures the canvas with the micro-font parameter summary printed at the bottom-left. Commit the downloaded files to the repo and they will appear here automatically (fetched via the GitHub API).
           </p>
@@ -315,10 +310,10 @@
     const state = {
       totalPoints: 180,  // N (10 to 1440)
       offsetN: 0,        // n (0 to N-1)
-      multiplierK: 3.0,  // k (Strictly in steps of 0.5)
+      multiplierK: 3.0,  // k (Strictly in steps of 1)
 
-      rotStepDeg: 20,    // angular step between successive rotations
-      rotPairs: 3,       // how many left/right pairs (±step, ±2·step, …)
+      rotStepDeg: 30,    // angular step between successive rotations
+      rotPairs: 2,       // how many left/right pairs (±step, ±2·step, …)
 
       opacity: 0.60,
       lineWidth: 1.1,
@@ -378,7 +373,6 @@
     const sidebar = document.getElementById('sidebar');
 
     const btnSavePng = document.getElementById('btnSavePng');
-    const btnSavePngSidebar = document.getElementById('btnSavePngSidebar');
     const galleryItems = document.getElementById('galleryItems');
 
     // Build the layer list: the original figure plus m×step rotations to the
@@ -567,7 +561,7 @@
       ctx.textAlign = 'left';
       ctx.textBaseline = 'middle';
       lines.forEach(function (line, i) {
-        ctx.fillText(line, pad, h - bandH + pad + lineH * (i + 0.5));
+        ctx.fillText(line, pad, h - bandH + pad + lineH * (i + 1.0));
       });
       ctx.restore();
     }
@@ -595,7 +589,6 @@
     }
 
     btnSavePng.addEventListener('click', savePng);
-    btnSavePngSidebar.addEventListener('click', savePng);
 
     // --- Right-side gallery: all saved "rotated_string_art_layers_" PNGs ---
     // Lists the repo contents through the GitHub API so every committed
@@ -656,7 +649,7 @@
         });
     }
 
-    // Helper to sanitize k to exact 0.5 increments
+    // Helper to sanitize k to exact 1.0 increments
     function setMultiplier(val) {
       let rounded = Math.round(val * 2) / 2;
       if (rounded < 0) rounded = 0;
@@ -696,18 +689,18 @@
       render();
     });
 
-    // Multiplier slider with step="0.5"
+    // Multiplier slider with step="1.0"
     inputMultiplier.addEventListener('input', (e) => {
       setMultiplier(parseFloat(e.target.value));
     });
 
-    // Step Modifier Buttons (-0.5 / +0.5)
+    // Step Modifier Buttons (-1.0 / +1.0)
     btnStepMinus.addEventListener('click', () => {
-      setMultiplier(state.multiplierK - 0.5);
+      setMultiplier(state.multiplierK - 1.0);
     });
 
     btnStepPlus.addEventListener('click', () => {
-      setMultiplier(state.multiplierK + 0.5);
+      setMultiplier(state.multiplierK + 1.0);
     });
 
     inputRotStep.addEventListener('input', (e) => {
