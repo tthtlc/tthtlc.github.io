@@ -4,17 +4,28 @@
   <link rel="stylesheet" href="/assets/math-art.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rotating Gradient Background</title>
+    <title>Spherical Tessellation</title>
     <style>
         body, html {
             margin: 0;
             padding: 0;
             height: 100%;
             overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             font-family: Arial, sans-serif;
+        }
+
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            cursor: grab;
+        }
+
+        canvas:active {
+            cursor: grabbing;
         }
 
         /* Controls styling */
@@ -24,179 +35,486 @@
             left: 20px;
             font-size: 1.2em;
             display: flex;
+            align-items: center;
             gap: 1em;
+            z-index: 2;
+            color: #fff;
+            text-shadow: 0 0 4px rgba(0, 0, 0, 0.8);
         }
 
         /* Content text styling */
         #content {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
             color: #fff;
             font-size: 2em;
             text-align: center;
             z-index: 1;
+            text-shadow: 0 0 6px rgba(0, 0, 0, 0.6);
+            pointer-events: none;
         }
     </style>
 </head>
 <body>
+    <canvas id="canvas"></canvas>
     <div id="controls">
         <label for="color1-picker">Color 1:</label>
         <input type="color" id="color1-picker" value="#0000ff">
 
         <label for="color2-picker">Color 2:</label>
         <input type="color" id="color2-picker" value="#00ffff">
+
+        <label for="color-count">Colors:</label>
+        <input type="range" id="color-count" min="2" max="32" value="5">
+        <span id="color-count-value">5</span>
     </div>
-    <div id="content">Rotating Gradient Background</div>
+    <div id="content">Spherical Tessellation</div>
 
     <script>
 // Constants
-const order_n = 2;
-const normalize = true;
-const platonicSolid = 2;
-let rotationMatrix = mat4.create();
-mat4.identity(rotationMatrix);
+const order_n = 2;              // triangle subdivision depth
+const normalize = true;         // project midpoints onto the unit sphere
+const platonicSolid = 2;        // 0 = tetrahedron, 1 = octahedron, 2 = icosahedron
+
+let vertices = [];              // tessellated triangles, 3 floats per vertex
+let normals = [];               // one flat face normal per vertex (duplicated per triangle)
+let colors = [];                // one flat color per vertex (duplicated per triangle)
+let lineIndices = [];           // edge index pairs for the wireframe overlay
+
+// ---- Minimal column-major mat4 helpers (replaces gl-matrix) ----
+function mat4Identity(m) {
+    m.set([1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1]);
+}
+
+function mat4Multiply(out, a, b) {
+    const r = new Float32Array(16);
+    for (let col = 0; col < 4; col++) {
+        for (let row = 0; row < 4; row++) {
+            let s = 0;
+            for (let k = 0; k < 4; k++) s += a[k * 4 + row] * b[col * 4 + k];
+            r[col * 4 + row] = s;
+        }
+    }
+    out.set(r);
+}
+
+function mat4Rotate(out, m, angle, axis) {
+    const a = normalizeVector(axis);
+    const x = a[0], y = a[1], z = a[2];
+    const c = Math.cos(angle), s = Math.sin(angle), t = 1 - c;
+    const R = new Float32Array([
+        t*x*x + c,     t*x*y + s*z, t*x*z - s*y, 0,
+        t*x*y - s*z,   t*y*y + c,   t*y*z + s*x, 0,
+        t*x*z + s*y,   t*y*z - s*x, t*z*z + c,   0,
+        0, 0, 0, 1
+    ]);
+    mat4Multiply(out, m, R);   // out = m * R
+}
+
+function mat4Translate(m, x, y, z) {
+    m.set([1,0,0,0, 0,1,0,0, 0,0,1,0, x,y,z,1]);
+}
+
+function mat4Perspective(out, fovy, aspect, near, far) {
+    const f = 1 / Math.tan(fovy / 2);
+    out.fill(0);
+    out[0] = f / aspect;
+    out[5] = f;
+    out[10] = (far + near) / (near - far);
+    out[11] = -1;
+    out[14] = (2 * far * near) / (near - far);
+}
 
 // Utility Functions
 function normalizeVector(v) {
-  const len = Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
-  return [v[0] / len, v[1] / len, v[2] / len];
+    const len = Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
+    return [v[0] / len, v[1] / len, v[2] / len];
 }
 
 function crossProduct(a, b) {
-  return [
-    a[1] * b[2] - a[2] * b[1],
-    a[2] * b[0] - a[0] * b[2],
-    a[0] * b[1] - a[1] * b[0]
-  ];
+    return [
+        a[1] * b[2] - a[2] * b[1],
+        a[2] * b[0] - a[0] * b[2],
+        a[0] * b[1] - a[1] * b[0]
+    ];
 }
 
-// Tessellation of Triangles for Spheres
+// Beautiful contrasting color by golden-angle hue spacing (HSV -> RGB)
+function paletteColor(i) {
+    const hue = (i * 137.508 + 15) % 360;  // golden angle: consecutive hues far apart
+    const s = 0.72, v = 0.92;
+    const c = v * s;
+    const x = c * (1 - Math.abs((hue / 60) % 2 - 1));
+    const m = v - c;
+    let r, g, b;
+    if (hue < 60)       { r = c; g = x; b = 0; }
+    else if (hue < 120) { r = x; g = c; b = 0; }
+    else if (hue < 180) { r = 0; g = c; b = x; }
+    else if (hue < 240) { r = 0; g = x; b = c; }
+    else if (hue < 300) { r = x; g = 0; b = c; }
+    else                { r = c; g = 0; b = x; }
+    return [r + m, g + m, b + m];
+}
+
+// Tessellation of triangles for spheres
 function triangle(n, a, b, c) {
-  if (n < order_n) {
-    const d = normalize ? normalizeVector([(a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2]) : [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2];
-    const e = normalize ? normalizeVector([(b[0] + c[0]) / 2, (b[1] + c[1]) / 2, (b[2] + c[2]) / 2]) : [(b[0] + c[0]) / 2, (b[1] + c[1]) / 2, (b[2] + c[2]) / 2];
-    const f = normalize ? normalizeVector([(a[0] + c[0]) / 2, (a[1] + c[1]) / 2, (a[2] + c[2]) / 2]) : [(a[0] + c[0]) / 2, (a[1] + c[1]) / 2, (a[2] + c[2]) / 2];
-    
-    triangle(n + 1, a, d, f);
-    triangle(n + 1, d, b, e);
-    triangle(n + 1, f, e, c);
-    triangle(n + 1, f, d, e);
-  } else {
-    // Add triangle vertices to WebGL buffer
-    vertices.push(...a, ...b, ...c);
-  }
+    if (n < order_n) {
+        const d = normalize ? normalizeVector([(a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2]) : [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2];
+        const e = normalize ? normalizeVector([(b[0] + c[0]) / 2, (b[1] + c[1]) / 2, (b[2] + c[2]) / 2]) : [(b[0] + c[0]) / 2, (b[1] + c[1]) / 2, (b[2] + c[2]) / 2];
+        const f = normalize ? normalizeVector([(a[0] + c[0]) / 2, (a[1] + c[1]) / 2, (a[2] + c[2]) / 2]) : [(a[0] + c[0]) / 2, (a[1] + c[1]) / 2, (a[2] + c[2]) / 2];
+
+        triangle(n + 1, a, d, f);
+        triangle(n + 1, d, b, e);
+        triangle(n + 1, f, e, c);
+        triangle(n + 1, f, d, e);
+    } else {
+        // Add triangle vertices to the buffer
+        vertices.push(...a, ...b, ...c);
+    }
 }
 
-// Initialize Platonic Solids
+// Initialize Platonic Solids (complete triangle lists)
 function initializeSolid() {
-  const sqrt3 = Math.sqrt(3);
-  const sqrt2 = Math.sqrt(2);
-  vertices = [];
-  
-  // Define vertices for solids
-  const tetrahedronVertices = [
-    [-sqrt3, -1, 1], [sqrt3, -1, 1], [0, 1, 0],
-    [sqrt3, -1, 1], [0, 1, 0], [0, -1, -1],
-    [0, -1, -1], [-sqrt3, -1, 1], [0, 1, 0]
-  ];
+    const sqrt3 = Math.sqrt(3);
+    const phi = (1 + Math.sqrt(5)) / 2;
 
-  const octahedronVertices = [
-    [-sqrt2, 0, sqrt2], [sqrt2, 0, sqrt2], [0, 1, 0],
-    [sqrt2, 0, sqrt2], [0, 0, -sqrt2], [0, 1, 0],
-    [0, 0, -sqrt2], [-sqrt2, 0, sqrt2], [0, 1, 0],
-  ];
+    // Tetrahedron: 4 faces
+    const tetrahedron = [
+        [-sqrt3, -1, 1], [sqrt3, -1, 1], [0, 1, 0],
+        [sqrt3, -1, 1], [0, 1, 0], [0, -1, -1],
+        [0, -1, -1], [-sqrt3, -1, 1], [0, 1, 0],
+        [0, -1, -1], [sqrt3, -1, 1], [-sqrt3, -1, 1]
+    ];
 
-  const solids = [tetrahedronVertices, octahedronVertices];
-  const verticesSet = solids[platonicSolid];
+    // Octahedron: 8 faces (unit axes)
+    const octahedron = [
+        [1, 0, 0], [0, 1, 0], [0, 0, 1],
+        [0, 1, 0], [-1, 0, 0], [0, 0, 1],
+        [-1, 0, 0], [0, -1, 0], [0, 0, 1],
+        [0, -1, 0], [1, 0, 0], [0, 0, 1],
+        [1, 0, 0], [0, 0, -1], [0, 1, 0],
+        [0, 1, 0], [0, 0, -1], [-1, 0, 0],
+        [-1, 0, 0], [0, 0, -1], [0, -1, 0],
+        [0, -1, 0], [0, 0, -1], [1, 0, 0]
+    ];
 
-  // Subdivide triangles
-  for (let i = 0; i < verticesSet.length; i += 3) {
-    triangle(0, verticesSet[i], verticesSet[i + 1], verticesSet[i + 2]);
-  }
+    // Icosahedron: 12 vertices, 20 faces
+    const iv = [
+        [-1, phi, 0], [1, phi, 0], [-1, -phi, 0], [1, -phi, 0],
+        [0, -1, phi], [0, 1, phi], [0, -1, -phi], [0, 1, -phi],
+        [phi, 0, -1], [phi, 0, 1], [-phi, 0, -1], [-phi, 0, 1]
+    ];
+    const faces = [
+        [0,11,5],[0,5,1],[0,1,7],[0,7,10],[0,10,11],
+        [1,5,9],[5,11,4],[11,10,2],[10,7,6],[7,1,8],
+        [3,9,4],[3,4,2],[3,2,6],[3,6,8],[3,8,9],
+        [4,9,5],[2,4,11],[6,2,10],[8,6,7],[9,8,1]
+    ];
+    const icosahedron = faces.map(f => f.map(i => iv[i]));
+
+    const solids = [tetrahedron, octahedron, icosahedron];
+    const solidTriangles = solids[platonicSolid];
+
+    // Normalize base vertices and subdivide each face
+    vertices = [];
+    for (const tri of solidTriangles) {
+        triangle(0, normalizeVector(tri[0]), normalizeVector(tri[1]), normalizeVector(tri[2]));
+    }
+
+    // One flat face normal per triangle (duplicated per vertex), oriented outward
+    normals = [];
+    const triangleCount = vertices.length / 9;
+    for (let i = 0; i < triangleCount; i++) {
+        const o = i * 9;
+        const a = [vertices[o], vertices[o + 1], vertices[o + 2]];
+        const b = [vertices[o + 3], vertices[o + 4], vertices[o + 5]];
+        const c = [vertices[o + 6], vertices[o + 7], vertices[o + 8]];
+        let n = normalizeVector(crossProduct([b[0]-a[0], b[1]-a[1], b[2]-a[2]], [c[0]-a[0], c[1]-a[1], c[2]-a[2]]));
+        // Orient toward the outside regardless of winding order
+        const centroid = [(a[0]+b[0]+c[0]) / 3, (a[1]+b[1]+c[1]) / 3, (a[2]+b[2]+c[2]) / 3];
+        if (n[0]*centroid[0] + n[1]*centroid[1] + n[2]*centroid[2] < 0) {
+            n = [-n[0], -n[1], -n[2]];
+        }
+        for (let k = 0; k < 3; k++) normals.push(n[0], n[1], n[2]);
+    }
+
+    // Edge index pairs for the wireframe overlay (3 edges per triangle)
+    lineIndices = [];
+    for (let i = 0; i < vertices.length; i += 9) {
+        lineIndices.push(i / 3, i / 3 + 1, i / 3 + 1, i / 3 + 2, i / 3 + 2, i / 3);
+    }
 }
 
-// WebGL Drawing Functions
-function drawScene(gl, programInfo, buffers) {
-  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-  gl.uniformMatrix4fv(programInfo.uniformLocations.uRotationMatrix, false, rotationMatrix);
-
-  gl.bindBuffer(gl.ARRAY_BUFFER, buffers.position);
-  gl.vertexAttribPointer(programInfo.attribLocations.vertexPosition, 3, gl.FLOAT, false, 0, 0);
-  gl.enableVertexAttribArray(programInfo.attribLocations.vertexPosition);
-
-  gl.drawArrays(gl.TRIANGLES, 0, vertices.length / 3);
+// Assign one palette color per triangle, alternating among `colorCount` colors
+function buildColors(colorCount) {
+    colors = [];
+    const triangleCount = vertices.length / 9;
+    for (let i = 0; i < triangleCount; i++) {
+        const col = paletteColor(i % colorCount);
+        for (let k = 0; k < 3; k++) colors.push(col[0], col[1], col[2]);
+    }
 }
 
-function initBuffers(gl) {
-  initializeSolid();
-  
-  const positionBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-  
-  return { position: positionBuffer };
+// Shader sources
+const vsSource = `
+    attribute vec4 aVertexPosition;
+    attribute vec3 aNormal;
+    attribute vec3 aColor;
+    uniform mat4 uProjectionMatrix;
+    uniform mat4 uModelViewMatrix;
+    varying vec3 vNormal;
+    varying vec3 vColor;
+    void main(void) {
+        vNormal = aNormal;
+        vColor = aColor;
+        gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
+    }
+`;
+
+const sphereFsSource = `
+    precision mediump float;
+    varying vec3 vNormal;
+    varying vec3 vColor;
+    uniform vec3 uLightDir;
+    void main(void) {
+        float d = max(dot(normalize(vNormal), normalize(uLightDir)), 0.0);
+        gl_FragColor = vec4(vColor * (0.35 + 0.75 * d), 1.0);
+    }
+`;
+
+const lineFsSource = `
+    precision mediump float;
+    void main(void) {
+        gl_FragColor = vec4(0.1, 0.1, 0.12, 1.0);
+    }
+`;
+
+const bgVsSource = `
+    attribute vec2 aPosition;
+    void main(void) {
+        gl_Position = vec4(aPosition, 0.0, 1.0);
+    }
+`;
+
+const bgFsSource = `
+    precision mediump float;
+    uniform vec2 uResolution;
+    uniform vec3 uColor1;
+    uniform vec3 uColor2;
+    void main(void) {
+        vec3 c = mix(uColor1, uColor2, gl_FragCoord.y / uResolution.y);
+        gl_FragColor = vec4(c, 1.0);
+    }
+`;
+
+// Shader helpers
+function loadShader(gl, type, source) {
+    const shader = gl.createShader(type);
+    gl.shaderSource(shader, source);
+    gl.compileShader(shader);
+    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+        console.error('Shader compile error: ' + gl.getShaderInfoLog(shader));
+        gl.deleteShader(shader);
+        return null;
+    }
+    return shader;
 }
 
-// Shader Program Setup
 function initShaderProgram(gl, vsSource, fsSource) {
-  const vertexShader = loadShader(gl, gl.VERTEX_SHADER, vsSource);
-  const fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, fsSource);
+    const vertexShader = loadShader(gl, gl.VERTEX_SHADER, vsSource);
+    const fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, fsSource);
 
-  const shaderProgram = gl.createProgram();
-  gl.attachShader(shaderProgram, vertexShader);
-  gl.attachShader(shaderProgram, fragmentShader);
-  gl.linkProgram(shaderProgram);
-
-  return shaderProgram;
+    const shaderProgram = gl.createProgram();
+    gl.attachShader(shaderProgram, vertexShader);
+    gl.attachShader(shaderProgram, fragmentShader);
+    gl.linkProgram(shaderProgram);
+    if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+        console.error('Program link error: ' + gl.getProgramInfoLog(shaderProgram));
+        return null;
+    }
+    return shaderProgram;
 }
 
-// Event Handlers
-function handleMouseMove(event) {
-  const dx = event.movementX * 0.01;
-  const dy = event.movementY * 0.01;
-  
-  mat4.rotate(rotationMatrix, rotationMatrix, dx, [0, 1, 0]);
-  mat4.rotate(rotationMatrix, rotationMatrix, dy, [1, 0, 0]);
+function hexToRGB(hex) {
+    const n = parseInt(hex.slice(1), 16);
+    return new Float32Array([((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255]);
+}
+
+// Transform a direction by the transpose of a rotation matrix (R^T * v)
+function transformByTranspose(m, v) {
+    const out = [0, 0, 0];
+    for (let i = 0; i < 3; i++) {
+        for (let j = 0; j < 3; j++) out[i] += m[i * 4 + j] * v[j];
+    }
+    return out;
 }
 
 // Initialization and Animation Loop
 function main() {
-  const canvas = document.getElementById("canvas");
-  const gl = canvas.getContext("webgl");
+    const canvas = document.getElementById('canvas');
+    const gl = canvas.getContext('webgl');
 
-  if (!gl) return;
-
-  const vsSource = `
-    attribute vec4 aVertexPosition;
-    uniform mat4 uRotationMatrix;
-    void main(void) {
-      gl_Position = uRotationMatrix * aVertexPosition;
+    if (!gl) {
+        console.error('WebGL not available');
+        return;
     }
-  `;
 
-  const fsSource = `
-    void main(void) {
-      gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+    const sphereProgram = initShaderProgram(gl, vsSource, sphereFsSource);
+    const lineProgram = initShaderProgram(gl, vsSource, lineFsSource);
+    const bgProgram = initShaderProgram(gl, bgVsSource, bgFsSource);
+
+    // Geometry buffers
+    initializeSolid();
+
+    const positionBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+
+    const normalBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normals), gl.STATIC_DRAW);
+
+    const colorBuffer = gl.createBuffer();
+
+    const lineBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, lineBuffer);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(lineIndices), gl.STATIC_DRAW);
+
+    const buffers = { position: positionBuffer, normal: normalBuffer, color: colorBuffer, lines: lineBuffer };
+
+    // Upload the triangle colors (and re-upload whenever the slider moves)
+    function updateColors() {
+        const colorCount = parseInt(document.getElementById('color-count').value);
+        document.getElementById('color-count-value').textContent = colorCount;
+        buildColors(colorCount);
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffers.color);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
     }
-  `;
+    updateColors();
+    document.getElementById('color-count').addEventListener('input', updateColors);
 
-  const shaderProgram = initShaderProgram(gl, vsSource, fsSource);
-  const programInfo = {
-    program: shaderProgram,
-    attribLocations: { vertexPosition: gl.getAttribLocation(shaderProgram, "aVertexPosition") },
-    uniformLocations: { uRotationMatrix: gl.getUniformLocation(shaderProgram, "uRotationMatrix") },
-  };
+    const sphereInfo = {
+        aVertexPosition: gl.getAttribLocation(sphereProgram, 'aVertexPosition'),
+        aNormal: gl.getAttribLocation(sphereProgram, 'aNormal'),
+        aColor: gl.getAttribLocation(sphereProgram, 'aColor'),
+        uProjectionMatrix: gl.getUniformLocation(sphereProgram, 'uProjectionMatrix'),
+        uModelViewMatrix: gl.getUniformLocation(sphereProgram, 'uModelViewMatrix'),
+        uLightDir: gl.getUniformLocation(sphereProgram, 'uLightDir')
+    };
+    const lineInfo = {
+        aVertexPosition: gl.getAttribLocation(lineProgram, 'aVertexPosition'),
+        uProjectionMatrix: gl.getUniformLocation(lineProgram, 'uProjectionMatrix'),
+        uModelViewMatrix: gl.getUniformLocation(lineProgram, 'uModelViewMatrix')
+    };
+    const bgInfo = {
+        aPosition: gl.getAttribLocation(bgProgram, 'aPosition'),
+        uResolution: gl.getUniformLocation(bgProgram, 'uResolution'),
+        uColor1: gl.getUniformLocation(bgProgram, 'uColor1'),
+        uColor2: gl.getUniformLocation(bgProgram, 'uColor2')
+    };
 
-  const buffers = initBuffers(gl);
+    // Full-screen triangle for the gradient background
+    const bgBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, bgBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
 
-  canvas.addEventListener("mousemove", handleMouseMove);
+    const rotationMatrix = new Float32Array(16);
+    mat4Identity(rotationMatrix);
+    const projectionMatrix = new Float32Array(16);
+    const modelViewMatrix = new Float32Array(16);
+    const eyeDistance = 3.5;
 
-  function render() {
-    drawScene(gl, programInfo, buffers);
-    requestAnimationFrame(render);
-  }
+    function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        gl.viewport(0, 0, canvas.width, canvas.height);
+        mat4Perspective(projectionMatrix, Math.PI / 4, canvas.width / canvas.height, 0.1, 100);
+    }
+    resize();
+    window.addEventListener('resize', resize);
 
-  gl.clearColor(0.0, 0.0, 0.0, 1.0);
-  gl.enable(gl.DEPTH_TEST);
-  render();
+    // Drag to rotate
+    let dragging = false;
+    canvas.addEventListener('mousedown', () => { dragging = true; });
+    window.addEventListener('mouseup', () => { dragging = false; });
+    canvas.addEventListener('mousemove', (event) => {
+        if (!dragging) return;
+        const dx = event.movementX * 0.01;
+        const dy = event.movementY * 0.01;
+        mat4Rotate(rotationMatrix, rotationMatrix, dx, [0, 1, 0]);
+        mat4Rotate(rotationMatrix, rotationMatrix, dy, [1, 0, 0]);
+    });
+
+    const worldLight = normalizeVector([0.35, 0.6, 0.75]);
+    const color1Input = document.getElementById('color1-picker');
+    const color2Input = document.getElementById('color2-picker');
+
+    function drawScene() {
+        const color1 = hexToRGB(color1Input.value);
+        const color2 = hexToRGB(color2Input.value);
+
+        gl.clearColor(0, 0, 0, 1);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+        // 1. Gradient background (full-screen triangle)
+        gl.disable(gl.DEPTH_TEST);
+        gl.useProgram(bgProgram);
+        gl.bindBuffer(gl.ARRAY_BUFFER, bgBuffer);
+        gl.vertexAttribPointer(bgInfo.aPosition, 2, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(bgInfo.aPosition);
+        gl.uniform2f(bgInfo.uResolution, canvas.width, canvas.height);
+        gl.uniform3fv(bgInfo.uColor1, color1);
+        gl.uniform3fv(bgInfo.uColor2, color2);
+        gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+        // 2. Tessellated sphere: flat-shaded triangles, each with its palette color
+        gl.enable(gl.DEPTH_TEST);
+        gl.useProgram(sphereProgram);
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffers.position);
+        gl.vertexAttribPointer(sphereInfo.aVertexPosition, 3, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(sphereInfo.aVertexPosition);
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffers.normal);
+        gl.vertexAttribPointer(sphereInfo.aNormal, 3, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(sphereInfo.aNormal);
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffers.color);
+        gl.vertexAttribPointer(sphereInfo.aColor, 3, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(sphereInfo.aColor);
+        gl.uniformMatrix4fv(sphereInfo.uProjectionMatrix, false, projectionMatrix);
+        gl.uniformMatrix4fv(sphereInfo.uModelViewMatrix, false, modelViewMatrix);
+        const lightDir = new Float32Array(normalizeVector(transformByTranspose(rotationMatrix, worldLight)));
+        gl.uniform3fv(sphereInfo.uLightDir, lightDir);
+        gl.enable(gl.POLYGON_OFFSET_FILL);
+        gl.polygonOffset(1.0, 1.0);
+        gl.drawArrays(gl.TRIANGLES, 0, vertices.length / 3);
+        gl.disable(gl.POLYGON_OFFSET_FILL);
+
+        // 3. Wireframe overlay (edges win the depth test against the offset fills)
+        gl.useProgram(lineProgram);
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffers.position);
+        gl.vertexAttribPointer(lineInfo.aVertexPosition, 3, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(lineInfo.aVertexPosition);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.lines);
+        gl.uniformMatrix4fv(lineInfo.uProjectionMatrix, false, projectionMatrix);
+        gl.uniformMatrix4fv(lineInfo.uModelViewMatrix, false, modelViewMatrix);
+        gl.drawElements(gl.LINES, lineIndices.length, gl.UNSIGNED_SHORT, 0);
+    }
+
+    function render() {
+        if (!dragging) {
+            mat4Rotate(rotationMatrix, rotationMatrix, 0.005, [0, 1, 0]);
+            mat4Rotate(rotationMatrix, rotationMatrix, 0.002, [1, 0, 0]);
+        }
+        const T = new Float32Array(16);
+        mat4Translate(T, 0, 0, -eyeDistance);
+        mat4Multiply(modelViewMatrix, T, rotationMatrix);
+
+        drawScene();
+        requestAnimationFrame(render);
+    }
+
+    render();
 }
 
 window.onload = main;
@@ -205,4 +523,3 @@ window.onload = main;
 
 </body>
 </html>
-

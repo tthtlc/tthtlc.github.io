@@ -4,7 +4,8 @@
 Reads the master list, extracts each page's real <title> (falling back to a
 humanized filename), classifies every page into a topic category via filename
 rules (first match wins, so rule order matters), and writes
-_data/visualization_categories.yml consumed by the gallery page.
+_data/visualization_categories.yml consumed by the gallery page. Pages under
+todo_design/ and any page matching no rule are excluded from the gallery.
 
 Re-run after adding new pages:
     python3 scripts/categorize_visualizations.py
@@ -56,7 +57,7 @@ CATEGORIES = [
      "Sine waves, square waves and sinusoidal ribbons — oscillation drawn in "
      "animated color.",
      [r"sinusoid", r"sinsoid", r"sinewave", r"squarewave", r"square_sine",
-      r"wavy", r"wavelines", r"sine_sinusoidal"]),
+      r"wavy", r"wavelines", r"sine_sinusoidal", r"spider"]),
     ("hearts", "Hearts & Valentine", "💗",
      "Heart-shaped curves and clickable valentine games.",
      [r"heart", r"valentine"]),
@@ -78,22 +79,17 @@ CATEGORIES = [
     ("lineart", "Line Art & Sectors", "📐",
      "Line drawings across polygon vertices, spokes and randomized sectors — "
      "polygonal scribble art.",
-     [r"line_rotate", r"line_drawing", r"drawsector", r"sector", r"spoke"]),
+     [r"line_rotate", r"line_drawing", r"drawsector", r"sector", r"spoke",
+      r"string_art"]),
     ("circles", "Circles & Concentric Rings", "🎯",
      "Circles on circles, concentric rings and polar-coordinate drawings.",
-     [r"concentric", r"circle", r"hexagon_circle"]),
+     [r"concentric", r"circle", r"circular", r"hexagon_circle"]),
     ("shapes", "Shapes & Curiosities", "💠",
      "Diamonds, windmills, boomerangs, turtle graphics, parametric patterns "
      "and other geometric curiosities.",
      [r"diamond", r"boomerang", r"windmill", r"chopstick", r"turtle",
       r"parametric", r"cubic", r"psychedlic", r"sin_cos", r"pinterest",
       r"quart", r"square_triangle", r"twotriangle", r"pentagon_star"]),
-    ("backgrounds", "Backgrounds & Templates", "🎨",
-     "Animated color backgrounds and gradient templates.",
-     [r"background", r"gradient"]),
-    ("extras", "Experiments & Extras", "📦",
-     "Test pages and one-off experiments that don't fit elsewhere.",
-     [r"."]),  # catch-all
 ]
 
 TAG_RULES = [
@@ -143,11 +139,11 @@ def extract_title(filename):
 def classify(filename):
     base = filename.lower()
     if base.startswith("todo_design/"):
-        return "extras"  # draft pages under todo_design/
+        return None  # draft pages under todo_design/ are excluded from the gallery
     for slug, name, emoji, desc, rules in CATEGORIES:
         if any(re.search(r, base) for r in rules):
             return slug
-    return "extras"
+    return None  # unclassified pages are excluded from the gallery
 
 
 def tags_for(filename):
@@ -166,11 +162,16 @@ def main():
 
     buckets = {slug: [] for slug, _, _, _, _ in CATEGORIES}
     missing = []
+    excluded = []
     for f in files:
         if not os.path.exists(os.path.join(ROOT, f)):
             missing.append(f)
             continue
-        buckets[classify(f)].append({
+        slug = classify(f)
+        if slug is None:
+            excluded.append(f)
+            continue
+        buckets[slug].append({
             "file": f,
             "title": extract_title(f) or humanize(f),
             "tags": tags_for(f),
@@ -201,6 +202,10 @@ def main():
     if missing:
         print("Missing from disk (skipped):")
         for f in missing:
+            print("  ", f)
+    if excluded:
+        print("Excluded from gallery:")
+        for f in excluded:
             print("  ", f)
 
 

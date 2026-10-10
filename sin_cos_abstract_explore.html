@@ -81,41 +81,107 @@
 
         const canvas = document.getElementById('cardioidCanvas');
         const ctx = canvas.getContext('2d');
-        const centerX = canvas.width / 2;
+        const centerX = canvas.width / 2;   // design origin (0,0) maps here
         const centerY = canvas.height / 2;
         const radius = 200;
         const steps = 200;
         const delta = 2 * Math.PI / steps;
 
+        // Offscreen sprite: base design + 3 rotated copies rendered once,
+        // then rotated slowly on screen each frame (cheap: one drawImage)
+        const spriteSize = 1600;
+        const sprite = document.createElement('canvas');
+        sprite.width = sprite.height = spriteSize;
+        const sctx = sprite.getContext('2d');
+        const sCenter = spriteSize / 2;
+
+        // Colors: base design first, then its three rotated copies
+        const layerColors = ['red', 'blue', 'green', 'darkorange'];
+
         // Initialize variables
         let a1 = 1, b1 = 1, c1 = 1, d1 = 1, e1 = 1, f1 = 1;
 
-        function drawCardioid() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            ctx.strokeStyle = 'red';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-
-            for (let phasea = 0; phasea <= 2 * Math.PI ; phasea += a1*delta) {
-            for (let theta = 0; theta <= 2 * Math.PI * b1 *d1; theta += delta) {
-		phaseb = f1*delta;
-                let x = radius * (1 - Math.sin(b1 / c1 * theta + phasea)) * Math.cos(d1 / e1 * theta + phaseb) * Math.cos(theta) + centerX;
-                let y = radius * (1 - Math.cos(b1 / c1 * theta + phasea)) * Math.sin(d1 / e1 * theta + phaseb) * Math.sin(theta) + centerY;
-
-                if (theta === 0) {
-                    ctx.moveTo(x, y);
-                } else {
-                    ctx.lineTo(x, y);
-                }
-            }
-            }
-
-            ctx.closePath();
-            ctx.stroke();
+        // Rotate a point (x, y) around (cx, cy) by an angle
+        function rotatePoint(x, y, cx, cy, angle) {
+            const cosA = Math.cos(angle);
+            const sinA = Math.sin(angle);
+            const dx = x - cx;
+            const dy = y - cy;
+            return { x: cx + dx * cosA - dy * sinA, y: cy + dx * sinA + dy * cosA };
         }
 
-        // Update variables and redraw cardioid
+        // Draw the base curve, rotated by `rot` about the origin, in `color`
+        function drawLayer(color, rot) {
+            sctx.strokeStyle = color;
+            sctx.lineWidth = 2;
+            sctx.beginPath();
+
+            for (let phasea = 0; phasea <= 2 * Math.PI; phasea += a1 * delta) {
+                for (let theta = 0; theta <= 2 * Math.PI * b1 * d1; theta += delta) {
+                    const phaseb = f1 * delta;
+                    const x = radius * (1 - Math.sin(b1 / c1 * theta + phasea)) * Math.cos(d1 / e1 * theta + phaseb) * Math.cos(theta);
+                    const y = radius * (1 - Math.cos(b1 / c1 * theta + phasea)) * Math.sin(d1 / e1 * theta + phaseb) * Math.sin(theta);
+
+                    const p = rotatePoint(sCenter + x, sCenter + y, sCenter, sCenter, rot);
+
+                    if (theta === 0) {
+                        sctx.moveTo(p.x, p.y);
+                    } else {
+                        sctx.lineTo(p.x, p.y);
+                    }
+                }
+            }
+
+            sctx.closePath();
+            sctx.stroke();
+        }
+
+        // Render base design + three copies rotated 90° apart about (0,0)
+        function renderSprite() {
+            sctx.clearRect(0, 0, spriteSize, spriteSize);
+            for (let k = 0; k < 4; k++) {
+                drawLayer(layerColors[k], k * Math.PI / 2);
+            }
+        }
+
+        // Micro-font formula below the curves, inside the canvas
+        function drawFormulaText() {
+            // Legibility strip behind the text
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+            ctx.fillRect(0, canvas.height - 44, canvas.width, 44);
+
+            ctx.font = '9px "Courier New", monospace';
+            ctx.fillStyle = '#333';
+            ctx.textAlign = 'center';
+            ctx.fillText('x(θ) = r·(1 − sin((b/c)θ + φ))·cos((d/e)θ + fΔ)·cos(θ)', centerX, canvas.height - 34);
+            ctx.fillText('y(θ) = r·(1 − cos((b/c)θ + φ))·sin((d/e)θ + fΔ)·sin(θ)', centerX, canvas.height - 24);
+            ctx.fillText(`r=${radius}  a=${a1} b=${b1} c=${c1} d=${d1} e=${e1} f=${f1}  ·  base + 3 copies rotated 90° about (0,0)`, centerX, canvas.height - 12);
+        }
+
+        // Slow rotation of the whole design
+        let globalAngle = 0;
+        function animate() {
+            globalAngle += 0.002;  // radians per frame
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            ctx.save();
+            ctx.translate(centerX, centerY);
+            ctx.rotate(globalAngle);
+            ctx.drawImage(sprite, -sCenter, -sCenter);
+            ctx.restore();
+
+            // Marker for the rotation center (the 0,0 point)
+            ctx.fillStyle = '#333';
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 3, 0, 2 * Math.PI);
+            ctx.fill();
+
+            drawFormulaText();
+            requestAnimationFrame(animate);
+        }
+
+        // Update variables and rebuild the sprite
         function updateCardioid() {
             a1 = parseInt(document.getElementById('a1').value);
             b1 = parseInt(document.getElementById('b1').value);
@@ -131,7 +197,7 @@
             document.getElementById('e1Value').textContent = e1;
             document.getElementById('f1Value').textContent = f1;
 
-            drawCardioid();
+            renderSprite();
         }
 
         // Attach event listeners to sliders
@@ -142,8 +208,8 @@
         document.getElementById('e1').addEventListener('input', updateCardioid);
         document.getElementById('f1').addEventListener('input', updateCardioid);
 
-        drawCardioid();
+        renderSprite();
+        requestAnimationFrame(animate);
     </script>
 </body>
 </html>
-

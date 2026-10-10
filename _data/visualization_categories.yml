@@ -67,6 +67,10 @@
     title: Polygon Animation
     tags:
     - Interactive
+  - file: double_ngon_explore_sharing_index.html
+    title: Polygon Animation
+    tags:
+    - Interactive
   - file: double_pentagon.html
     title: Pentagon Animation
     tags: []
@@ -219,16 +223,6 @@
     title: Rotating Circle Shape
     tags:
     - Rotating
-  - file: rotating_circle1_animated.html
-    title: Rotating Circle Shape
-    tags:
-    - Animated
-    - Rotating
-  - file: rotating_circle_animated.html
-    title: Dynamic Circles with Red-to-Blue Gradient
-    tags:
-    - Animated
-    - Rotating
   - file: spirograph.html
     title: Circle Rotation Contour
     tags: []
@@ -253,11 +247,6 @@
   - file: triple_ring_rotate_line.html
     title: Rotating Perpendicular Rings in 3D
     tags:
-    - Rotating
-  - file: triple_rotating_circle_animated.html
-    title: Dynamic Circles with Red-to-Blue Gradient
-    tags:
-    - Animated
     - Rotating
 - name: Lemniscates & Figure-Eights
   slug: lemniscates
@@ -327,10 +316,6 @@
     title: Rotating Lemniscate
     tags:
     - Random
-  - file: lemniscate_rotating_four.html
-    title: Rotating Lemniscates
-    tags:
-    - Rotating
 - name: Chasing & Rotating Polygons
   slug: chasing
   emoji: 🏃
@@ -765,7 +750,7 @@
     title: Sinusoidal Waves Around a Sphere (Side View)
     tags: []
   - file: spherical_tessellation.html
-    title: Rotating Gradient Background
+    title: Spherical Tessellation
     tags: []
   - file: spherical_tessellation_hexagon.html
     title: Sphere Tessellation with Hexagons
@@ -801,6 +786,10 @@
     tags:
     - Interactive
     - Gradient
+  - file: interactive_boy_surface_mesh_dot.html
+    title: Interactive Boy's Surface - Dot Mesh
+    tags:
+    - Interactive
 - name: Waves & Oscillations
   slug: waves
   emoji: 🌊
@@ -814,12 +803,6 @@
     - Color
   - file: ellipse_sinusoidal_moving_color_background_explore.html
     title: Animated Sinusoidal Wave on Ellipse
-    tags:
-    - Interactive
-    - Motion
-    - Color
-  - file: sine_sinusoidal_moving_color_background_explore.html
-    title: Animated Sinusoidal Wave on Circle
     tags:
     - Interactive
     - Motion
@@ -848,6 +831,9 @@
     tags: []
   - file: sinusoidal_plane.html
     title: Animated 3D Sine Waves
+    tags: []
+  - file: spider-waves.html
+    title: Spider Waves — Parametric Curve Generator
     tags: []
   - file: square_sine.html
     title: SquarishSine Curves
@@ -954,6 +940,10 @@
     title: Ellipse Animation
     tags:
     - Rotating
+  - file: rotating-ellipse.html
+    title: The 5:1 Ellipse
+    tags:
+    - Rotating
   - file: rotating_ellipse.html
     title: Rotating Ellipse
     tags:
@@ -972,6 +962,10 @@
     - Rotating
   - file: rotating_ellipse7.html
     title: Rotating and Shrinking Ellipse
+    tags:
+    - Rotating
+  - file: rotating_ellipse8.html
+    title: Rotating Ellipse with Sinusoidal Minor Axis
     tags:
     - Rotating
   - file: rotating_ellipse_group.html
@@ -1130,6 +1124,9 @@
   - file: line_drawing.html
     title: Geometric Line Drawing
     tags: []
+  - file: modular_string_art_visualizer.html
+    title: Modular String Art & Multiplier Visualizer
+    tags: []
   - file: pentagon_line_rotate.html
     title: Pentagon Animation
     tags:
@@ -1139,6 +1136,10 @@
     tags:
     - Rotating
     - Gradient
+  - file: rotated_string_art_layers.html
+    title: Rotated String Art Layers — Modular Circle Visualizer
+    tags:
+    - Rotating
   - file: rotating_sector.html
     title: Rotating sector
     tags:
@@ -1173,6 +1174,9 @@
     - Color
   - file: circle_cycle.html
     title: Heart-shaped Line Art
+    tags: []
+  - file: circular_thread.html
+    title: Pink Circular String Art
     tags: []
   - file: clickme_circle_on_circle.html
     title: Draw Circles with Polar Coordinates
@@ -1271,6 +1275,9 @@
     title: Pinterests Curve 1
     tags:
     - Interactive
+  - file: psychedlic_art.html
+    title: Psychedelic Art Generator
+    tags: []
   - file: quart_motion.html
     title: Dynamic Complex Line Drawing
     tags: []
@@ -1299,86 +1306,6 @@
   - file: twotriangle.html
     title: Triangle Animation
     tags: []
-  - file: psychedlic_art.html
-    title: Psychedelic Art Generator
-    tags: []
   - file: windmill.html
     title: Windmill Curves
-    tags: []
-- name: Backgrounds & Templates
-  slug: backgrounds
-  emoji: 🎨
-  description: Animated color backgrounds and gradient templates.
-  items:
-  - file: animated_blue_background.html
-    title: Animated Gradient Background
-    tags:
-    - Animated
-  - file: animated_color_background.html
-    title: Rotating Gradient Background
-    tags:
-    - Animated
-    - Color
-  - file: bluebackground.html
-    title: Random Blue Gradient Background
-    tags: []
-  - file: color_gradient_template.html
-    title: Color Picker with HSL Gradient
-    tags:
-    - Color
-    - Gradient
-    - Template
-  - file: color_gradient_template2.html
-    title: Color Picker with HSL Gradient
-    tags:
-    - Color
-    - Gradient
-    - Template
-- name: Experiments & Extras
-  slug: extras
-  emoji: 📦
-  description: Test pages and one-off experiments that don't fit elsewhere.
-  items:
-  - file: rotating_zonohedra.html
-    title: Rotating Zonohedra
-    tags:
-    - Rotating
-  - file: square1.html
-    title: Square Animation
-    tags: []
-  - file: square2.html
-    title: Recursive Squares
-    tags: []
-  - file: todo_design/character_graphics.html
-    title: Donut Animation
-    tags: []
-  - file: todo_design/concurrent_translation_and_reflection.html
-    title: Moving Circles with Complex Line Drawing
-    tags: []
-  - file: todo_design/hypotrochoid.html
-    title: Rotating Lemniscate
-    tags: []
-  - file: todo_design/math.html
-    title: Todo Design/Math
-    tags: []
-  - file: todo_design/notok.html
-    title: Polygon Drawing with Iterations
-    tags: []
-  - file: todo_design/octahedron.html
-    title: 3D Octahedron
-    tags: []
-  - file: todo_design/octahedron1.html
-    title: 3D Octahedron
-    tags: []
-  - file: todo_design/octahedron2.html
-    title: 3D Octahedron
-    tags: []
-  - file: todo_design/octahedron3.html
-    title: 3D Octahedron
-    tags: []
-  - file: todo_design/store.html
-    title: Parametric Equation Visualization with Rotation
-    tags: []
-  - file: todo_design/wavylines3.html
-    title: Wavy Lines (v2)
     tags: []
