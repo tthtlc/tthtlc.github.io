@@ -1,120 +1,199 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full bg-slate-950 text-slate-100">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rotating Ellipse with Sinusoidal Minor Axis</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-            background-color: #f0f0f0;
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(51, 65, 85, 0.8);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(71, 85, 105, 1);
         }
         canvas {
-            display: block;
-            background-color: white;
+            touch-action: none;
         }
-        #controls {
-            position: fixed;
-            top: 10px;
-            left: 10px;
-            z-index: 10;
-            background: rgba(255, 255, 255, 0.92);
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            padding: 10px 14px;
-            font: 13px/1.6 sans-serif;
-            color: #333;
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
-        }
-        #controls label {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        #controls button {
-            margin-top: 6px;
-            padding: 2px 10px;
-        }
-        #gallery {
-            position: fixed;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            width: 190px;
-            overflow-y: auto;
-            background: rgba(255, 255, 255, 0.92);
-            border-left: 1px solid #ccc;
-            z-index: 10;
-            padding: 8px;
-            box-sizing: border-box;
-            font: 11px/1.3 sans-serif;
-            color: #333;
-        }
-        #gallery .gallery-title {
-            font-weight: bold;
-            margin-bottom: 6px;
-        }
-        #gallery .thumb {
-            margin-bottom: 12px;
-        }
-        #gallery .thumb img {
-            width: 100%;
-            display: block;
-            border: 1px solid #ddd;
-            background: #fff;
-            cursor: pointer;
-        }
-        #gallery .thumb-name {
-            word-break: break-all;
-            color: #555;
-            margin-top: 3px;
+        .slider-thumb-custom::-webkit-slider-thumb {
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
         }
     </style>
 <!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-GEX61LPT08"></script> <script>   window.dataLayer = window.dataLayer || [];   function gtag(){dataLayer.push(arguments);}   gtag('js', new Date());   gtag('config', 'G-GEX61LPT08'); </script> </head>
-<body>
-<canvas id="myCanvas"></canvas>
-<div id="controls">
-    <label>Sine cycles (m):
-        <input type="range" id="sineCycles" min="1" max="20" step="1" value="5">
-        <span id="sineCyclesValue">5</span>
-    </label>
-    <label>Ellipse rotations (n):
-        <input type="range" id="rotations" min="1" max="20" step="1" value="1">
-        <span id="rotationsValue">1</span>
-    </label>
-    <div id="ratioValue">Ratio m : n = 5 : 1</div>
-    <label>Base radius (r₁):
-        <input type="range" id="r1Slider" min="0" max="0.5" step="0.01" value="0.10">
-        <span id="r1Value">0.10</span>
-    </label>
-    <label>Sine amplitude (r₂):
-        <input type="range" id="r2Slider" min="0" max="0.5" step="0.01" value="0.30">
-        <span id="r2Value">0.30</span>
-    </label>
-    <label>Major axis size:
-        <input type="range" id="majorAxisSlider" min="10" max="100" step="1" value="50">
-        <span id="majorAxisValue">50%</span>
-    </label>
-    <label>Rotation speed (°/s):
-        <input type="range" id="speedSlider" min="1" max="720" step="1" value="80">
-        <span id="speedValue">80</span>
-    </label>
-    <label>Max rotation (deg):
-        <input type="range" id="maxAngleSlider" min="0" max="36000" step="360" value="3600">
-        <span id="maxAngleValue">3600</span>
-    </label>
-    <button id="clearBtn">Clear lines</button>
-    <button id="savePngBtn">Save PNG</button>
-</div>
-<div id="gallery">
-    <div class="gallery-title">Saved PNGs</div>
-    <div id="galleryItems"></div>
-</div>
-<script>
-  document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
+<body class="h-full flex flex-col font-sans overflow-hidden bg-slate-950 text-slate-200 antialiased selection:bg-cyan-500 selection:text-white">
+
+  <header class="flex-shrink-0 border-b border-slate-800/80 bg-slate-900/90 backdrop-blur-md px-4 py-3 flex items-center justify-between z-20 shadow-md">
+    <div class="flex items-center space-x-3">
+      <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+        <i class="fa-solid fa-circle-notch text-white text-lg font-bold"></i>
+      </div>
+      <div>
+        <h1 class="text-base font-bold bg-gradient-to-r from-cyan-400 via-indigo-300 to-pink-400 bg-clip-text text-transparent">
+          Rotating Ellipse
+        </h1>
+        <p class="text-xs text-slate-400 hidden sm:block">An ellipse with a sinusoidal minor axis, drawing continuously as it rotates</p>
+      </div>
+    </div>
+
+    <button id="btnToggleSidebar" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition lg:hidden" title="Toggle Sidebar">
+      <i class="fa-solid fa-sliders"></i>
+    </button>
+  </header>
+
+  <div class="flex-1 flex overflow-hidden relative">
+
+    <main id="stage" class="flex-1 relative bg-slate-950 overflow-hidden select-none">
+      <canvas id="myCanvas" class="w-full h-full block bg-[#020617]"></canvas>
+
+      <!-- Canvas Navigation Controls -->
+      <div class="absolute bottom-4 left-4 z-10 flex items-center space-x-2 bg-slate-900/85 backdrop-blur-md p-1.5 rounded-2xl border border-slate-800 shadow-2xl">
+        <button id="clearBtn" class="px-3.5 h-8 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs flex items-center space-x-2 transition">
+          <i class="fa-solid fa-eraser text-xs"></i>
+          <span>Clear lines</span>
+        </button>
+        <button id="savePngBtn" class="px-3.5 h-8 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-600 text-white font-semibold text-xs flex items-center space-x-2 shadow-lg shadow-emerald-500/20 hover:opacity-90 transition">
+          <i class="fa-solid fa-camera text-xs"></i>
+          <span>Save PNG</span>
+        </button>
+      </div>
+    </main>
+
+    <aside id="sidebar" class="w-80 sm:w-96 border-l border-slate-800/80 bg-slate-900/95 backdrop-blur-xl flex flex-col z-20 transition-all duration-300 absolute lg:relative right-0 h-full max-lg:translate-x-full shadow-2xl lg:shadow-none">
+
+      <div class="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-900">
+        <h2 class="font-bold text-sm text-slate-200 flex items-center space-x-2">
+          <i class="fa-solid fa-sliders text-cyan-400"></i>
+          <span>Parameter Scrollbars &amp; Controls</span>
+        </h2>
+        <button id="btnCloseSidebar" class="lg:hidden text-slate-400 hover:text-white p-1">
+          <i class="fa-solid fa-xmark text-base"></i>
+        </button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto p-4 space-y-5 text-xs">
+
+        <!-- CURVE PARAMETERS -->
+        <div class="bg-slate-950/70 rounded-2xl p-3.5 border border-slate-800/80 space-y-4 shadow-inner">
+          <h3 class="font-semibold text-cyan-400 flex items-center justify-between border-b border-slate-800/80 pb-1.5">
+            <span>Curve Parameters</span>
+            <i class="fa-solid fa-calculator text-slate-500"></i>
+          </h3>
+
+          <div class="space-y-1.5">
+            <div class="flex justify-between items-center text-slate-300">
+              <label for="sineCycles" class="font-medium">Sine cycles (m)</label>
+              <span id="sineCyclesValue" class="font-mono text-cyan-400 font-bold bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-800/40">5</span>
+            </div>
+            <input type="range" id="sineCycles" min="1" max="20" step="1" value="5"
+              class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-500 slider-thumb-custom">
+            <div class="flex justify-between text-[10px] text-slate-500 font-mono"><span>1</span><span>20</span></div>
+          </div>
+
+          <div class="space-y-1.5">
+            <div class="flex justify-between items-center text-slate-300">
+              <label for="rotations" class="font-medium">Ellipse rotations (n)</label>
+              <span id="rotationsValue" class="font-mono text-cyan-400 font-bold bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-800/40">1</span>
+            </div>
+            <input type="range" id="rotations" min="1" max="20" step="1" value="1"
+              class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-500 slider-thumb-custom">
+            <div class="flex justify-between text-[10px] text-slate-500 font-mono"><span>1</span><span>20</span></div>
+          </div>
+
+          <div class="flex justify-between items-center text-slate-300">
+            <span class="font-medium">Ratio m : n</span>
+            <span id="ratioValue" class="font-mono text-cyan-400 font-bold bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-800/40">5 : 1</span>
+          </div>
+
+          <div class="space-y-1.5">
+            <div class="flex justify-between items-center text-slate-300">
+              <label for="r1Slider" class="font-medium">Base radius (r₁)</label>
+              <span id="r1Value" class="font-mono text-cyan-400 font-bold bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-800/40">0.25</span>
+            </div>
+            <input type="range" id="r1Slider" min="0" max="0.5" step="0.01" value="0.25"
+              class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-500 slider-thumb-custom">
+            <div class="flex justify-between text-[10px] text-slate-500 font-mono"><span>0</span><span>0.5</span></div>
+          </div>
+
+          <div class="space-y-1.5">
+            <div class="flex justify-between items-center text-slate-300">
+              <label for="r2Slider" class="font-medium">Sine amplitude (r₂)</label>
+              <span id="r2Value" class="font-mono text-cyan-400 font-bold bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-800/40">0.25</span>
+            </div>
+            <input type="range" id="r2Slider" min="0" max="0.5" step="0.01" value="0.25"
+              class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-500 slider-thumb-custom">
+            <div class="flex justify-between text-[10px] text-slate-500 font-mono"><span>0</span><span>0.5</span></div>
+          </div>
+
+          <div class="space-y-1.5">
+            <div class="flex justify-between items-center text-slate-300">
+              <label for="majorAxisSlider" class="font-medium">Major axis size</label>
+              <span id="majorAxisValue" class="font-mono text-cyan-400 font-bold bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-800/40">50%</span>
+            </div>
+            <input type="range" id="majorAxisSlider" min="10" max="100" step="1" value="50"
+              class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-500 slider-thumb-custom">
+            <div class="flex justify-between text-[10px] text-slate-500 font-mono"><span>10</span><span>100</span></div>
+          </div>
+
+          <div class="space-y-1.5">
+            <div class="flex justify-between items-center text-slate-300">
+              <label for="speedSlider" class="font-medium">Rotation speed (°/s)</label>
+              <span id="speedValue" class="font-mono text-cyan-400 font-bold bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-800/40">180</span>
+            </div>
+            <input type="range" id="speedSlider" min="1" max="720" step="1" value="180"
+              class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-500 slider-thumb-custom">
+            <div class="flex justify-between text-[10px] text-slate-500 font-mono"><span>1</span><span>720</span></div>
+          </div>
+
+          <div class="space-y-1.5">
+            <div class="flex justify-between items-center text-slate-300">
+              <label for="maxAngleSlider" class="font-medium">Max rotation (deg)</label>
+              <span id="maxAngleValue" class="font-mono text-cyan-400 font-bold bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-800/40">3600</span>
+            </div>
+            <input type="range" id="maxAngleSlider" min="0" max="36000" step="360" value="3600"
+              class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-500 slider-thumb-custom">
+            <div class="flex justify-between text-[10px] text-slate-500 font-mono"><span>0 (∞)</span><span>36000</span></div>
+          </div>
+        </div>
+
+        <!-- SAVED PNG GALLERY -->
+        <div class="bg-slate-950/70 rounded-2xl p-3.5 border border-slate-800/80 space-y-3">
+          <h3 class="font-semibold text-emerald-400 flex items-center justify-between border-b border-slate-800/80 pb-1.5">
+            <span>Saved PNGs</span>
+            <i class="fa-solid fa-images text-slate-500"></i>
+          </h3>
+
+          <p class="text-[10px] text-slate-500 leading-snug">
+            The PNG captures the canvas with the micro-font parameter summary printed at the bottom. Commit the downloaded files to the repo and they will appear here automatically (fetched via the GitHub API).
+          </p>
+
+          <div id="galleryItems" class="grid grid-cols-2 gap-2"></div>
+        </div>
+
+      </div>
+
+      <div class="p-3 border-t border-slate-800 bg-slate-950 text-[11px] text-slate-400 text-center">
+        Adjust any scrollbar to redraw the ellipse instantly.
+      </div>
+
+    </aside>
+  </div>
+
+  <script>
+    document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
     const canvas = document.getElementById("myCanvas");
     const ctx = canvas.getContext("2d");
+    const stage = document.getElementById("stage");
 
     // Lines are drawn onto a fixed-size offscreen canvas that is never
     // cleared, so previously drawn lines are kept forever (even across
@@ -125,17 +204,15 @@
     offscreen.width = OFF_SIZE;
     offscreen.height = OFF_SIZE;
     const offCtx = offscreen.getContext("2d");
-    offCtx.fillStyle = "white";
+    offCtx.fillStyle = "#020617";
     offCtx.fillRect(0, 0, OFF_SIZE, OFF_SIZE);
     const offCenter = OFF_SIZE / 2;
     const offMajorAxis = OFF_SIZE / 2; // half the offscreen: maximally covers the viewport
 
-    const galleryEl = document.getElementById("gallery");
     function sizeCanvas() {
-        // Leave room on the right for the thumbnail gallery.
-        const sidebarW = galleryEl ? galleryEl.offsetWidth : 0;
-        canvas.width = Math.max(0, window.innerWidth - sidebarW);
-        canvas.height = window.innerHeight;
+        // Fill the whole stage area (the right-hand sidebar is a flex sibling).
+        canvas.width = Math.max(0, stage.clientWidth);
+        canvas.height = Math.max(0, stage.clientHeight);
     }
     window.addEventListener("resize", sizeCanvas);
     sizeCanvas();
@@ -151,7 +228,7 @@
     const rotationsValue = document.getElementById("rotationsValue");
     const ratioValue = document.getElementById("ratioValue");
     function updateRatioDisplay() {
-        ratioValue.textContent = "Ratio m : n = " + sineCycles + " : " + ellipseRotations;
+        ratioValue.textContent = sineCycles + " : " + ellipseRotations;
     }
     sineCyclesInput.addEventListener("input", function() {
         sineCycles = parseInt(sineCyclesInput.value, 10);
@@ -215,7 +292,7 @@
     });
 
     document.getElementById("clearBtn").addEventListener("click", function() {
-        offCtx.fillStyle = "white";
+        offCtx.fillStyle = "#020617";
         offCtx.fillRect(0, 0, OFF_SIZE, OFF_SIZE);
         angle = 0; // restart the drawing from the beginning
     });
@@ -244,7 +321,7 @@
         targetCtx.font = fontPx + "px monospace";
         targetCtx.fillStyle = "rgba(255, 255, 255, 0.85)"; // legible over the curves
         targetCtx.fillRect(0, h - bandH, w, bandH);
-        targetCtx.fillStyle = "#222";
+        targetCtx.fillStyle = "#111827";
         targetCtx.textBaseline = "middle";
         lines.forEach(function(line, i) {
             targetCtx.fillText(line, pad, h - bandH + pad + lineH * (i + 0.5));
@@ -298,28 +375,29 @@
     function renderGallery(items) {
         galleryItemsEl.innerHTML = "";
         if (!items.length) {
-            galleryItemsEl.textContent = "No saved PNGs yet.";
+            const empty = document.createElement("div");
+            empty.className = "col-span-2 text-slate-500 text-center py-3";
+            empty.textContent = "No saved PNGs yet.";
+            galleryItemsEl.appendChild(empty);
             return;
         }
         items.forEach(function(item) {
-            const wrap = document.createElement("div");
-            wrap.className = "thumb";
-
-            const a = document.createElement("a");
-            a.href = item.url;
-            a.target = "_blank";
-            a.rel = "noopener";
-            a.title = "Open " + item.name;
+            const wrap = document.createElement("a");
+            wrap.href = item.url;
+            wrap.target = "_blank";
+            wrap.rel = "noopener";
+            wrap.title = "Open " + item.name;
+            wrap.className = "group block rounded-lg overflow-hidden border border-slate-800 hover:border-cyan-500/60 transition bg-slate-900/60";
 
             const img = document.createElement("img");
             img.src = item.url;
             img.alt = item.name;
             img.loading = "lazy";
-            a.appendChild(img);
-            wrap.appendChild(a);
+            img.className = "w-full h-16 object-cover";
+            wrap.appendChild(img);
 
             const label = document.createElement("div");
-            label.className = "thumb-name";
+            label.className = "px-1.5 py-1 text-[9px] font-mono text-slate-400 truncate group-hover:text-cyan-300";
             label.textContent = item.name;
             wrap.appendChild(label);
 
@@ -355,6 +433,13 @@
     }
 
     loadGallery();
+
+    // Popup sidebar (smaller screens): slide the panel in and out.
+    const sidebar = document.getElementById("sidebar");
+    document.getElementById("btnToggleSidebar")
+      .addEventListener("click", () => sidebar.classList.toggle("max-lg:translate-x-full"));
+    document.getElementById("btnCloseSidebar")
+      .addEventListener("click", () => sidebar.classList.add("max-lg:translate-x-full"));
 
     let angle = 0;
     let lastTime = performance.now();
@@ -396,7 +481,7 @@
         // whole ellipse inside the viewport.
         const scale = Math.hypot(canvas.width, canvas.height) * (majorAxisFraction / 100) / OFF_SIZE;
         ctx.setTransform(1, 0, 0, 1, 0, 0);
-        ctx.fillStyle = "white";
+        ctx.fillStyle = "#020617";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.setTransform(scale, 0, 0, scale,
             canvas.width / 2 - scale * OFF_SIZE / 2,
@@ -414,6 +499,6 @@
     }
 
     requestAnimationFrame(drawRotatedEllipse);
-</script>
+  </script>
 </body>
 </html>

@@ -105,6 +105,11 @@
           <i id="playIcon" class="fa-solid fa-play text-xs"></i>
           <span id="playText">Animate (+0.5)</span>
         </button>
+        <div class="h-4 w-px bg-slate-800 mx-1"></div>
+        <button id="btnSavePng" class="px-3.5 h-8 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-600 text-white font-semibold text-xs flex items-center space-x-2 shadow-lg shadow-emerald-500/20 hover:opacity-90 transition">
+          <i class="fa-solid fa-camera text-xs"></i>
+          <span>Save PNG</span>
+        </button>
       </div>
 
       <!-- Main Canvas Element -->
@@ -306,6 +311,20 @@
           </div>
         </div>
 
+        <!-- SAVED PNG GALLERY -->
+        <div class="bg-slate-950/70 rounded-2xl p-3.5 border border-slate-800/80 space-y-3">
+          <h3 class="font-semibold text-emerald-400 flex items-center justify-between border-b border-slate-800/80 pb-1.5">
+            <span>Saved PNGs</span>
+            <i class="fa-solid fa-images text-slate-500"></i>
+          </h3>
+
+          <p class="text-[10px] text-slate-500 leading-snug">
+            The PNG captures the canvas with the micro-font parameter summary printed at the bottom-left. Commit the downloaded files to the repo and they will appear here automatically (fetched via the GitHub API).
+          </p>
+
+          <div id="galleryItems" class="grid grid-cols-2 gap-2"></div>
+        </div>
+
       </div>
 
       <div class="p-3 border-t border-slate-800 bg-slate-950 text-[11px] text-slate-400 text-center">
@@ -389,6 +408,8 @@
     const btnToggleSidebar = document.getElementById('btnToggleSidebar');
     const btnCloseSidebar = document.getElementById('btnCloseSidebar');
     const sidebar = document.getElementById('sidebar');
+    const btnSavePng = document.getElementById('btnSavePng');
+    const galleryItems = document.getElementById('galleryItems');
 
     function getLineColor(index, total, theme, alpha) {
       const t = index / total;
@@ -714,9 +735,123 @@
     btnToggleSidebar.addEventListener('click', () => sidebar.classList.toggle('max-lg:translate-x-full'));
     btnCloseSidebar.addEventListener('click', () => sidebar.classList.add('max-lg:translate-x-full'));
 
+    // --- Save PNG with micro-font parameter summary -------------------------
+    let showParamsUntil = 0;
+    const PARAM_DISPLAY_MS = 5000;
+
+    function buildParamLines() {
+      return [
+        `N = ${state.totalPoints}, n = ${state.offsetN}, k = ${state.multiplierK.toFixed(1)}   [x → (n + k·x) mod N]`,
+        `theme = ${state.colorTheme}, opacity = ${Math.round(state.opacity * 100)}%, line width = ${state.lineWidth.toFixed(1)}px`,
+        `glow = ${state.glowEffect ? 'on' : 'off'}, dots = ${state.showDots ? 'on' : 'off'}, labels = ${state.showLabels ? 'on' : 'off'}`,
+        `zoom = ${state.zoom.toFixed(2)}, pan = (${Math.round(state.panX)}, ${Math.round(state.panY)})`
+      ];
+    }
+
+    function drawParams() {
+      const w = canvas.width;
+      const h = canvas.height;
+      const lines = buildParamLines();
+
+      const fontPx = Math.max(10, Math.round(Math.min(w, h) / 80)); // micro font
+      const lineH = fontPx * 1.45;
+      const pad = fontPx * 0.6;
+      const bandH = lines.length * lineH + 2 * pad;
+
+      ctx.save();
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.font = fontPx + 'px monospace';
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+      ctx.fillRect(0, h - bandH, w, bandH);
+      ctx.fillStyle = '#111827';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'middle';
+      lines.forEach(function (line, i) {
+        ctx.fillText(line, pad, h - bandH + pad + lineH * (i + 0.5));
+      });
+      ctx.restore();
+    }
+
+    function savePng() {
+      render();
+      drawParams();
+      showParamsUntil = performance.now() + PARAM_DISPLAY_MS;
+
+      const link = document.createElement('a');
+      link.download = 'modular_string_art_visualizer_N' + state.totalPoints +
+          '_n' + state.offsetN +
+          '_k' + state.multiplierK.toFixed(1) + '.png';
+      link.href = canvas.toDataURL('image/png');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      setTimeout(() => { if (performance.now() >= showParamsUntil) render(); }, PARAM_DISPLAY_MS);
+    }
+
+    btnSavePng.addEventListener('click', savePng);
+
+    // --- Right-side gallery: all saved "modular_string_art_visualizer_" PNGs ---
+    function renderGallery(items) {
+      galleryItems.innerHTML = '';
+      if (!items.length) {
+        const empty = document.createElement('div');
+        empty.className = 'col-span-2 text-slate-500 text-center py-3';
+        empty.textContent = 'No saved PNGs yet.';
+        galleryItems.appendChild(empty);
+        return;
+      }
+      items.forEach(function (item) {
+        const wrap = document.createElement('a');
+        wrap.href = item.url;
+        wrap.target = '_blank';
+        wrap.rel = 'noopener';
+        wrap.title = 'Open ' + item.name;
+        wrap.className = 'group block rounded-lg overflow-hidden border border-slate-800 hover:border-cyan-500/60 transition bg-slate-900/60';
+
+        const img = document.createElement('img');
+        img.src = item.url;
+        img.alt = item.name;
+        img.loading = 'lazy';
+        img.className = 'w-full h-16 object-cover';
+        wrap.appendChild(img);
+
+        const label = document.createElement('div');
+        label.className = 'px-1.5 py-1 text-[9px] font-mono text-slate-400 truncate group-hover:text-cyan-300';
+        label.textContent = item.name;
+        wrap.appendChild(label);
+
+        galleryItems.appendChild(wrap);
+      });
+    }
+
+    function loadGallery() {
+      fetch('https://api.github.com/repos/tthtlc/tthtlc.github.io/contents/')
+        .then(function (response) {
+          if (!response.ok) { throw new Error('HTTP ' + response.status); }
+          return response.json();
+        })
+        .then(function (files) {
+          if (!Array.isArray(files)) { throw new Error('unexpected response'); }
+          const items = files
+            .filter(function (f) {
+              return f.type === 'file' &&
+                  f.name.indexOf('modular_string_art_visualizer_') === 0 &&
+                  f.name.slice(-4).toLowerCase() === '.png';
+            })
+            .map(function (f) { return { name: f.name, url: f.download_url }; })
+            .sort(function (a, b) { return a.name < b.name ? -1 : 1; });
+          renderGallery(items);
+        })
+        .catch(function () {
+          renderGallery([]);
+        });
+    }
+
     window.onload = () => {
       resizeCanvas();
       requestAnimationFrame(animateLoop);
+      loadGallery();
     };
   </script>
 </body>

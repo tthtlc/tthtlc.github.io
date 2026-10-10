@@ -1,528 +1,220 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full bg-slate-950 text-slate-100">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Spider Waves — Parametric Curve Generator</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    :root {
-      color-scheme: dark;
-      --background: #080064;
-      --page: #080818;
-      --panel: #111038;
-      --panel-deep: rgba(8, 0, 100, 0.45);
-      --text: #edf5ff;
-      --muted: #aebbd3;
-      --accent: #00e5ff;
-      --border: #34335d;
-      --button: #242347;
-      --button-hover: #353368;
+    /* Custom Scrollbar Styles */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
     }
-
-    * {
-      box-sizing: border-box;
+    ::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.6);
     }
-
-    html,
-    body {
-      height: 100%;
+    ::-webkit-scrollbar-thumb {
+      background: rgba(51, 65, 85, 0.8);
+      border-radius: 4px;
     }
-
-    body {
-      margin: 0;
-      background: var(--page);
-      color: var(--text);
-      font-family: system-ui, sans-serif;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(71, 85, 105, 1);
     }
-
-    /* ---------- Header ---------- */
-    header {
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 10px 16px;
-      border-bottom: 1px solid var(--border);
-      background: rgba(17, 16, 56, 0.92);
-      z-index: 30;
-    }
-
-    .header-title {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      min-width: 0;
-    }
-
-    .logo {
-      width: 36px;
-      height: 36px;
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 12px;
-      background: linear-gradient(135deg, #00e5ff, #4f46e5);
-      color: white;
-      font-size: 17px;
-      box-shadow: 0 0 12px rgba(0, 229, 255, 0.35);
-    }
-
-    h1 {
-      margin: 0;
-      font-size: 16px;
-      font-weight: 700;
-      background: linear-gradient(90deg, #00e5ff, #a5b4fc, #f472b6);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
-
-    .subtitle {
-      margin: 2px 0 0;
-      font-size: 12px;
-      color: var(--muted);
-    }
-
-    .icon-btn {
-      width: 36px;
-      height: 36px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      background: var(--button);
-      color: var(--text);
-      font-size: 15px;
-      cursor: pointer;
-    }
-
-    .icon-btn:hover {
-      background: var(--button-hover);
-    }
-
-    #btnToggleSidebar,
-    #btnCloseSidebar {
-      display: none;
-    }
-
-    /* ---------- Layout: stage + right-hand sidebar ---------- */
-    .app {
-      flex: 1;
-      display: flex;
-      overflow: hidden;
-      position: relative;
-    }
-
-    .stage {
-      flex: 1;
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--background);
-      overflow: hidden;
-    }
-
     canvas {
-      display: block;
+      touch-action: none;
     }
-
-    /* Live formula overlay (top-left of the stage) */
-    .formula {
-      position: absolute;
-      top: 16px;
-      left: 16px;
-      z-index: 10;
-      pointer-events: none;
-      max-width: calc(100% - 32px);
-      overflow: hidden;
-      padding: 10px 14px;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      background: rgba(17, 16, 56, 0.85);
-      font-family: Georgia, serif;
-      font-size: 13px;
-      line-height: 1.7;
-      color: var(--accent);
-      white-space: nowrap;
-    }
-
-    /* Floating Save PNG button (bottom-left of the stage) */
-    .stage-toolbar {
-      position: absolute;
-      bottom: 16px;
-      left: 16px;
-      z-index: 10;
-    }
-
-    /* ---------- Sidebar ---------- */
-    .sidebar {
-      width: 340px;
-      max-width: 85vw;
-      flex-shrink: 0;
-      display: flex;
-      flex-direction: column;
-      background: var(--panel);
-      border-left: 1px solid var(--border);
-      z-index: 20;
-    }
-
-    .sidebar-head {
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 14px 16px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .sidebar-head h2 {
-      margin: 0;
-      font-size: 14px;
-      font-weight: 700;
-    }
-
-    .sidebar-head h2 i {
-      color: var(--accent);
-      margin-right: 8px;
-    }
-
-    .sidebar-body {
-      flex: 1;
-      overflow-y: auto;
-      padding: 16px;
-    }
-
-    .section {
-      margin-bottom: 16px;
-      padding: 14px;
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      background: var(--panel-deep);
-    }
-
-    .section h3 {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin: 0 0 12px;
-      padding-bottom: 8px;
-      border-bottom: 1px solid var(--border);
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--accent);
-    }
-
-    .section h3 i {
-      color: #64748b;
-      font-size: 12px;
-    }
-
-    .field {
-      margin-bottom: 14px;
-    }
-
-    .field:last-child {
-      margin-bottom: 0;
-    }
-
-    .field-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 6px;
-    }
-
-    .field-head label {
-      font-size: 13px;
-    }
-
-    .value {
-      font-family: ui-monospace, monospace;
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--accent);
-      background: rgba(0, 229, 255, 0.08);
-      border: 1px solid rgba(0, 229, 255, 0.3);
-      border-radius: 6px;
-      padding: 2px 8px;
-      white-space: nowrap;
-    }
-
-    input[type="range"] {
-      width: 100%;
-      accent-color: var(--accent);
-      cursor: pointer;
-    }
-
-    .range-hints {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 2px;
-      font-family: ui-monospace, monospace;
-      font-size: 10px;
-      color: var(--muted);
-    }
-
-    .color-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-
-    .color-field label {
-      display: block;
-      margin-bottom: 6px;
-      font-size: 12px;
-      color: var(--muted);
-    }
-
-    .color-field input[type="color"] {
-      width: 100%;
-      height: 34px;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      background: transparent;
-      cursor: pointer;
-    }
-
-    .buttons {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 16px;
-    }
-
-    button {
-      padding: 10px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      background: var(--button);
-      color: var(--text);
-      font: inherit;
-      font-size: 13px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background: var(--button-hover);
-    }
-
-    button.primary {
-      background: #00576b;
-      border-color: #0089a5;
-    }
-
-    button.save {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      border: none;
-      background: linear-gradient(135deg, #10b981, #0891b2);
-      color: white;
-      font-weight: 600;
-      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
-    }
-
-    button.save:hover {
-      opacity: 0.9;
-      background: linear-gradient(135deg, #10b981, #0891b2);
-    }
-
-    .stage-toolbar button.save {
-      padding: 9px 14px;
-      border-radius: 12px;
-      font-size: 12px;
-    }
-
-    #status {
-      margin: 12px 0 0;
-      min-height: 1.2em;
-      font-size: 12px;
-      color: var(--muted);
-    }
-
-    .sidebar-foot {
-      flex-shrink: 0;
-      padding: 10px 16px;
-      border-top: 1px solid var(--border);
-      font-size: 11px;
-      color: var(--muted);
-      text-align: center;
-    }
-
-    /* ---------- Popup behaviour on smaller screens ---------- */
-    /* Below 1024px the sidebar slides in over the stage as a popup panel,
-       exactly like the right-hand panel of rotated_string_art_layers.html. */
-    @media (max-width: 1023px) {
-      #btnToggleSidebar,
-      #btnCloseSidebar {
-        display: flex;
-      }
-
-      .sidebar {
-        position: absolute;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        transform: translateX(100%);
-        transition: transform 0.3s ease;
-        box-shadow: -8px 0 24px rgba(0, 0, 0, 0.45);
-      }
-
-      .sidebar.open {
-        transform: translateX(0);
-      }
+    .slider-thumb-custom::-webkit-slider-thumb {
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
     }
   </style>
 </head>
+<body class="h-full flex flex-col font-sans overflow-hidden bg-slate-950 text-slate-200 antialiased selection:bg-cyan-500 selection:text-white">
 
-<body>
-  <header>
-    <div class="header-title">
-      <div class="logo">
-        <i class="fa-solid fa-circle-nodes"></i>
+  <header class="flex-shrink-0 border-b border-slate-800/80 bg-slate-900/90 backdrop-blur-md px-4 py-3 flex items-center justify-between z-20 shadow-md">
+    <div class="flex items-center space-x-3">
+      <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+        <i class="fa-solid fa-circle-nodes text-white text-lg font-bold"></i>
       </div>
       <div>
-        <h1>Spider Waves</h1>
-        <p class="subtitle">
-          A single parametric curve with a woven, web-like appearance —
-          adjust the frequencies and amplitude to explore its geometry.
-        </p>
+        <h1 class="text-base font-bold bg-gradient-to-r from-cyan-400 via-indigo-300 to-pink-400 bg-clip-text text-transparent">
+          Spider Waves
+        </h1>
+        <p class="text-xs text-slate-400 hidden sm:block">A single parametric curve with a woven, web-like appearance — adjust frequencies &amp; amplitude to explore its geometry</p>
       </div>
     </div>
 
-    <button id="btnToggleSidebar" class="icon-btn" title="Toggle Sidebar">
+    <button id="btnToggleSidebar" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition lg:hidden" title="Toggle Sidebar">
       <i class="fa-solid fa-sliders"></i>
     </button>
   </header>
 
-  <div class="app">
-    <main class="stage" id="stage">
-      <div id="formula" class="formula"></div>
+  <div class="flex-1 flex overflow-hidden relative">
 
-      <div class="stage-toolbar">
-        <button id="btnSavePngStage" class="save">
-          <i class="fa-solid fa-camera"></i>
+    <main id="stage" class="flex-1 relative flex items-center justify-center bg-slate-950 overflow-hidden select-none">
+
+      <!-- Live Formula Display -->
+      <div id="formula" class="absolute top-4 left-4 z-10 pointer-events-none max-w-[calc(100%-2rem)] overflow-hidden bg-slate-900/80 backdrop-blur-md px-3.5 py-2.5 rounded-xl border border-slate-800/90 text-xs font-mono text-cyan-400 shadow-xl"></div>
+
+      <!-- Canvas Navigation Controls -->
+      <div class="absolute bottom-4 left-4 z-10 flex items-center space-x-2 bg-slate-900/85 backdrop-blur-md p-1.5 rounded-2xl border border-slate-800 shadow-2xl">
+        <button id="btnSavePngStage" class="px-3.5 h-8 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-600 text-white font-semibold text-xs flex items-center space-x-2 shadow-lg shadow-emerald-500/20 hover:opacity-90 transition">
+          <i class="fa-solid fa-camera text-xs"></i>
           <span>Save PNG</span>
         </button>
       </div>
 
+      <!-- Main Canvas Element -->
       <canvas id="canvas" role="img" aria-label="Spider Waves parametric curve"></canvas>
     </main>
 
-    <aside id="sidebar" class="sidebar" aria-label="Parameter controls">
-      <div class="sidebar-head">
-        <h2>
-          <i class="fa-solid fa-sliders"></i>
+    <aside id="sidebar" class="w-80 sm:w-96 border-l border-slate-800/80 bg-slate-900/95 backdrop-blur-xl flex flex-col z-20 transition-all duration-300 absolute lg:relative right-0 h-full max-lg:translate-x-full shadow-2xl lg:shadow-none">
+
+      <div class="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-900">
+        <h2 class="font-bold text-sm text-slate-200 flex items-center space-x-2">
+          <i class="fa-solid fa-sliders text-cyan-400"></i>
           <span>Parameter Scrollbars &amp; Controls</span>
         </h2>
-        <button id="btnCloseSidebar" class="icon-btn" title="Close Sidebar">
-          <i class="fa-solid fa-xmark"></i>
+        <button id="btnCloseSidebar" class="lg:hidden text-slate-400 hover:text-white p-1">
+          <i class="fa-solid fa-xmark text-base"></i>
         </button>
       </div>
 
-      <div class="sidebar-body">
-        <section class="section">
-          <h3>
+      <div class="flex-1 overflow-y-auto p-4 space-y-5 text-xs">
+
+        <!-- CURVE PARAMETERS -->
+        <div class="bg-slate-950/70 rounded-2xl p-3.5 border border-slate-800/80 space-y-4 shadow-inner">
+          <h3 class="font-semibold text-cyan-400 flex items-center justify-between border-b border-slate-800/80 pb-1.5">
             <span>Curve Parameters</span>
-            <i class="fa-solid fa-calculator"></i>
+            <i class="fa-solid fa-calculator text-slate-500"></i>
           </h3>
 
-          <div class="field">
-            <div class="field-head">
-              <label for="fx">X frequency</label>
-              <span id="fxValue" class="value">110</span>
+          <div class="space-y-1.5">
+            <div class="flex justify-between items-center text-slate-300">
+              <label for="fx" class="font-medium">X frequency</label>
+              <span id="fxValue" class="font-mono text-cyan-400 font-bold bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-800/40">110</span>
             </div>
-            <input id="fx" type="range" min="1" max="200" step="1" value="110">
-            <div class="range-hints"><span>1</span><span>200</span></div>
-          </div>
-
-          <div class="field">
-            <div class="field-head">
-              <label for="fy">Y frequency</label>
-              <span id="fyValue" class="value">112</span>
-            </div>
-            <input id="fy" type="range" min="1" max="200" step="1" value="112">
-            <div class="range-hints"><span>1</span><span>200</span></div>
-          </div>
-
-          <div class="field">
-            <div class="field-head">
-              <label for="divisor">Amplitude divisor</label>
-              <span id="divisorValue" class="value">1.4</span>
-            </div>
-            <input id="divisor" type="range" min="0.5" max="4" step="0.05" value="1.4">
-            <div class="range-hints"><span>0.5</span><span>4</span></div>
-          </div>
-
-          <div class="field">
-            <div class="field-head">
-              <label for="power">Y sine power</label>
-              <span id="powerValue" class="value">3</span>
-            </div>
-            <input id="power" type="range" min="1" max="7" step="2" value="3">
-            <div class="range-hints"><span>1</span><span>7</span></div>
-          </div>
-
-          <div class="field">
-            <div class="field-head">
-              <label for="samples">Samples</label>
-              <span id="samplesValue" class="value">80,000</span>
-            </div>
-            <input id="samples" type="range" min="10000" max="120000" step="5000" value="80000">
-            <div class="range-hints"><span>10k</span><span>120k</span></div>
-          </div>
-
-          <div class="field">
-            <div class="field-head">
-              <label for="width">Line width</label>
-              <span id="widthValue" class="value">0.55</span>
-            </div>
-            <input id="width" type="range" min="0.2" max="2" step="0.05" value="0.55">
-            <div class="range-hints"><span>0.2</span><span>2</span></div>
-          </div>
-        </section>
-
-        <section class="section">
-          <h3>
-            <span>Visual Styling</span>
-            <i class="fa-solid fa-palette"></i>
-          </h3>
-
-          <div class="color-grid">
-            <div class="color-field">
-              <label for="lineColor">Curve color</label>
-              <input id="lineColor" type="color" value="#00e5ff">
-            </div>
-            <div class="color-field">
-              <label for="bgColor">Background color</label>
-              <input id="bgColor" type="color" value="#080064">
+            <input id="fx" type="range" min="1" max="200" step="1" value="110"
+              class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-500 slider-thumb-custom">
+            <div class="flex justify-between text-[10px] text-slate-500 font-mono">
+              <span>1</span><span>200</span>
             </div>
           </div>
-        </section>
 
-        <div class="buttons">
-          <button id="animate" class="primary">Animate</button>
+          <div class="space-y-1.5">
+            <div class="flex justify-between items-center text-slate-300">
+              <label for="fy" class="font-medium">Y frequency</label>
+              <span id="fyValue" class="font-mono text-cyan-400 font-bold bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-800/40">112</span>
+            </div>
+            <input id="fy" type="range" min="1" max="200" step="1" value="112"
+              class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-500 slider-thumb-custom">
+            <div class="flex justify-between text-[10px] text-slate-500 font-mono">
+              <span>1</span><span>200</span>
+            </div>
+          </div>
+
+          <div class="space-y-1.5">
+            <div class="flex justify-between items-center text-slate-300">
+              <label for="divisor" class="font-medium">Amplitude divisor</label>
+              <span id="divisorValue" class="font-mono text-cyan-400 font-bold bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-800/40">1.4</span>
+            </div>
+            <input id="divisor" type="range" min="0.5" max="4" step="0.05" value="1.4"
+              class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-500 slider-thumb-custom">
+            <div class="flex justify-between text-[10px] text-slate-500 font-mono">
+              <span>0.5</span><span>4</span>
+            </div>
+          </div>
+
+          <div class="space-y-1.5">
+            <div class="flex justify-between items-center text-slate-300">
+              <label for="power" class="font-medium">Y sine power</label>
+              <span id="powerValue" class="font-mono text-cyan-400 font-bold bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-800/40">3</span>
+            </div>
+            <input id="power" type="range" min="1" max="7" step="2" value="3"
+              class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-500 slider-thumb-custom">
+            <div class="flex justify-between text-[10px] text-slate-500 font-mono">
+              <span>1</span><span>7</span>
+            </div>
+          </div>
+
+          <div class="space-y-1.5">
+            <div class="flex justify-between items-center text-slate-300">
+              <label for="samples" class="font-medium">Samples</label>
+              <span id="samplesValue" class="font-mono text-cyan-400 font-bold bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-800/40">80,000</span>
+            </div>
+            <input id="samples" type="range" min="10000" max="120000" step="5000" value="80000"
+              class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-500 slider-thumb-custom">
+            <div class="flex justify-between text-[10px] text-slate-500 font-mono">
+              <span>10k</span><span>120k</span>
+            </div>
+          </div>
+
+          <div class="space-y-1.5">
+            <div class="flex justify-between items-center text-slate-300">
+              <label for="width" class="font-medium">Line width</label>
+              <span id="widthValue" class="font-mono text-cyan-400 font-bold bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-800/40">0.55</span>
+            </div>
+            <input id="width" type="range" min="0.2" max="2" step="0.05" value="0.55"
+              class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-500 slider-thumb-custom">
+            <div class="flex justify-between text-[10px] text-slate-500 font-mono">
+              <span>0.2</span><span>2</span>
+            </div>
+          </div>
         </div>
 
-        <p id="status" role="status" aria-live="polite"></p>
+        <!-- VISUAL STYLING -->
+        <div class="bg-slate-950/70 rounded-2xl p-3.5 border border-slate-800/80 space-y-3">
+          <h3 class="font-semibold text-amber-400 flex items-center justify-between border-b border-slate-800/80 pb-1.5">
+            <span>Visual Styling</span>
+            <i class="fa-solid fa-palette text-slate-500"></i>
+          </h3>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div class="space-y-1">
+              <label for="lineColor" class="block text-slate-300 font-medium">Curve color</label>
+              <input id="lineColor" type="color" value="#00e5ff" class="w-full h-9 border border-slate-700 rounded-lg bg-transparent cursor-pointer">
+            </div>
+            <div class="space-y-1">
+              <label for="bgColor" class="block text-slate-300 font-medium">Background color</label>
+              <input id="bgColor" type="color" value="#080064" class="w-full h-9 border border-slate-700 rounded-lg bg-transparent cursor-pointer">
+            </div>
+          </div>
+        </div>
+
+        <!-- ANIMATION -->
+        <div class="bg-slate-950/70 rounded-2xl p-3.5 border border-slate-800/80 space-y-3">
+          <h3 class="font-semibold text-indigo-400 flex items-center justify-between border-b border-slate-800/80 pb-1.5">
+            <span>Animation</span>
+            <i class="fa-solid fa-circle-play text-slate-500"></i>
+          </h3>
+
+          <button id="animate" class="w-full px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-600 text-white font-semibold text-xs shadow-lg shadow-cyan-500/20 hover:opacity-90 transition">Animate</button>
+          <p id="status" role="status" aria-live="polite" class="min-h-[1.2em] text-slate-400"></p>
+        </div>
+
+        <!-- SAVED PNG GALLERY -->
+        <div class="bg-slate-950/70 rounded-2xl p-3.5 border border-slate-800/80 space-y-3">
+          <h3 class="font-semibold text-emerald-400 flex items-center justify-between border-b border-slate-800/80 pb-1.5">
+            <span>Saved PNGs</span>
+            <i class="fa-solid fa-images text-slate-500"></i>
+          </h3>
+
+          <p class="text-[10px] text-slate-500 leading-snug">
+            The PNG captures the canvas with the micro-font parameter summary printed at the bottom. Commit the downloaded files to the repo and they will appear here automatically (fetched via the GitHub API).
+          </p>
+
+          <div id="galleryItems" class="grid grid-cols-2 gap-2"></div>
+        </div>
+
       </div>
 
-      <div class="sidebar-foot">
+      <div class="p-3 border-t border-slate-800 bg-slate-950 text-[11px] text-slate-400 text-center">
         Adjust any scrollbar to redraw the curve instantly.
       </div>
+
     </aside>
   </div>
 
@@ -849,6 +541,67 @@
       statusElement.textContent = "PNG saved with parameter summary.";
     }
 
+    // --- Right-side gallery: all saved "spider_waves_" PNGs ---
+    // Lists the repo contents through the GitHub API so every committed
+    // "spider_waves_*.png" shows up without editing this file.
+    const galleryItems = document.getElementById("galleryItems");
+
+    function renderGallery(items) {
+      galleryItems.innerHTML = "";
+      if (!items.length) {
+        const empty = document.createElement("div");
+        empty.className = "col-span-2 text-slate-500 text-center py-3";
+        empty.textContent = "No saved PNGs yet.";
+        galleryItems.appendChild(empty);
+        return;
+      }
+      items.forEach(function (item) {
+        const wrap = document.createElement("a");
+        wrap.href = item.url;
+        wrap.target = "_blank";
+        wrap.rel = "noopener";
+        wrap.title = "Open " + item.name;
+        wrap.className = "group block rounded-lg overflow-hidden border border-slate-800 hover:border-cyan-500/60 transition bg-slate-900/60";
+
+        const img = document.createElement("img");
+        img.src = item.url;
+        img.alt = item.name;
+        img.loading = "lazy";
+        img.className = "w-full h-16 object-cover";
+        wrap.appendChild(img);
+
+        const label = document.createElement("div");
+        label.className = "px-1.5 py-1 text-[9px] font-mono text-slate-400 truncate group-hover:text-cyan-300";
+        label.textContent = item.name;
+        wrap.appendChild(label);
+
+        galleryItems.appendChild(wrap);
+      });
+    }
+
+    function loadGallery() {
+      fetch("https://api.github.com/repos/tthtlc/tthtlc.github.io/contents/")
+        .then(function (response) {
+          if (!response.ok) { throw new Error("HTTP " + response.status); }
+          return response.json();
+        })
+        .then(function (files) {
+          if (!Array.isArray(files)) { throw new Error("unexpected response"); }
+          const items = files
+            .filter(function (f) {
+              return f.type === "file" &&
+                  f.name.indexOf("spider_waves_") === 0 &&
+                  f.name.slice(-4).toLowerCase() === ".png";
+            })
+            .map(function (f) { return { name: f.name, url: f.download_url }; })
+            .sort(function (a, b) { return a.name < b.name ? -1 : 1; });
+          renderGallery(items);
+        })
+        .catch(function () {
+          renderGallery([]);
+        });
+    }
+
     // --- Wiring -------------------------------------------------------------
     for (const control of Object.values(controls)) {
       control.addEventListener("input", scheduleRedraw);
@@ -864,15 +617,16 @@
     const sidebar = document.getElementById("sidebar");
 
     document.getElementById("btnToggleSidebar")
-      .addEventListener("click", () => sidebar.classList.toggle("open"));
+      .addEventListener("click", () => sidebar.classList.toggle("max-lg:translate-x-full"));
 
     document.getElementById("btnCloseSidebar")
-      .addEventListener("click", () => sidebar.classList.remove("open"));
+      .addEventListener("click", () => sidebar.classList.add("max-lg:translate-x-full"));
 
     const resizeObserver = new ResizeObserver(scheduleRedraw);
     resizeObserver.observe(stage);
 
     drawInstantly();
+    loadGallery();
   </script>
 </body>
 </html>
