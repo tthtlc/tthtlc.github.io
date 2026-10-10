@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Generalized Ellipse Windings</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f3f4f6;color:#20252c;font:14px system-ui,sans-serif}main{max-width:1400px;margin:auto;padding:24px}h1{margin:0 0 8px;font-size:30px}p{line-height:1.6}.layout{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:20px}.gallery{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;align-content:start}.card{background:white;border:1px solid #bcc2ca;border-radius:7px;overflow:hidden}.card.selected{outline:3px solid #437ac0}.card button{border:0;border-bottom:1px solid #e3e5e8;border-radius:0;text-align:left;font-size:12px;padding:9px;background:#fafafa;margin:0}.card canvas{display:block;width:100%;aspect-ratio:1;touch-action:none;cursor:grab}.panel{background:white;border:1px solid #d4d8df;border-radius:8px;padding:17px;align-self:start}h2{font-size:24px;margin:0 0 14px}h3{font-size:18px;margin:20px 0 12px}.row{margin:11px 0}.row label{display:flex;justify-content:space-between;font-size:12px}input[type=range]{width:100%;accent-color:#437ac0}output{font-variant-numeric:tabular-nums;color:#526477}button,select{width:100%;padding:9px;border:1px solid #c7ccd3;border-radius:5px;background:white;font:inherit;margin:5px 0;cursor:pointer}.small{font-size:12px;color:#626a75}details{margin-top:20px;background:white;border:1px solid #d4d8df;border-radius:8px;padding:16px}code{white-space:pre-wrap}.check{display:block;margin:12px 0;font-size:12px}@media(max-width:950px){.layout{grid-template-columns:1fr}.panel{position:static}.gallery{gap:6px}main{padding:12px}}@media(max-width:530px){.gallery{grid-template-columns:repeat(2,minmax(0,1fr))}}.saved-gallery{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.saved-item{display:block;border:1px solid #e3e5e8;border-radius:5px;overflow:hidden;background:#fafafa;text-decoration:none}.saved-item img{display:block;width:100%;aspect-ratio:1;object-fit:contain;background:white}.saved-item span{display:block;padding:4px 6px;font-size:10px;font-family:monospace;color:#626a75;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+</style></head><body><main>
+<h1>Generalized ellipse windings</h1>
+<p>One equation, nine parameter presets. Select a panel to edit it; drag any drawing to rotate its view. These are illustrative approximations, not recovered equations for the reference image.</p>
+<div class="layout"><div class="gallery" id="gallery"></div><aside class="panel"><h2 id="selectedTitle"></h2><div id="controls"></div>
+<label class="check"><input type="checkbox" id="continuous"> One continuous strand instead of separate ellipses</label>
+<div class="row"><label>Ellipse turns per orientation sweep <output id="turnsOut"></output></label><input id="turns" type="range" min="2" max="60" value="24" step="1"></div>
+<label class="check"><input type="checkbox" id="animate"> Animate viewing angles</label>
+<button id="reset">Reset selected preset</button><button id="resetAll">Reset all panels</button><button id="export">Download selected drawing as SVG</button><p class="small">The shared center stays fixed. Angles use radians. Integer frequency ratios give periodic orientation functions. SVG export saves the current view.</p><h3>Saved SVGs</h3><p class="small">Commit downloaded SVGs to the repo and they appear here automatically (fetched via the GitHub API).</p><div id="savedGallery" class="saved-gallery"></div></aside></div>
+<details><summary>Equation and interpretation</summary><p>Each separate loop is an exact ellipse in 3D:</p><code>p(t, φ) = Ry(α(φ)) Rz(β(φ)) Ry(γ(φ)) [b sin(t), a cos(t), 0]ᵀ
+α(φ) = Pφ
+β(φ) = β₀ + A sin(mφ + δ)
+γ(φ) = Kφ + B sin(nφ)
+0 ≤ t &lt; 2π,  0 ≤ φ &lt; 2π</code><p>Rotations act from right to left: local twist, axis tilt, then precession. The camera applies another rotation and orthographic projection. Varying φ between closed loops gives a family of ellipses. In continuous mode, t=Nφ: orientation changes during each turn, so the strand is generally not an ellipse. For integer P, K, m, n, and N, that strand closes after one full φ sweep.</p><p>Orthographic projection maps each planar ellipse to an ellipse or, in an edge-on view, a line segment. Apparent crossings do not imply that strands meet in 3D.</p></details>
+</main><script>
+'use strict';
+const TAU=2*Math.PI;
+const base={a:1.1,b:0.52,P:1,beta:0.5,A:0,m:3,K:0,B:0,n:2,delta:0.35,loops:120,opacity:0.36,zoom:1};
+const specs=[
+['Broad crossing',{beta:0.8,b:0.50},[0.35,0.25,-0.5]],
+['Cone sweep',{beta:0.44,b:0.57},[0.4,-0.16,-0.61]],
+['Horizontal weave',{beta:0.95,A:0.5,m:3,K:2,B:0.4,b:0.58,loops:150},[0.8,0.5,0.05]],
+['Crossed fans',{beta:0.65,A:0.65,m:2,K:1,B:0.3,loops:148},[0.35,0.2,0.65]],
+['Fixed-axis spindle',{beta:0,b:0.42,loops:46,P:1},[0.3,0.05,-0.68]],
+['Wide twisting cage',{beta:0.9,A:0.3,m:2,K:1,B:0.55,b:0.7,loops:118},[0.6,0.3,0.6]],
+['Asymmetric fans',{beta:0.6,A:0.6,m:1,K:1,B:0.55,n:3,b:0.45,loops:116},[0.8,0.1,-0.4]],
+['Wobbling weave',{beta:0.7,A:0.62,m:3,K:2,B:0.4,loops:124},[0.4,0.45,-0.35]],
+['Nested cone loops',{beta:1.06,b:0.78,loops:148,K:1},[0.6,0.35,-0.65]]
+];
+const fields=[['loops','Loop count',12,200,1],['a','Long semiaxis',0.5,1.5,0.01],['b','Short semiaxis',0.15,0.95,0.01],['P','Precession turns',-4,4,1],['beta','Mean tilt',0,1.57,0.01],['A','Tilt wobble',0,1.8,0.01],['m','Tilt cycles',1,8,1],['K','Local twist turns',-5,5,1],['B','Twist oscillation',0,1.5,0.01],['n','Twist cycles',1,8,1],['delta','Wobble phase',0,6.28,0.01],['opacity','Stroke opacity',0.08,0.8,0.01],['zoom','Zoom',0.6,1.4,0.01]];
+const gallery=document.querySelector('#gallery'), controls=document.querySelector('#controls');
+let selected=1,dirty=true,raf=null,last=null;
+const figures=specs.map(([name,overrides,view],i)=>{
+ const card=document.createElement('article');card.className='card';
+ const button=document.createElement('button');button.textContent=`${i+1}. ${name}`;button.onclick=()=>select(i);
+ const canvas=document.createElement('canvas');canvas.setAttribute('aria-label',name);
+ card.append(button,canvas);gallery.append(card);
+ return {name,card,canvas,ctx:canvas.getContext('2d'),defaults:{...base,...overrides},p:{...base,...overrides},initial:[...view],view:[...view],continuous:false,turns:24,paths:[],drag:null};
+});
+const elements={};
+fields.forEach(([key,label,min,max,step])=>{
+ const row=document.createElement('div');row.className='row';row.innerHTML=`<label for="${key}">${label}<output></output></label><input id="${key}" type="range" min="${min}" max="${max}" step="${step}">`;
+ controls.append(row);const input=row.querySelector('input'),out=row.querySelector('output');elements[key]={input,out};
+ input.oninput=()=>{figures[selected].p[key]=+input.value;out.value=fmt(+input.value,step);if(!['opacity','zoom'].includes(key))build(figures[selected]);request();};
+});
+function fmt(v,step){return step===1?String(v):v.toFixed(2)}
+function select(i){selected=i;figures.forEach((f,j)=>f.card.classList.toggle('selected',i===j));sync();request()}
+function sync(){const f=figures[selected];document.querySelector('#selectedTitle').textContent=`${selected+1}. ${f.name}`;fields.forEach(([k,l,min,max,step])=>{elements[k].input.value=f.p[k];elements[k].out.value=fmt(f.p[k],step)});document.querySelector('#continuous').checked=f.continuous;document.querySelector('#turns').value=f.turns;document.querySelector('#turnsOut').value=f.turns}
+function ry(p,v){const c=Math.cos(v),s=Math.sin(v);return [c*p[0]+s*p[2],p[1],-s*p[0]+c*p[2]]}
+function rz(p,v){const c=Math.cos(v),s=Math.sin(v);return [c*p[0]-s*p[1],s*p[0]+c*p[1],p[2]]}
+function point(t,phi,s){let p=[s.b*Math.sin(t),s.a*Math.cos(t),0];p=ry(p,s.K*phi+s.B*Math.sin(s.n*phi));p=rz(p,s.beta+s.A*Math.sin(s.m*phi+s.delta));return ry(p,s.P*phi)}
+function build(f){const paths=[];if(f.continuous){const count=Math.max(2400,f.turns*160),path=[];for(let j=0;j<count;j++){const phi=TAU*j/count;path.push(point(f.turns*phi,phi,f.p))}paths.push(path)}else{for(let i=0;i<f.p.loops;i++){const path=[],phi=TAU*i/f.p.loops;for(let j=0;j<200;j++)path.push(point(TAU*j/200,phi,f.p));paths.push(path)}}f.paths=paths}
+function camera(p,v){p=ry(p,v[0]);const c=Math.cos(v[1]),s=Math.sin(v[1]);p=[p[0],c*p[1]-s*p[2],s*p[1]+c*p[2]];return rz(p,v[2])}
+function projected(f,w,h){const scale=Math.min(w,h)*0.31*f.p.zoom;return f.paths.map(path=>path.map(p=>{const q=camera(p,f.view);return [w/2+q[0]*scale,h/2-q[1]*scale]}))}
+function lineColor(i,n,a){const t=n>1?i/(n-1):0;return a===undefined?`hsl(${t*360},60%,32%)`:`hsla(${t*360},60%,32%,${a})`}
+function draw(f){const r=f.canvas.getBoundingClientRect(),dpr=window.devicePixelRatio||1,w=r.width,h=r.height;if(!w||!h)return;const pw=Math.round(w*dpr),ph=Math.round(h*dpr);if(f.canvas.width!==pw||f.canvas.height!==ph){f.canvas.width=pw;f.canvas.height=ph}const ctx=f.ctx;ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);ctx.lineWidth=0.65;ctx.lineJoin='round';const paths=projected(f,w,h);const grad=paths.length>1;paths.forEach((path,i)=>{ctx.strokeStyle=grad?lineColor(i,paths.length,f.p.opacity):`rgba(15,18,22,${f.p.opacity})`;ctx.beginPath();path.forEach(([x,y],j)=>j?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.closePath();ctx.stroke()})}
+function request(){dirty=true;if(raf===null)raf=requestAnimationFrame(render)}
+function render(time){raf=null;const moving=document.querySelector('#animate').checked;if(moving){const dt=last===null?0:Math.min((time-last)/1000,0.05);figures.forEach(f=>{if(!f.drag)f.view[0]+=dt*0.22});dirty=true}last=moving?time:null;if(dirty){figures.forEach(draw);dirty=false}if(moving)raf=requestAnimationFrame(render)}
+figures.forEach((f,i)=>{const c=f.canvas;c.onpointerdown=e=>{if(f.drag||(e.pointerType==='mouse'&&e.button!==0))return;select(i);f.drag={id:e.pointerId,x:e.clientX,y:e.clientY};c.setPointerCapture(e.pointerId)};c.onpointermove=e=>{const d=f.drag;if(!d||d.id!==e.pointerId)return;f.view[0]+=(e.clientX-d.x)*0.008;f.view[1]+=(e.clientY-d.y)*0.008;d.x=e.clientX;d.y=e.clientY;request()};const stop=e=>{if(f.drag?.id===e.pointerId)f.drag=null};c.onpointerup=stop;c.onpointercancel=stop;c.onlostpointercapture=stop;build(f)});
+document.querySelector('#continuous').onchange=e=>{figures[selected].continuous=e.target.checked;build(figures[selected]);request()};
+document.querySelector('#turns').oninput=e=>{figures[selected].turns=+e.target.value;document.querySelector('#turnsOut').value=e.target.value;build(figures[selected]);request()};
+document.querySelector('#animate').onchange=()=>{last=null;request()};
+function reset(f){f.p={...f.defaults};f.view=[...f.initial];f.continuous=false;f.turns=24;build(f)}
+document.querySelector('#reset').onclick=()=>{reset(figures[selected]);sync();request()};document.querySelector('#resetAll').onclick=()=>{figures.forEach(reset);document.querySelector('#animate').checked=false;sync();request()};
+document.querySelector('#export').onclick=()=>{const f=figures[selected],w=900,h=900;const proj=projected(f,w,h);const paths=proj.map((path,i)=>`<path stroke="${proj.length>1?lineColor(i,proj.length):'#0f1216'}" d="${path.map(([x,y],j)=>`${j?'L':'M'}${x.toFixed(3)},${y.toFixed(3)}`).join(' ')} Z"/>`).join('');const parts=fields.map(([k,l,mn,mx,st])=>`${k}=${fmt(f.p[k],st)}`).concat([`continuous=${f.continuous}`,`turns=${f.turns}`,`view=[${f.view.map(v=>v.toFixed(2)).join(', ')}]`]);const half=Math.ceil(parts.length/2);const meta=`<text x="10" y="${h-22}" font-family="monospace" font-size="8" fill="#7a828c"><tspan x="10">${parts.slice(0,half).join('  ')}</tspan><tspan x="10" dy="11">${parts.slice(half).join('  ')}</tspan></text>`;const svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}"><rect width="100%" height="100%" fill="white"/><g fill="none" stroke-opacity="${f.p.opacity}" stroke-width="1.8" stroke-linejoin="round">${paths}</g>${meta}</svg>`;const slug=f.name.toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'');const url=URL.createObjectURL(new Blob([svg],{type:'image/svg+xml'}));const a=document.createElement('a');a.href=url;a.download=`gew_${slug}.svg`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)};
+const savedGalleryEl=document.querySelector('#savedGallery');
+const FALLBACK_SVG_NAMES=[];
+function renderSavedGallery(items){
+	savedGalleryEl.innerHTML='';
+	if(!items.length){
+		const empty=document.createElement('div');
+		empty.className='small';empty.style.gridColumn='1/-1';empty.style.textAlign='center';empty.style.padding='10px 0';
+		empty.textContent='No saved SVGs yet.';
+		savedGalleryEl.appendChild(empty);
+		return;
+	}
+	items.forEach(item=>{
+		const wrap=document.createElement('a');
+		wrap.className='saved-item';wrap.href=item.url;wrap.target='_blank';wrap.rel='noopener';wrap.title='Open '+item.name;
+		const img=document.createElement('img');
+		img.src=item.url;img.alt=item.name;img.loading='lazy';
+		const label=document.createElement('span');
+		label.textContent=item.name;
+		wrap.append(img,label);
+		savedGalleryEl.appendChild(wrap);
+	});
+}
+function loadSavedGallery(){
+	fetch('https://api.github.com/repos/tthtlc/tthtlc.github.io/contents/')
+		.then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.json()})
+		.then(files=>{
+			if(!Array.isArray(files))throw new Error('unexpected response');
+			const items=files
+				.filter(f=>f.type==='file'&&f.name.indexOf('gew_')===0&&f.name.slice(-4).toLowerCase()==='.svg')
+				.map(f=>({name:f.name,url:f.download_url}))
+				.sort((a,b)=>a.name<b.name?-1:1);
+			renderSavedGallery(items);
+		})
+		.catch(()=>renderSavedGallery(FALLBACK_SVG_NAMES.map(n=>({name:n,url:n}))));
+}
+loadSavedGallery();
+const observer=new ResizeObserver(request);figures.forEach(f=>observer.observe(f.canvas));window.addEventListener('resize',request);select(selected);
+</script></body></html>
