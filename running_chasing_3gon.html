@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="stylesheet" href="/assets/math-art.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pentagon Drawing with Iterations</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        canvas {
+            background-color: white;
+            border: 1px solid #ccc;
+        }
+    
+        /* Centered link at the bottom */ 
+        .footer-link { 
+            position: absolute; 
+            bottom: 20px; 
+            text-align: center; 
+            width: 100%; 
+        } 
+ 
+        .footer-link a { 
+            font-size: 16px; 
+            color: #007bff; 
+            text-decoration: none; 
+        } 
+ 
+        .footer-link a:hover { 
+            text-decoration: underline; 
+        } 
+</style>
+<!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-GEX61LPT08"></script> <script>   window.dataLayer = window.dataLayer || [];   function gtag(){dataLayer.push(arguments);}   gtag('js', new Date());   gtag('config', 'G-GEX61LPT08'); </script> </head>
+<body>
+
+<canvas id="pentagonCanvas" width="500" height="500"></canvas>
+
+
+    <script> 
+document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
+    const canvas = document.getElementById('pentagonCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Fixed list of 16 colors: each consecutive color is only 22.5° apart on
+    // the hue wheel (minimal change from one to the next), while the full
+    // list steps all the way around to cover the entire color spectrum.
+    const NUM_COLORS = 16;
+    const colors = [
+        'hsl(0, 100%, 50%)',       // 0     red
+        'hsl(22.5, 100%, 50%)',
+        'hsl(45, 100%, 50%)',      //       yellow
+        'hsl(67.5, 100%, 50%)',
+        'hsl(90, 100%, 50%)',      //       green
+        'hsl(112.5, 100%, 50%)',
+        'hsl(135, 100%, 50%)',
+        'hsl(157.5, 100%, 50%)',
+        'hsl(180, 100%, 50%)',     //       cyan
+        'hsl(202.5, 100%, 50%)',
+        'hsl(225, 100%, 50%)',     //       blue
+        'hsl(247.5, 100%, 50%)',
+        'hsl(270, 100%, 50%)',     //       violet
+        'hsl(292.5, 100%, 50%)',
+        'hsl(315, 100%, 50%)',     //       magenta
+        'hsl(337.5, 100%, 50%)'
+    ];
+
+    // Function to draw the triangle outline
+    function drawPentagon(points, color) {
+        ctx.beginPath();
+        for (let i = 0; i < points.length; i++) {
+            const startPoint = points[i];
+            const endPoint = points[(i + 1) % points.length]; // Connect the last point to the first
+            ctx.moveTo(startPoint.x, startPoint.y);
+            ctx.lineTo(endPoint.x, endPoint.y);
+        }
+        ctx.strokeStyle = color;
+        ctx.stroke();
+    }
+
+    // Function to calculate the next pentagon's points
+    function getNextPentagonPoints(previousPoints) {
+        let newPoints = [];
+
+        // For each edge, calculate a point 1/10th along the line
+        for (let i = 0; i < previousPoints.length; i++) {
+            const startPoint = previousPoints[i];
+            const endPoint = previousPoints[(i + 1) % previousPoints.length];
+
+            // Calculate 1/10th point along the line
+            const newPoint = {
+                x: startPoint.x + (endPoint.x - startPoint.x) * 0.1,
+                y: startPoint.y + (endPoint.y - startPoint.y) * 0.1
+            };
+            newPoints.push(newPoint);
+        }
+
+        return newPoints;
+    }
+
+    // Function to create and draw the nested triangles
+    function createPentagons(points, iterations, colorOffset) {
+        let currentPoints = points;
+        for (let i = 0; i < iterations; i++) {
+            // The outer triangle stays black; the lines drawn inside loop
+            // sequentially through the 16-color list.
+            const color = i === 0
+                ? '#000000'
+                : colors[(i - 1 + colorOffset) % NUM_COLORS];
+            drawPentagon(currentPoints, color);
+            currentPoints = getNextPentagonPoints(currentPoints);
+        }
+    }
+
+    // Initial points for the first pentagon ABCDE
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    const radius = 150;
+
+    // Generate points for the initial pentagon ABC
+    const initialPentagon = [];
+    for (let i = 0; i < 3; i++) {
+        const angle = (2 * Math.PI / 3) * i - Math.PI / 2; // Starting from the top
+        initialPentagon.push({
+            x: centerX + radius * Math.cos(angle),
+            y: centerY + radius * Math.sin(angle)
+        });
+    }
+
+    // Animation loop
+    let colorOffset = 0;
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
+        createPentagons(initialPentagon, 40, colorOffset);
+        colorOffset = (colorOffset + 1) % NUM_COLORS; // Keep looping through the color list
+        requestAnimationFrame(animate); // Loop the animation
+    }
+
+    // Start animation
+    animate();
+
+</script>
+
+</body>
+</html>
+

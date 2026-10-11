@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="stylesheet" href="/assets/math-art.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Growing Star (10 nested stars)</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        canvas {
+            background-color: white;
+            border: 1px solid #ccc;
+        }
+
+        /* Centered link at the bottom */
+        .footer-link {
+            position: absolute;
+            bottom: 20px;
+            text-align: center;
+            width: 100%;
+        }
+
+        .footer-link a {
+            font-size: 16px;
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .footer-link a:hover {
+            text-decoration: underline;
+        }
+</style>
+<!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-GEX61LPT08"></script> <script>   window.dataLayer = window.dataLayer || [];   function gtag(){dataLayer.push(arguments);}   gtag('js', new Date());   gtag('config', 'G-GEX61LPT08'); </script>
+</head>
+<body>
+    <canvas id="diamondCanvas" width="500" height="500"></canvas>
+
+    <script>
+document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
+        const canvas = document.getElementById("diamondCanvas");
+        const ctx = canvas.getContext("2d");
+
+        // Diamond dimensions and starting point
+        const startX = canvas.width / 2;
+        const startY = canvas.height / 2;
+        const sideLength = 100;
+
+        // Convert degrees to radians
+        function toRadians(deg) {
+            return deg * (Math.PI / 180);
+        }
+
+        // Function to rotate a point around a given origin by an angle
+        function rotatePoint(x, y, originX, originY, rotateAngle) {
+            const radians = rotateAngle * Math.PI / 180;
+            const newX = originX + (x - originX) * Math.cos(radians) - (y - originY) * Math.sin(radians);
+            const newY = originY + (x - originX) * Math.sin(radians) + (y - originY) * Math.cos(radians);
+            return { x: newX, y: newY };
+        }
+
+        // Function to calculate diamond vertices based on start point and side length
+        function calculateDiamondPoints(x, y) {
+            const angle30 = toRadians(30);
+            const angle120 = toRadians(90);
+
+            const p1 = { x: x, y: y };
+            const p2 = { x: p1.x + sideLength * Math.cos(angle30), y: p1.y - sideLength * Math.sin(angle30) };
+            const p3 = { x: p2.x + sideLength * Math.cos(angle120), y: p2.y + sideLength * Math.sin(angle120) };
+            const p4 = { x: p3.x - sideLength * Math.cos(angle30), y: p3.y + sideLength * Math.sin(angle30) };
+            return { p1, p2, p3, p4 };
+        }
+
+        // Build the original 6-diamond figure and collect every vertex it produces
+        let { p1, p2, p3, p4 } = calculateDiamondPoints(startX, startY);
+        const figureCentre = { x: p4.x, y: p4.y }; // the diamonds rotate around p4
+
+        const allVertices = [];
+        for (let rotateAngle = 0; rotateAngle < 360; rotateAngle += 360 / 6) {
+            allVertices.push(rotatePoint(p1.x, p1.y, figureCentre.x, figureCentre.y, rotateAngle));
+            allVertices.push(rotatePoint(p2.x, p2.y, figureCentre.x, figureCentre.y, rotateAngle));
+            allVertices.push(rotatePoint(p3.x, p3.y, figureCentre.x, figureCentre.y, rotateAngle));
+        }
+
+        // Identify all the outermost points of the figure: its convex hull
+        function convexHull(points) {
+            const sorted = points.slice().sort((a, b) => a.x - b.x || a.y - b.y);
+            const cross = (o, a, b) => (a.x - o.x) * (b.y - o.y) - (a.y - o.y) * (b.x - o.x);
+            const lower = [];
+            for (const p of sorted) {
+                while (lower.length >= 2 && cross(lower[lower.length - 2], lower[lower.length - 1], p) <= 0) lower.pop();
+                lower.push(p);
+            }
+            const upper = [];
+            for (let i = sorted.length - 1; i >= 0; i--) {
+                const p = sorted[i];
+                while (upper.length >= 2 && cross(upper[upper.length - 2], upper[upper.length - 1], p) <= 0) upper.pop();
+                upper.push(p);
+            }
+            upper.pop();
+            lower.pop();
+            return lower.concat(upper); // in counter-clockwise order
+        }
+
+        const outermost = convexHull(allVertices); // the 6 outermost tips of the star
+
+        // Centralize the figure: put the centre of the star at the canvas centre
+        const centre = { x: canvas.width / 2, y: canvas.height / 2 };
+        const hullCentre = outermost.reduce(
+            (acc, p) => ({ x: acc.x + p.x, y: acc.y + p.y }),
+            { x: 0, y: 0 }
+        );
+        hullCentre.x /= outermost.length;
+        hullCentre.y /= outermost.length;
+
+        // Shooting vectors: from the star centre to each outermost point.
+        // Their length is rescaled so that the 10th star still fits on the canvas.
+        const GROW_FACTOR = 1.1; // 11/10
+        const MAX_STARS = 10;
+        const maxStarRadius = Math.min(canvas.width, canvas.height) / 2 - 30; // margin
+        const initialRadius = maxStarRadius / Math.pow(GROW_FACTOR, MAX_STARS - 1);
+        const shootVectors = outermost.map(p => {
+            const length = Math.hypot(p.x - hullCentre.x, p.y - hullCentre.y);
+            const s = initialRadius / length;
+            return { x: (p.x - hullCentre.x) * s, y: (p.y - hullCentre.y) * s };
+        });
+
+        // 16-color palette (same as running_chasing_3gon.html): consecutive colors
+        // differ by only 22.5° of hue, and together they cover the full spectrum.
+        const NUM_COLORS = 16;
+        const colors = [
+            'hsl(0, 100%, 50%)',       // 0     red
+            'hsl(22.5, 100%, 50%)',
+            'hsl(45, 100%, 50%)',      //       yellow
+            'hsl(67.5, 100%, 50%)',
+            'hsl(90, 100%, 50%)',      //       green
+            'hsl(112.5, 100%, 50%)',
+            'hsl(135, 100%, 50%)',
+            'hsl(157.5, 100%, 50%)',
+            'hsl(180, 100%, 50%)',     //       cyan
+            'hsl(202.5, 100%, 50%)',
+            'hsl(225, 100%, 50%)',     //       blue
+            'hsl(247.5, 100%, 50%)',
+            'hsl(270, 100%, 50%)',     //       violet
+            'hsl(292.5, 100%, 50%)',
+            'hsl(315, 100%, 50%)',     //       magenta
+            'hsl(337.5, 100%, 50%)'
+        ];
+
+        // Draw one star: extend the shooting vectors by the given scale factor
+        // and join the resulting points in star order (i -> i+2)
+        function drawStar(scale, color) {
+            const pts = shootVectors.map(v => ({
+                x: centre.x + v.x * scale,
+                y: centre.y + v.y * scale
+            }));
+            ctx.beginPath();
+            for (let i = 0; i < pts.length; i++) {
+                const a = pts[i];
+                const b = pts[(i + 2) % pts.length];
+                ctx.moveTo(a.x, a.y);
+                ctx.lineTo(b.x, b.y);
+            }
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+
+        // Animation: add one new star at a time; after 10 stars are drawn,
+        // erase everything and start from the beginning again.
+        const FRAMES_PER_STAR = 30;
+        const HOLD_FRAMES = 90;
+        const TOTAL_FRAMES = MAX_STARS * FRAMES_PER_STAR + HOLD_FRAMES;
+        let frame = 0;
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // erase everything
+
+            const starsDrawn = Math.min(Math.floor(frame / FRAMES_PER_STAR), MAX_STARS);
+            let scale = 1;
+            for (let k = 0; k < starsDrawn; k++) {
+                drawStar(scale, colors[k % NUM_COLORS]); // each star a different color
+                scale *= GROW_FACTOR; // extend the shooting vectors by 11/10
+            }
+
+            frame = (frame + 1) % TOTAL_FRAMES; // wrap -> erase and restart
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    </script>
+</body>
+</html>

@@ -46,6 +46,16 @@
 document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
         const canvas = document.getElementById('pentagonCanvas');
         const ctx = canvas.getContext('2d');
+
+        // Define the gradient color palette from blue to yellow
+        // (same palette as chasing_hexagon_rotating.html)
+        const colorPalette = [
+            '#0000FF', '#1A33FF', '#3366FF', '#4D99FF', '#66CCFF', '#80FFFF', '#99FFCC', '#B3FF99',
+            '#CCFF66', '#E6FF33', '#FFFF00', '#FFCC00', '#FF9933', '#FF6600', '#FF3300', '#FFFF33'
+        ];
+
+        let colorIndex = 0; // Start with the first color
+
         const centerX = canvas.width / 2;
         const centerY = canvas.height / 2;
         const radiusX = 50;
@@ -126,8 +136,9 @@ document.addEventListener("contextmenu", function(event) { event.preventDefault(
             }
         }
 
-    function drawDiamond(points) {
+    function drawDiamond(points, color) {
         let edges = [];
+        ctx.strokeStyle = color;
         ctx.beginPath();
         for (let i = 0; i < points.length; i++) {
             const startPoint = points[i];
@@ -160,14 +171,27 @@ document.addEventListener("contextmenu", function(event) { event.preventDefault(
         return newPoints;
     }
 
-    // Function to create the pentagons iteratively
+    // Function to create the nested polygons iteratively, following the
+    // color-shifting pattern of chasing_hexagon_rotating.html
     function drawChasingPolygon(initialPoints, iterations) {
-        let currentPoints = initialPoints;
+        // Start from the first polygon inside the diamond so the outer
+        // diamond outline keeps its own color (red for the original,
+        // blue for the surrounding ones)
+        let currentPoints = getNextDiamondPoints(getEdges(initialPoints));
         for (let i = 0; i < iterations; i++) {
-            const edges = drawDiamond(currentPoints);
-            //pentagonsEdges.push(edges); // Store the edges
-            currentPoints = getNextDiamondPoints(edges); // Calculate the next pentagon's points
+            const color = colorPalette[(colorIndex + i) % colorPalette.length]; // Shift color by index
+            const edges = drawDiamond(currentPoints, color);
+            currentPoints = getNextDiamondPoints(edges); // Calculate the next polygon's points
         }
+    }
+
+    // Function to return the edges of a polygon without drawing them
+    function getEdges(points) {
+        const edges = [];
+        for (let i = 0; i < points.length; i++) {
+            edges.push([points[i], points[(i + 1) % points.length]]);
+        }
+        return edges;
     }
 
     // Initial points for the first pentagon ABCDE
@@ -188,8 +212,17 @@ document.addEventListener("contextmenu", function(event) { event.preventDefault(
 
 
 
-        // Call the function to generate and draw the pentagons
-        generateAndDrawDiamonds();
+        // Function to animate the chasing lines inside the diamonds,
+        // following the pattern of chasing_hexagon_rotating.html
+        function animateDiamonds() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas before each frame
+            generateAndDrawDiamonds();
+            colorIndex = (colorIndex + 1) % colorPalette.length; // Shift color index
+            setTimeout(animateDiamonds, 50); // Request next frame
+        }
+
+        // Start the animation
+        animateDiamonds();
     </script>
 </body>
 </html>
