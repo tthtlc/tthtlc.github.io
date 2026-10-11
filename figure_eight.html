@@ -4,7 +4,7 @@
   <link rel="stylesheet" href="/assets/math-art.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Figure of 8 using Polar Coordinates</title>
+    <title>Multiple Figure of 8 joined by Gradient Lines</title>
     <style>
         body {
             display: flex;
@@ -12,74 +12,126 @@
             align-items: center;
             height: 100vh;
             margin: 0;
-            background-color: #f0f0f0;
+            background-color: #333;
         }
         canvas {
-            background-color: white;
+            background-color: #333;
             border: 1px solid black;
         }
-    
-        /* Centered link at the bottom */ 
-        .footer-link { 
-            position: absolute; 
-            bottom: 20px; 
-            text-align: center; 
-            width: 100%; 
-        } 
- 
-        .footer-link a { 
-            font-size: 16px; 
-            color: #007bff; 
-            text-decoration: none; 
-        } 
- 
-        .footer-link a:hover { 
-            text-decoration: underline; 
-        } 
+
+        /* Centered link at the bottom */
+        .footer-link {
+            position: absolute;
+            bottom: 20px;
+            text-align: center;
+            width: 100%;
+        }
+
+        .footer-link a {
+            font-size: 16px;
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .footer-link a:hover {
+            text-decoration: underline;
+        }
 </style>
 <!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-GEX61LPT08"></script> <script>   window.dataLayer = window.dataLayer || [];   function gtag(){dataLayer.push(arguments);}   gtag('js', new Date());   gtag('config', 'G-GEX61LPT08'); </script> </head>
 <body>
-    <canvas id="figure8Canvas" width="500" height="500"></canvas>
+    <canvas id="figure8Canvas" width="600" height="600"></canvas>
 
-    
-    <script> 
+
+    <script>
 document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
         const canvas = document.getElementById('figure8Canvas');
         const ctx = canvas.getContext('2d');
         const centerX = canvas.width / 2;
         const centerY = canvas.height / 2;
-        const scale = 100;
-        const parts = 120;
-        const step = 2*Math.PI/parts;
 
-        function drawFigure8() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.beginPath();
+        const numEights = 3;                 // number of figure-eights
+        const parts = 160;                   // samples per figure-eight
+        const baseScale = 90;                // base size of each figure-eight
+        const orbitRadius = 150;             // distance of each figure-eight from canvas centre
 
-            for (let theta = 0; theta <= 4 * Math.PI; theta += step) {
-                // Polar coordinates for figure of 8 (lemniscate of Bernoulli)
-                const internal = (Math.cos(2 * theta));
-		if (internal < 0) 
-		    continue;
-                const r = scale * Math.sqrt(internal);
-                const x = r * Math.cos(theta);
-                const y = r * Math.sin(theta);
+        let angleOffset = 0;
 
-                // Convert to Cartesian coordinates and draw
-                if (theta == 0) {
-                    ctx.moveTo(centerX + x, centerY + y);
-                } else {
-                    ctx.lineTo(centerX + x, centerY + y);
-                }
+        // Precompute one unit figure-eight (lemniscate of Bernoulli) as parts points.
+        // The curve r^2 = cos(2*theta) only exists where cos(2*theta) >= 0, so the
+        // two lobes are sampled over [-pi/4, pi/4] and [3pi/4, 5pi/4].
+        const unit = [];
+        const half = parts / 2;
+        for (let i = 0; i < parts; i++) {
+            let theta;
+            if (i < half) {
+                theta = -Math.PI / 4 + (i / (half - 1)) * (Math.PI / 2);
+            } else {
+                theta = 3 * Math.PI / 4 + ((i - half) / (half - 1)) * (Math.PI / 2);
             }
-
-            ctx.strokeStyle = 'blue';
-            ctx.lineWidth = 2;
-            ctx.stroke();
+            const r = Math.sqrt(Math.max(0, Math.cos(2 * theta)));
+            unit.push({ x: r * Math.cos(theta), y: r * Math.sin(theta) });
         }
 
-        drawFigure8();
+        // Point on figure-eight k at sample i. Each figure-eight orbits the canvas
+        // centre at its own rate/phase, spins around its own centre, and gently
+        // pulses in size -- all driven by sin/cos of the shared angleOffset,
+        // following the same logic as triple_motion.
+        function pointOnEight(k, i, t) {
+            const orbitAngle = t * (0.5 + 0.15 * Math.sin(t * 0.3 + k)) + k * 2 * Math.PI / numEights;
+            const spin = t * (0.8 + 0.4 * Math.sin(t * 0.5 + k * 2.1));
+            const s = baseScale * (1 + 0.25 * Math.sin(3 * t + k * 2.4));
+            const ox = centerX + orbitRadius * Math.cos(orbitAngle);
+            const oy = centerY + orbitRadius * Math.sin(orbitAngle);
+            const cosS = Math.cos(spin), sinS = Math.sin(spin);
+            const px = unit[i].x * s, py = unit[i].y * s;
+            return {
+                x: ox + px * cosS - py * sinS,
+                y: oy + px * sinS + py * cosS
+            };
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Lines joining the figure-eights: each sample i gets its own colour
+            // from a rainbow gradient that slides around as the animation runs,
+            // and connects the matching point on every figure-eight (0-1-2-0).
+            for (let i = 0; i < parts; i++) {
+                const hue = (360 * i / parts + angleOffset * 50) % 360;
+                ctx.strokeStyle = 'hsl(' + hue + ', 90%, 60%)';
+                ctx.lineWidth = 0.8;
+                ctx.beginPath();
+                let p = pointOnEight(0, i, angleOffset);
+                ctx.moveTo(p.x, p.y);
+                for (let k = 1; k <= numEights; k++) {
+                    p = pointOnEight(k % numEights, i, angleOffset);
+                    ctx.lineTo(p.x, p.y);
+                }
+                ctx.stroke();
+            }
+
+            // Draw the figure-eight outlines themselves on top.
+            for (let k = 0; k < numEights; k++) {
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.75)';
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                for (let i = 0; i <= parts; i++) {
+                    const p = pointOnEight(k, i % parts, angleOffset);
+                    if (i === 0) {
+                        ctx.moveTo(p.x, p.y);
+                    } else {
+                        ctx.lineTo(p.x, p.y);
+                    }
+                }
+                ctx.stroke();
+            }
+
+            // Update the shared parameter to create the animation.
+            angleOffset += 0.01;
+            requestAnimationFrame(draw);
+        }
+
+        draw();
     </script>
 </body>
 </html>
-
