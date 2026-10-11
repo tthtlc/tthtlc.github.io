@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Four-petal Spirograph</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f4f5fa;color:#20233a;font:15px system-ui,sans-serif}main{max-width:1160px;margin:32px auto;padding:0 20px;display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:24px}section,aside{background:white;border-radius:18px;box-shadow:0 8px 36px #2023500b}section{overflow:hidden;display:flex;align-items:center;justify-content:center;min-width:0}canvas{display:block;width:100%;aspect-ratio:1;touch-action:none}aside{padding:24px}h1{font-size:22px;margin:0 0 8px}p{color:#707589;line-height:1.5;font-size:13px}label{display:block;margin-top:22px;font-weight:600;font-size:13px}label span{float:right;color:#696b88;font-weight:400}input[type=range]{width:100%;accent-color:#6152df;margin-top:10px}input[type=color]{width:100%;height:38px;padding:3px;margin-top:10px;border:1px solid #ddd;border-radius:6px;background:white}button{cursor:pointer;border:0;border-radius:8px;padding:11px 14px;font-weight:600;background:#6152df;color:white}button.secondary{background:#efedf9;color:#5144ae}.buttons{display:flex;gap:9px;flex-wrap:wrap;margin-top:24px}.note{border-top:1px solid #ececf3;padding-top:16px;margin-top:24px;font-size:12px} @media(max-width:760px){main{grid-template-columns:1fr;margin:16px auto;padding:0 12px;gap:16px}aside{padding:20px}section{border-radius:12px}}
+</style>
+</head>
+<body><main><section><canvas id="art" aria-label="Blue four-petal geometric line pattern"></canvas></section><aside>
+<h1>Four-petal spirograph</h1><p>A continuous oscillating curve, inspired by the reference image. Adjust the geometry or export your drawing.</p>
+<label for="loops">Loop density <span id="loopsValue"></span></label><input id="loops" type="range" min="40" max="160" value="88" step="1">
+<label for="width">Petal width <span id="widthValue"></span></label><input id="width" type="range" min="0.20" max="0.65" value="0.40" step="0.01">
+<label for="ripple">Loop size <span id="rippleValue"></span></label><input id="ripple" type="range" min="0.04" max="0.40" value="0.23" step="0.01">
+<label for="weight">Line weight <span id="weightValue"></span></label><input id="weight" type="range" min="0.2" max="1.5" value="0.65" step="0.05">
+<label for="opacity">Ink opacity <span id="opacityValue"></span></label><input id="opacity" type="range" min="0.05" max="0.65" value="0.24" step="0.01">
+<label for="color">Ink color</label><input id="color" type="color" value="#4338d5">
+<div class="buttons"><button id="png">Save PNG</button><button id="svg" class="secondary">Save SVG</button><button id="reset" class="secondary">Reset</button></div>
+<p class="note">Rendered locally. No dependencies, network requests, or installation required. SVG export preserves the line artwork at any size.</p>
+</aside></main>
+<script>
+'use strict';
+const canvas=document.getElementById('art'), ctx=canvas.getContext('2d');
+const defaults={loops:88,width:0.40,ripple:0.23,weight:0.65,opacity:0.24,color:'#4338d5'};
+const controls=Object.fromEntries(Object.keys(defaults).map(k=>[k,document.getElementById(k)]));
+let scheduled=false;
+function settings(){return Object.fromEntries(Object.entries(controls).map(([k,e])=>[k,k==='color'?e.value:Number(e.value)]));}
+// Each lobe follows a radial centerline. A rapidly rotating offset
+// traces small elliptical loops; its amplitude vanishes at the origin.
+function geometry(s,size){
+ const points=[], scale=size*0.425/(1+s.ripple), center=size/2;
+ const samples=Math.max(16000,s.loops*240);
+ for(let i=0;i<=samples;i++){
+  const t=i/samples*Math.PI*2;
+  const petal=Math.floor(Math.min(t/(Math.PI/2),3));
+  const u=(t-petal*Math.PI/2)/(Math.PI/2);
+  const a=petal*Math.PI/2;
+  const r=Math.sin(Math.PI*u);
+  const lateral=s.width*Math.sin(2*Math.PI*u)*r;
+  const phase=2*Math.PI*s.loops*u;
+  const along=r+s.ripple*r*Math.cos(phase);
+  const across=lateral+s.ripple*r*Math.sin(phase);
+  const x=center+scale*(along*Math.cos(a)-across*Math.sin(a));
+  const y=center+scale*(along*Math.sin(a)+across*Math.cos(a));
+  points.push([x,y]);
+ }
+ return points;
+}
+function draw(){
+ scheduled=false; const s=settings();
+ for(const k of Object.keys(defaults)){const out=document.getElementById(k+'Value');if(out)out.textContent=k==='loops'?s[k]:s[k].toFixed(2);}
+ const size=canvas.getBoundingClientRect().width, dpr=Math.min(window.devicePixelRatio||1,3);
+ if(!size)return;
+ canvas.width=Math.round(size*dpr);canvas.height=Math.round(size*dpr);
+ ctx.setTransform(dpr,0,0,dpr,0,0);ctx.fillStyle='#fff';ctx.fillRect(0,0,size,size);
+ ctx.beginPath();const pts=geometry(s,size);pts.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));
+ ctx.strokeStyle=s.color;ctx.globalAlpha=s.opacity;ctx.lineWidth=s.weight*size/736;ctx.lineJoin='round';ctx.stroke();ctx.globalAlpha=1;
+}
+function requestDraw(){if(!scheduled){scheduled=true;requestAnimationFrame(draw);}}
+Object.values(controls).forEach(e=>e.addEventListener('input',requestDraw));
+new ResizeObserver(requestDraw).observe(canvas);
+document.getElementById('reset').onclick=()=>{for(const[k,v]of Object.entries(defaults))controls[k].value=v;requestDraw();};
+function download(blob,name){const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),2000);}
+document.getElementById('svg').onclick=()=>{const s=settings(),size=1200;const path=geometry(s,size).map(([x,y],i)=>(i?'L':'M')+x.toFixed(3)+','+y.toFixed(3)).join(' ');const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}"><rect width="100%" height="100%" fill="white"/><path d="${path}" fill="none" stroke="${s.color}" stroke-opacity="${s.opacity}" stroke-width="${s.weight*size/736}" stroke-linejoin="round"/></svg>`;download(new Blob([svg],{type:'image/svg+xml'}),'four-petal-spirograph.svg');};
+document.getElementById('png').onclick=()=>{const s=settings(),size=2200,out=document.createElement('canvas');out.width=out.height=size;const c=out.getContext('2d');c.fillStyle='white';c.fillRect(0,0,size,size);c.beginPath();geometry(s,size).forEach(([x,y],i)=>i?c.lineTo(x,y):c.moveTo(x,y));c.strokeStyle=s.color;c.globalAlpha=s.opacity;c.lineWidth=s.weight*size/736;c.lineJoin='round';c.stroke();out.toBlob(blob=>{if(blob)download(blob,'four-petal-spirograph.png');},'image/png');};
+requestDraw();
+</script></body></html>
