@@ -52,27 +52,48 @@ document.addEventListener("contextmenu", function(event) { event.preventDefault(
         const parts = 120;
         const step = 2*Math.PI/parts;
 
-        function drawFigure8() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.beginPath();
+        let hueOffset = 0;
 
-            for (let theta = 0; theta <= 16 * Math.PI; theta += step) {
+        function drawFigure8() {
+            // Fade the previous frame slightly so the rainbow line leaves a moving trail
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.lineWidth = 2;
+
+            const maxTheta = 16 * Math.PI;
+            let px, py;
+
+            for (let theta = 0; theta <= maxTheta; theta += step) {
                 // Polar coordinates for figure of 8 (lemniscate of Bernoulli)
                 const r = scale * (Math.cos(2 * theta/5));
                 const x = r * Math.cos(theta);
                 const y = r * Math.sin(theta);
 
-                // Convert to Cartesian coordinates and draw
+                // Convert to Cartesian coordinates
+                const cx = centerX + x;
+                const cy = centerY + y;
+
                 if (theta == 0) {
-                    ctx.moveTo(centerX + x, centerY + y);
+                    px = cx;
+                    py = cy;
                 } else {
-                    ctx.lineTo(centerX + x, centerY + y);
+                    // Color each segment by its progress through the curve,
+                    // with a hue offset that advances each frame to animate the colors
+                    ctx.strokeStyle = `hsl(${((theta / maxTheta) * 360 + hueOffset) % 360}, 100%, 50%)`;
+                    ctx.beginPath();
+                    ctx.moveTo(px, py);
+                    ctx.lineTo(cx, cy);
+                    ctx.stroke();
+
+                    px = cx;
+                    py = cy;
                 }
             }
 
-            ctx.strokeStyle = 'blue';
-            ctx.lineWidth = 2;
-            ctx.stroke();
+            // Advance the hue offset so the colors flow along the line each frame
+            hueOffset = (hueOffset + 2) % 360;
+            requestAnimationFrame(drawFigure8);
         }
 
         drawFigure8();
