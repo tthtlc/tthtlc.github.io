@@ -22,19 +22,12 @@
             margin-top: 20px;
             width: 300px;
         }
-        #controlButton {
-            margin-top: 10px;
-            padding: 8px 16px;
-            font-size: 16px;
-            cursor: pointer;
-        }
     </style>
 </head>
 <body>
     <canvas id="canvas" width="800" height="800"></canvas>
     <input type="range" id="offsetSlider" min="1" max="240" value="1">
     <label for="offsetSlider">Offset</label>
-    <button id="controlButton">Start</button>
 
     <script>
     document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
@@ -44,20 +37,39 @@
     const width = canvas.width;
     const height = canvas.height;
     const offsetSlider = document.getElementById('offsetSlider');
-    const controlButton = document.getElementById('controlButton');
 
     let offset = parseInt(offsetSlider.value);
-    let isAnimating = false;
     let animationFrameId;
 
     offsetSlider.addEventListener('input', function() {
         offset = parseInt(this.value);
+        restartDrawing();
     });
 
     // Utility function to calculate the greatest common divisor (GCD)
     Math.gcd = function(a, b) {
         return b ? Math.gcd(b, a % b) : Math.abs(a);
     };
+
+    // 16 colours spanning the full spectrum, each a slightly different hue
+    const colors = [
+        'hsl(0, 100%, 50%)',
+        'hsl(22.5, 100%, 50%)',
+        'hsl(45, 100%, 50%)',
+        'hsl(67.5, 100%, 50%)',
+        'hsl(90, 100%, 50%)',
+        'hsl(112.5, 100%, 50%)',
+        'hsl(135, 100%, 50%)',
+        'hsl(157.5, 100%, 50%)',
+        'hsl(180, 100%, 50%)',
+        'hsl(202.5, 100%, 50%)',
+        'hsl(225, 100%, 50%)',
+        'hsl(247.5, 100%, 50%)',
+        'hsl(270, 100%, 50%)',
+        'hsl(292.5, 100%, 50%)',
+        'hsl(315, 100%, 50%)',
+        'hsl(337.5, 100%, 50%)'
+    ];
 
     function generateHypotrochoid(R, r, d, numPoints) {
         const points = [];
@@ -101,7 +113,7 @@
             ctx.moveTo(points1[i].x, points1[i].y);
             ctx.lineTo(rotatedPoints2[i].x, rotatedPoints2[i].y);
             ctx.lineTo(points1[adjustedIndex].x, points1[adjustedIndex].y);
-            ctx.strokeStyle = 'rgba(0, 0, 255, 0.5)';
+            ctx.strokeStyle = colors[i % colors.length];
             ctx.stroke();
         }
 
@@ -122,29 +134,33 @@
         ctx.stroke();
     }
 
+    let iteration = 0;
+    const maxIterations = 1440;
+
     function animate() {
-        if (isAnimating) {
-            drawHypotrochoids();
-            rotationAngle += rotationStep * rotationDirection;
+        if (iteration >= maxIterations) return;
 
-            if (rotationAngle >= maxRotation || rotationAngle <= -maxRotation) {
-                rotationDirection *= -1;
-            }
+        drawHypotrochoids();
+        rotationAngle += rotationStep * rotationDirection;
 
-            animationFrameId = requestAnimationFrame(animate);
+        if (rotationAngle >= maxRotation || rotationAngle <= -maxRotation) {
+            rotationDirection *= -1;
         }
+
+        iteration++;
+        animationFrameId = requestAnimationFrame(animate);
     }
 
-    controlButton.addEventListener('click', () => {
-        isAnimating = !isAnimating;
-        if (isAnimating) {
-            controlButton.textContent = "Stop";
-            animate();
-        } else {
-            controlButton.textContent = "Start";
-            cancelAnimationFrame(animationFrameId);
-        }
-    });
+    function restartDrawing() {
+        cancelAnimationFrame(animationFrameId);
+        iteration = 0;
+        rotationAngle = 0;
+        rotationDirection = 1;
+        animate();
+    }
+
+    // Start drawing automatically once the page has loaded
+    animate();
 
     </script>
 </body>
