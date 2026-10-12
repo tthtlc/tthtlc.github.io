@@ -35,49 +35,125 @@
     <canvas id="fernCanvas" width="600" height="600"></canvas>
 
     
-    <script> 
+    <script>
 document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
         const canvas = document.getElementById("fernCanvas");
         const ctx = canvas.getContext("2d");
 
-        function drawBarnsleyFern() {
-            const width = canvas.width;
-            const height = canvas.height;
+        const W = canvas.width;
+        const H = canvas.height;
+        const SCALE = 50;            // pixels per fern unit (same as the original drawing)
+        const N = 50000;             // number of points
+        const Y_MAX = 11;            // vertical span of the fern in fern units
+        const LOOP_MS = 12000;       // one grow-and-rise cycle
 
-            let x = 0;
-            let y = 0;
+        // --- generate the fern points with the classic Barnsley IFS ---
+        const xs = new Float32Array(N);
+        const ys = new Float32Array(N);
+        let x = 0, y = 0;
+        for (let i = 0; i < N; i++) {
+            const r = Math.random();
+            let nx, ny;
+            if (r < 0.01) {
+                nx = 0;
+                ny = 0.16 * y;
+            } else if (r < 0.86) {
+                nx = 0.85 * x + 0.04 * y;
+                ny = -0.04 * x + 0.85 * y + 1.6;
+            } else if (r < 0.93) {
+                nx = 0.2 * x - 0.26 * y;
+                ny = 0.23 * x + 0.22 * y + 1.6;
+            } else {
+                nx = -0.15 * x + 0.28 * y;
+                ny = 0.26 * x + 0.24 * y + 0.44;
+            }
+            x = nx;
+            y = ny;
+            xs[i] = x;
+            ys[i] = y;
+        }
 
-            ctx.fillStyle = "#00FF00"; // Fern color
+        // --- sort points bottom-to-top so the fern grows from its base ---
+        const order = new Uint32Array(N);
+        for (let i = 0; i < N; i++) order[i] = i;
+        order.sort((a, b) => ys[a] - ys[b]);
 
-            for (let i = 0; i < 50000; i++) {
-                const r = Math.random();
-                let newX, newY;
+        // --- colour buckets: dark at the base, bright at the leaf tips ---
+        const BUCKETS = 24;
+        const bucketCounts = new Uint32Array(BUCKETS);
+        for (let i = 0; i < N; i++) {
+            const b = Math.min(BUCKETS - 1, Math.floor((ys[order[i]] / Y_MAX) * BUCKETS));
+            bucketCounts[b]++;
+        }
+        const bucketStarts = new Uint32Array(BUCKETS);
+        for (let b = 1; b < BUCKETS; b++) {
+            bucketStarts[b] = bucketStarts[b - 1] + bucketCounts[b - 1];
+        }
 
-                if (r < 0.01) {
-                    newX = 0;
-                    newY = 0.16 * y;
-                } else if (r < 0.86) {
-                    newX = 0.85 * x + 0.04 * y;
-                    newY = -0.04 * x + 0.85 * y + 1.6;
-                } else if (r < 0.93) {
-                    newX = 0.2 * x - 0.26 * y;
-                    newY = 0.23 * x + 0.22 * y + 1.6;
-                } else {
-                    newX = -0.15 * x + 0.28 * y;
-                    newY = 0.26 * x + 0.24 * y + 0.44;
+        // --- offscreen layer holds the fully grown fern; it is filled in
+        // --- progressively and then scaled/translated on every frame ---
+        const layer = document.createElement("canvas");
+        layer.width = W;
+        layer.height = H;
+        const lctx = layer.getContext("2d");
+        let revealed = 0;
+
+        function revealPoints(upTo) {
+            upTo = Math.min(N, upTo);
+            while (revealed < upTo) {
+                const b = Math.min(BUCKETS - 1, Math.floor((ys[order[revealed]] / Y_MAX) * BUCKETS));
+                const lightness = 30 + 30 * ((b + 0.5) / BUCKETS);
+                lctx.fillStyle = `hsl(125, 90%, ${lightness}%)`;
+                const bucketEnd = bucketStarts[b] + bucketCounts[b];
+                const end = Math.min(upTo, bucketEnd);
+                for (let i = revealed; i < end; i++) {
+                    const p = order[i];
+                    lctx.fillRect(W / 2 + xs[p] * SCALE, H - ys[p] * SCALE, 1, 1);
                 }
-
-                x = newX;
-                y = newY;
-
-                const plotX = width / 2 + x * 50;
-                const plotY = height - y * 50;
-
-                ctx.fillRect(plotX, plotY, 1, 1);
+                revealed = end;
             }
         }
 
-        drawBarnsleyFern();
+        // --- animation helpers ---
+        const clamp01 = t => (t < 0 ? 0 : t > 1 ? 1 : t);
+        const easeInOutCubic = t => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+
+        const start = performance.now();
+        let prevT = 0;
+
+        function frame(now) {
+            const t = ((now - start) % LOOP_MS) / LOOP_MS;
+            if (t < prevT) {           // new cycle: regrow from scratch
+                lctx.clearRect(0, 0, W, H);
+                revealed = 0;
+            }
+            prevT = t;
+
+            // growth 0..1 over 5%..65% of the loop, rise 0..1 over 10%..85%
+            const grow = easeInOutCubic(clamp01((t - 0.05) / 0.60));
+            const rise = easeInOutCubic(clamp01((t - 0.10) / 0.75));
+
+            const scale = 0.25 + 0.75 * grow;         // leaves grow bigger...
+            const baseY = H - rise * 140;             // ...and the whole fern drifts upward
+            const sway = Math.sin(now * 0.0016) * 6 * grow;
+            const angle = Math.sin(now * 0.0013) * 0.045 * grow;
+            const alpha = clamp01(t / 0.10) * clamp01((1 - t) / 0.15);
+
+            revealPoints(Math.round(grow * N));
+
+            ctx.clearRect(0, 0, W, H);
+            ctx.save();
+            ctx.globalAlpha = alpha;
+            ctx.translate(W / 2 + sway, baseY);
+            ctx.rotate(angle);
+            ctx.scale(scale, scale);
+            ctx.drawImage(layer, -W / 2, -H);
+            ctx.restore();
+
+            requestAnimationFrame(frame);
+        }
+
+        requestAnimationFrame(frame);
     </script>
 </body>
 </html>
