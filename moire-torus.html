@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Moiré torus — Interactive Study</title>
+<style>
+:root{color-scheme:dark;font-family:Inter,system-ui,sans-serif;background:#10151d;color:#eef2f8}*{box-sizing:border-box}body{margin:0}main{display:grid;grid-template-columns:1fr 300px;min-height:100vh}.stage{position:relative;min-height:650px;overflow:hidden;background:radial-gradient(ellipse at 50% 45%,#253247,#10151d 70%)}canvas{display:block;width:100%;height:100%;position:absolute;touch-action:none;cursor:grab}canvas:active{cursor:grabbing}.topbar{position:absolute;top:32px;left:36px;right:36px;display:flex;align-items:flex-start;gap:36px;flex-wrap:wrap;z-index:2}.heading{pointer-events:none}h1{font-size:clamp(24px,3vw,40px);font-weight:500;letter-spacing:-.04em;margin:6px 0}.eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.22em;color:#91a5bf}.hint{position:absolute;bottom:28px;left:36px;color:#92a3b9;font-size:12px;pointer-events:none}aside{padding:32px 25px;background:#151c27;border-left:1px solid #2a3443}h2{font-size:17px;font-weight:500;margin:0 0 26px}label{display:block;font-size:13px;color:#c7d2e3;margin-bottom:22px}.row{display:flex;justify-content:space-between;margin-bottom:8px}output{font-variant-numeric:tabular-nums;color:#88dbc6}input[type=range]{width:100%;accent-color:#88dbc6}select,button{background:#202d3d;color:#eef2f8;border:1px solid #3a485b;border-radius:8px;padding:10px;font:inherit;width:100%}input[type=color]{width:100%;height:34px;background:none;border:0;padding:0}button{cursor:pointer;margin-top:10px}button:hover{background:#2b3e53}.check{display:flex;gap:10px;align-items:center}.note{font-size:12px;color:#91a5bf;line-height:1.65;margin-top:25px}details{font-size:12px;color:#91a5bf;line-height:1.65}summary{cursor:pointer;color:#c7d2e3}code{color:#a4e3d4}.geometry{pointer-events:auto;max-width:min(46vw,400px);background:rgba(21,28,39,.88);border:1px solid #2a3443;border-radius:12px;padding:10px 14px;backdrop-filter:blur(6px);margin-top:4px}.geometry p{margin:.6em 0}.gallery{border-top:1px solid #2a3443;margin-top:25px;padding-top:22px}.gallery h2{margin:0 0 8px}.gallery-note{font-size:11px;color:#91a5bf;line-height:1.6;margin:0 0 14px}.gallery-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.gallery-item{display:block;border:1px solid #2a3443;border-radius:8px;overflow:hidden;text-decoration:none;background:#10151d}.gallery-item:hover{border-color:#88dbc6}.gallery-item img{display:block;width:100%;height:64px;object-fit:cover}.gallery-item span{display:block;font-size:9px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#91a5bf;padding:4px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.gallery-empty{grid-column:1/-1;color:#6b7d94;font-size:12px;text-align:center;padding:14px 0}@media(max-width:760px){main{grid-template-columns:1fr}.stage{height:65vh;min-height:420px}aside{border-left:0;border-top:1px solid #2a3443}.topbar{left:24px;top:22px;right:24px;gap:24px}.hint{left:24px}}
+</style>
+</head>
+<body>
+<main><section class="stage"><canvas id="canvas" aria-label="Interactive moiré torus: two families of nested oval rings, one rotated and offset, overlapping over part of the ring."></canvas><div class="topbar"><div class="heading"><div class="eyebrow">Form study / 22</div><h1>Moiré torus</h1></div><details class="geometry"><summary>Geometry</summary><p>Two families of nested ovals stand in for the torus. Family A holds <code>N</code> rings of radius <code>r_i = r0 + i·Δ</code>, each drawn as a circle squashed by the eccentricity <code>e</code> and left unrotated.</p><p><code>A_i : (x,y) = r_i (cos t, (1−e) sin t)</code><br><code>B_i : (x,y) = o + r_i R(δ) (cos t, (1−e) sin t)</code></p><p>Family B repeats the same construction rotated by <code>δ</code> and displaced by <code>o = (offset cos45°, offset sin45°·0.6)</code>, so its rings sit a hair out of register with A. Where the two families cross, the small angle produces broad moiré beats that sweep along the bands; a smaller <code>δ</code> widens the beats, a larger one tightens them.</p><p>B is drawn under a wedge clip — the sector from <code>sector angle</code> spanning <code>sector span</code> — so interference is confined to one arc of the ring and a quiet region of plain A rings remains for contrast. Drag to slide B bodily across A.</p></details></div><div class="hint">Drag to shift the pattern · Scroll to zoom</div></section>
+<aside><h2>Shape &amp; appearance</h2>
+<label><span class="row"><span>Ring count N</span><output id="NOut"></output></span><input id="N" type="range" min="6" max="40" step="2" value="22"></label>
+<label><span class="row"><span>Base radius r0</span><output id="r0Out"></output></span><input id="r0" type="range" min="0.3" max="1.2" step="0.01" value="0.5"></label>
+<label><span class="row"><span>Ring spacing Δ</span><output id="drOut"></output></span><input id="dr" type="range" min="0.03" max="0.18" step="0.005" value="0.075"></label>
+<label><span class="row"><span>Eccentricity e</span><output id="eccOut"></output></span><input id="ecc" type="range" min="0" max="0.6" step="0.01" value="0.25"></label>
+<label><span class="row"><span>Rotation δ</span><output id="rotOut"></output></span><input id="rot" type="range" min="-8" max="8" step="0.1" value="2.5"></label>
+<label><span class="row"><span>Offset</span><output id="offOut"></output></span><input id="off" type="range" min="0" max="0.5" step="0.01" value="0.15"></label>
+<label><span class="row"><span>Sector span</span><output id="spanOut"></output></span><input id="span" type="range" min="90" max="360" step="1" value="240"></label>
+<label><span class="row"><span>Sector angle</span><output id="sec0Out"></output></span><input id="sec0" type="range" min="0" max="360" step="1" value="0"></label>
+<label><span class="row"><span>Line width</span><output id="lwOut"></output></span><input id="lw" type="range" min="0.5" max="2.5" step="0.01" value="1"></label>
+<label><span class="row"><span>Zoom</span><output id="zoomOut"></output></span><input id="zoom" type="range" min="0.6" max="1.7" step="0.01" value="1"></label>
+<label>Ring colour A<input id="color" type="color" value="#9fd8c8"></label>
+<label>Ring colour B<input id="color2" type="color" value="#e0a3c8"></label>
+<button id="reset">Reset design</button><button id="export">Save PNG</button>
+<p class="note" id="status"></p>
+<section class="gallery"><h2>Saved PNGs</h2><p class="gallery-note">PNG captures are named with their parameter values. Commit the downloaded files to the repo and they will appear here automatically (fetched via the GitHub API).</p><div id="galleryItems" class="gallery-grid"></div></section>
+</aside></main>
+<script>
+'use strict';
+const $ = id => document.getElementById(id);
+const canvas=$('canvas'), ctx=canvas.getContext('2d');
+const TAU=Math.PI*2;
+const controls=['N','r0','dr','ecc','rot','off','span','sec0','lw','zoom','color','color2'];
+let width=1,height=1,dpr=1,drag=null,dragX=0,dragY=0,dirty=true;
+function params(){
+ const N=Math.round(+$('N').value),r0=+$('r0').value,dr=+$('dr').value;
+ return {N,r0,dr,ecc:+$('ecc').value,rot:+$('rot').value*Math.PI/180,off:+$('off').value,
+  span:+$('span').value,sec0:+$('sec0').value,lw:+$('lw').value,zoom:+$('zoom').value,maxR:r0+(N-1)*dr};
+}
+function sync(){
+ const p=params();
+ for(const id of controls){
+  if(id==='color'||id==='color2')continue;
+  $(id+'Out').value=(id==='N')?String(+$(id).value):(+$(id).value).toFixed(id==='dr'?3:2);
+ }
+ $('status').textContent=`${p.N} rings · δ = ${(+$('rot').value).toFixed(1)}° · offset ${p.off.toFixed(2)}`;
+}
+function resize(){const box=canvas.parentElement.getBoundingClientRect();width=box.width;height=box.height;dpr=Math.min(devicePixelRatio||1,2);canvas.width=Math.round(width*dpr);canvas.height=Math.round(height*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);dirty=true}
+function draw(){
+ ctx.clearRect(0,0,width,height);
+ const p=params();
+ const scale=Math.min(width,height)*.42*p.zoom/p.maxR;
+ const cx=width/2,cy=height/2;
+ const squash=1-p.ecc;
+ ctx.lineWidth=p.lw;ctx.lineCap='round';
+ ctx.strokeStyle=$('color').value;
+ for(let i=0;i<p.N;i++){
+  const r=(p.r0+i*p.dr)*scale;
+  ctx.beginPath();ctx.ellipse(cx,cy,r,r*squash,0,0,TAU);ctx.stroke();
+ }
+ ctx.save();
+ ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,Math.hypot(width,height),p.sec0*Math.PI/180,(p.sec0+p.span)*Math.PI/180);ctx.closePath();ctx.clip();
+ ctx.globalAlpha=.55;
+ ctx.strokeStyle=$('color2').value;
+ const ox=p.off*Math.cos(Math.PI/4)*scale+dragX, oy=p.off*Math.sin(Math.PI/4)*.6*scale+dragY;
+ for(let i=0;i<p.N;i++){
+  const r=(p.r0+i*p.dr)*scale;
+  ctx.beginPath();ctx.ellipse(cx+ox,cy+oy,r,r*squash,p.rot,0,TAU);ctx.stroke();
+ }
+ ctx.restore();
+ ctx.globalAlpha=1;
+ dirty=false;
+}
+function animate(){if(dirty)draw();requestAnimationFrame(animate)}
+for(const id of controls)$(id).addEventListener('input',()=>{sync();dirty=true});
+canvas.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY};canvas.setPointerCapture(e.pointerId)});
+canvas.addEventListener('pointermove',e=>{if(!drag)return;dragX+=e.clientX-drag.x;dragY+=e.clientY-drag.y;drag={x:e.clientX,y:e.clientY};dirty=true});
+for(const type of ['pointerup','pointercancel','lostpointercapture'])canvas.addEventListener(type,()=>drag=null);
+canvas.addEventListener('wheel',e=>{e.preventDefault();$('zoom').value=Math.max(.6,Math.min(1.7,+$('zoom').value-e.deltaY*.001));sync();dirty=true},{passive:false});
+$('reset').onclick=()=>{Object.entries({N:22,r0:.5,dr:.075,ecc:.25,rot:2.5,off:.15,span:240,sec0:0,lw:1,zoom:1,color:'#9fd8c8',color2:'#e0a3c8'}).forEach(([id,v])=>$(id).value=v);dragX=0;dragY=0;sync();dirty=true};
+$('export').onclick=()=>{draw();const out=document.createElement('canvas');out.width=canvas.width;out.height=canvas.height;const c=out.getContext('2d');c.fillStyle='#10151d';c.fillRect(0,0,out.width,out.height);c.drawImage(canvas,0,0);out.toBlob(blob=>{if(!blob)return;const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`moire-torus_N${(+$('N').value).toFixed(2)}_r0${(+$('r0').value).toFixed(2)}_dr${(+$('dr').value).toFixed(2)}_ecc${(+$('ecc').value).toFixed(2)}_rot${(+$('rot').value).toFixed(2)}_off${(+$('off').value).toFixed(2)}_span${(+$('span').value).toFixed(2)}_sec0${(+$('sec0').value).toFixed(2)}_lw${(+$('lw').value).toFixed(2)}_zoom${(+$('zoom').value).toFixed(2)}_${$('color').value.slice(1)}_${$('color2').value.slice(1)}.png`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)},'image/png')};
+const gallery=$('galleryItems');
+const FALLBACK_PNG_NAMES=[]; // mirrors the committed moire-torus_*.png files; the GitHub API path below is preferred
+function renderGallery(items){gallery.innerHTML='';if(!items.length){const e=document.createElement('div');e.className='gallery-empty';e.textContent='No saved PNGs yet.';gallery.appendChild(e);return}for(const item of items){const w=document.createElement('a');w.className='gallery-item';w.href=item.url;w.target='_blank';w.rel='noopener';w.title='Open '+item.name;const img=document.createElement('img');img.src=item.url;img.alt=item.name;img.loading='lazy';w.appendChild(img);const l=document.createElement('span');l.textContent=item.name;w.appendChild(l);gallery.appendChild(w)}}
+fetch('https://api.github.com/repos/tthtlc/tthtlc.github.io/contents/').then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.json()}).then(files=>{if(!Array.isArray(files))throw new Error('unexpected response');renderGallery(files.filter(f=>f.type==='file'&&f.name.startsWith('moire-torus_')&&f.name.toLowerCase().endsWith('.png')).map(f=>({name:f.name,url:f.download_url})).sort((a,b)=>a.name<b.name?-1:1))}).catch(()=>renderGallery(FALLBACK_PNG_NAMES.map(n=>({name:n,url:n}))));
+new ResizeObserver(resize).observe(canvas.parentElement);
+sync();resize();requestAnimationFrame(animate);
+</script>
+</body></html>
