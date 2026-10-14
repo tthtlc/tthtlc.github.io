@@ -1,215 +1,229 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link rel="stylesheet" href="/assets/math-art.css">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cardioid Shape</title>
-    <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            margin: 0;
-            background-color: #f0f0f0;
-        }
-
-        canvas {
-            background-color: white;
-            border: 1px solid #ccc;
-            margin-bottom: 20px;
-        }
-
-        .controls {
-            display: grid;
-            grid-template-columns: auto 1fr auto;
-            gap: 10px;
-            align-items: center;
-            width: 80%;
-        }
-
-        .footer-link {
-            position: absolute;
-            bottom: 20px;
-            text-align: center;
-            width: 100%;
-        }
-
-        .footer-link a {
-            font-size: 16px;
-            color: #007bff;
-            text-decoration: none;
-        }
-
-        .footer-link a:hover {
-            text-decoration: underline;
-        }
-    </style>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sin·Cos Abstract Curve — Interactive Study</title>
+<style>
+:root{color-scheme:dark;font-family:Inter,system-ui,sans-serif;background:#10151d;color:#eef2f8}*{box-sizing:border-box}body{margin:0}main{display:grid;grid-template-columns:1fr 300px;min-height:100vh}.stage{position:relative;min-height:650px;overflow:hidden;background:radial-gradient(ellipse at 50% 45%,#253247,#10151d 70%)}canvas{display:block;width:100%;height:100%;position:absolute;touch-action:none}.topbar{position:absolute;top:32px;left:36px;right:36px;display:flex;align-items:flex-start;gap:36px;flex-wrap:wrap;z-index:2}.heading{pointer-events:none}h1{font-size:clamp(24px,3vw,40px);font-weight:500;letter-spacing:-.04em;margin:6px 0}.eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.22em;color:#91a5bf}.hint{position:absolute;bottom:28px;left:36px;color:#92a3b9;font-size:12px;pointer-events:none}aside{padding:32px 25px;background:#151c27;border-left:1px solid #2a3443}h2{font-size:17px;font-weight:500;margin:0 0 26px}label{display:block;font-size:13px;color:#c7d2e3;margin-bottom:22px}.row{display:flex;justify-content:space-between;margin-bottom:8px}output{font-variant-numeric:tabular-nums;color:#88dbc6}input[type=range]{width:100%;accent-color:#88dbc6}select,button{background:#202d3d;color:#eef2f8;border:1px solid #3a485b;border-radius:8px;padding:10px;font:inherit;width:100%}input[type=color]{width:100%;height:34px;background:none;border:0;padding:0}button{cursor:pointer;margin-top:10px}button:hover{background:#2b3e53}.check{display:flex;gap:10px;align-items:center}.note{font-size:12px;color:#91a5bf;line-height:1.65;margin-top:25px}details{font-size:12px;color:#91a5bf;line-height:1.65}summary{cursor:pointer;color:#c7d2e3}code{color:#a4e3d4}.geometry{pointer-events:auto;max-width:min(46vw,400px);background:rgba(21,28,39,.88);border:1px solid #2a3443;border-radius:12px;padding:10px 14px;backdrop-filter:blur(6px);margin-top:4px}.geometry p{margin:.6em 0}.gallery{border-top:1px solid #2a3443;margin-top:25px;padding-top:22px}.gallery h2{margin:0 0 8px}.gallery-note{font-size:11px;color:#91a5bf;line-height:1.6;margin:0 0 14px}.gallery-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.gallery-item{display:block;border:1px solid #2a3443;border-radius:8px;overflow:hidden;text-decoration:none;background:#10151d}.gallery-item:hover{border-color:#88dbc6}.gallery-item img{display:block;width:100%;height:64px;object-fit:cover}.gallery-item span{display:block;font-size:9px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#91a5bf;padding:4px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.gallery-empty{grid-column:1/-1;color:#6b7d94;font-size:12px;text-align:center;padding:14px 0}@media(max-width:760px){main{grid-template-columns:1fr}.stage{height:65vh;min-height:420px}aside{border-left:0;border-top:1px solid #2a3443}.topbar{left:24px;top:22px;right:24px;gap:24px}.hint{left:24px}}
+</style>
 </head>
 <body>
-    <canvas id="cardioidCanvas" width="800" height="800"></canvas>
+<main><section class="stage"><canvas id="canvas" aria-label="Interactive sin-cos abstract curve. Four copies of one parametric curve rotated 90 degrees apart, slowly rotating. Use the controls to change its geometry." tabindex="0"></canvas><div class="topbar"><div class="heading"><div class="eyebrow">Form study / 02</div><h1>Sin·cos abstract curve</h1></div><details class="geometry"><summary>Geometry</summary><p>Four copies of one parametric curve, rotated 90° apart about the origin, form this rosette. Each point is a radial envelope multiplied by two angular terms:</p><p><code>x(θ) = r·(1 − sin((b/c)·θ + φ))·cos((d/e)·θ + fΔ)·cos θ</code><br><code>y(θ) = r·(1 − cos((b/c)·θ + φ))·sin((d/e)·θ + fΔ)·sin θ</code></p><p>The ratios b/c and d/e are the modulation frequencies — coprime integers close the curve, while other ratios weave dense Lissajous-like webs. The phase φ sweeps 0…2π in steps of a·Δ, drawing a stack of envelope curves; f shifts the angular phase by f·Δ. The finished rosette rotates slowly about the origin.</p></details></div><div class="hint">Rotates slowly about the origin · sliders redraw the curve</div></section>
+<aside><h2>Curve & motion</h2>
+<label><span class="row"><span>Phase sweep a</span><output id="aOut"></output></span><input id="a" type="range" min="1" max="30" step="1" value="12"></label>
+<label><span class="row"><span>Envelope frequency b</span><output id="bOut"></output></span><input id="b" type="range" min="1" max="30" step="1" value="6"></label>
+<label><span class="row"><span>Envelope divisor c</span><output id="cOut"></output></span><input id="c" type="range" min="1" max="30" step="1" value="1"></label>
+<label><span class="row"><span>Angular frequency d</span><output id="dOut"></output></span><input id="d" type="range" min="1" max="30" step="1" value="1"></label>
+<label><span class="row"><span>Angular divisor e</span><output id="eOut"></output></span><input id="e" type="range" min="1" max="30" step="1" value="1"></label>
+<label><span class="row"><span>Angular phase shift f</span><output id="fOut"></output></span><input id="f" type="range" min="1" max="200" step="1" value="1"></label>
+<label><span class="row"><span>Zoom</span><output id="zoomOut"></output></span><input id="zoom" type="range" min="0.3" max="1.6" step="0.01" value="1"></label>
+<label>Base colour<input id="color" type="color" value="#ff0000"></label>
+<label class="check"><input id="spin" type="checkbox" checked>Auto-rotate</label>
+<button id="reset">Reset design</button><button id="export">Save PNG</button>
+<p class="note" id="status"></p>
+<section class="gallery"><h2>Saved PNGs</h2><p class="gallery-note">PNG captures are named with their parameter values. Commit the downloaded files to the repo and they will appear here automatically (fetched via the GitHub API).</p><div id="galleryItems" class="gallery-grid"></div></section>
+</aside></main>
+<script>
+'use strict';
+const $ = id => document.getElementById(id);
+const canvas = $('canvas'), ctx = canvas.getContext('2d');
+const TAU = Math.PI * 2, STEPS = 200, DELTA = TAU / STEPS;
+let width = 1, height = 1, dpr = 1, S = 1600, s = 1, globalAngle = 0, lastTime = 0, spriteDirty = true;
+const sprite = document.createElement('canvas');
+sprite.width = sprite.height = S;
+const sctx = sprite.getContext('2d');
 
-    <div class="controls">
-        <label for="a1">a1:</label>
-        <input type="range" id="a1" min="1" max="30" value="1">
-        <span id="a1Value">1</span>
+document.addEventListener('contextmenu', e => e.preventDefault());
 
-        <label for="b1">b1:</label>
-        <input type="range" id="b1" min="1" max="30" value="1">
-        <span id="b1Value">1</span>
+// Rotate a hex colour by `deg` (HSL hue rotation); used to derive the
+// three rotated copies from the base colour at 0/90/180/270 degrees.
+function hueShift(hex, deg) {
+  const r = parseInt(hex.slice(1, 3), 16) / 255;
+  const g = parseInt(hex.slice(3, 5), 16) / 255;
+  const b = parseInt(hex.slice(5, 7), 16) / 255;
+  const mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn, l = (mx + mn) / 2;
+  let h = 0;
+  const sat = d === 0 ? 0 : d / (1 - Math.abs(2 * l - 1));
+  if (d) {
+    if (mx === r) h = ((g - b) / d) % 6;
+    else if (mx === g) h = (b - r) / d + 2;
+    else h = (r - g) / d + 4;
+    h *= 60; if (h < 0) h += 360;
+  }
+  h = (h + deg) % 360;
+  const c = (1 - Math.abs(2 * l - 1)) * sat;
+  const x = c * (1 - Math.abs((h / 60) % 2 - 1));
+  const m = l - c / 2;
+  const [R, G, B] = h < 60 ? [c, x, 0] : h < 120 ? [x, c, 0] : h < 180 ? [0, c, x] : h < 240 ? [0, x, c] : h < 300 ? [x, 0, c] : [c, 0, x];
+  return `rgb(${Math.round((R + m) * 255)},${Math.round((G + m) * 255)},${Math.round((B + m) * 255)})`;
+}
 
-        <label for="c1">c1:</label>
-        <input type="range" id="c1" min="1" max="30" value="1">
-        <span id="c1Value">1</span>
+function resize() {
+  const box = canvas.parentElement.getBoundingClientRect();
+  width = box.width; height = box.height;
+  dpr = Math.min(devicePixelRatio || 1, 2);
+  canvas.width = Math.round(width * dpr); canvas.height = Math.round(height * dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  // Sprite stays at least as sharp as the largest zoom on this canvas.
+  const S2 = Math.max(1600, Math.ceil(Math.min(width, height) * 1.63 * dpr));
+  if (S2 !== S) { S = S2; sprite.width = sprite.height = S; spriteDirty = true; }
+}
 
-        <label for="d1">d1:</label>
-        <input type="range" id="d1" min="1" max="30" value="1">
-        <span id="d1Value">1</span>
+function rotatePoint(x, y, cx, cy, angle) {
+  const cosA = Math.cos(angle), sinA = Math.sin(angle);
+  const dx = x - cx, dy = y - cy;
+  return { x: cx + dx * cosA - dy * sinA, y: cy + dx * sinA + dy * cosA };
+}
 
-        <label for="e1">e1:</label>
-        <input type="range" id="e1" min="1" max="30" value="1">
-        <span id="e1Value">1</span>
+// Draw the base curve, rotated by `rot` about the origin, in `color`
+function drawLayer(color, rot) {
+  sctx.strokeStyle = color;
+  sctx.lineWidth = Math.max(1, S / 800);
+  sctx.beginPath();
+  let first = true;
+  const a = +$('a').value, b = +$('b').value, c = +$('c').value, d = +$('d').value, e = +$('e').value, f = +$('f').value;
+  const r = S / 8;
+  const phases = Math.ceil(TAU / (a * DELTA));       // number of φ sweeps
+  const innerSteps = Math.ceil(TAU * b * d / DELTA); // θ samples per sweep
+  // Sampling guard: extreme settings would freeze the redraw; beyond
+  // ~200k points per layer the polyline is dense enough to skip samples.
+  const maxPts = 200000;
+  const step = phases * innerSteps > maxPts ? DELTA * (phases * innerSteps / maxPts) : DELTA;
+  for (let phasea = 0; phasea <= TAU; phasea += a * DELTA) {
+    for (let theta = 0; theta <= TAU * b * d; theta += step) {
+      const phaseb = f * DELTA;
+      const x = r * (1 - Math.sin(b / c * theta + phasea)) * Math.cos(d / e * theta + phaseb) * Math.cos(theta);
+      const y = r * (1 - Math.cos(b / c * theta + phasea)) * Math.sin(d / e * theta + phaseb) * Math.sin(theta);
+      const p = rotatePoint(S / 2 + x, S / 2 + y, S / 2, S / 2, rot);
+      if (first) { sctx.moveTo(p.x, p.y); first = false; } else sctx.lineTo(p.x, p.y);
+    }
+  }
+  sctx.closePath();
+  sctx.stroke();
+}
 
-        <label for="f1">f1:</label>
-        <input type="range" id="f1" min="1" max="200" value="1">
-        <span id="f1Value">1</span>
-    </div>
+// Render base design + three copies rotated 90° apart about (0,0)
+function renderSprite() {
+  sctx.clearRect(0, 0, S, S);
+  const base = $('color').value;
+  for (let k = 0; k < 4; k++) drawLayer(hueShift(base, k * 90), k * Math.PI / 2);
+}
 
-    <script>
-        document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
+// Micro-font formula strip below the curves, inside the canvas
+function strip() {
+  ctx.fillStyle = 'rgba(16,21,29,.85)';
+  ctx.fillRect(0, height - 44, width, 44);
+  ctx.font = '9px "Courier New", monospace';
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#a4e3d4';
+  ctx.fillText('x(θ) = r·(1 − sin((b/c)θ + φ))·cos((d/e)θ + fΔ)·cos(θ)', width / 2, height - 34);
+  ctx.fillText('y(θ) = r·(1 − cos((b/c)θ + φ))·sin((d/e)θ + fΔ)·sin(θ)', width / 2, height - 24);
+  ctx.fillStyle = '#91a5bf';
+  ctx.fillText(`a=${$('a').value} b=${$('b').value} c=${$('c').value} d=${$('d').value} e=${$('e').value} f=${$('f').value} · 4 copies rotated 90° about (0,0)`, width / 2, height - 12);
+}
 
-        const canvas = document.getElementById('cardioidCanvas');
-        const ctx = canvas.getContext('2d');
-        const centerX = canvas.width / 2;   // design origin (0,0) maps here
-        const centerY = canvas.height / 2;
-        const radius = 200;
-        const steps = 200;
-        const delta = 2 * Math.PI / steps;
+function draw() {
+  ctx.clearRect(0, 0, width, height);
+  s = 1.0177 * Math.min(width, height) * (+$('zoom').value) / S;
+  ctx.save();
+  ctx.translate(width / 2, height / 2);
+  ctx.rotate(globalAngle);
+  ctx.drawImage(sprite, -S * s / 2, -S * s / 2, S * s, S * s);
+  ctx.restore();
+  // Marker for the rotation centre (the 0,0 point)
+  ctx.fillStyle = '#eef2f8';
+  ctx.beginPath();
+  ctx.arc(width / 2, height / 2, 3, 0, TAU);
+  ctx.fill();
+  strip();
+}
 
-        // Offscreen sprite: base design + 3 rotated copies rendered once,
-        // then rotated slowly on screen each frame (cheap: one drawImage)
-        const spriteSize = 1600;
-        const sprite = document.createElement('canvas');
-        sprite.width = sprite.height = spriteSize;
-        const sctx = sprite.getContext('2d');
-        const sCenter = spriteSize / 2;
+function status() {
+  const a = +$('a').value, b = +$('b').value, c = +$('c').value, d = +$('d').value, e = +$('e').value;
+  $('status').textContent = `b/c ${(b / c).toFixed(2)} : 1 · d/e ${(d / e).toFixed(2)} : 1 · ${Math.ceil(TAU / (a * DELTA))} phase curves · θ sweep ${b * d}·2π · 4 copies at 90°`;
+}
 
-        // Colors: base design first, then its three rotated copies
-        const layerColors = ['red', 'blue', 'green', 'darkorange'];
+function refreshOutputs() {
+  for (const id of ['a', 'b', 'c', 'd', 'e', 'f']) $(id + 'Out').value = $(id).value;
+  $('zoomOut').value = (+$('zoom').value).toFixed(2);
+}
 
-        // Initialize variables
-        let a1 = 1, b1 = 1, c1 = 1, d1 = 1, e1 = 1, f1 = 1;
+// Slow rotation of the whole design
+function animate(t) {
+  const dt = Math.min((t - lastTime) / 1000, .05);
+  lastTime = t;
+  if (spriteDirty) { renderSprite(); spriteDirty = false; }
+  if ($('spin').checked && !document.hidden) globalAngle += dt * .12;
+  draw();
+  requestAnimationFrame(animate);
+}
 
-        // Rotate a point (x, y) around (cx, cy) by an angle
-        function rotatePoint(x, y, cx, cy, angle) {
-            const cosA = Math.cos(angle);
-            const sinA = Math.sin(angle);
-            const dx = x - cx;
-            const dy = y - cy;
-            return { x: cx + dx * cosA - dy * sinA, y: cy + dx * sinA + dy * cosA };
-        }
+for (const id of ['a', 'b', 'c', 'd', 'e', 'f']) $(id).addEventListener('input', () => {
+  $(id + 'Out').value = $(id).value;
+  spriteDirty = true; status();
+});
+$('zoom').addEventListener('input', () => { $('zoomOut').value = (+$('zoom').value).toFixed(2); });
+$('color').addEventListener('input', () => { spriteDirty = true; });
 
-        // Draw the base curve, rotated by `rot` about the origin, in `color`
-        function drawLayer(color, rot) {
-            sctx.strokeStyle = color;
-            sctx.lineWidth = 2;
-            sctx.beginPath();
+$('reset').onclick = () => {
+  Object.entries({ a: 12, b: 6, c: 1, d: 1, e: 1, f: 1, zoom: 1, color: '#ff0000' }).forEach(([id, v]) => $(id).value = v);
+  $('spin').checked = true;
+  globalAngle = 0;
+  refreshOutputs(); spriteDirty = true; status();
+};
 
-            for (let phasea = 0; phasea <= 2 * Math.PI; phasea += a1 * delta) {
-                for (let theta = 0; theta <= 2 * Math.PI * b1 * d1; theta += delta) {
-                    const phaseb = f1 * delta;
-                    const x = radius * (1 - Math.sin(b1 / c1 * theta + phasea)) * Math.cos(d1 / e1 * theta + phaseb) * Math.cos(theta);
-                    const y = radius * (1 - Math.cos(b1 / c1 * theta + phasea)) * Math.sin(d1 / e1 * theta + phaseb) * Math.sin(theta);
+$('export').onclick = () => {
+  draw();
+  const out = document.createElement('canvas');
+  out.width = canvas.width; out.height = canvas.height;
+  const c = out.getContext('2d');
+  c.fillStyle = '#10151d'; c.fillRect(0, 0, out.width, out.height);
+  c.drawImage(canvas, 0, 0);
+  out.toBlob(blob => {
+    if (!blob) return;
+    const url = URL.createObjectURL(blob), a = document.createElement('a');
+    a.href = url;
+    a.download = `sin_cos_abstract_explore_a${$('a').value}_b${$('b').value}_c${$('c').value}_d${$('d').value}_e${$('e').value}_f${$('f').value}_zoom${(+$('zoom').value).toFixed(2)}_${$('color').value.slice(1)}.png`;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }, 'image/png');
+};
 
-                    const p = rotatePoint(sCenter + x, sCenter + y, sCenter, sCenter, rot);
+const gallery = $('galleryItems');
+const FALLBACK_PNG_NAMES = []; // mirrors the committed sin_cos_abstract_explore_*.png files; the GitHub API path below is preferred
+function renderGallery(items) {
+  gallery.innerHTML = '';
+  if (!items.length) {
+    const e = document.createElement('div');
+    e.className = 'gallery-empty';
+    e.textContent = 'No saved PNGs yet.';
+    gallery.appendChild(e);
+    return;
+  }
+  for (const item of items) {
+    const w = document.createElement('a');
+    w.className = 'gallery-item';
+    w.href = item.url; w.target = '_blank'; w.rel = 'noopener';
+    w.title = 'Open ' + item.name;
+    const img = document.createElement('img');
+    img.src = item.url; img.alt = item.name; img.loading = 'lazy';
+    w.appendChild(img);
+    const l = document.createElement('span');
+    l.textContent = item.name;
+    w.appendChild(l);
+    gallery.appendChild(w);
+  }
+}
+fetch('https://api.github.com/repos/tthtlc/tthtlc.github.io/contents/').then(r => {
+  if (!r.ok) throw new Error('HTTP ' + r.status);
+  return r.json();
+}).then(files => {
+  if (!Array.isArray(files)) throw new Error('unexpected response');
+  renderGallery(files.filter(f => f.type === 'file' && f.name.startsWith('sin_cos_abstract_explore_') && f.name.toLowerCase().endsWith('.png')).map(f => ({ name: f.name, url: f.download_url })).sort((a, b) => a.name < b.name ? -1 : 1));
+}).catch(() => renderGallery(FALLBACK_PNG_NAMES.map(n => ({ name: n, url: n }))));
 
-                    if (theta === 0) {
-                        sctx.moveTo(p.x, p.y);
-                    } else {
-                        sctx.lineTo(p.x, p.y);
-                    }
-                }
-            }
-
-            sctx.closePath();
-            sctx.stroke();
-        }
-
-        // Render base design + three copies rotated 90° apart about (0,0)
-        function renderSprite() {
-            sctx.clearRect(0, 0, spriteSize, spriteSize);
-            for (let k = 0; k < 4; k++) {
-                drawLayer(layerColors[k], k * Math.PI / 2);
-            }
-        }
-
-        // Micro-font formula below the curves, inside the canvas
-        function drawFormulaText() {
-            // Legibility strip behind the text
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
-            ctx.fillRect(0, canvas.height - 44, canvas.width, 44);
-
-            ctx.font = '9px "Courier New", monospace';
-            ctx.fillStyle = '#333';
-            ctx.textAlign = 'center';
-            ctx.fillText('x(θ) = r·(1 − sin((b/c)θ + φ))·cos((d/e)θ + fΔ)·cos(θ)', centerX, canvas.height - 34);
-            ctx.fillText('y(θ) = r·(1 − cos((b/c)θ + φ))·sin((d/e)θ + fΔ)·sin(θ)', centerX, canvas.height - 24);
-            ctx.fillText(`r=${radius}  a=${a1} b=${b1} c=${c1} d=${d1} e=${e1} f=${f1}  ·  base + 3 copies rotated 90° about (0,0)`, centerX, canvas.height - 12);
-        }
-
-        // Slow rotation of the whole design
-        let globalAngle = 0;
-        function animate() {
-            globalAngle += 0.002;  // radians per frame
-
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            ctx.save();
-            ctx.translate(centerX, centerY);
-            ctx.rotate(globalAngle);
-            ctx.drawImage(sprite, -sCenter, -sCenter);
-            ctx.restore();
-
-            // Marker for the rotation center (the 0,0 point)
-            ctx.fillStyle = '#333';
-            ctx.beginPath();
-            ctx.arc(centerX, centerY, 3, 0, 2 * Math.PI);
-            ctx.fill();
-
-            drawFormulaText();
-            requestAnimationFrame(animate);
-        }
-
-        // Update variables and rebuild the sprite
-        function updateCardioid() {
-            a1 = parseInt(document.getElementById('a1').value);
-            b1 = parseInt(document.getElementById('b1').value);
-            c1 = parseInt(document.getElementById('c1').value);
-            d1 = parseInt(document.getElementById('d1').value);
-            e1 = parseInt(document.getElementById('e1').value);
-            f1 = parseInt(document.getElementById('f1').value);
-
-            document.getElementById('a1Value').textContent = a1;
-            document.getElementById('b1Value').textContent = b1;
-            document.getElementById('c1Value').textContent = c1;
-            document.getElementById('d1Value').textContent = d1;
-            document.getElementById('e1Value').textContent = e1;
-            document.getElementById('f1Value').textContent = f1;
-
-            renderSprite();
-        }
-
-        // Attach event listeners to sliders
-        document.getElementById('a1').addEventListener('input', updateCardioid);
-        document.getElementById('b1').addEventListener('input', updateCardioid);
-        document.getElementById('c1').addEventListener('input', updateCardioid);
-        document.getElementById('d1').addEventListener('input', updateCardioid);
-        document.getElementById('e1').addEventListener('input', updateCardioid);
-        document.getElementById('f1').addEventListener('input', updateCardioid);
-
-        renderSprite();
-        requestAnimationFrame(animate);
-    </script>
-</body>
-</html>
+new ResizeObserver(resize).observe(canvas.parentElement);
+if (matchMedia('(prefers-reduced-motion: reduce)').matches) $('spin').checked = false;
+refreshOutputs(); status(); resize(); requestAnimationFrame(animate);
+</script>
+</body></html>
