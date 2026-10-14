@@ -254,7 +254,7 @@
   description: The lemniscate family — figure-eight curves radiating, rotating and multiplying.
   items:
   - file: figure_eight.html
-    title: Figure of 8 using Polar Coordinates
+    title: Multiple Figure of 8 joined by Gradient Lines
     tags: []
   - file: figure_eight_double.html
     title: Figure of 8 using Polar Coordinates
@@ -263,7 +263,7 @@
     title: Figure of 8 using Polar Coordinates
     tags: []
   - file: figure_eight_radiating.html
-    title: Animating Figure of 8
+    title: Figure of 8 radiating with Rotating Offset Chords
     tags: []
   - file: figure_eight_radiating_fixed.html
     title: Figure of 8 with Growing Lobes
@@ -648,10 +648,28 @@
   description: 'Three-dimensional geometry: minimal surfaces, Klein bottles, tori, Platonic solids, Möbius
     strips and tessellations.'
   items:
+  - file: beaded-torus.html
+    title: Beaded torus — Interactive Study
+    tags: []
+  - file: braided-torus.html
+    title: Braided torus — Interactive Study
+    tags: []
   - file: clickme_mobius_manual1.html
     title: Möbius Strip Wireframe with Gradient
     tags:
     - Manual
+  - file: contour-line-torus.html
+    title: Contour-line torus — Interactive Study
+    tags: []
+  - file: contour-slice-torus.html
+    title: Contour-slice torus — Interactive Study
+    tags: []
+  - file: crystalline-growth-torus.html
+    title: Crystalline-growth torus — Interactive Study
+    tags: []
+  - file: cut-paper-torus.html
+    title: Cut-paper torus — Interactive Study
+    tags: []
   - file: dodecahedron.html
     title: Dodecahedron Line Graphics
     tags: []
@@ -660,6 +678,12 @@
     tags: []
   - file: dodecahedron_nolabel.html
     title: Dodecahedron Line Graphics
+    tags: []
+  - file: eccentric-aperture-torus.html
+    title: Eccentric-aperture torus — Interactive Study
+    tags: []
+  - file: elliptical-torus.html
+    title: Elliptical Torus — Interactive Study
     tags: []
   - file: enneper.html
     title: Enneper Surface
@@ -675,6 +699,25 @@
     title: Dynamic Enneper Surface
     tags:
     - Rotating
+  - file: exploded-torus.html
+    title: Exploded Torus — Interactive Study
+    tags: []
+  - file: faceted-gemstone-torus.html
+    title: Faceted Gemstone Torus — Interactive Study
+    tags: []
+  - file: flattened-pebble-torus.html
+    title: Flattened Pebble Torus — Interactive Study
+    tags: []
+  - file: fluted-torus.html
+    title: Fluted Torus — Interactive Study
+    tags: []
+  - file: gradient-halo-torus.html
+    title: Gradient halo — Interactive Study
+    tags:
+    - Gradient
+  - file: heart-loop-torus.html
+    title: Heart-loop torus — Interactive Study
+    tags: []
   - file: hexagon_tessellation.html
     title: Hexagon Circle Tessellation
     tags: []
@@ -689,6 +732,9 @@
     tags: []
   - file: icosahedron_surface.html
     title: Icosahedron with Centroid Lines
+    tags: []
+  - file: interlocked-pair.html
+    title: Interlocked Pair — Interactive Study
     tags: []
   - file: klein2_animation.html
     title: Klein Bottle Line Drawing
@@ -705,6 +751,9 @@
   - file: klein_bottle.html
     title: Klein Bottle Visualization
     tags: []
+  - file: lace-shell-torus.html
+    title: Lace-shell Torus — Interactive Study
+    tags: []
   - file: mobius.html
     title: Möbius Strip Wireframe
     tags: []
@@ -720,16 +769,43 @@
   - file: mobius_radiating.html
     title: Möbius Strip Wireframe Animation
     tags: []
+  - file: moire-torus.html
+    title: Moiré torus — Interactive Study
+    tags: []
+  - file: negative-space-torus.html
+    title: Negative-space torus — Interactive Study
+    tags: []
+  - file: nested-tilted-tori.html
+    title: Nested Tilted Tori — Interactive Study
+    tags: []
+  - file: orbital-torus-bouquet.html
+    title: Orbital Torus Bouquet — Interactive Study
+    tags: []
+  - file: petal-torus.html
+    title: Petal torus — Interactive Study
+    tags: []
   - file: rhombicDodecahedron.html
     title: Resizable Rhombic Dodecahedron
     tags: []
   - file: rhombicIcosahedron.html
     title: Rhombic Icosahedron — Random Tumble
     tags: []
+  - file: ribbon-wrap-torus.html
+    title: Ribbon-wrap torus — Interactive Study
+    tags: []
   - file: rotating_rhombic_icosahedron.html
     title: Rotating Rhombic Icosahedron
     tags:
     - Rotating
+  - file: rounded-square-torus.html
+    title: Rounded-square torus — Interactive Study
+    tags: []
+  - file: rounded-triangle-torus.html
+    title: Rounded-triangle torus — Interactive Study
+    tags: []
+  - file: saddle-wave-torus.html
+    title: Saddle-Wave Torus — Interactive Study
+    tags: []
   - file: sinusoidal_on_sphere_explore.html
     title: Cardioid Shape
     tags:
@@ -755,8 +831,17 @@
   - file: spherical_tessellation_hexagon.html
     title: Sphere Tessellation with Hexagons
     tags: []
+  - file: spiral-grooved-torus.html
+    title: Spiral-grooved Torus — Interactive Study
+    tags: []
   - file: square_sphere.html
     title: Triangle Animation
+    tags: []
+  - file: tapered-torus.html
+    title: Tapered Torus — Interactive Study
+    tags: []
+  - file: torus-knot-sculpture.html
+    title: Torus-Knot Sculpture — Interactive Study
     tags: []
   - file: torus.html
     title: Klein Bottle Transformation
@@ -770,6 +855,12 @@
     - Rotating
   - file: truncated_dodecahedron_one_corner.html
     title: Truncated Dodecahedron Line Graphics
+    tags: []
+  - file: twisted-oval-tube-torus.html
+    title: Twisted Oval-Tube Torus — Interactive Study
+    tags: []
+  - file: wireframe-torus.html
+    title: Wireframe Torus — Interactive Study
     tags: []
 - name: Minimal Surfaces
   slug: minimal-surfaces
@@ -788,6 +879,10 @@
     - Gradient
   - file: interactive_boy_surface_mesh_dot.html
     title: Interactive Boy's Surface - Dot Mesh
+    tags:
+    - Interactive
+  - file: minimal_surfaces_interactive_blog.html
+    title: Generating and Rendering Minimal Surfaces — with Costa Samples
     tags:
     - Interactive
 - name: Waves & Oscillations
@@ -1165,9 +1260,6 @@
   emoji: 🎯
   description: Circles on circles, concentric rings and polar-coordinate drawings.
   items:
-  - file: circle.html
-    title: Circle Spokes
-    tags: []
   - file: circle_color.html
     title: Circle Spokes with Different Colors
     tags:
@@ -1219,9 +1311,6 @@
     title: Dynamic Diamond Drawing
     tags:
     - Animated
-  - file: diamond4.html
-    title: Diamond Shape with Labels
-    tags: []
   - file: diamond4_animated.html
     title: Diamond Shape Drawing
     tags:
@@ -1238,6 +1327,9 @@
     - Animated
   - file: diamond_label.html
     title: Diamond Shape with Labels
+    tags: []
+  - file: geometric-studies.html
+    title: 20 Geometric Studies — Interactive Canvas Gallery
     tags: []
   - file: parametric_curve1.html
     title: Parametric Equation Visualization
@@ -1275,6 +1367,9 @@
     title: Pinterests Curve 1
     tags:
     - Interactive
+  - file: poincare_disk.html
+    title: Poincaré Disk Explorer
+    tags: []
   - file: psychedlic_art.html
     title: Psychedelic Art Generator
     tags: []
@@ -1285,7 +1380,7 @@
     title: Psychedelic line drawing
     tags: []
   - file: sin_cos_abstract_explore.html
-    title: Cardioid Shape
+    title: Sin·Cos Abstract Curve — Interactive Study
     tags:
     - Interactive
   - file: square_triangle.html
@@ -1302,9 +1397,6 @@
     tags: []
   - file: turtle_forwarding_pattern5.html
     title: Turtle Graphics Pentagon
-    tags: []
-  - file: twotriangle.html
-    title: Triangle Animation
     tags: []
   - file: windmill.html
     title: Windmill Curves

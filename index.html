@@ -73,6 +73,13 @@ title: "Mathematical Art"
 
 <section class="ma-section">
   <div class="ma-section-head">
+    <h2>Recently added pages</h2>
+  </div>
+  <div id="recent-list-container" class="ma-figure-grid"></div>
+</section>
+
+<section class="ma-section">
+  <div class="ma-section-head">
     <h2>Curves for further exploration</h2>
   </div>
   <div id="master-list-container" class="ma-figure-grid"></div>
@@ -140,6 +147,20 @@ title: "Mathematical Art"
 
   renderHtmlFiles(getRandomFiles(htmlFiles.filter(function (f) { return f.includes('explore'); }), 4, 'AAAAAAA'), 'master-list-container');
   renderHtmlFiles(getRandomFiles(htmlFiles.filter(function (f) { return !f.includes('explore'); }), 4, 'explore'), 'random-list-container');
+
+  const recentFiles = [
+    'flattened-pebble-torus.html',
+    'negative-space-torus.html',
+    'saddle-wave-torus.html',
+    'lace-shell-torus.html',
+    'vortex_explore.html',
+    'gradient-halo-torus.html',
+    'orbital-torus-bouquet.html',
+    'petal-torus.html',
+    'tapered-torus.html',
+    'interlocked-pair.html'
+  ];
+  renderHtmlFiles(recentFiles, 'recent-list-container');
 </script>
 </body>
 </html>

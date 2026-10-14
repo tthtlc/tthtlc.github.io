@@ -47,8 +47,9 @@ CATEGORIES = [
     ("threed", "3D Surfaces & Solids", "🧊",
      "Three-dimensional geometry: minimal surfaces, Klein bottles, tori, "
      "Platonic solids, Möbius strips and tessellations.",
-     [r"enneper", r"klein", r"torus", r"sphere", r"spherical", r"icosahedron",
-      r"dodecahedron", r"rhombic", r"mobius", r"tessellation"]),
+     [r"enneper", r"klein", r"torus", r"tori", r"interlocked", r"sphere",
+      r"spherical", r"icosahedron", r"dodecahedron", r"rhombic", r"mobius",
+      r"tessellation"]),
     ("minimal-surfaces", "Minimal Surfaces", "🫧",
      "Soap-film-like minimal surfaces and their immersions — Boy's surface and "
      "other zero-mean-curvature forms rendered as interactive meshes.",
@@ -89,7 +90,8 @@ CATEGORIES = [
      "and other geometric curiosities.",
      [r"diamond", r"boomerang", r"windmill", r"chopstick", r"turtle",
       r"parametric", r"cubic", r"psychedlic", r"sin_cos", r"pinterest",
-      r"quart", r"square_triangle", r"twotriangle", r"pentagon_star"]),
+      r"quart", r"square_triangle", r"twotriangle", r"pentagon_star",
+      r"geometric", r"poincare"]),
 ]
 
 TAG_RULES = [
