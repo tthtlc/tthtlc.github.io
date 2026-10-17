@@ -10,59 +10,6 @@ title: "Mathematical Art"
 
 <div class="ma-frontispiece">
   <p class="ma-lede">A collection of interactive webpages — dynamic geometry, curves, fractals, and animations — each a working figure you can open and play.</p>
-  <div class="ma-featured">
-    <div class="ma-featured-heading">Featured pages of the week</div>
-    <a class="ma-featured-link" href="/generalized_ellipse_windings.html" target="_blank" rel="noopener">
-      <div class="ma-featured-plate">
-        <iframe src="/generalized_ellipse_windings.html" loading="lazy" title="Generalized Ellipse Windings preview"></iframe>
-        <span class="ma-featured-open">Open</span>
-      </div>
-      <div class="ma-featured-body">
-        <div class="ma-featured-title">Generalized Ellipse Windings</div>
-        <div class="ma-featured-file">generalized_ellipse_windings.html</div>
-      </div>
-    </a>
-    <a class="ma-featured-link" href="/rotating_ellipse8.html" target="_blank" rel="noopener">
-      <div class="ma-featured-plate">
-        <iframe src="/rotating_ellipse8.html" loading="lazy" title="Rotating Ellipse 8 preview"></iframe>
-        <span class="ma-featured-open">Open</span>
-      </div>
-      <div class="ma-featured-body">
-        <div class="ma-featured-title">Rotating Ellipse 8</div>
-        <div class="ma-featured-file">rotating_ellipse8.html</div>
-      </div>
-    </a>
-    <a class="ma-featured-link" href="/circular_thread.html" target="_blank" rel="noopener">
-      <div class="ma-featured-plate">
-        <iframe src="/circular_thread.html" loading="lazy" title="Circular Thread preview"></iframe>
-        <span class="ma-featured-open">Open</span>
-      </div>
-      <div class="ma-featured-body">
-        <div class="ma-featured-title">Circular Thread</div>
-        <div class="ma-featured-file">circular_thread.html</div>
-      </div>
-    </a>
-    <a class="ma-featured-link" href="/modular_string_art_visualizer.html" target="_blank" rel="noopener">
-      <div class="ma-featured-plate">
-        <iframe src="/modular_string_art_visualizer.html" loading="lazy" title="Modular String Art Visualizer preview"></iframe>
-        <span class="ma-featured-open">Open</span>
-      </div>
-      <div class="ma-featured-body">
-        <div class="ma-featured-title">Modular String Art Visualizer</div>
-        <div class="ma-featured-file">modular_string_art_visualizer.html</div>
-      </div>
-    </a>
-    <a class="ma-featured-link" href="/rotated_string_art_layers.html" target="_blank" rel="noopener">
-      <div class="ma-featured-plate">
-        <iframe src="/rotated_string_art_layers.html" loading="lazy" title="Rotated String Art Layers preview"></iframe>
-        <span class="ma-featured-open">Open</span>
-      </div>
-      <div class="ma-featured-body">
-        <div class="ma-featured-title">Rotated String Art Layers</div>
-        <div class="ma-featured-file">rotated_string_art_layers.html</div>
-      </div>
-    </a>
-  </div>
   <div class="ma-actions">
     <a class="ma-action ma-action-primary" href="/index_gallery.html">Browse the full gallery — {{ site.data.visualizations.size }} pages by topic →</a>
     <a class="ma-action" href="/index_search.html">Search the collection</a>
@@ -149,16 +96,38 @@ title: "Mathematical Art"
   renderHtmlFiles(getRandomFiles(htmlFiles.filter(function (f) { return !f.includes('explore'); }), 4, 'explore'), 'random-list-container');
 
   const recentFiles = [
-    'flattened-pebble-torus.html',
-    'negative-space-torus.html',
+    'elliptical-torus.html',
     'saddle-wave-torus.html',
-    'lace-shell-torus.html',
-    'vortex_explore.html',
+    'fluted-torus.html',
+    'twisted-oval-tube-torus.html',
     'gradient-halo-torus.html',
-    'orbital-torus-bouquet.html',
+    'beaded-torus.html',
+    'rounded-square-torus.html',
+    'flattened-pebble-torus.html',
+    'cut-paper-torus.html',
+    'rounded-triangle-torus.html',
     'petal-torus.html',
+    'faceted-gemstone-torus.html',
+    'heart-loop-torus.html',
+    'eccentric-aperture-torus.html',
     'tapered-torus.html',
-    'interlocked-pair.html'
+    'braided-torus.html',
+    'wireframe-torus.html',
+    'moire-torus.html',
+    'crystalline-growth-torus.html',
+    'contour-line-torus.html',
+    'ribbon-wrap-torus.html',
+    'lace-shell-torus.html',
+    'interlocked-pair.html',
+    'nested-tilted-tori.html',
+    'orbital-torus-bouquet.html',
+    'exploded-torus.html',
+    'torus-knot-sculpture.html',
+    'contour-slice-torus.html',
+    'spiral-grooved-torus.html',
+    'geometric-studies.html',
+    'poincare_disk.html',
+    'sin_cos_abstract_explore.html'
   ];
   renderHtmlFiles(recentFiles, 'recent-list-container');
 </script>

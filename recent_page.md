@@ -1,9 +1,3 @@
-figure_eight_fifth.html
-hypotrochoid_animated_rotate_hex.html
-vortex_explore.html
-double_hypotrochoid_rotating_offset_explore.html
-double_hypotrochoid_moving_offset_explore.html
-minimal_surfaces_interactive_blog.html
 elliptical-torus.html
 saddle-wave-torus.html
 fluted-torus.html
@@ -22,7 +16,6 @@ tapered-torus.html
 braided-torus.html
 wireframe-torus.html
 moire-torus.html
-negative-space-torus.html
 crystalline-growth-torus.html
 contour-line-torus.html
 ribbon-wrap-torus.html

@@ -35,7 +35,6 @@
 - chasing_triangle.html
 - chasing_triangle_rotating.html
 - chopstick_explore.html
-- circle.html
 - circle_color.html
 - circle_cycle.html
 - circular_thread.html
@@ -53,7 +52,6 @@
 - diamond2.html
 - diamond3.html
 - diamond3_animate.html
-- diamond4.html
 - diamond4_animated.html
 - diamond4_random_sector.html
 - diamond4_random_sector_translate.html
@@ -120,6 +118,7 @@
 - figure_eight_radiating.html
 - figure_eight_radiating_fixed.html
 - figure_eight_rotating.html
+- figure_eight_running.html
 - figure_eight_third.html
 - five_edged_random_sector.html
 - five_rotate_spoke.html
@@ -127,11 +126,13 @@
 - flattened-pebble-torus.html
 - flower_in_motion.html
 - fluted-torus.html
+- four-petal-spirograph.html
 - four_edged_random_sector.html
 - four_petal.html
 - four_petal_double.html
 - four_petal_rotate.html
 - fractal_fern.html
+- generalized_ellipse_windings.html
 - generalized_vicsek_fractal_multiple.html
 - geometric-studies.html
 - gradient-halo-torus.html
@@ -210,7 +211,6 @@
 - moving_square.html
 - moving_square_rotate.html
 - moving_square_rotate_double.html
-- negative-space-torus.html
 - nested-tilted-tori.html
 - octagon_auto_rotate.html
 - orbital-torus-bouquet.html
@@ -279,6 +279,8 @@
 - rotating_spoke.html
 - rounded-square-torus.html
 - rounded-triangle-torus.html
+- running_chasing_3gon.html
+- running_star.html
 - saddle-wave-torus.html
 - sierpinski.html
 - sierpinski_carpet.html
@@ -354,7 +356,6 @@
 - twisted-oval-tube-torus.html
 - two_ellipse.html
 - two_petal.html
-- twotriangle.html
 - valentine.html
 - valentine2.html
 - variable_fraction_npoint_petal_rotate.html

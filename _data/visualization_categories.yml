@@ -149,6 +149,9 @@
   - file: figure_eight_double_wheel.html
     title: Figure of 8 using Polar Coordinates with Rotating Wheel
     tags: []
+  - file: four-petal-spirograph.html
+    title: Four-petal Spirograph
+    tags: []
   - file: hypocycloid_explore.html
     title: Hypotrochoid Curves with Scrollbars, Labels, and Color Picker
     tags:
@@ -272,6 +275,9 @@
     title: Animated Rotating Figure of 8
     tags:
     - Rotating
+  - file: figure_eight_running.html
+    title: Figure of 8 radiating with Rotating Offset Chords
+    tags: []
   - file: figure_eight_third.html
     title: Figure of 8 using Polar Coordinates
     tags: []
@@ -495,6 +501,9 @@
     title: Random Rotating Polygon Drawer
     tags:
     - Rotating
+  - file: running_chasing_3gon.html
+    title: Pentagon Drawing with Iterations
+    tags: []
   - file: square_auto_rotate.html
     title: Pentagon Rotation Animation
     tags:
@@ -772,9 +781,6 @@
   - file: moire-torus.html
     title: Moiré torus — Interactive Study
     tags: []
-  - file: negative-space-torus.html
-    title: Negative-space torus — Interactive Study
-    tags: []
   - file: nested-tilted-tori.html
     title: Nested Tilted Tori — Interactive Study
     tags: []
@@ -1035,6 +1041,9 @@
     title: Ellipse Animation
     tags:
     - Rotating
+  - file: generalized_ellipse_windings.html
+    title: Generalized Ellipse Windings
+    tags: []
   - file: rotating-ellipse.html
     title: The 5:1 Ellipse
     tags:
