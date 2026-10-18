@@ -1,0 +1,150 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Rotating Circle with Hypotrochoid Trace</title>
+<style>
+  html,body{margin:0;height:100%;background:#05060a;overflow:hidden}
+  canvas{display:block}
+  .controls{position:fixed;left:16px;bottom:52px;color:#cfe8ff;font:13px/1.45 system-ui,sans-serif;background:rgba(10,15,25,.78);padding:12px 14px;border:1px solid #24344a;border-radius:12px;backdrop-filter:blur(6px)}
+  label{display:block;margin-bottom:8px}
+  input{width:220px;vertical-align:middle}
+  button{margin-top:4px;background:#122033;color:#cfe8ff;border:1px solid #2c4360;border-radius:8px;padding:5px 10px;cursor:pointer}
+  button:hover{background:#1a2c46}
+  .readout{position:fixed;left:0;right:0;bottom:8px;text-align:center;color:#9fb6cc;font:10px/1.4 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.04em;pointer-events:none;text-shadow:0 0 6px rgba(0,0,0,.9)}
+  .readout .formula{color:#7fd4ff;margin-bottom:2px}
+  .readout .values{color:#cfe8ff}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div class="controls">
+  <label>Rotation speed
+    <input id="speed" type="range" min="-6" max="6" step="0.05" value="1.8">
+  </label>
+  <label>Inner circle A diameter
+    <input id="diameter" type="range" min="10" max="95" step="1" value="52">
+  </label>
+  <button id="clear">Clear trace</button>
+</div>
+
+<div class="readout">
+  <div class="formula">
+    R<sub>A</sub> = p R<sub>B</sub>,&nbsp;&nbsp;
+    d = R<sub>B</sub> &minus; R<sub>A</sub>,&nbsp;&nbsp;
+    A<sub>c</sub> = (d cos θ, d sin θ),&nbsp;&nbsp;
+    φ = &minus;θ(R<sub>B</sub>/R<sub>A</sub> &minus; 1),&nbsp;&nbsp;
+    C = A<sub>c</sub> + R<sub>A</sub>(cos(φ+α), sin(φ+α))
+  </div>
+  <div class="values" id="readout"></div>
+</div>
+
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+let W,H,cx,cy,dpr;
+
+function resize(){
+  dpr = Math.min(window.devicePixelRatio || 1, 2);
+  W = innerWidth; H = innerHeight;
+  canvas.width = W*dpr; canvas.height = H*dpr;
+  canvas.style.width = W+'px'; canvas.style.height = H+'px';
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  cx = W/2; cy = H/2;
+}
+addEventListener('resize', resize); resize();
+
+const speedInput = document.getElementById('speed');
+const diameterInput = document.getElementById('diameter');
+const clearButton = document.getElementById('clear');
+const readout = document.getElementById('readout');
+
+let theta = 0;
+let lastDiameterPercent = parseFloat(diameterInput.value);
+let trail = [];
+let cAngle = Math.random() * Math.PI * 2;
+
+function RB(){ return Math.min(W,H) * 0.36; }
+function RA(){ return RB() * parseFloat(diameterInput.value) / 100; }
+
+function draw(){
+  const RBv = RB();
+  const RAv = RA();
+  const p = parseFloat(diameterInput.value) / 100;
+  const speed = parseFloat(speedInput.value);
+  theta += speed * 0.016;
+
+  if (Math.abs(parseFloat(diameterInput.value) - lastDiameterPercent) > 1e-6) {
+    trail = [];
+    lastDiameterPercent = parseFloat(diameterInput.value);
+  }
+
+  ctx.clearRect(0,0,W,H);
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+
+  if (trail.length > 1) {
+    ctx.strokeStyle = 'rgba(126,255,171,0.9)';
+    ctx.lineWidth = 1.6;
+    ctx.beginPath();
+    ctx.moveTo(trail[0][0], trail[0][1]);
+    for (let i=1;i<trail.length;i++) ctx.lineTo(trail[i][0], trail[i][1]);
+    ctx.stroke();
+  }
+
+  ctx.strokeStyle = '#7fd4ff';
+  ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.arc(cx,cy,RBv,0,Math.PI*2); ctx.stroke();
+
+  const d = RBv - RAv;
+  const ax = cx + d*Math.cos(theta);
+  const ay = cy + d*Math.sin(theta);
+  const phi = -theta * (RBv/RAv - 1);
+
+  ctx.strokeStyle = '#ffd166';
+  ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.arc(ax,ay,RAv,0,Math.PI*2); ctx.stroke();
+
+  ctx.strokeStyle = '#ff5d8f';
+  ctx.lineWidth = 2.2;
+  for (let k=0;k<2;k++){
+    const a = phi + k*Math.PI/2;
+    ctx.beginPath();
+    ctx.moveTo(ax - RAv*Math.cos(a), ay - RAv*Math.sin(a));
+    ctx.lineTo(ax + RAv*Math.cos(a), ay + RAv*Math.sin(a));
+    ctx.stroke();
+  }
+
+  const aC = phi + cAngle;
+  const px = ax + RAv*Math.cos(aC);
+  const py = ay + RAv*Math.sin(aC);
+  trail.push([px,py]);
+  if (trail.length > 12000) trail.shift();
+
+  ctx.fillStyle = '#b388ff';
+  ctx.beginPath(); ctx.arc(px,py,5,0,Math.PI*2); ctx.fill();
+
+  const qx = cx + RBv*Math.cos(theta);
+  const qy = cy + RBv*Math.sin(theta);
+  ctx.fillStyle = '#7fffd4';
+  ctx.beginPath(); ctx.arc(qx,qy,4,0,Math.PI*2); ctx.fill();
+
+  ctx.fillStyle = '#e8f6ff';
+  ctx.font = '13px system-ui,sans-serif';
+  ctx.fillText('B', cx+RBv+8, cy+4);
+  ctx.fillText('A', ax+RAv+8, ay+4);
+  ctx.fillStyle = '#b388ff';
+  ctx.fillText('C', px+8, py-6);
+
+  readout.textContent =
+    `RB=${RBv.toFixed(1)}px   RA=${RAv.toFixed(1)}px   p=${p.toFixed(2)}   ` +
+    `theta=${theta.toFixed(2)} rad   phi=${phi.toFixed(2)} rad   alpha_C=${cAngle.toFixed(2)} rad`;
+
+  requestAnimationFrame(draw);
+}
+
+clearButton.addEventListener('click', () => trail = []);
+draw();
+</script>
+</body>
+</html>
