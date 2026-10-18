@@ -1,0 +1,78 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sine Wave — 40 Segment Circular Buffer</title><style>*{box-sizing:border-box}body{margin:0;background:#080b10;color:#d7e4ed;font:14px system-ui}main{max-width:1100px;margin:35px auto;padding:0 20px}h1{font-size:21px;font-weight:500}p{color:#91a3b5;line-height:1.6}canvas{display:block;width:100%;height:380px;background:#000;border:1px solid #263747;border-radius:10px}.controls{display:flex;gap:20px;flex-wrap:wrap;align-items:center;margin:20px 0}button{padding:9px 16px;background:#182b3b;color:#e0ecf4;border:1px solid #39556e;border-radius:6px;cursor:pointer}label{display:flex;align-items:center;gap:10px}input{accent-color:#edbc63}#status{font:13px monospace;line-height:1.8;color:#c4d8e8}.cells{display:grid;grid-template-columns:repeat(20,1fr);gap:4px;margin:20px 0}.cell{height:26px;background:#14202b;color:#63798b;text-align:center;font:10px monospace;padding-top:7px;border:1px solid #253644;border-radius:3px}.filled{background:#725621;color:#ffe1a2}.next{outline:2px solid #e7b95e}small{color:#8197aa}</style></head><body><main><h1>Sine wave · 40-segment circular buffer</h1><p>One new sine-wave segment per step. Each segment replaces slot <code>counter % 40</code>. The trace travels from left to right, then starts again at the left edge.</p><canvas id="wave" aria-label="Animated sine wave retaining at most forty line segments"></canvas><div class="controls"><button id="play">Pause</button><button id="step">Step</button><button id="reset">Reset</button><label>Segments / second <input id="rate" type="range" min="1" max="120" value="30"><span id="rateValue">30</span></label></div><div id="status"></div><div class="cells" id="cells"></div><small>Dark slots contain 9999.99. Gold slots contain segment coordinates. The outlined slot is the next to be overwritten.</small></main><script>
+'use strict';
+const CAPACITY = 40;
+const EMPTY = 9999.99;
+const SEGMENTS_PER_SWEEP = 240;
+const cells = new Array(CAPACITY).fill(EMPTY);
+let counter = 0n;
+let running = !matchMedia('(prefers-reduced-motion: reduce)').matches;
+let width = 0, height = 380, last = null, accumulator = 0;
+const canvas = document.getElementById('wave');
+const ctx = canvas.getContext('2d');
+const $ = id => document.getElementById(id);
+const indicators = Array.from({length: CAPACITY}, (_, i) => {
+ const el = document.createElement('div');el.className='cell';el.textContent=i;$('cells').appendChild(el);return el;
+});
+function generateSegment(sequence) {
+ const k = Number(sequence % BigInt(SEGMENTS_PER_SWEEP));
+ const x1 = k / SEGMENTS_PER_SWEEP;
+ const x2 = (k + 1) / SEGMENTS_PER_SWEEP;
+ return {x1, y1: Math.sin(4 * Math.PI * x1), x2, y2: Math.sin(4 * Math.PI * x2)};
+}
+function drawSegment(segment, erase = false) {
+ const pad = 24, scaleX = width - 2 * pad, amplitude = height * .32;
+ ctx.beginPath();
+ ctx.moveTo(pad + segment.x1 * scaleX, height / 2 - amplitude * segment.y1);
+ ctx.lineTo(pad + segment.x2 * scaleX, height / 2 - amplitude * segment.y2);
+ ctx.strokeStyle = erase ? '#000' : '#f0bd62';
+ ctx.lineWidth = erase ? 6 : 2.5;
+ ctx.lineCap = 'round';ctx.stroke();
+}
+function repaintRetainedSegments() {
+ // Recompose from stored coordinates to repair shared endpoints and antialiasing.
+ ctx.fillStyle = '#000';ctx.fillRect(0, 0, width, height);
+ for (const segment of cells) if (segment !== EMPTY) drawSegment(segment);
+}
+function updateStatus() {
+ const retained = counter < 40n ? Number(counter) : CAPACITY;
+ const nextIndex = Number(counter % 40n);
+ $('status').textContent = `counter = ${counter}   |   next index = ${nextIndex}   |   retained segments = ${retained} / 40`;
+ indicators.forEach((el, i) => {
+  el.className = 'cell' + (cells[i] !== EMPTY ? ' filled' : '') + (i === nextIndex ? ' next' : '');
+  el.title = cells[i] === EMPTY ? '9999.99' : JSON.stringify(cells[i]);
+ });
+}
+function appendNextSegment() {
+ const index = Number(counter % 40n);
+ const nextSegment = generateSegment(counter);
+ if (cells[index] !== EMPTY) {
+  drawSegment(cells[index], true); // Erase the old segment using its saved coordinates.
+ }
+ cells[index] = nextSegment;       // Replace sentinel or old coordinates.
+ drawSegment(nextSegment);        // Render the new segment.
+ counter += 1n;                   // BigInt: no fixed integer precision limit.
+ repaintRetainedSegments();       // Preserve adjacent retained segments at shared endpoints.
+ updateStatus();
+}
+function resize() {
+ width = canvas.getBoundingClientRect().width;
+ const dpr = Math.min(devicePixelRatio || 1, 2);
+ canvas.width = Math.round(width * dpr);canvas.height = Math.round(height * dpr);
+ ctx.setTransform(dpr, 0, 0, dpr, 0, 0);repaintRetainedSegments();
+}
+function syncPlay() {$('play').textContent = running ? 'Pause' : 'Play';}
+$('play').onclick = () => {running = !running;syncPlay();};
+$('step').onclick = () => {running = false;syncPlay();appendNextSegment();};
+$('reset').onclick = () => {cells.fill(EMPTY);counter = 0n;accumulator = 0;repaintRetainedSegments();updateStatus();};
+$('rate').oninput = () => {$('rateValue').textContent = $('rate').value;};
+function frame(now) {
+ const dt = last === null ? 0 : Math.min((now - last) / 1000, .1);last = now;
+ if (running) {
+  accumulator += dt * Number($('rate').value);
+  while (accumulator >= 1) {appendNextSegment();accumulator -= 1;}
+ }
+ requestAnimationFrame(frame);
+}
+addEventListener('resize', resize);
+resize();updateStatus();syncPlay();requestAnimationFrame(frame);
+</script></body></html>

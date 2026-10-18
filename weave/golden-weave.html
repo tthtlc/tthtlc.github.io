@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Golden Weave</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#000;color:#e9d8ad;font:14px system-ui,sans-serif;overflow:hidden}canvas{display:block;width:100vw;height:100vh}header{position:fixed;top:24px;left:28px;pointer-events:none}h1{font-size:15px;font-weight:500;letter-spacing:.23em;margin:0 0 8px}header p{font-size:12px;color:#9c8b68;margin:0}.controls{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:20px;padding:15px 20px;border:1px solid #67512c66;border-radius:16px;background:#0c0b08db;backdrop-filter:blur(14px);max-width:96vw}label{display:grid;gap:7px;font-size:11px;letter-spacing:.08em;color:#c8b58d}input{width:105px;accent-color:#d7aa50}button{background:#241d10;border:1px solid #72592d;border-radius:8px;color:#ead8b0;padding:9px 12px;cursor:pointer;white-space:nowrap}button:hover{background:#3b2c12}.hint{position:fixed;right:24px;top:26px;color:#766749;font-size:11px}@media(max-width:600px){.controls{gap:10px;padding:12px}input{width:65px}.hint{display:none}header{left:18px;top:18px}}
+</style></head><body><canvas id="art" aria-label="Animated golden interwoven ribbon curves"></canvas><header><h1>GOLDEN WEAVE</h1><p>A study in curves, light, and motion</p></header><div class="hint">Space to pause · H to hide controls</div>
+<div class="controls"><button id="play">Pause</button><label>SPEED<input id="speed" type="range" min="0" max="2" step=".01" value=".45"></label><label>LOBES<input id="lobes" type="range" min="3" max="10" step="1" value="7"></label><label>THREADS<input id="threads" type="range" min="16" max="72" step="1" value="44"></label><button id="save">Save PNG</button></div>
+<script>
+const canvas=document.querySelector('canvas'),ctx=canvas.getContext('2d');
+const speed=document.querySelector('#speed'),lobes=document.querySelector('#lobes'),threads=document.querySelector('#threads');
+let W,H,dpr,time=0,last=0,playing=!matchMedia('(prefers-reduced-motion: reduce)').matches;
+function resize(){W=innerWidth;H=innerHeight;dpr=Math.min(devicePixelRatio||1,2);canvas.width=W*dpr;canvas.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0)}
+addEventListener('resize',resize);resize();
+function draw(){
+ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);
+const scale=Math.min(W*.47,H*.425),cx=W/2,cy=H/2-8,n=+lobes.value,N=+threads.value,steps=840;
+// Each thread is a closed, periodically folded ribbon edge. Phase offsets form the ruled weave.
+for(let j=0;j<N;j++){
+ const u=j/(N-1)*Math.PI*2,light=(Math.cos(u-.8)+1)/2;
+ ctx.strokeStyle=`rgba(${Math.round(197+55*light)},${Math.round(139+85*light)},${Math.round(49+124*light)},${.67+.23*light})`;
+ ctx.lineWidth=.75;ctx.beginPath();
+ for(let k=0;k<=steps;k++){
+  const t=k/steps*Math.PI*2,q=n*t+u+time*.65;
+  const r=.73+.235*Math.cos(q);
+  const theta=t+.155*Math.sin(q)+time*.065;
+  const z=.17*Math.sin(q),tilt=.25+.12*Math.sin(time*.23);
+  const x=r*Math.cos(theta),y=r*Math.sin(theta)*Math.cos(tilt)+z*Math.sin(tilt);
+  const breathing=1+.018*Math.sin(time*.55);
+  const px=cx+scale*x*breathing,py=cy+scale*y*breathing;
+  k?ctx.lineTo(px,py):ctx.moveTo(px,py);
+ }
+ ctx.closePath();ctx.stroke();
+}
+}
+function updateButton(){document.querySelector('#play').textContent=playing?'Pause':'Play'}updateButton();
+function toggle(){playing=!playing;updateButton()}
+document.querySelector('#play').onclick=toggle;
+document.querySelector('#save').onclick=()=>{draw();const a=document.createElement('a');a.download='golden-weave.png';a.href=canvas.toDataURL('image/png');a.click()};
+let hidden=false;addEventListener('keydown',e=>{if(e.code==='Space'&&!['INPUT','BUTTON'].includes(document.activeElement.tagName)){e.preventDefault();toggle()}if(e.key.toLowerCase()==='h'){hidden=!hidden;document.querySelectorAll('header,.controls,.hint').forEach(el=>el.style.visibility=hidden?'hidden':'visible')}});
+function frame(now){const dt=Math.min((now-last)/1000,.05);last=now;if(playing)time+=dt*(+speed.value);draw();requestAnimationFrame(frame)}requestAnimationFrame(frame);
+</script></body></html>

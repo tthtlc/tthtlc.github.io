@@ -1,0 +1,65 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Golden Ribbon — 40 Path Circular Buffer</title><style>*{box-sizing:border-box}body{margin:0;background:#000;color:#dec38d;font:13px system-ui;overflow:hidden}canvas{display:block;width:100vw;height:100vh}header{position:fixed;top:22px;left:24px;pointer-events:none}h1{font-size:14px;letter-spacing:.15em;margin:0 0 9px}#stats{font:12px monospace;color:#a48c63}aside{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:16px;max-width:95vw;width:max-content;padding:14px;background:#110e09ee;border:1px solid #71552d;border-radius:12px}button{background:#302411;color:#ead7b0;border:1px solid #71552d;border-radius:6px;padding:9px;cursor:pointer}label{display:grid;gap:5px;font-size:11px}input{width:110px;accent-color:#d9ab58}</style><canvas aria-label="Golden ribbon with a maximum of forty buffered paths"></canvas><header><h1>GOLDEN RIBBON · 40-PATH BUFFER</h1><div id="stats"></div></header><aside><button id="play">Pause</button><label>Paths per second<input id="rate" type="range" min="1" max="100" value="30"></label><label>Zoom<input id="zoom" type="range" min=".7" max="2" step=".01" value="1"></label><button id="reset">Reset buffer</button><button id="save">Save PNG</button></aside><script>
+'use strict';
+const CAPACITY = 40;
+const EMPTY = 9999.99;
+// Each occupied cell holds the generated coordinates and stroke color of one path.
+const cells = new Array(CAPACITY).fill(EMPTY);
+let counter = 0n; // BigInt keeps increasing without Number's integer precision limit.
+let running = !matchMedia('(prefers-reduced-motion: reduce)').matches;
+let lastTime = null, accumulated = 0, w, h;
+const canvas = document.querySelector('canvas'), ctx = canvas.getContext('2d');
+const $ = id => document.getElementById(id);
+function resize(){w=innerWidth;h=innerHeight;const d=Math.min(devicePixelRatio||1,2);canvas.width=w*d;canvas.height=h*d;ctx.setTransform(d,0,0,d,0,0);renderRetainedPaths()}
+function strokePath(path, erase=false){
+ const scale=Math.min(w*.47,h*.425)*+$('zoom').value;
+ ctx.save();ctx.translate(w/2,h/2-8);ctx.scale(scale,scale);
+ ctx.strokeStyle=erase?'#000':path.color;
+ ctx.lineWidth=(erase?2.8:.9)/scale;
+ ctx.lineJoin='round';ctx.lineCap='round';ctx.beginPath();
+ const p=path.coordinates;
+ for(let i=0;i<p.length;i+=2){i?ctx.lineTo(p[i],p[i+1]):ctx.moveTo(p[i],p[i+1])}
+ ctx.closePath();ctx.stroke();ctx.restore();
+}
+function generatePath(sequence){
+ // 40 consecutive paths span nearly one full ribbon section.
+ const u=Number(sequence%400n)*(2*Math.PI/40);
+ const drift=Number(sequence%10n)*.0007;
+ const coordinates=new Float64Array(2*901);
+ for(let k=0;k<=60;k++){
+  const t=k/900*Math.PI*2,q=7*t+u,r=.70+.27*Math.cos(q);
+  const theta=t+.205*Math.sin(q)+drift;
+  const tilt=.22+.08*Math.sin(drift),z=.20*Math.sin(q);
+  coordinates[2*k]=r*Math.cos(theta);
+  coordinates[2*k+1]=r*Math.sin(theta)*Math.cos(tilt)+z*Math.sin(tilt);
+ }
+ const light=(1+Math.cos(u-.8))/2;
+ return {coordinates,color:`rgb(${197+55*light},${139+85*light},${49+124*light})`};
+}
+function renderRetainedPaths(){
+ // Recompose from stored coordinates to repair intersections and antialiasing.
+ ctx.fillStyle='#000';ctx.fillRect(0,0,w,h);
+ const count=counter<BigInt(CAPACITY)?Number(counter):CAPACITY;
+ const start=counter<BigInt(CAPACITY)?0:Number(counter%BigInt(CAPACITY));
+ for(let k=0;k<count;k++){const path=cells[(start+k)%CAPACITY];if(path!==EMPTY)strokePath(path)}
+ $('stats').textContent=`counter: ${counter} | next slot: ${counter%40n} | retained: ${count}/40`;
+}
+function appendNextPath(){
+ const index=Number(counter%40n);
+ const nextPath=generatePath(counter);
+ if(cells[index]!==EMPTY){
+  strokePath(cells[index],true); // Erase using the old cell's stored coordinates.
+ }
+ cells[index]=nextPath;         // Overwrite sentinel or previous coordinate array.
+ strokePath(nextPath);          // Draw the new path after storing it.
+ counter+=1n;
+ renderRetainedPaths();         // Restore retained lines damaged at intersections.
+}
+function sync(){$('play').textContent=running?'Pause':'Play'}
+$('play').onclick=()=>{running=!running;sync()};sync();
+$('reset').onclick=()=>{cells.fill(EMPTY);counter=0n;accumulated=0;renderRetainedPaths()};
+$('zoom').oninput=renderRetainedPaths;
+$('save').onclick=()=>{let a=document.createElement('a');a.download='golden-ribbon-40-paths.png';a.href=canvas.toDataURL('image/png');a.click()};
+addEventListener('resize',resize);addEventListener('keydown',e=>{if(e.code==='Space'&&!['INPUT','BUTTON'].includes(document.activeElement.tagName)){e.preventDefault();running=!running;sync()}});
+function frame(now){const dt=lastTime===null?0:Math.min((now-lastTime)/1000,.1);lastTime=now;if(running){accumulated+=dt*+$('rate').value;while(accumulated>=1){appendNextPath();accumulated-=1}}requestAnimationFrame(frame)}
+resize();requestAnimationFrame(frame);
+</script></html>
