@@ -86,7 +86,7 @@ function draw(){
  ctx.clearRect(0,0,width,height);
  const top=$('view').value==='top',zoom=+$('zoom').value;
  const kf=9/Math.max(1,9-.8*fit),scale=Math.min(width*.82,height*.64)/(2*fit*kf)*zoom;
- const cx=width/2,cy=height*.54;
+ const cx=width/2,cy=height*.42;
  const transformed=vertices.map(v=>{const p=rotation(v.p),n=rotation(v.n),k=top?1:9/(9-p[2]);return {p,n,xy:[cx+p[0]*scale*k,cy-p[1]*scale*k]}});
  const mode=$('mode').value;
  const sorted=faces.map(f=>({f,z:(transformed[f.v[0]].p[2]+transformed[f.v[1]].p[2]+transformed[f.v[2]].p[2])/3})).sort((a,b)=>a.z-b.z);

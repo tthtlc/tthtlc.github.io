@@ -61,7 +61,7 @@ function draw(){
  const top=$('view').value==='top',zoom=+$('zoom').value,p=+$('p').value,w0=+$('w').value;
  const mu=Math.round(+$('mu').value),nv=Math.round(+$('nv').value);
  const scale=Math.min(width,height)*.42*zoom/3;
- const cx=width/2,cy=height/2;
+ const cx=width/2,cy=height*.42;
  const rgb=[1,3,5].map(i=>parseInt($('color').value.slice(i,i+2),16));
  const V=pts.map((q,i)=>{const a=rotate(q),n=rotate(nrm[i]),k=top?1:9/(9-a[2]);return [cx+a[0]*scale*k,cy-a[1]*scale*k,n[2]]});
  ctx.lineCap='round';

@@ -100,7 +100,7 @@ function draw(){
  ctx.clearRect(0,0,width,height);
  const top=$('view').value==='top',mode=$('mode').value,zoom=+$('zoom').value;
  const scale=Math.min(width*.82,height*.64)/(2*(+$('R').value+ +$('rb').value+ +$('raise').value+2* +$('th').value))*zoom;
- const cx=width/2,cy=height*.54;
+ const cx=width/2,cy=height*.42;
  const tv=vertices.map(p=>{const q=rotation(p),k=top?1:9/(9-q[2]);return {p:q,xy:[cx+q[0]*scale*k,cy-q[1]*scale*k]}});
  const tn=vnorms.map(rotation);
  const order=faces.map((f,i)=>({i,z:(tv[f[0]].p[2]+tv[f[1]].p[2]+tv[f[2]].p[2])/3})).sort((a,b)=>a.z-b.z);
