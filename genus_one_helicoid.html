@@ -1,0 +1,471 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Genus-One Helicoid — Rotating 3D</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0a0a1a;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    font-family: 'Segoe UI', sans-serif;
+    color: #eee;
+    overflow: hidden;
+  }
+  h1 {
+    margin: 10px 0 5px;
+    font-size: 1.3rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #f0d060;
+  }
+  .subtitle {
+    font-size: 0.75rem;
+    color: #888;
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+  }
+  canvas {
+    border-radius: 12px;
+    box-shadow: 0 0 50px rgba(240, 200, 80, 0.15);
+  }
+  .controls {
+    margin: 12px 0;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+  }
+  button {
+    padding: 7px 16px;
+    border: 2px solid #f0d060;
+    background: transparent;
+    color: #f0d060;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.3s;
+  }
+  button:hover, button.active {
+    background: #f0d060;
+    color: #0a0a1a;
+  }
+  label {
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: #aaa;
+  }
+  input[type="range"] {
+    accent-color: #f0d060;
+    width: 80px;
+  }
+</style>
+</head>
+<body>
+
+<h1>Genus-One Helicoid</h1>
+<div class="subtitle">Minimal surface with one handle — rotating 3D view</div>
+<canvas id="canvas" width="800" height="700"></canvas>
+<div class="controls">
+  <button class="active" onclick="setView(0)">3D Perspective</button>
+  <button onclick="setView(1)">Top View</button>
+  <button onclick="setView(2)">Side View</button>
+  <label>Speed: <input type="range" id="speed" min="1" max="10" value="4" oninput="updateParams()"></label>
+  <label>Turns: <input type="range" id="turns" min="1" max="4" value="2" step="0.5" oninput="updateParams()"></label>
+  <label>Handle: <input type="range" id="handleSize" min="0" max="10" value="5" oninput="updateParams()"></label>
+</div>
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const W = canvas.width, H = canvas.height;
+const cx = W / 2, cy = H / 2;
+
+let time = 0;
+let animSpeed = 4;
+let numTurns = 2;
+let handleSize = 0.5;
+let viewMode = 0;
+let rotX = 0.4, rotY = 0, rotZ = 0;
+
+// ── 3D Math ───
+function rotateX(p, a) {
+  const c = Math.cos(a), s = Math.sin(a);
+  return [p[0], p[1]*c - p[2]*s, p[1]*s + p[2]*c];
+}
+function rotateY(p, a) {
+  const c = Math.cos(a), s = Math.sin(a);
+  return [p[0]*c + p[2]*s, p[1], -p[0]*s + p[2]*c];
+}
+function rotateZ(p, a) {
+  const c = Math.cos(a), s = Math.sin(a);
+  return [p[0]*c - p[1]*s, p[0]*s + p[1]*c, p[2]];
+}
+
+function project(p) {
+  const fov = 500;
+  const z = p[2] + 400;
+  const scale = fov / (fov + z);
+  return [cx + p[0] * scale, cy + p[1] * scale, z, scale];
+}
+
+// ─── Genus-One Helicoid Parametrization ───
+// Combines a helicoid with a handle (torus-like connection)
+function helicoidPoint(u, v, turns, hSize) {
+  const pitch = 40;
+  const R = 200;
+  const rMin = 30 + hSize * 15;
+
+  // Clamp u to avoid singularity
+  const uClamped = Math.sign(u) * Math.max(Math.abs(u), rMin * 0.3);
+
+  // Helicoid base
+  let x = uClamped * Math.cos(v);
+  let y = uClamped * Math.sin(v);
+  let z = (v / (2 * Math.PI)) * pitch * 2;
+
+  // Handle modification: near the axis, bend the surface to create a tunnel
+  const distFromAxis = Math.sqrt(x*x + y*y);
+  const handleFactor = Math.exp(-distFromAxis * distFromAxis / (rMin * rMin * 2));
+
+  // Add handle curvature — pushes surface away from axis near center
+  const handleR = rMin * hSize * 1.5;
+  const handleAngle = v * 0.5;
+
+  // Modify z near center to create the handle/tunnel shape
+  const zOffset = handleFactor * handleR * Math.sin(v * 2) * 0.5;
+  z += zOffset;
+
+  // Radial push for handle
+  const radialPush = handleFactor * handleR * 0.3;
+  const pushX = radialPush * Math.cos(v);
+  const pushY = radialPush * Math.sin(v);
+  x += pushX;
+  y += pushY;
+
+  return [x, y, z];
+}
+
+// Handle tube parametrization (connects the two sheets)
+function handlePoint(t, phi, hSize) {
+  const rMin = 30 + hSize * 15;
+  const handleR = rMin * hSize * 1.2;
+  const tubeR = 12 + hSize * 5;
+
+  // Torus-like handle going through the center
+  const majorR = rMin * 0.8;
+  const x = (majorR + tubeR * Math.cos(phi)) * Math.cos(t);
+  const y = (majorR + tubeR * Math.cos(phi)) * Math.sin(t);
+  const z = tubeR * Math.sin(phi) + Math.sin(t * 2) * 20;
+
+  return [x, y, z];
+}
+
+// ─── Generate Surface Mesh ───
+function generateMesh() {
+  const mesh = [];
+  const uSteps = 30;
+  const vSteps = 60;
+  const uMin = -200, uMax = 200;
+  const vMax = numTurns * 2 * Math.PI;
+
+  // Helicoid surface
+  for (let i = 0; i <= uSteps; i++) {
+    for (let j = 0; j <= vSteps; j++) {
+      const u = uMin + (uMax - uMin) * (i / uSteps);
+      const v = (j / vSteps) * vMax;
+
+      // Skip the very center to create the hole
+      if (Math.abs(u) < 20) continue;
+
+      const p = helicoidPoint(u, v, numTurns, handleSize);
+      mesh.push({ u: i, v: j, point: p, type: 'surface' });
+    }
+  }
+
+  return mesh;
+}
+
+// ─── Generate Grid Lines ──
+function generateGridLines() {
+  const lines = [];
+  const uSteps = 20;
+  const vSteps = 40;
+  const uMin = -200, uMax = 200;
+  const vMax = numTurns * 2 * Math.PI;
+
+  // Meridian lines (constant v) — red
+  const vValues = [];
+  for (let j = 0; j <= vSteps; j++) {
+    vValues.push((j / vSteps) * vMax);
+  }
+
+  for (const v of vValues) {
+    const line = [];
+    for (let i = 0; i <= uSteps; i++) {
+      const u = uMin + (uMax - uMin) * (i / uSteps);
+      if (Math.abs(u) < 20) continue;
+      const p = helicoidPoint(u, v, numTurns, handleSize);
+      line.push(p);
+    }
+    if (line.length > 1) lines.push({ points: line, color: '#cc2222', type: 'meridian' });
+  }
+
+  // Parallel lines (constant u) — green/teal
+  const uValues = [];
+  for (let i = 0; i <= uSteps; i++) {
+    uValues.push(uMin + (uMax - uMin) * (i / uSteps));
+  }
+
+  for (const u of uValues) {
+    if (Math.abs(u) < 20) continue;
+    const line = [];
+    for (let j = 0; j <= vSteps; j++) {
+      const v = (j / vSteps) * vMax;
+      const p = helicoidPoint(u, v, numTurns, handleSize);
+      line.push(p);
+    }
+    if (line.length > 1) lines.push({ points: line, color: '#228866', type: 'parallel' });
+  }
+
+  return lines;
+}
+
+// ─── Handle Tube Lines ───
+function generateHandleLines() {
+  const lines = [];
+  const steps = 40;
+  const tubeSteps = 12;
+
+  // Longitudinal lines on handle
+  for (let t = 0; t < tubeSteps; t++) {
+    const phi = (t / tubeSteps) * Math.PI * 2;
+    const line = [];
+    for (let i = 0; i <= steps; i++) {
+      const tt = (i / steps) * Math.PI * 2;
+      const p = handlePoint(tt, phi, handleSize);
+      line.push(p);
+    }
+    lines.push({ points: line, color: '#cc4444', type: 'handle' });
+  }
+
+  // Latitudinal lines on handle
+  for (let i = 0; i <= steps; i += 4) {
+    const tt = (i / steps) * Math.PI * 2;
+    const line = [];
+    for (let t = 0; t < tubeSteps; t++) {
+      const phi = (t / tubeSteps) * Math.PI * 2;
+      const p = handlePoint(tt, phi, handleSize);
+      line.push(p);
+    }
+    lines.push({ points: line, color: '#44aa88', type: 'handle' });
+  }
+
+  return lines;
+}
+
+// ─── Render ───
+function render() {
+  time += 0.016 * animSpeed;
+
+  // Clear
+  ctx.fillStyle = '#0a0a1a';
+  ctx.fillRect(0, 0, W, H);
+
+  // Background gradient
+  const bgGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, W * 0.6);
+  bgGrad.addColorStop(0, '#1a1a3a');
+  bgGrad.addColorStop(1, '#0a0a1a');
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, W, H);
+
+  // Update rotation
+  rotY = time * 0.3;
+  rotX = 0.3 + Math.sin(time * 0.2) * 0.15;
+
+  if (viewMode === 1) {
+    rotX = Math.PI / 2 - 0.1;
+    rotY = time * 0.2;
+  } else if (viewMode === 2) {
+    rotX = 0;
+    rotY = time * 0.3;
+  }
+
+  // Generate geometry
+  const gridLines = generateGridLines();
+  const handleLines = generateHandleLines();
+
+  // Transform and project all lines
+  const allLines = [...gridLines, ...handleLines];
+  const projectedLines = [];
+
+  for (const line of allLines) {
+    const projPoints = [];
+    let avgZ = 0;
+
+    for (const p of line.points) {
+      let rp = rotateX(p, rotX);
+      rp = rotateY(rp, rotY);
+      rp = rotateZ(rp, rotZ);
+      const proj = project(rp);
+      projPoints.push(proj);
+      avgZ += proj[2];
+    }
+
+    avgZ /= projPoints.length;
+    projectedLines.push({ points: projPoints, color: line.color, type: line.type, avgZ });
+  }
+
+  // Sort by depth (painter's algorithm)
+  projectedLines.sort((a, b) => b.avgZ - a.avgZ);
+
+  // Draw surface fill (semi-transparent)
+  drawSurfaceFill(rotX, rotY, rotZ);
+
+  // Draw grid lines
+  for (const line of projectedLines) {
+    if (line.points.length < 2) continue;
+
+    ctx.beginPath();
+    ctx.moveTo(line.points[0][0], line.points[0][1]);
+
+    for (let i = 1; i < line.points.length; i++) {
+      ctx.lineTo(line.points[i][0], line.points[i][1]);
+    }
+
+    const alpha = line.type === 'handle' ? 0.6 : 0.8;
+    ctx.strokeStyle = line.color;
+    ctx.lineWidth = line.type === 'handle' ? 1.5 : 2;
+    ctx.globalAlpha = alpha;
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+  }
+
+  // Draw handle tube surface
+  drawHandleSurface(rotX, rotY, rotZ);
+
+  // Info text
+  ctx.fillStyle = '#666';
+  ctx.font = '11px monospace';
+  ctx.fillText(`Rotation: ${(rotY * 180 / Math.PI % 360).toFixed(1)}°`, 15, H - 15);
+  ctx.fillText(`Turns: ${numTurns} | Handle: ${handleSize.toFixed(1)}`, 15, H - 30);
+
+  requestAnimationFrame(render);
+}
+
+function drawSurfaceFill(rx, ry, rz) {
+  const uSteps = 25;
+  const vSteps = 50;
+  const uMin = -200, uMax = 200;
+  const vMax = numTurns * 2 * Math.PI;
+
+  ctx.globalAlpha = 0.15;
+
+  for (let i = 0; i < uSteps; i++) {
+    for (let j = 0; j < vSteps; j++) {
+      const u1 = uMin + (uMax - uMin) * (i / uSteps);
+      const u2 = uMin + (uMax - uMin) * ((i + 1) / uSteps);
+      const v1 = (j / vSteps) * vMax;
+      const v2 = ((j + 1) / vSteps) * vMax;
+
+      if (Math.abs(u1) < 20 || Math.abs(u2) < 20) continue;
+
+      const p1 = helicoidPoint(u1, v1, numTurns, handleSize);
+      const p2 = helicoidPoint(u2, v1, numTurns, handleSize);
+      const p3 = helicoidPoint(u2, v2, numTurns, handleSize);
+      const p4 = helicoidPoint(u1, v2, numTurns, handleSize);
+
+      const pts = [p1, p2, p3, p4].map(p => {
+        let rp = rotateX(p, rx);
+        rp = rotateY(rp, ry);
+        rp = rotateZ(rp, rz);
+        return project(rp);
+      });
+
+      // Color based on position
+      const avgU = (u1 + u2) / 2;
+      const t = (avgU + 200) / 400;
+      const r = Math.floor(180 + t * 75);
+      const g = Math.floor(180 + (1 - t) * 50);
+      const b = Math.floor(80);
+
+      ctx.beginPath();
+      ctx.moveTo(pts[0][0], pts[0][1]);
+      ctx.lineTo(pts[1][0], pts[1][1]);
+      ctx.lineTo(pts[2][0], pts[2][1]);
+      ctx.lineTo(pts[3][0], pts[3][1]);
+      ctx.closePath();
+      ctx.fillStyle = `rgb(${r},${g},${b})`;
+      ctx.fill();
+    }
+  }
+
+  ctx.globalAlpha = 1;
+}
+
+function drawHandleSurface(rx, ry, rz) {
+  const steps = 30;
+  const tubeSteps = 10;
+
+  ctx.globalAlpha = 0.2;
+
+  for (let i = 0; i < steps; i++) {
+    for (let j = 0; j < tubeSteps; j++) {
+      const t1 = (i / steps) * Math.PI * 2;
+      const t2 = ((i + 1) / steps) * Math.PI * 2;
+      const p1 = (j / tubeSteps) * Math.PI * 2;
+      const p2 = ((j + 1) / tubeSteps) * Math.PI * 2;
+
+      const pts = [
+        handlePoint(t1, p1, handleSize),
+        handlePoint(t2, p1, handleSize),
+        handlePoint(t2, p2, handleSize),
+        handlePoint(t1, p2, handleSize)
+      ].map(p => {
+        let rp = rotateX(p, rx);
+        rp = rotateY(rp, ry);
+        rp = rotateZ(rp, rz);
+        return project(rp);
+      });
+
+      ctx.beginPath();
+      ctx.moveTo(pts[0][0], pts[0][1]);
+      ctx.lineTo(pts[1][0], pts[1][1]);
+      ctx.lineTo(pts[2][0], pts[2][1]);
+      ctx.lineTo(pts[3][0], pts[3][1]);
+      ctx.closePath();
+      ctx.fillStyle = '#cc6644';
+      ctx.fill();
+    }
+  }
+
+  ctx.globalAlpha = 1;
+}
+
+// ─── Controls ───
+function setView(v) {
+  viewMode = v;
+  document.querySelectorAll('button').forEach((b, i) => {
+    b.classList.toggle('active', i === v);
+  });
+}
+
+function updateParams() {
+  animSpeed = parseInt(document.getElementById('speed').value) / 3;
+  numTurns = parseFloat(document.getElementById('turns').value);
+  handleSize = parseInt(document.getElementById('handleSize').value) / 10;
+}
+
+// ─── Start ───
+render();
+</script>
+</body>
+</html>

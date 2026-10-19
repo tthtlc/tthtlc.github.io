@@ -1,0 +1,399 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>5-Fold Möbius Strip – Parametric Surface</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #1a1a2e;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            color: #e0e0e0;
+        }
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+        canvas { display: block; }
+
+        #info-panel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(10, 10, 30, 0.85);
+            border: 1px solid rgba(180, 200, 50, 0.4);
+            border-radius: 12px;
+            padding: 20px 24px;
+            max-width: 380px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+        }
+        #info-panel h1 {
+            font-size: 18px;
+            color: #c8d830;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+        #info-panel .formula {
+            font-family: 'Cambria Math', 'Times New Roman', serif;
+            font-size: 15px;
+            line-height: 1.8;
+            color: #d0d8a0;
+            margin-bottom: 14px;
+            padding: 10px 14px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+            border-left: 3px solid #a0b820;
+        }
+        #info-panel .formula span.var { color: #f0e060; font-style: italic; }
+        #info-panel .params {
+            font-size: 13px;
+            color: #999;
+            line-height: 1.6;
+        }
+        #info-panel .params strong { color: #c8d830; }
+
+        #controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+            background: rgba(10, 10, 30, 0.85);
+            border: 1px solid rgba(180, 200, 50, 0.3);
+            border-radius: 12px;
+            padding: 14px 20px;
+            backdrop-filter: blur(10px);
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        #controls label {
+            font-size: 13px;
+            color: #aaa;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        #controls input[type="range"] {
+            width: 100px;
+            accent-color: #c8d830;
+        }
+        #controls button {
+            background: rgba(180, 200, 50, 0.2);
+            border: 1px solid rgba(180, 200, 50, 0.5);
+            color: #c8d830;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+        #controls button:hover {
+            background: rgba(180, 200, 50, 0.4);
+        }
+        #controls button.active {
+            background: rgba(180, 200, 50, 0.5);
+            color: #fff;
+        }
+
+        .value-display {
+            color: #c8d830;
+            font-weight: bold;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        #copyright {
+            position: absolute;
+            bottom: 80px;
+            left: 20px;
+            font-size: 11px;
+            color: rgba(200, 216, 48, 0.5);
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas-container"></div>
+
+    <div id="info-panel">
+        <h1>🌀 5-Fold Möbius Strip</h1>
+        <div class="formula">
+            <span class="var">x</span>(<span class="var">u</span>,<span class="var">v</span>) =
+            (R + <span class="var">v</span>·cos(5<span class="var">u</span>/2))·cos(<span class="var">u</span>)<br>
+            <span class="var">y</span>(<span class="var">u</span>,<span class="var">v</span>) =
+            (R + <span class="var">v</span>·cos(5<span class="var">u</span>/2))·sin(<span class="var">u</span>)<br>
+            <span class="var">z</span>(<span class="var">u</span>,<span class="var">v</span>) =
+            <span class="var">v</span>·sin(5<span class="var">u</span>/2)
+        </div>
+        <div class="params">
+            <strong>Parameters:</strong><br>
+            <span class="var">u</span> ∈ [0, 4π] &nbsp;|&nbsp;
+            <span class="var">v</span> ∈ [−w, +w]<br>
+            <strong>R</strong> = major radius &nbsp;|&nbsp;
+            <strong>w</strong> = half-width<br>
+            <strong>N</strong> = half-twists (odd = one-sided)
+        </div>
+    </div>
+
+    <div id="controls">
+        <label>Twists (N):
+            <input type="range" id="twists" min="1" max="11" step="2" value="5">
+            <span class="value-display" id="twistsVal">5</span>
+        </label>
+        <label>Width:
+            <input type="range" id="width" min="0.3" max="2.0" step="0.1" value="1.2">
+            <span class="value-display" id="widthVal">1.2</span>
+        </label>
+        <label>Radius:
+            <input type="range" id="radius" min="1.0" max="4.0" step="0.1" value="2.5">
+            <span class="value-display" id="radiusVal">2.5</span>
+        </label>
+        <label>Resolution:
+            <input type="range" id="resolution" min="50" max="400" step="10" value="200">
+            <span class="value-display" id="resVal">200</span>
+        </label>
+        <button id="toggleWireframe">Wireframe</button>
+        <button id="toggleAutoRotate" class="active">Auto Rotate</button>
+        <button id="resetView">Reset View</button>
+    </div>
+
+    <div id="copyright">©2004 Dan Leyer — Mathematical Art Recreation</div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+    <script>
+        // ─── Scene Setup ───
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+
+        // Gradient background
+        const bgCanvas = document.createElement('canvas');
+        bgCanvas.width = 512; bgCanvas.height = 512;
+        const bgCtx = bgCanvas.getContext('2d');
+        const gradient = bgCtx.createRadialGradient(256, 256, 0, 256, 256, 362);
+        gradient.addColorStop(0, '#e8e8f0');
+        gradient.addColorStop(0.5, '#8888b8');
+        gradient.addColorStop(1, '#2a2a5e');
+        bgCtx.fillStyle = gradient;
+        bgCtx.fillRect(0, 0, 512, 512);
+        const bgTexture = new THREE.CanvasTexture(bgCanvas);
+        scene.background = bgTexture;
+
+        const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(5, 4, 7);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        container.appendChild(renderer.domElement);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.08;
+        controls.autoRotate = true;
+        controls.autoRotateSpeed = 1.5;
+
+        // ─── Lighting ───
+        const ambientLight = new THREE.AmbientLight(0x404060, 0.6);
+        scene.add(ambientLight);
+
+        const dirLight1 = new THREE.DirectionalLight(0xffffff, 1.0);
+        dirLight1.position.set(5, 8, 5);
+        dirLight1.castShadow = true;
+        scene.add(dirLight1);
+
+        const dirLight2 = new THREE.DirectionalLight(0x8888cc, 0.5);
+        dirLight2.position.set(-5, -3, -5);
+        scene.add(dirLight2);
+
+        const pointLight = new THREE.PointLight(0xc8d830, 0.4, 20);
+        pointLight.position.set(0, 3, 0);
+        scene.add(pointLight);
+
+        // ─── Surface Generation ───
+        let surfaceMesh = null;
+        let wireframeMesh = null;
+        let showWireframe = false;
+
+        function createSurface(N, halfWidth, R, segmentsU, segmentsV) {
+            const geometry = new THREE.BufferGeometry();
+            const vertices = [];
+            const normals = [];
+            const colors = [];
+            const indices = [];
+
+            const uMax = 4 * Math.PI; // Full closure for odd N
+            const uStep = uMax / segmentsU;
+            const vStep = (2 * halfWidth) / segmentsV;
+
+            // Generate vertices
+            for (let i = 0; i <= segmentsU; i++) {
+                const u = i * uStep;
+                for (let j = 0; j <= segmentsV; j++) {
+                    const v = -halfWidth + j * vStep;
+
+                    const cosHalf = Math.cos(N * u / 2);
+                    const sinHalf = Math.sin(N * u / 2);
+
+                    const x = (R + v * cosHalf) * Math.cos(u);
+                    const y = (R + v * cosHalf) * Math.sin(u);
+                    const z = v * sinHalf;
+
+                    vertices.push(x, y, z);
+
+                    // Approximate normal via partial derivatives
+                    const du = 0.001;
+                    const dv = 0.001;
+
+                    const cosHalf_du = Math.cos(N * (u + du) / 2);
+                    const sinHalf_du = Math.sin(N * (u + du) / 2);
+                    const x_du = (R + v * cosHalf_du) * Math.cos(u + du);
+                    const y_du = (R + v * cosHalf_du) * Math.sin(u + du);
+                    const z_du = v * sinHalf_du;
+
+                    const cosHalf_dv = Math.cos(N * u / 2);
+                    const sinHalf_dv = Math.sin(N * u / 2);
+                    const x_dv = (R + (v + dv) * cosHalf_dv) * Math.cos(u);
+                    const y_dv = (R + (v + dv) * cosHalf_dv) * Math.sin(u);
+                    const z_dv = (v + dv) * sinHalf_dv;
+
+                    const tx = x_du - x, ty = y_du - y, tz = z_du - z;
+                    const sx = x_dv - x, sy = y_dv - y, sz = z_dv - z;
+
+                    const nx = ty * sz - tz * sy;
+                    const ny = tz * sx - tx * sz;
+                    const nz = tx * sy - ty * sx;
+                    const len = Math.sqrt(nx * nx + ny * ny + nz * nz) || 1;
+
+                    normals.push(nx / len, ny / len, nz / len);
+
+                    // Color: olive/gold gradient based on position
+                    const t = (u / uMax + v / (2 * halfWidth) + 1) / 2;
+                    const r = 0.55 + 0.25 * Math.sin(t * Math.PI * 2);
+                    const g = 0.65 + 0.20 * Math.cos(t * Math.PI * 3);
+                    const b = 0.10 + 0.10 * Math.sin(t * Math.PI);
+                    colors.push(r, g, b);
+                }
+            }
+
+            // Generate indices
+            for (let i = 0; i < segmentsU; i++) {
+                for (let j = 0; j < segmentsV; j++) {
+                    const a = i * (segmentsV + 1) + j;
+                    const b = a + segmentsV + 1;
+                    const c = a + 1;
+                    const d = b + 1;
+
+                    indices.push(a, b, c);
+                    indices.push(c, b, d);
+                }
+            }
+
+            geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+            geometry.setAttribute('normal', new THREE.Float32BufferAttribute(normals, 3));
+            geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+            geometry.setIndex(indices);
+            geometry.computeVertexNormals();
+
+            return geometry;
+        }
+
+        function buildSurface() {
+            const N = parseInt(document.getElementById('twists').value);
+            const halfWidth = parseFloat(document.getElementById('width').value);
+            const R = parseFloat(document.getElementById('radius').value);
+            const res = parseInt(document.getElementById('resolution').value);
+
+            // Remove old meshes
+            if (surfaceMesh) { scene.remove(surfaceMesh); surfaceMesh.geometry.dispose(); surfaceMesh.material.dispose(); }
+            if (wireframeMesh) { scene.remove(wireframeMesh); wireframeMesh.geometry.dispose(); wireframeMesh.material.dispose(); }
+
+            const geometry = createSurface(N, halfWidth, R, res, Math.max(20, Math.floor(res / 4)));
+
+            // Solid material
+            const material = new THREE.MeshPhongMaterial({
+                vertexColors: true,
+                side: THREE.DoubleSide,
+                shininess: 80,
+                specular: new THREE.Color(0x888840),
+                flatShading: false,
+                transparent: false,
+                opacity: 1.0
+            });
+
+            surfaceMesh = new THREE.Mesh(geometry, material);
+            surfaceMesh.castShadow = true;
+            surfaceMesh.receiveShadow = true;
+            scene.add(surfaceMesh);
+
+            // Wireframe
+            const wireGeo = new THREE.WireframeGeometry(geometry);
+            const wireMat = new THREE.LineBasicMaterial({
+                color: 0x2a3a10,
+                transparent: true,
+                opacity: 0.3
+            });
+            wireframeMesh = new THREE.LineSegments(wireGeo, wireMat);
+            wireframeMesh.visible = showWireframe;
+            scene.add(wireframeMesh);
+        }
+
+        buildSurface();
+
+        // ─── Controls ───
+        const sliders = ['twists', 'width', 'radius', 'resolution'];
+        const displays = ['twistsVal', 'widthVal', 'radiusVal', 'resVal'];
+
+        sliders.forEach((id, i) => {
+            const el = document.getElementById(id);
+            const disp = document.getElementById(displays[i]);
+            el.addEventListener('input', () => {
+                disp.textContent = el.value;
+                buildSurface();
+            });
+        });
+
+        document.getElementById('toggleWireframe').addEventListener('click', function() {
+            showWireframe = !showWireframe;
+            if (wireframeMesh) wireframeMesh.visible = showWireframe;
+            this.classList.toggle('active', showWireframe);
+        });
+
+        document.getElementById('toggleAutoRotate').addEventListener('click', function() {
+            controls.autoRotate = !controls.autoRotate;
+            this.classList.toggle('active', controls.autoRotate);
+        });
+
+        document.getElementById('resetView').addEventListener('click', () => {
+            camera.position.set(5, 4, 7);
+            controls.target.set(0, 0, 0);
+            controls.update();
+        });
+
+        // ─── Animation Loop ───
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // ─── Resize ───
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
