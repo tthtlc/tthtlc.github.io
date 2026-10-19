@@ -1,0 +1,42 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Current minus previous · five sine waves</title><style>*{box-sizing:border-box}body{background:#080d15;color:#dce8f2;font:14px system-ui;margin:0}main{max-width:1180px;padding:22px;margin:auto}h1{font-size:21px}p,small{color:#92a9bc;line-height:1.7}.views{display:grid;grid-template-columns:1fr 2fr;gap:16px}canvas{width:100%;height:350px;display:block;background:#000;border:1px solid #344c62;border-radius:7px}h2{font-size:14px;font-weight:500}.controls{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin:20px 0}button{padding:9px 14px;background:#1b3042;color:#dce8f2;border:1px solid #47617a;border-radius:6px;cursor:pointer}label{display:flex;gap:8px;align-items:center}input{width:100px;accent-color:#efc361}pre{background:#101b27;padding:15px;line-height:1.8;white-space:pre-wrap;color:#b8cfdf}@media(max-width:650px){.views{grid-template-columns:1fr}canvas{height:260px}}</style><main><h1>Five sine waves · current vector position − previous position</h1><p>Each update uses the newest vector displacement, including across the circular-buffer boundary.</p><div class="views"><section><h2>Random vector · five stored paths</h2><canvas id="vector"></canvas></section><section><h2>Modified sine waves · forty segments per wave</h2><canvas id="waves"></canvas></section></div><div class="controls"><button id="play">Pause</button><button id="step">Step all</button><button id="reset">Reset</button><label>Updates / second<input id="rate" type="range" min="1" max="90" value="30"></label><label>Offset gain<input id="gain" type="range" min="1" max="30" step=".5" value="1"><span id="gainLabel">1×</span></label></div><pre id="stats"></pre><small>All cells start at 9999.99. The first displacement uses the starting corner as the previous position. Gain 1 applies the requested calculation exactly. Displacements are added directly, not accumulated; old sine segments remain where they were generated.</small></main><script>
+'use strict';
+const EMPTY=9999.99,vectorCells=new Array(5).fill(EMPTY),waveCells=Array.from({length:5},()=>new Array(40).fill(EMPTY));
+const colors=['#efbd61','#66d0e9','#ed87b9','#aede7f','#b29afa'];
+const $=id=>document.getElementById(id),vc=$('vector'),wc=$('waves'),vctx=vc.getContext('2d'),wctx=wc.getContext('2d');
+let counter=0n,x=0,y=0,theta=Math.PI/4,omega=0,diffx=0,diffy=0,previous={x:0,y:0};
+let running=!matchMedia('(prefers-reduced-motion: reduce)').matches,last=null,acc=0,vw,vh,ww,wh;
+function gaussian(){let a=0,b=0;while(!a)a=Math.random();while(!b)b=Math.random();return Math.sqrt(-2*Math.log(a))*Math.cos(2*Math.PI*b)}
+function generateVectorPath(){let points=[{x,y}];for(let i=0;i<5;i++){let dt=1/150;omega+=-1.4*omega*dt+1.25*Math.sqrt(dt)*gaussian();omega=Math.max(-2.2,Math.min(2.2,omega));theta+=omega*dt;let dx=Math.cos(theta),dy=Math.sin(theta),remaining=.09*dt;while(remaining>1e-12){let tx=dx>1e-12?(1-x)/dx:dx< -1e-12?-x/dx:Infinity,ty=dy>1e-12?(1-y)/dy:dy< -1e-12?-y/dy:Infinity;tx=Math.max(0,tx);ty=Math.max(0,ty);let hit=Math.min(tx,ty);if(hit>remaining){x+=remaining*dx;y+=remaining*dy;remaining=0}else{x=Math.max(0,Math.min(1,x+hit*dx));y=Math.max(0,Math.min(1,y+hit*dy));points.push({x,y});remaining-=hit;if(Math.abs(tx-hit)<1e-10)dx=-dx;if(Math.abs(ty-hit)<1e-10)dy=-dy;theta=Math.atan2(dy,dx);omega=-omega}}points.push({x,y})}return {points,x,y}}
+function vm(p){let s=Math.min(vw,vh)-32;return {x:(vw-s)/2+p.x*s,y:(vh+s)/2-p.y*s}}
+function wm(p){return {x:24+(p.x+.08)/1.16*(ww-48),y:wh/2-p.y/3.2*(wh-40)}}
+function stroke(ctx,points,map,color,erase=false){ctx.beginPath();points.forEach((p,i)=>{let q=map(p);i?ctx.lineTo(q.x,q.y):ctx.moveTo(q.x,q.y)});ctx.strokeStyle=erase?'#000':color;ctx.lineWidth=erase?7:2.2;ctx.lineCap='round';ctx.lineJoin='round';ctx.stroke()}
+function render(){vctx.fillStyle='#000';vctx.fillRect(0,0,vw,vh);let s=Math.min(vw,vh)-32;vctx.strokeStyle='#3b5368';vctx.strokeRect((vw-s)/2,(vh-s)/2,s,s);for(let cell of vectorCells)if(cell!==EMPTY)stroke(vctx,cell.points,vm,'#d4b45b');let p=vm({x,y});vctx.fillStyle='#ffe547';vctx.beginPath();vctx.arc(p.x,p.y,4.5,0,2*Math.PI);vctx.fill();wctx.fillStyle='#000';wctx.fillRect(0,0,ww,wh);for(let wave=0;wave<5;wave++)for(let cell of waveCells[wave])if(cell!==EMPTY)stroke(wctx,cell,wm,colors[wave]);
+let completed=counter>0n?counter-1n:0n,ci=Number(completed%5n),pi=(ci+4)%5;
+$('stats').textContent=`Completed updates: ${counter}
+Last current slot: ${counter?ci+1:'—'} | previous slot: ${counter>1n?pi+1:'starting corner'}
+Previous position: (${previous.x.toFixed(6)}, ${previous.y.toFixed(6)})
+Current position:  (${x.toFixed(6)}, ${y.toFixed(6)})
+diffx = ${diffx.toFixed(6)} | diffy = ${diffy.toFixed(6)}
+Retained sine segments: ${counter<40n?counter:40n}/40 per wave · phases 0, π/8, π/4, 3π/8, π/2`}
+function update(){
+ const currentIndex=Number(counter%5n);
+ const previousIndex=(currentIndex+4)%5;
+ // Read the chronologically previous slot BEFORE storing the new current path.
+ const old=vectorCells[previousIndex];
+ previous=old===EMPTY?{x:0,y:0}:{x:old.x,y:old.y};
+ const current=generateVectorPath();
+ if(vectorCells[currentIndex]!==EMPTY)stroke(vctx,vectorCells[currentIndex].points,vm,'',true);
+ vectorCells[currentIndex]=current;
+ diffx=current.x-previous.x;
+ diffy=current.y-previous.y;
+ // One displacement snapshot shared by all five waves in this update.
+ const gain=Number($('gain').value),ox=gain*diffx,oy=gain*diffy,k=Number(counter%240n),index=Number(counter%40n);
+ const next=Array.from({length:5},(_,wave)=>[k/240,(k+1)/240].map(t=>({x:t+ox,y:Math.sin(4*Math.PI*t+wave*Math.PI/8)+oy})));
+ for(let wave=0;wave<5;wave++)if(waveCells[wave][index]!==EMPTY)stroke(wctx,waveCells[wave][index],wm,'',true);
+ for(let wave=0;wave<5;wave++){waveCells[wave][index]=next[wave];stroke(wctx,next[wave],wm,colors[wave])}
+ counter+=1n;render();
+}
+function resize(){for(let [c,ctx]of [[vc,vctx],[wc,wctx]]){let r=c.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,2);c.width=Math.round(r.width*d);c.height=Math.round(r.height*d);ctx.setTransform(d,0,0,d,0,0)}vw=vc.getBoundingClientRect().width;vh=vc.getBoundingClientRect().height;ww=wc.getBoundingClientRect().width;wh=wc.getBoundingClientRect().height;render()}
+function sync(){$('play').textContent=running?'Pause':'Play'}$('play').onclick=()=>{running=!running;sync()};$('step').onclick=()=>{running=false;sync();update()};$('reset').onclick=()=>{vectorCells.fill(EMPTY);waveCells.forEach(a=>a.fill(EMPTY));counter=0n;x=y=omega=diffx=diffy=acc=0;theta=Math.PI/4;previous={x:0,y:0};render()};$('gain').oninput=()=>{$('gainLabel').textContent=$('gain').value+'×'};
+function frame(now){let dt=last===null?0:Math.min((now-last)/1000,.1);last=now;if(running){acc+=dt*Number($('rate').value);while(acc>=1){update();acc-=1}}requestAnimationFrame(frame)}addEventListener('resize',resize);resize();sync();requestAnimationFrame(frame);
+</script></html>

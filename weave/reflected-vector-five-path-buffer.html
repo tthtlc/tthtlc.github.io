@@ -1,0 +1,58 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Reflected random vector · five-path buffer</title><style>*{box-sizing:border-box}body{margin:0;background:#080d15;color:#d9e5ef;font:14px system-ui}main{max-width:820px;margin:24px auto;padding:0 18px}h1{font-size:21px;font-weight:500;margin-bottom:8px}p{color:#8fa4b8;line-height:1.6}canvas{display:block;width:min(100%,66vh);aspect-ratio:1;margin:20px auto;background:#020509;border:1px solid #344c63;border-radius:3px}.controls{display:flex;justify-content:center;align-items:center;gap:14px;flex-wrap:wrap}button{background:#172b3d;color:#dce9f5;border:1px solid #37566e;border-radius:6px;padding:9px 15px;cursor:pointer}label{font-size:12px;display:flex;gap:8px;align-items:center}input{width:100px;accent-color:#ffe552}#status{text-align:center;color:#9fb6c9;font:12px monospace;line-height:1.9;margin:18px 0}.slots{display:flex;justify-content:center;gap:8px}.slot{width:52px;padding:8px;text-align:center;border:1px solid #304558;background:#15202c;color:#647f96;border-radius:4px}.occupied{background:#63501d;color:#ffe58b}.next{outline:2px solid #ffe552}small{display:block;margin-top:16px;color:#8096aa;line-height:1.6;text-align:center}</style></head><body><main><h1>Reflected random vector</h1><p>Constant-speed motion with smooth, forward-biased random steering. Starts at the top-left corner, reflects off the walls, and retains only five trail segments.</p><canvas id="box" aria-label="A yellow point moving inside a square with a five-segment trail"></canvas><div class="controls"><button id="play">Pause</button><button id="reset">Restart at corner</button><label>Speed <input id="speed" type="range" min=".025" max=".35" step=".005" value=".09"></label><label>Wandering <input id="wander" type="range" min=".15" max="2.5" step=".05" value="1"></label></div><div id="status"></div><div class="slots" id="slots"></div><small>Five independent buffer cells, initially 9999.99. The outlined cell is the next to be replaced.<br>Speed is constant between slider changes; the default is 9% of the box width per second. Space pauses/resumes.</small></main><script>
+'use strict';
+const EMPTY=9999.99,CAPACITY=5;
+const cells=new Array(CAPACITY).fill(EMPTY);
+let counter=0n,x=0,y=0,theta=Math.PI/4,angularVelocity=0;
+let running=!matchMedia('(prefers-reduced-motion: reduce)').matches;
+let last=null,accumulator=0,boxSize=500,bounces=0;
+const DT=1/60,STEPS_PER_PATH=5;
+let pendingPoints=[{x:0,y:0}],stepsInPath=0;
+const canvas=document.getElementById('box'),ctx=canvas.getContext('2d');
+const $=id=>document.getElementById(id);
+const slots=Array.from({length:5},(_,i)=>{let el=document.createElement('div');el.className='slot';el.textContent=i;$('slots').appendChild(el);return el});
+function gaussian(){let u=0,v=0;while(!u)u=Math.random();while(!v)v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)}
+function map(p){const pad=12,s=boxSize-2*pad;return {x:pad+p.x*s,y:pad+p.y*s}}
+function stroke(points,erase=false){if(points.length<2)return;ctx.beginPath();points.forEach((p,i)=>{let q=map(p);i?ctx.lineTo(q.x,q.y):ctx.moveTo(q.x,q.y)});ctx.strokeStyle=erase?'#020509':'#e9bd55';ctx.lineWidth=erase?7:2.4;ctx.lineCap='round';ctx.lineJoin='round';ctx.stroke()}
+function erasePoint(){const p=map({x,y});ctx.fillStyle='#020509';ctx.beginPath();ctx.arc(p.x,p.y,8,0,Math.PI*2);ctx.fill()}
+function render(){ctx.fillStyle='#020509';ctx.fillRect(0,0,boxSize,boxSize);ctx.strokeStyle='#3c556b';ctx.lineWidth=1;ctx.strokeRect(12,12,boxSize-24,boxSize-24);
+ const count=counter<5n?Number(counter):5,start=counter<5n?0:Number(counter%5n);
+ for(let i=0;i<count;i++){let path=cells[(start+i)%5];if(path!==EMPTY)stroke(path)}
+ // The in-progress path is deliberately not drawn: at most five stored paths are visible.
+ const p=map({x,y});ctx.fillStyle='#ffe94f';ctx.shadowColor='#ffdd33';ctx.shadowBlur=12;ctx.beginPath();ctx.arc(p.x,p.y,4.5,0,2*Math.PI);ctx.fill();ctx.shadowBlur=0;
+ $('status').textContent=`counter: ${counter} | next slot: ${counter%5n} | retained: ${count}/5 | reflections: ${bounces} | position: (${x.toFixed(3)}, ${y.toFixed(3)})`;
+ slots.forEach((el,i)=>{el.className='slot'+(cells[i]!==EMPTY?' occupied':'')+(i===Number(counter%5n)?' next':'');el.title=cells[i]===EMPTY?'9999.99':JSON.stringify(cells[i])});
+}
+function appendPath(points){const index=Number(counter%5n);if(cells[index]!==EMPTY)stroke(cells[index],true);cells[index]=points;stroke(points);counter+=1n;}
+function advance(){
+ // Correlated angular velocity produces smooth steering; small local turns favor forward motion.
+ const wander=Number($('wander').value);
+ angularVelocity+=-1.4*angularVelocity*DT+1.25*wander*Math.sqrt(DT)*gaussian();
+ angularVelocity=Math.max(-2.2,Math.min(2.2,angularVelocity));
+ theta+=angularVelocity*DT;
+ let dx=Math.cos(theta),dy=Math.sin(theta),remaining=Number($('speed').value)*DT;
+ // Resolve exact boundary intersections, retaining bounce points in the path.
+ while(remaining>1e-12){
+  let tx=dx>1e-12?(1-x)/dx:dx< -1e-12?-x/dx:Infinity;
+  let ty=dy>1e-12?(1-y)/dy:dy< -1e-12?-y/dy:Infinity;
+  tx=Math.max(0,tx);ty=Math.max(0,ty);
+  const hit=Math.min(tx,ty);
+  if(hit>remaining){x+=dx*remaining;y+=dy*remaining;remaining=0;}
+  else{
+   x=Math.max(0,Math.min(1,x+dx*hit));y=Math.max(0,Math.min(1,y+dy*hit));
+   pendingPoints.push({x,y});remaining-=hit;
+   if(Math.abs(tx-hit)<1e-10)dx=-dx;
+   if(Math.abs(ty-hit)<1e-10)dy=-dy;
+   theta=Math.atan2(dy,dx);angularVelocity=-angularVelocity;bounces++;
+  }
+ }
+ pendingPoints.push({x,y});stepsInPath++;
+ if(stepsInPath===STEPS_PER_PATH){appendPath(pendingPoints);pendingPoints=[{x,y}];stepsInPath=0;}
+}
+function resize(){boxSize=canvas.getBoundingClientRect().width;const d=Math.min(devicePixelRatio||1,2);canvas.width=Math.round(boxSize*d);canvas.height=Math.round(boxSize*d);ctx.setTransform(d,0,0,d,0,0);render()}
+function sync(){$('play').textContent=running?'Pause':'Play'}
+$('play').onclick=()=>{running=!running;sync()};
+$('reset').onclick=()=>{cells.fill(EMPTY);counter=0n;x=y=0;theta=Math.PI/4;angularVelocity=0;bounces=0;accumulator=0;pendingPoints=[{x,y}];stepsInPath=0;render()};
+addEventListener('keydown',e=>{if(e.code==='Space'&&!['INPUT','BUTTON'].includes(document.activeElement.tagName)){e.preventDefault();running=!running;sync()}});
+function frame(now){const dt=last===null?0:Math.min((now-last)/1000,.1);last=now;if(running){erasePoint();accumulator+=dt;while(accumulator>=DT){advance();accumulator-=DT;}render();}requestAnimationFrame(frame)}
+addEventListener('resize',resize);resize();sync();requestAnimationFrame(frame);
+</script></body></html>

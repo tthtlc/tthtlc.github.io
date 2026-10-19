@@ -1,0 +1,67 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Five synchronized sine-wave buffers</title><style>*{box-sizing:border-box}body{margin:0;background:#080c12;color:#dce6ef;font:14px system-ui}main{max-width:1150px;margin:28px auto;padding:0 20px}h1{font-size:21px;font-weight:500}p{color:#94a7b8;line-height:1.6}canvas{display:block;width:100%;height:380px;background:#000;border:1px solid #293b4d;border-radius:10px}.controls{display:flex;flex-wrap:wrap;align-items:center;gap:16px;margin:18px 0}button{background:#182d3d;color:#e1edf6;border:1px solid #39576e;border-radius:6px;padding:9px 15px;cursor:pointer}input{accent-color:#e9b75b}label{display:flex;align-items:center;gap:8px}#status{font:12px monospace;margin-bottom:20px;color:#bed1e0}.row{display:flex;align-items:center;gap:12px;margin:9px 0}.name{width:120px;flex-shrink:0;font:12px monospace}.slots{flex:1;display:grid;grid-template-columns:repeat(40,1fr);gap:3px}.slot{height:19px;background:#182532;border:1px solid #2b3c4b;border-radius:2px}.next{outline:2px solid white;outline-offset:1px}small{display:block;margin-top:18px;color:#859bae;line-height:1.6}@media(max-width:600px){.name{width:90px;font-size:10px}.slots{gap:2px}.slot{height:16px}}</style><main><h1>Five sine waves · synchronized 40-slot buffers</h1><p>Phases: 0, π/8, π/4, 3π/8, π/2. Each update calculates and draws one segment for all five waves before the next update begins.</p><canvas id="plot" aria-label="Five phase-shifted sine waves, each retaining forty segments"></canvas><div class="controls"><button id="play">Pause</button><button id="step">Step all five</button><button id="reset">Reset</button><label>Updates / second <input id="rate" type="range" min="1" max="120" value="30"><span id="rateValue">30</span></label></div><div id="status"></div><div id="buffers"></div><small>Each row is a separate 40-slot array. Empty cells contain 9999.99; colored cells hold segment coordinates. The white outline marks counter % 40. At capacity there are 200 retained segments: 40 per wave.</small></main><script>
+'use strict';
+const WAVE_COUNT=5, CAPACITY=40, EMPTY=9999.99, SEGMENTS_PER_SWEEP=240;
+// Five independent arrays, not five references to the same array.
+const buffers=Array.from({length:WAVE_COUNT},()=>new Array(CAPACITY).fill(EMPTY));
+const colors=['#f3bd61','#65d2ec','#ec88ba','#a9dd7c','#b39aff'];
+const phaseNames=['0','π/8','π/4','3π/8','π/2'];
+let counter=0n, running=!matchMedia('(prefers-reduced-motion: reduce)').matches;
+let width=0,height=380,last=null,accumulator=0;
+const $=id=>document.getElementById(id),canvas=$('plot'),ctx=canvas.getContext('2d');
+const slotElements=Array.from({length:WAVE_COUNT},(_,wave)=>{
+ const row=document.createElement('div');row.className='row';
+ const name=document.createElement('div');name.className='name';name.style.color=colors[wave];name.textContent=`${wave+1}: φ=${phaseNames[wave]}`;
+ const slots=document.createElement('div');slots.className='slots';row.append(name,slots);$('buffers').appendChild(row);
+ return Array.from({length:CAPACITY},()=>{const el=document.createElement('div');el.className='slot';slots.appendChild(el);return el;});
+});
+function generateSegment(sequence,wave){
+ const k=Number(sequence%BigInt(SEGMENTS_PER_SWEEP));
+ const x1=k/SEGMENTS_PER_SWEEP,x2=(k+1)/SEGMENTS_PER_SWEEP;
+ const phase=wave*Math.PI/8;
+ return {x1,y1:Math.sin(4*Math.PI*x1+phase),x2,y2:Math.sin(4*Math.PI*x2+phase)};
+}
+function drawSegment(segment,wave,erase=false){
+ const pad=24,sx=width-2*pad,amplitude=height*.32;
+ ctx.beginPath();ctx.moveTo(pad+segment.x1*sx,height/2-amplitude*segment.y1);
+ ctx.lineTo(pad+segment.x2*sx,height/2-amplitude*segment.y2);
+ ctx.strokeStyle=erase?'#000':colors[wave];ctx.lineWidth=erase?6:2.2;ctx.lineCap='round';ctx.stroke();
+}
+function repaintRetained(){
+ // Repair crossings and shared endpoints using only the saved coordinates.
+ ctx.fillStyle='#000';ctx.fillRect(0,0,width,height);
+ for(let wave=0;wave<WAVE_COUNT;wave++)for(const segment of buffers[wave])if(segment!==EMPTY)drawSegment(segment,wave);
+}
+function updateStatus(){
+ const retained=counter<40n?Number(counter):40,index=Number(counter%40n);
+ $('status').textContent=`completed updates: ${counter} | next slot: ${index} | per wave: ${retained}/40 | total: ${retained*5}/200`;
+ for(let wave=0;wave<WAVE_COUNT;wave++)for(let i=0;i<CAPACITY;i++){
+  const el=slotElements[wave][i],segment=buffers[wave][i];
+  el.className='slot'+(i===index?' next':'');el.style.background=segment===EMPTY?'':colors[wave];
+  el.title=segment===EMPTY?'9999.99':JSON.stringify(segment);
+ }
+}
+function advanceAllFive(){
+ const index=Number(counter%40n);
+ // Stage 1: calculate this update's five segments, with the same counter.
+ const nextSegments=Array.from({length:WAVE_COUNT},(_,wave)=>generateSegment(counter,wave));
+ // Stage 2: erase all five old segments before drawing replacements.
+ for(let wave=0;wave<WAVE_COUNT;wave++)if(buffers[wave][index]!==EMPTY)drawSegment(buffers[wave][index],wave,true);
+ // Stage 3: store and render all five new segments synchronously.
+ for(let wave=0;wave<WAVE_COUNT;wave++){
+  buffers[wave][index]=nextSegments[wave];
+  drawSegment(nextSegments[wave],wave);
+ }
+ repaintRetained();
+ // Barrier: increment only AFTER all five waves have been rendered.
+ counter+=1n;
+ updateStatus();
+}
+function resize(){width=canvas.getBoundingClientRect().width;const d=Math.min(devicePixelRatio||1,2);canvas.width=Math.round(width*d);canvas.height=Math.round(height*d);ctx.setTransform(d,0,0,d,0,0);repaintRetained()}
+function sync(){$('play').textContent=running?'Pause':'Play'}
+$('play').onclick=()=>{running=!running;sync()};
+$('step').onclick=()=>{running=false;sync();advanceAllFive()};
+$('reset').onclick=()=>{buffers.forEach(buffer=>buffer.fill(EMPTY));counter=0n;accumulator=0;repaintRetained();updateStatus()};
+$('rate').oninput=()=>{$('rateValue').textContent=$('rate').value};
+function frame(now){const dt=last===null?0:Math.min((now-last)/1000,.1);last=now;if(running){accumulator+=dt*Number($('rate').value);while(accumulator>=1){advanceAllFive();accumulator-=1}}requestAnimationFrame(frame)}
+addEventListener('resize',resize);resize();updateStatus();sync();requestAnimationFrame(frame);
+</script></html>
