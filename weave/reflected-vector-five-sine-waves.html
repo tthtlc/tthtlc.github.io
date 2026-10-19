@@ -1,0 +1,111 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Reflected walker · five sine ribbons along the path</title><style>
+*{box-sizing:border-box}body{margin:0;background:#080d15;color:#d9e5ef;font:14px system-ui}main{max-width:840px;margin:24px auto;padding:0 18px}h1{font-size:21px;font-weight:500;margin-bottom:8px}p{color:#8fa4b8;line-height:1.6}canvas{display:block;width:min(100%,66vh);aspect-ratio:1;margin:20px auto;background:#020509;border:1px solid #344c63;border-radius:3px}.controls{display:flex;justify-content:center;align-items:center;gap:14px;flex-wrap:wrap}button{background:#172b3d;color:#dce9f5;border:1px solid #37566e;border-radius:6px;padding:9px 15px;cursor:pointer}label{font-size:12px;display:flex;gap:8px;align-items:center}input{width:100px;accent-color:#ffe552}#status{text-align:center;color:#9fb6c9;font:12px monospace;line-height:1.9;margin:18px 0}.legend{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin:4px 0}small{display:block;margin-top:16px;color:#8096aa;line-height:1.6;text-align:center}</style></head><body><main>
+<h1>Reflected walker · five sine ribbons along the path</h1>
+<p>Combines <em>reflected-vector-five-path-buffer</em> (the traversal generator) with <em>five-sine-waves-synchronized-buffers</em> (the wave engine). A constant-speed point steers forward-biased and reflects off the walls. Its <b>direction of movement</b> drives five phase-shifted sine waves (φ = 0, π/8, π/4, 3π/8, π/2) that follow the walker's path as one continuous ribbon — the ribbon extends as far as the walker has travelled, turns as the walker turns, and the crests keep flowing in the direction of travel, never stopping.</p>
+<canvas id="box" aria-label="A yellow point reflecting inside a square while five phase-shifted sine ribbons follow its path"></canvas>
+<div class="controls">
+<button id="play">Pause</button><button id="reset">Restart at corner</button>
+<label>Speed <input id="speed" type="range" min=".025" max=".35" step=".005" value=".09"></label>
+<label>Wandering <input id="wander" type="range" min=".15" max="2.5" step=".05" value="1"></label>
+</div>
+<div id="status"></div>
+<div class="legend" id="legend"></div>
+<small>The faint gold line is the walker's actual path; the five coloured ribbons oscillate perpendicular to it. Each ribbon keeps a rolling window of the path (≈2.5 box-widths of forward motion) and the phase travels along it, so the waves flow forward continuously. Space pauses/resumes. Speed is 9% of the box per second.</small>
+</main><script>
+'use strict';
+const DT=1/60;
+const WAVE_COUNT=5;
+const WAVE_COLORS=['#f3bd61','#65d2ec','#ec88ba','#a9dd7c','#b39aff'];
+const PHASE_LABELS=['0','π/8','π/4','3π/8','π/2'];
+const PHASES=PHASE_LABELS.map((_,i)=>i*Math.PI/8);
+const LAMBDA=.14,V_PHASE=.12,AMP=.055;
+const K=2*Math.PI/LAMBDA,OMEGA=K*V_PHASE;
+const MAX_ARC=2.5,SPACING=.004;
+
+let x=0,y=0,theta=Math.PI/4,angularVelocity=0;
+let simTime=0,bounces=0;
+let running=!matchMedia('(prefers-reduced-motion: reduce)').matches;
+let last=null,accumulator=0,boxSize=500;
+let trail=[]; // {x,y,nx,ny,s}: position, unit normal (perpendicular to heading), cumulative arc length
+
+const canvas=document.getElementById('box'),ctx=canvas.getContext('2d');
+const $=id=>document.getElementById(id);
+const legend=$('legend');
+WAVE_COLORS.forEach((c,i)=>{const el=document.createElement('span');el.style.cssText=`color:${c};font:11px monospace;display:inline-flex;gap:4px;align-items:center`;el.textContent=`φ=${PHASE_LABELS[i]}`;legend.appendChild(el)});
+
+function gaussian(){let u=0,v=0;while(!u)u=Math.random();while(!v)v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)}
+function mapPoint(p){const pad=12,s=boxSize-2*pad;return{x:pad+p.x*s,y:pad+p.y*s}}
+
+function appendTrail(){
+ const dx=Math.cos(theta),dy=Math.sin(theta),nx=-dy,ny=dx;
+ const prev=trail.length?trail[trail.length-1]:null;
+ if(prev){
+  const d=Math.hypot(x-prev.x,y-prev.y);
+  if(d<SPACING)return;
+  trail.push({x,y,nx,ny,s:prev.s+d});
+ }else trail.push({x,y,nx,ny,s:0});
+ while(trail.length>1&&trail[trail.length-1].s-trail[0].s>MAX_ARC)trail.shift();
+}
+
+function render(){
+ ctx.fillStyle='#020509';ctx.fillRect(0,0,boxSize,boxSize);
+ const pad=12,side=boxSize-2*pad;
+ ctx.strokeStyle='#3c556b';ctx.lineWidth=1;ctx.strokeRect(pad,pad,side,side);
+ if(trail.length>=2){
+  ctx.save();ctx.beginPath();ctx.rect(pad,pad,side,side);ctx.clip();
+  // spine: the walker's actual path
+  ctx.beginPath();trail.forEach((p,i)=>{const q=mapPoint(p);i?ctx.lineTo(q.x,q.y):ctx.moveTo(q.x,q.y)});
+  ctx.strokeStyle='rgba(233,189,85,.26)';ctx.lineWidth=1.4;ctx.stroke();
+  // five sine ribbons, each oscillating perpendicular to the path and flowing forward
+  for(let w=0;w<WAVE_COUNT;w++){
+   ctx.beginPath();
+   trail.forEach((p,i)=>{
+    const off=AMP*Math.sin(K*p.s-OMEGA*simTime+PHASES[w]);
+    const q=mapPoint({x:p.x+off*p.nx,y:p.y+off*p.ny});
+    i?ctx.lineTo(q.x,q.y):ctx.moveTo(q.x,q.y);
+   });
+   ctx.strokeStyle=WAVE_COLORS[w];ctx.lineWidth=1.7;ctx.lineJoin='round';ctx.lineCap='round';ctx.stroke();
+  }
+  ctx.restore();
+ }
+ const p=mapPoint({x,y});ctx.fillStyle='#ffe94f';ctx.shadowColor='#ffdd33';ctx.shadowBlur=12;ctx.beginPath();ctx.arc(p.x,p.y,4.5,0,2*Math.PI);ctx.fill();ctx.shadowBlur=0;
+ updateStatus();
+}
+
+function advance(){
+ const wander=Number($('wander').value);
+ angularVelocity+=-1.4*angularVelocity*DT+1.25*wander*Math.sqrt(DT)*gaussian();
+ angularVelocity=Math.max(-2.2,Math.min(2.2,angularVelocity));
+ theta+=angularVelocity*DT;
+ let dx=Math.cos(theta),dy=Math.sin(theta),remaining=Number($('speed').value)*DT;
+ while(remaining>1e-12){
+  let tx=dx>1e-12?(1-x)/dx:dx< -1e-12?-x/dx:Infinity;
+  let ty=dy>1e-12?(1-y)/dy:dy< -1e-12?-y/dy:Infinity;
+  tx=Math.max(0,tx);ty=Math.max(0,ty);
+  const hit=Math.min(tx,ty);
+  if(hit>remaining){x+=dx*remaining;y+=dy*remaining;remaining=0;}
+  else{
+   x=Math.max(0,Math.min(1,x+dx*hit));y=Math.max(0,Math.min(1,y+dy*hit));
+   remaining-=hit;
+   if(Math.abs(tx-hit)<1e-10)dx=-dx;
+   if(Math.abs(ty-hit)<1e-10)dy=-dy;
+   theta=Math.atan2(dy,dx);angularVelocity=-angularVelocity;bounces++;
+  }
+ }
+ appendTrail();
+ simTime+=DT;
+}
+
+function updateStatus(){
+ const len=trail.length?trail[trail.length-1].s:0,deg=((theta*180/Math.PI)%360+360)%360;
+ $('status').textContent=`path travelled: ${len.toFixed(2)} | ribbon window: ${Math.min(len,MAX_ARC).toFixed(2)}/${MAX_ARC.toFixed(1)} | points: ${trail.length} | reflections: ${bounces} | heading: ${deg.toFixed(0)}°`;
+}
+
+function resize(){boxSize=canvas.getBoundingClientRect().width;const d=Math.min(devicePixelRatio||1,2);canvas.width=Math.round(boxSize*d);canvas.height=Math.round(boxSize*d);ctx.setTransform(d,0,0,d,0,0);render()}
+function sync(){$('play').textContent=running?'Pause':'Play'}
+$('play').onclick=()=>{running=!running;sync()};
+$('reset').onclick=()=>{x=y=0;theta=Math.PI/4;angularVelocity=0;bounces=0;accumulator=0;trail=[];simTime=0;render()};
+addEventListener('keydown',e=>{if(e.code==='Space'&&!['INPUT','BUTTON'].includes(document.activeElement.tagName)){e.preventDefault();running=!running;sync()}});
+function frame(now){const dt=last===null?0:Math.min((now-last)/1000,.1);last=now;if(running){accumulator+=dt;while(accumulator>=DT){advance();accumulator-=DT}render()}requestAnimationFrame(frame)}
+addEventListener('resize',resize);resize();sync();requestAnimationFrame(frame);
+</script></body></html>

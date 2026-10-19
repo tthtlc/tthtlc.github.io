@@ -1,0 +1,253 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interactive Boy's Surface - Dynamic Dot Mesh</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #090a0f;
+      color: #e0e6ed;
+      font-family: system-ui, -apple-system, sans-serif;
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      cursor: grab;
+    }
+    canvas:active { cursor: grabbing; }
+
+    /* Controls overlay with scrollable parameters */
+    .controls-panel {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      width: 280px;
+      max-height: calc(100vh - 40px);
+      overflow-y: auto;
+      background: rgba(15, 18, 25, 0.85);
+      padding: 18px;
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+
+    h1 { font-size: 1.1rem; font-weight: 600; margin-bottom: 4px; color: #fff; }
+    p.subtitle { font-size: 0.8rem; color: #8a99ad; margin-bottom: 16px; }
+
+    .control-group {
+      margin-bottom: 14px;
+    }
+    .control-group label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: #c2d0e0;
+      margin-bottom: 6px;
+    }
+    .control-group input[type="range"] {
+      width: 100%;
+      accent-color: #00d2ff;
+      cursor: pointer;
+    }
+
+    /* Scrollbar styling for controls panel */
+    .controls-panel::-webkit-scrollbar {
+      width: 6px;
+    }
+    .controls-panel::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 3px;
+    }
+    .controls-panel::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 3px;
+    }
+    .controls-panel::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.4);
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="canvas"></canvas>
+
+  <div class="controls-panel">
+    <h1>Boy's Surface</h1>
+    <p class="subtitle">Bryant–Kusner Dynamic Dot Mesh</p>
+
+    <div class="control-group">
+      <label>U Steps (Density) <span id="valU">60</span></label>
+      <input type="range" id="sliderU" min="20" max="120" value="60" />
+    </div>
+
+    <div class="control-group">
+      <label>V Steps (Density) <span id="valV">60</span></label>
+      <input type="range" id="sliderV" min="20" max="120" value="60" />
+    </div>
+
+    <div class="control-group">
+      <label>Dot Radius <span id="valRadius">1.8</span></label>
+      <input type="range" id="sliderRadius" min="0.5" max="5.0" step="0.1" value="1.8" />
+    </div>
+
+    <div class="control-group">
+      <label>Color Shift Speed <span id="valSpeed">1.0</span></label>
+      <input type="range" id="sliderSpeed" min="0.1" max="3.0" step="0.1" value="1.0" />
+    </div>
+
+    <div class="control-group">
+      <label>Auto-Rotation Speed <span id="valRotSpeed">1.0</span></label>
+      <input type="range" id="sliderRotSpeed" min="0" max="3.0" step="0.1" value="1.0" />
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+
+    let width, height;
+    function resize() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // UI Parameters
+    const sliderU = document.getElementById('sliderU');
+    const sliderV = document.getElementById('sliderV');
+    const sliderRadius = document.getElementById('sliderRadius');
+    const sliderSpeed = document.getElementById('sliderSpeed');
+    const sliderRotSpeed = document.getElementById('sliderRotSpeed');
+
+    sliderU.oninput = (e) => document.getElementById('valU').textContent = e.target.value;
+    sliderV.oninput = (e) => document.getElementById('valV').textContent = e.target.value;
+    sliderRadius.oninput = (e) => document.getElementById('valRadius').textContent = e.target.value;
+    sliderSpeed.oninput = (e) => document.getElementById('valSpeed').textContent = e.target.value;
+    sliderRotSpeed.oninput = (e) => document.getElementById('valRotSpeed').textContent = e.target.value;
+
+    // Camera State
+    let rotX = 0.4, rotY = 0.6;
+    let zoom = 220;
+    let isDragging = false;
+    let prevMouse = { x: 0, y: 0 };
+
+    window.addEventListener('mousedown', (e) => {
+      // Don't trigger rotation drag if clicking inside the control panel
+      if (e.target.closest('.controls-panel')) return;
+      isDragging = true;
+      prevMouse = { x: e.clientX, y: e.clientY };
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      const dx = e.clientX - prevMouse.x;
+      const dy = e.clientY - prevMouse.y;
+      rotY += dx * 0.005;
+      rotX += dy * 0.005;
+      prevMouse = { x: e.clientX, y: e.clientY };
+    });
+
+    window.addEventListener('mouseup', () => isDragging = false);
+    window.addEventListener('wheel', (e) => {
+      zoom *= e.deltaY > 0 ? 0.92 : 1.08;
+    });
+
+    // Bryant–Kusner Parametrization for Boy's Surface
+    function getBoyPoint(u, v) {
+      const cosU = Math.cos(u), sinU = Math.sin(u);
+      const cosV = Math.cos(v), sinV = Math.sin(v);
+      const cos2U = Math.cos(2*u), sin2U = Math.sin(2*u);
+      const sin3U = Math.sin(3*u), sin2V = Math.sin(2*v);
+
+      const sqrt2 = Math.SQRT2;
+      const denom = 2 - sqrt2 * sin3U * sin2V;
+
+      const x = (sqrt2 * cos2U * cosV * cosV + cosU * sin2V) / denom;
+      const y = (sqrt2 * sin2U * cosV * cosV - sinU * sin2V) / denom;
+      const z = (3 * cosV * cosV) / denom;
+
+      return { x, y: y - 0.7, z: z - 0.7 }; // Center geometry offset
+    }
+
+    // 3D Projection & Dynamic World Rotation
+    function project(p) {
+      let x1 = p.x * Math.cos(rotY) + p.z * Math.sin(rotY);
+      let y1 = p.y;
+      let z1 = -p.x * Math.sin(rotY) + p.z * Math.cos(rotY);
+
+      let x2 = x1;
+      let y2 = y1 * Math.cos(rotX) - z1 * Math.sin(rotX);
+      let z2 = y1 * Math.sin(rotX) + z1 * Math.cos(rotX);
+
+      return {
+        x: width / 2 + x2 * zoom,
+        y: height / 2 + y2 * zoom,
+        z: z2
+      };
+    }
+
+    let time = 0;
+
+    function render() {
+      // 1. Erase previous frame entirely
+      ctx.fillStyle = '#090a0f';
+      ctx.fillRect(0, 0, width, height);
+
+      // 2. Slow continuous auto-rotation (pauses during manual drag)
+      const rotSpeed = parseFloat(sliderRotSpeed.value);
+      if (!isDragging && rotSpeed > 0) {
+        rotY += 0.004 * rotSpeed;
+        rotX += 0.0015 * rotSpeed;
+      }
+
+      // Read parameter slider values
+      const stepsU = parseInt(sliderU.value);
+      const stepsV = parseInt(sliderV.value);
+      const dotRadius = parseFloat(sliderRadius.value);
+      const colorSpeed = parseFloat(sliderSpeed.value);
+
+      time += 0.5 * colorSpeed;
+      const totalDots = stepsU * stepsV;
+
+      // 3. Re-generate dots dynamically each frame
+      let dotIndex = 0;
+      for (let i = 0; i < stepsU; i++) {
+        const u = (i / stepsU) * Math.PI;
+        for (let j = 0; j < stepsV; j++) {
+          const v = (j / stepsV) * Math.PI;
+
+          const point3D = getBoyPoint(u, v);
+          const proj = project(point3D);
+
+          // Slight continuous hue shift from dot-to-dot + animated time shift
+          const hue = ((dotIndex / totalDots) * 360 + time) % 360;
+          const lightness = Math.max(25, Math.min(80, 50 + proj.z * 18)); // Depth shading
+
+          ctx.fillStyle = `hsl(${hue}, 90%, ${lightness}%)`;
+
+          // Draw animated dot
+          ctx.beginPath();
+          ctx.arc(proj.x, proj.y, dotRadius, 0, Math.PI * 2);
+          ctx.fill();
+
+          dotIndex++;
+        }
+      }
+
+      requestAnimationFrame(render);
+    }
+
+    render();
+  </script>
+</body>
+</html>
