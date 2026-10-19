@@ -1,3 +1,4 @@
+rotating_circle_trace.html
 elliptical-torus.html
 saddle-wave-torus.html
 fluted-torus.html
@@ -16,12 +17,7 @@ tapered-torus.html
 braided-torus.html
 wireframe-torus.html
 moire-torus.html
-crystalline-growth-torus.html
-contour-line-torus.html
 ribbon-wrap-torus.html
-lace-shell-torus.html
-interlocked-pair.html
-nested-tilted-tori.html
 orbital-torus-bouquet.html
 exploded-torus.html
 torus-knot-sculpture.html

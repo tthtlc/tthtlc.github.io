@@ -226,6 +226,10 @@
     title: Rotating Circle Shape
     tags:
     - Rotating
+  - file: rotating_circle_trace.html
+    title: Rotating Circle with Hypotrochoid Trace
+    tags:
+    - Rotating
   - file: spirograph.html
     title: Circle Rotation Contour
     tags: []
@@ -663,18 +667,8 @@
   - file: braided-torus.html
     title: Braided torus — Interactive Study
     tags: []
-  - file: clickme_mobius_manual1.html
-    title: Möbius Strip Wireframe with Gradient
-    tags:
-    - Manual
-  - file: contour-line-torus.html
-    title: Contour-line torus — Interactive Study
-    tags: []
   - file: contour-slice-torus.html
     title: Contour-slice torus — Interactive Study
-    tags: []
-  - file: crystalline-growth-torus.html
-    title: Crystalline-growth torus — Interactive Study
     tags: []
   - file: cut-paper-torus.html
     title: Cut-paper torus — Interactive Study
@@ -720,6 +714,9 @@
   - file: fluted-torus.html
     title: Fluted Torus — Interactive Study
     tags: []
+  - file: generalized_mobius_strip.html
+    title: Möbius Strip Wireframe — twists · density · size
+    tags: []
   - file: gradient-halo-torus.html
     title: Gradient halo — Interactive Study
     tags:
@@ -742,9 +739,6 @@
   - file: icosahedron_surface.html
     title: Icosahedron with Centroid Lines
     tags: []
-  - file: interlocked-pair.html
-    title: Interlocked Pair — Interactive Study
-    tags: []
   - file: klein2_animation.html
     title: Klein Bottle Line Drawing
     tags: []
@@ -759,9 +753,6 @@
     tags: []
   - file: klein_bottle.html
     title: Klein Bottle Visualization
-    tags: []
-  - file: lace-shell-torus.html
-    title: Lace-shell Torus — Interactive Study
     tags: []
   - file: mobius.html
     title: Möbius Strip Wireframe
@@ -780,9 +771,6 @@
     tags: []
   - file: moire-torus.html
     title: Moiré torus — Interactive Study
-    tags: []
-  - file: nested-tilted-tori.html
-    title: Nested Tilted Tori — Interactive Study
     tags: []
   - file: orbital-torus-bouquet.html
     title: Orbital Torus Bouquet — Interactive Study

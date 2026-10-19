@@ -40,13 +40,10 @@
 - circular_thread.html
 - claude_game_touch.html
 - clickme_circle_on_circle.html
-- clickme_mobius_manual1.html
 - concentric.html
-- contour-line-torus.html
 - contour-slice-torus.html
 - conway.html
 - counter_rotating_sector.html
-- crystalline-growth-torus.html
 - cubic.html
 - cut-paper-torus.html
 - diamond2.html
@@ -133,6 +130,7 @@
 - four_petal_rotate.html
 - fractal_fern.html
 - generalized_ellipse_windings.html
+- generalized_mobius_strip.html
 - generalized_vicsek_fractal_multiple.html
 - geometric-studies.html
 - gradient-halo-torus.html
@@ -172,7 +170,6 @@
 - interactive_boy_surface.html
 - interactive_boy_surface_gradient_mesh.html
 - interactive_boy_surface_mesh_dot.html
-- interlocked-pair.html
 - islamic_spiral.html
 - islamic_spiral2.html
 - julia_set.html
@@ -183,7 +180,6 @@
 - klein_bottle.html
 - koch_snowflake.html
 - koch_snowflake_multiple.html
-- lace-shell-torus.html
 - lemniscate.html
 - lemniscate2_fixed.html
 - lemniscate2_radiating.html
@@ -211,7 +207,6 @@
 - moving_square.html
 - moving_square_rotate.html
 - moving_square_rotate_double.html
-- nested-tilted-tori.html
 - octagon_auto_rotate.html
 - orbital-torus-bouquet.html
 - parametric_curve1.html
@@ -254,6 +249,7 @@
 - rotating_cardiod_line4.html
 - rotating_chasing_3gon.html
 - rotating_circle.html
+- rotating_circle_trace.html
 - rotating_diamond.html
 - rotating_ellipse.html
 - rotating_ellipse4.html
