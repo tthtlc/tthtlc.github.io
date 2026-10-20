@@ -1,571 +1,464 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Genus-One Helicoid — Interactive 3D</title>
-<style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    background: #0a0a1a;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    font-family: 'Segoe UI', sans-serif;
-    color: #eee;
-    overflow: hidden;
-  }
-  h1 {
-    margin: 10px 0 4px;
-    font-size: 1.2rem;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: #f0d060;
-  }
-  .subtitle {
-    font-size: 0.7rem;
-    color: #777;
-    margin-bottom: 10px;
-    letter-spacing: 1px;
-  }
-  canvas {
-    border-radius: 12px;
-    box-shadow: 0 0 50px rgba(240, 200, 80, 0.12);
-    background: #0a0a1a;
-  }
-  .controls {
-    margin: 12px 0;
-    display: flex;
-    gap: 14px;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    max-width: 800px;
-  }
-  .control-group {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background: rgba(255,255,255,0.04);
-    padding: 6px 12px;
-    border-radius: 20px;
-    border: 1px solid rgba(240,208,96,0.15);
-  }
-  .control-group label {
-    font-size: 0.72rem;
-    color: #bbb;
-    white-space: nowrap;
-  }
-  .control-group .val {
-    font-size: 0.7rem;
-    color: #f0d060;
-    min-width: 28px;
-    text-align: right;
-    font-family: monospace;
-  }
-  input[type="range"] {
-    accent-color: #f0d060;
-    width: 90px;
-  }
-  button {
-    padding: 7px 16px;
-    border: 2px solid #f0d060;
-    background: transparent;
-    color: #f0d060;
-    border-radius: 20px;
-    cursor: pointer;
-    font-size: 0.78rem;
-    transition: all 0.3s;
-    font-weight: 600;
-  }
-  button:hover, button.active {
-    background: #f0d060;
-    color: #0a0a1a;
-  }
-  .mode-toggle {
-    display: flex;
-    gap: 0;
-    border-radius: 20px;
-    overflow: hidden;
-    border: 2px solid #f0d060;
-  }
-  .mode-toggle button {
-    border: none;
-    border-radius: 0;
-    padding: 7px 14px;
-  }
-  .mode-toggle button.active {
-    background: #f0d060;
-    color: #0a0a1a;
-  }
-  .info {
-    position: absolute;
-    bottom: 10px;
-    left: 15px;
-    font-size: 0.65rem;
-    color: #555;
-    font-family: monospace;
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Genus-One Helicoid – Parametric Surface</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #090a0f;
+            font-family: 'STIX Two Text', 'Source Serif', Georgia, 'Times New Roman', serif;
+            overflow: hidden;
+            color: #e0e6ed;
+        }
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+        canvas { display: block; }
+
+        #info-panel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(15, 18, 25, 0.85);
+            border: 1px solid rgba(0, 210, 255, 0.4);
+            border-radius: 12px;
+            padding: 20px 24px;
+            max-width: 400px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+        #info-panel h1 {
+            font-size: 18px;
+            color: #00d2ff;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+        #info-panel .formula {
+            font-family: 'STIX Two Text', 'Source Serif', Georgia, 'Times New Roman', serif;
+            font-size: 14px;
+            line-height: 1.8;
+            color: #a8d8e8;
+            margin-bottom: 14px;
+            padding: 10px 14px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+        }
+        #info-panel .formula span.var { color: #7ff0ff; font-style: italic; }
+        #info-panel .formula .num { color: #e0f0ff; }
+        #info-panel .formula .den { color: #ff9df0; }
+        #info-panel .params {
+            font-size: 13px;
+            color: #8a99ad;
+            line-height: 1.6;
+        }
+        #info-panel .params strong { color: #00d2ff; }
+
+        #controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+            background: rgba(15, 18, 25, 0.85);
+            border: 1px solid rgba(0, 210, 255, 0.3);
+            border-radius: 12px;
+            padding: 14px 20px;
+            backdrop-filter: blur(10px);
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        #controls label {
+            font-size: 13px;
+            color: #c2d0e0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        #controls input[type="range"] {
+            width: 100px;
+            accent-color: #00d2ff;
+        }
+        #controls button {
+            background: rgba(0, 210, 255, 0.15);
+            border: 1px solid rgba(0, 210, 255, 0.5);
+            color: #00d2ff;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+        #controls button:hover {
+            background: rgba(0, 210, 255, 0.35);
+        }
+        #controls button.active {
+            background: rgba(0, 210, 255, 0.5);
+            color: #fff;
+        }
+
+        .value-display {
+            color: #00d2ff;
+            font-weight: bold;
+            min-width: 30px;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
-
-<h1>Genus-One Helicoid</h1>
-<div class="subtitle">Minimal surface · genus 1 · interactive 3D</div>
-<canvas id="canvas" width="800" height="650"></canvas>
-
-<div class="controls">
-  <div class="control-group">
-    <label>Speed</label>
-    <input type="range" id="speed" min="0" max="100" value="30">
-    <span class="val" id="speedVal">0.30</span>
-  </div>
-  <div class="control-group">
-    <label>Line Density</label>
-    <input type="range" id="density" min="5" max="60" value="24">
-    <span class="val" id="densityVal">24</span>
-  </div>
-  <div class="control-group">
-    <label>Turns</label>
-    <input type="range" id="turns" min="1" max="5" value="2" step="0.5">
-    <span class="val" id="turnsVal">2.0</span>
-  </div>
-  <div class="control-group">
-    <label>Handle</label>
-    <input type="range" id="handle" min="0" max="100" value="50">
-    <span class="val" id="handleVal">0.50</span>
-  </div>
-  <div class="mode-toggle">
-    <button id="btnLines" class="active" onclick="setRenderMode('lines')">Wireframe</button>
-    <button id="btnSurface" onclick="setRenderMode('surface')">3D Surface</button>
-    <button id="btnBoth" onclick="setRenderMode('both')">Both</button>
-  </div>
-  <button onclick="randomizeAxis()">🎲 New Axis</button>
-</div>
-
-<div class="info" id="info">Axis: (0.00, 1.00, 0.00) · Angle: 0.0°</div>
-
-<script>
-const canvas = document.getElementById('canvas');
-const ctx = canvas.getContext('2d');
-const W = canvas.width, H = canvas.height;
-const cx = W / 2, cy = H / 2;
-
-// ─── State ───
-let time = 0;
-let lastTime = performance.now();
-let speed = 0.30;
-let density = 24;
-let numTurns = 2;
-let handleSize = 0.5;
-let renderMode = 'lines'; // 'lines', 'surface', 'both'
-
-// Random rotation axis (unit vector)
-let axis = [0, 1, 0];
-let targetAxis = [0, 1, 0];
-let angle = 0;
-let axisTransition = 0; // 0..1 for smooth axis change
-
-// ─── 3D Math ───
-function rotatePoint(p, axis, angle) {
-  // Rodrigues' rotation formula
-  const [x, y, z] = p;
-  const [ax, ay, az] = axis;
-  const cos = Math.cos(angle);
-  const sin = Math.sin(angle);
-  const dot = x*ax + y*ay + z*az;
-  const cross = [
-    ay*z - az*y,
-    az*x - ax*z,
-    ax*y - ay*x
-  ];
-  return [
-    x*cos + cross[0]*sin + ax*dot*(1-cos),
-    y*cos + cross[1]*sin + ay*dot*(1-cos),
-    z*cos + cross[2]*sin + az*dot*(1-cos)
-  ];
-}
-
-function project(p) {
-  const fov = 600;
-  const z = p[2] + 500;
-  const scale = fov / Math.max(z, 100);
-  return [cx + p[0]*scale, cy + p[1]*scale, z, scale];
-}
-
-function normalize(v) {
-  const len = Math.sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
-  return [v[0]/len, v[1]/len, v[2]/len];
-}
-
-function lerpVec(a, b, t) {
-  return [a[0]+(b[0]-a[0])*t, a[1]+(b[1]-a[1])*t, a[2]+(b[2]-a[2])*t];
-}
-
-// ─── Genus-One Helicoid Parametrization ───
-function helicoidPoint(u, v) {
-  const pitch = 35;
-  const R = 220;
-  const rMin = 35 + handleSize * 20;
-
-  // Clamp u to avoid singularity at center
-  const sign = Math.sign(u) || 1;
-  const uClamped = sign * Math.max(Math.abs(u), rMin * 0.4);
-
-  // Base helicoid
-  let x = uClamped * Math.cos(v);
-  let y = uClamped * Math.sin(v);
-  let z = (v / (2*Math.PI)) * pitch * 2 - numTurns * pitch;
-
-  // Handle modification near axis
-  const dist = Math.sqrt(x*x + y*y);
-  const handleFactor = Math.exp(-dist*dist / (rMin*rMin * 1.5));
-  const handleR = rMin * handleSize * 1.8;
-
-  // Push surface away from axis near center to create tunnel
-  const radialPush = handleFactor * handleR * 0.4;
-  x += radialPush * Math.cos(v);
-  y += radialPush * Math.sin(v);
-
-  // Z-modulation for handle curvature
-  z += handleFactor * handleR * Math.sin(v * 2) * 0.4;
-
-  return [x, y, z];
-}
-
-// Handle tube (torus-like connection through center)
-function handlePoint(t, phi) {
-  const rMin = 35 + handleSize * 20;
-  const majorR = rMin * 0.7;
-  const tubeR = 10 + handleSize * 8;
-
-  const x = (majorR + tubeR*Math.cos(phi)) * Math.cos(t);
-  const y = (majorR + tubeR*Math.cos(phi)) * Math.sin(t);
-  const z = tubeR*Math.sin(phi) + Math.sin(t*2) * 15;
-
-  return [x, y, z];
-}
-
-// ─── Generate Grid Lines ───
-function generateGridLines() {
-  const lines = [];
-  const vMax = numTurns * 2 * Math.PI;
-  const uMin = -220, uMax = 220;
-
-  // Meridians (constant v) — red
-  const numV = density;
-  for (let j = 0; j < numV; j++) {
-    const v = (j / numV) * vMax;
-    const line = [];
-    const steps = 40;
-    for (let i = 0; i <= steps; i++) {
-      const u = uMin + (uMax - uMin) * (i / steps);
-      if (Math.abs(u) < 18) continue;
-      line.push(helicoidPoint(u, v));
-    }
-    if (line.length > 1) lines.push({ points: line, color: '#cc2222', type: 'meridian' });
-  }
-
-  // Parallels (constant u) — teal/green
-  const numU = Math.floor(density * 0.6);
-  for (let i = 0; i < numU; i++) {
-    const u = uMin + (uMax - uMin) * ((i + 0.5) / numU);
-    if (Math.abs(u) < 18) continue;
-    const line = [];
-    const steps = 60;
-    for (let j = 0; j <= steps; j++) {
-      const v = (j / steps) * vMax;
-      line.push(helicoidPoint(u, v));
-    }
-    if (line.length > 1) lines.push({ points: line, color: '#228866', type: 'parallel' });
-  }
-
-  return lines;
-}
-
-// ─── Generate Handle Lines ──
-function generateHandleLines() {
-  const lines = [];
-  const steps = 30;
-  const tubeSteps = Math.max(6, Math.floor(density * 0.4));
-
-  for (let t = 0; t < tubeSteps; t++) {
-    const phi = (t / tubeSteps) * Math.PI * 2;
-    const line = [];
-    for (let i = 0; i <= steps; i++) {
-      const tt = (i / steps) * Math.PI * 2;
-      line.push(handlePoint(tt, phi));
-    }
-    lines.push({ points: line, color: '#cc4444', type: 'handle' });
-  }
-
-  for (let i = 0; i <= steps; i += 3) {
-    const tt = (i / steps) * Math.PI * 2;
-    const line = [];
-    for (let t = 0; t < tubeSteps; t++) {
-      const phi = (t / tubeSteps) * Math.PI * 2;
-      line.push(handlePoint(tt, phi));
-    }
-    lines.push({ points: line, color: '#44aa88', type: 'handle' });
-  }
-
-  return lines;
-}
-
-// ─── Generate Surface Quads ───
-function generateSurfaceQuads() {
-  const quads = [];
-  const uSteps = Math.floor(density * 1.2);
-  const vSteps = Math.floor(density * 2);
-  const uMin = -220, uMax = 220;
-  const vMax = numTurns * 2 * Math.PI;
-
-  for (let i = 0; i < uSteps; i++) {
-    for (let j = 0; j < vSteps; j++) {
-      const u1 = uMin + (uMax - uMin) * (i / uSteps);
-      const u2 = uMin + (uMax - uMin) * ((i+1) / uSteps);
-      const v1 = (j / vSteps) * vMax;
-      const v2 = ((j+1) / vSteps) * vMax;
-
-      if (Math.abs(u1) < 18 || Math.abs(u2) < 18) continue;
-
-      const p1 = helicoidPoint(u1, v1);
-      const p2 = helicoidPoint(u2, v1);
-      const p3 = helicoidPoint(u2, v2);
-      const p4 = helicoidPoint(u1, v2);
-
-      // Normal for lighting
-      const v12 = [p2[0]-p1[0], p2[1]-p1[1], p2[2]-p1[2]];
-      const v14 = [p4[0]-p1[0], p4[1]-p1[1], p4[2]-p1[2]];
-      const normal = [
-        v12[1]*v14[2] - v12[2]*v14[1],
-        v12[2]*v14[0] - v12[0]*v14[2],
-        v12[0]*v14[1] - v12[1]*v14[0]
-      ];
-      const nLen = Math.sqrt(normal[0]**2 + normal[1]**2 + normal[2]**2);
-      if (nLen > 0) {
-        normal[0] /= nLen; normal[1] /= nLen; normal[2] /= nLen;
-      }
-
-      const avgU = (u1 + u2) / 2;
-      quads.push({
-        points: [p1, p2, p3, p4],
-        normal,
-        avgU,
-        avgZ: (p1[2]+p2[2]+p3[2]+p4[2]) / 4
-      });
-    }
-  }
-
-  return quads;
-}
-
-// ─── Render ──
-function render(now) {
-  const dt = Math.min((now - lastTime) / 1000, 0.05);
-  lastTime = now;
-  time += dt * speed;
-
-  // Smoothly transition rotation axis
-  axisTransition = Math.min(1, axisTransition + dt * 0.5);
-  axis = lerpVec(axis, targetAxis, axisTransition * 0.02);
-  axis = normalize(axis);
-
-  angle += dt * speed * 2;
-
-  // Clear
-  ctx.fillStyle = '#0a0a1a';
-  ctx.fillRect(0, 0, W, H);
-
-  // Subtle background glow
-  const bgGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, W*0.5);
-  bgGrad.addColorStop(0, 'rgba(40,30,60,0.3)');
-  bgGrad.addColorStop(1, 'rgba(10,10,26,0)');
-  ctx.fillStyle = bgGrad;
-  ctx.fillRect(0, 0, W, H);
-
-  // Generate geometry
-  const gridLines = generateGridLines();
-  const handleLines = generateHandleLines();
-  const surfaceQuads = generateSurfaceQuads();
-
-  // Transform and project quads
-  const projectedQuads = [];
-  for (const q of surfaceQuads) {
-    const projPts = q.points.map(p => {
-      const rp = rotatePoint(p, axis, angle);
-      return project(rp);
-    });
-    const rNormal = rotatePoint(q.normal, axis, angle);
-    // Lighting: light from upper-left-front
-    const light = [0.3, -0.5, -0.8];
-    const lightLen = Math.sqrt(light[0]**2+light[1]**2+light[2]**2);
-    light[0]/=lightLen; light[1]/=lightLen; light[2]/=lightLen;
-    const brightness = Math.max(0.15, -(rNormal[0]*light[0] + rNormal[1]*light[1] + rNormal[2]*light[2]));
-
-    const avgZ = (projPts[0][2]+projPts[1][2]+projPts[2][2]+projPts[3][2])/4;
-    const t = (q.avgU + 220) / 440;
-
-    projectedQuads.push({
-      pts: projPts,
-      brightness,
-      avgZ,
-      t
-    });
-  }
-
-  // Sort quads back-to-front
-  projectedQuads.sort((a, b) => b.avgZ - a.avgZ);
-
-  // Draw surface
-  if (renderMode === 'surface' || renderMode === 'both') {
-    for (const q of projectedQuads) {
-      const r = Math.floor(160 + q.t * 80);
-      const g = Math.floor(160 + (1-q.t) * 60);
-      const b = Math.floor(60 + q.brightness * 40);
-      const alpha = renderMode === 'both' ? 0.5 : 0.85;
-
-      ctx.beginPath();
-      ctx.moveTo(q.pts[0][0], q.pts[0][1]);
-      ctx.lineTo(q.pts[1][0], q.pts[1][1]);
-      ctx.lineTo(q.pts[2][0], q.pts[2][1]);
-      ctx.lineTo(q.pts[3][0], q.pts[3][1]);
-      ctx.closePath();
-      ctx.fillStyle = `rgba(${r},${g},${b},${alpha})`;
-      ctx.fill();
-    }
-  }
-
-  // Transform and project lines
-  const allLines = [...gridLines, ...handleLines];
-  const projectedLines = [];
-
-  for (const line of allLines) {
-    const projPts = line.points.map(p => {
-      const rp = rotatePoint(p, axis, angle);
-      return project(rp);
-    });
-    const avgZ = projPts.reduce((s, p) => s + p[2], 0) / projPts.length;
-    projectedLines.push({ points: projPts, color: line.color, type: line.type, avgZ });
-  }
-
-  projectedLines.sort((a, b) => b.avgZ - a.avgZ);
-
-  // Draw lines
-  if (renderMode === 'lines' || renderMode === 'both') {
-    for (const line of projectedLines) {
-      if (line.points.length < 2) continue;
-      ctx.beginPath();
-      ctx.moveTo(line.points[0][0], line.points[0][1]);
-      for (let i = 1; i < line.points.length; i++) {
-        ctx.lineTo(line.points[i][0], line.points[i][1]);
-      }
-      ctx.strokeStyle = line.color;
-      ctx.lineWidth = line.type === 'handle' ? 1.2 : 1.5;
-      ctx.globalAlpha = renderMode === 'both' ? 0.7 : 0.85;
-      ctx.stroke();
-      ctx.globalAlpha = 1;
-    }
-  }
-
-  // Draw handle tube surface
-  if (renderMode === 'surface' || renderMode === 'both') {
-    drawHandleSurface(axis, angle);
-  }
-
-  // Info
-  document.getElementById('info').textContent =
-    `Axis: (${axis[0].toFixed(2)}, ${axis[1].toFixed(2)}, ${axis[2].toFixed(2)}) · Angle: ${(angle*180/Math.PI % 360).toFixed(1)}°`;
-
-  requestAnimationFrame(render);
-}
-
-function drawHandleSurface(axis, angle) {
-  const steps = 24;
-  const tubeSteps = Math.max(6, Math.floor(density * 0.35));
-  const alpha = renderMode === 'both' ? 0.35 : 0.7;
-
-  const quads = [];
-  for (let i = 0; i < steps; i++) {
-    for (let j = 0; j < tubeSteps; j++) {
-      const t1 = (i/steps)*Math.PI*2;
-      const t2 = ((i+1)/steps)*Math.PI*2;
-      const p1 = (j/tubeSteps)*Math.PI*2;
-      const p2 = ((j+1)/tubeSteps)*Math.PI*2;
-
-      const pts = [
-        handlePoint(t1,p1), handlePoint(t2,p1),
-        handlePoint(t2,p2), handlePoint(t1,p2)
-      ].map(p => {
-        const rp = rotatePoint(p, axis, angle);
-        return project(rp);
-      });
-
-      const avgZ = (pts[0][2]+pts[1][2]+pts[2][2]+pts[3][2])/4;
-      quads.push({ pts, avgZ });
-    }
-  }
-
-  quads.sort((a,b) => b.avgZ - a.avgZ);
-
-  for (const q of quads) {
-    ctx.beginPath();
-    ctx.moveTo(q.pts[0][0], q.pts[0][1]);
-    ctx.lineTo(q.pts[1][0], q.pts[1][1]);
-    ctx.lineTo(q.pts[2][0], q.pts[2][1]);
-    ctx.lineTo(q.pts[3][0], q.pts[3][1]);
-    ctx.closePath();
-    ctx.fillStyle = `rgba(180,90,50,${alpha})`;
-    ctx.fill();
-  }
-}
-
-// ─── Controls ───
-function setRenderMode(mode) {
-  renderMode = mode;
-  document.querySelectorAll('.mode-toggle button').forEach(b => b.classList.remove('active'));
-  document.getElementById('btn' + mode.charAt(0).toUpperCase() + mode.slice(1)).classList.add('active');
-}
-
-function randomizeAxis() {
-  // Pick a random unit vector
-  const theta = Math.random() * Math.PI * 2;
-  const phi = Math.acos(2*Math.random() - 1);
-  targetAxis = [
-    Math.sin(phi)*Math.cos(theta),
-    Math.sin(phi)*Math.sin(theta),
-    Math.cos(phi)
-  ];
-  axisTransition = 0;
-}
-
-// Slider bindings
-document.getElementById('speed').addEventListener('input', e => {
-  speed = e.target.value / 100;
-  document.getElementById('speedVal').textContent = speed.toFixed(2);
-});
-document.getElementById('density').addEventListener('input', e => {
-  density = parseInt(e.target.value);
-  document.getElementById('densityVal').textContent = density;
-});
-document.getElementById('turns').addEventListener('input', e => {
-  numTurns = parseFloat(e.target.value);
-  document.getElementById('turnsVal').textContent = numTurns.toFixed(1);
-});
-document.getElementById('handle').addEventListener('input', e => {
-  handleSize = e.target.value / 100;
-  document.getElementById('handleVal').textContent = handleSize.toFixed(2);
-});
-
-// Periodically pick a new random axis
-setInterval(() => {
-  if (Math.random() < 0.3) randomizeAxis();
-}, 8000);
-
-// Start
-requestAnimationFrame(render);
-</script>
+    <div id="canvas-container"></div>
+
+    <div id="info-panel">
+        <h1>🌀 Genus-One Helicoid</h1>
+        <div class="formula">
+            <span class="var">x</span>(<span class="var">u</span>,<span class="var">v</span>) =
+            <span class="num">u·cos v</span> &nbsp;(+ handle modulation)<br>
+            <span class="var">y</span>(<span class="var">u</span>,<span class="var">v</span>) =
+            <span class="num">u·sin v</span><br>
+            <span class="var">z</span>(<span class="var">u</span>,<span class="var">v</span>) =
+            <span class="num">(p/π)·v − T·p</span><br>
+            <span class="den">p</span> = pitch, &nbsp;<span class="den">T</span> = turns
+        </div>
+        <div class="params">
+            <strong>Helicoid with a genus-one handle</strong><br>
+            <span class="var">u</span> ∈ [−220, 220] &nbsp;|&nbsp;
+            <span class="var">v</span> ∈ [0, 2π·T]<br>
+            A minimal surface pierced by a tunnel near its axis.
+        </div>
+    </div>
+
+    <div id="controls">
+        <label>U Segments:
+            <input type="range" id="segmentsU" min="20" max="200" step="10" value="100">
+            <span class="value-display" id="segmentsUVal">100</span>
+        </label>
+        <label>V Segments:
+            <input type="range" id="segmentsV" min="40" max="400" step="10" value="240">
+            <span class="value-display" id="segmentsVVal">240</span>
+        </label>
+        <label>Turns:
+            <input type="range" id="turns" min="1" max="5" step="0.5" value="2">
+            <span class="value-display" id="turnsVal">2.0</span>
+        </label>
+        <label>Handle:
+            <input type="range" id="handle" min="0" max="100" step="5" value="50">
+            <span class="value-display" id="handleVal">0.50</span>
+        </label>
+        <button id="toggleWireframe">Wireframe</button>
+        <button id="toggleAutoRotate" class="active">Auto Rotate</button>
+        <button id="resetView">Reset View</button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+    <script>
+        // ─── Scene Setup ───
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+
+        // Gradient background
+        const bgCanvas = document.createElement('canvas');
+        bgCanvas.width = 512; bgCanvas.height = 512;
+        const bgCtx = bgCanvas.getContext('2d');
+        const gradient = bgCtx.createRadialGradient(256, 256, 0, 256, 256, 362);
+        gradient.addColorStop(0, '#1a2a3a');
+        gradient.addColorStop(0.5, '#0d1420');
+        gradient.addColorStop(1, '#05060a');
+        bgCtx.fillStyle = gradient;
+        bgCtx.fillRect(0, 0, 512, 512);
+        const bgTexture = new THREE.CanvasTexture(bgCanvas);
+        scene.background = bgTexture;
+
+        const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(4, 3, 5);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        container.appendChild(renderer.domElement);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.08;
+        controls.autoRotate = true;
+        controls.autoRotateSpeed = 1.2;
+
+        // ─── Lighting ───
+        const ambientLight = new THREE.AmbientLight(0x303048, 0.7);
+        scene.add(ambientLight);
+
+        const dirLight1 = new THREE.DirectionalLight(0xffffff, 1.0);
+        dirLight1.position.set(5, 8, 5);
+        dirLight1.castShadow = true;
+        scene.add(dirLight1);
+
+        const dirLight2 = new THREE.DirectionalLight(0x4488cc, 0.5);
+        dirLight2.position.set(-5, -3, -5);
+        scene.add(dirLight2);
+
+        const pointLight = new THREE.PointLight(0x00d2ff, 0.4, 20);
+        pointLight.position.set(0, 3, 0);
+        scene.add(pointLight);
+
+        // ─── Genus-One Helicoid Parametrization ───
+        // Raw coordinates are in the ±220 range; scale + center to sit at the origin.
+        const SCALE = 0.007;
+        const PITCH = 35;
+        const U_MAX = 220;
+        const HOLE = 18; // radial gap near the axis, bridged by the handle tube
+
+        let numTurns = 2;
+        let handleSize = 0.5;
+
+        function helicoidPoint(u, v) {
+            const rMin = 35 + handleSize * 20;
+
+            // Clamp u to avoid the singularity at the center
+            const sign = Math.sign(u) || 1;
+            const uClamped = sign * Math.max(Math.abs(u), rMin * 0.4);
+
+            // Base helicoid
+            let x = uClamped * Math.cos(v);
+            let y = uClamped * Math.sin(v);
+            let z = (v / Math.PI) * PITCH - numTurns * PITCH;
+
+            // Handle modulation near the axis
+            const dist = Math.sqrt(x * x + y * y);
+            const handleFactor = Math.exp(-dist * dist / (rMin * rMin * 1.5));
+            const handleR = rMin * handleSize * 1.8;
+
+            // Push the surface away from the axis near the center to form the tunnel
+            const radialPush = handleFactor * handleR * 0.4;
+            x += radialPush * Math.cos(v);
+            y += radialPush * Math.sin(v);
+
+            // Z-modulation for the handle curvature
+            z += handleFactor * handleR * Math.sin(v * 2) * 0.4;
+
+            return { x, y, z };
+        }
+
+        // Handle tube (torus-like connection through the center)
+        function handlePoint(t, phi) {
+            const rMin = 35 + handleSize * 20;
+            const majorR = rMin * 0.7;
+            const tubeR = 10 + handleSize * 8;
+
+            const x = (majorR + tubeR * Math.cos(phi)) * Math.cos(t);
+            const y = (majorR + tubeR * Math.cos(phi)) * Math.sin(t);
+            const z = tubeR * Math.sin(phi) + Math.sin(t * 2) * 15;
+
+            return { x, y, z };
+        }
+
+        // HSL → RGB for iridescent vertex coloring.
+        function hslToRgb(h, s, l) {
+            const c = (1 - Math.abs(2 * l - 1)) * s;
+            const x = c * (1 - Math.abs(((h * 6) % 2) - 1));
+            const m = l - c / 2;
+            let r = 0, g = 0, b = 0;
+            if (h < 1 / 6)      { r = c; g = x; b = 0; }
+            else if (h < 2 / 6) { r = x; g = c; b = 0; }
+            else if (h < 3 / 6) { r = 0; g = c; b = x; }
+            else if (h < 4 / 6) { r = 0; g = x; b = c; }
+            else if (h < 5 / 6) { r = x; g = 0; b = c; }
+            else                { r = c; g = 0; b = x; }
+            return { r: r + m, g: g + m, b: b + m };
+        }
+
+        // ─── Surface Generation ───
+        let surfaceMesh = null;
+        let handleMesh = null;
+        let wireframeMesh = null;
+        let handleWireMesh = null;
+        let showWireframe = false;
+
+        const surfaceMaterial = new THREE.MeshPhongMaterial({
+            vertexColors: true,
+            side: THREE.DoubleSide,
+            shininess: 60,
+            specular: new THREE.Color(0x446688),
+            flatShading: false,
+            transparent: false,
+            opacity: 1.0
+        });
+
+        const handleMaterial = new THREE.MeshPhongMaterial({
+            color: 0xb06a3a,
+            side: THREE.DoubleSide,
+            shininess: 40,
+            specular: new THREE.Color(0x331c0f),
+            flatShading: false
+        });
+
+        const wireMaterial = new THREE.LineBasicMaterial({
+            color: 0x003344,
+            transparent: true,
+            opacity: 0.35
+        });
+
+        const handleWireMaterial = new THREE.LineBasicMaterial({
+            color: 0x2a1606,
+            transparent: true,
+            opacity: 0.3
+        });
+
+        // Build a parametric mesh over (a, b) with iridescent vertex colors.
+        // skipA(a) can skip whole rows of triangles (used to leave the axis hole).
+        function createSurface(pointFn, aMin, aMax, aSteps, bMin, bMax, bSteps, skipA) {
+            const vertices = [];
+            const colors = [];
+            const indices = [];
+
+            const da = (aMax - aMin) / aSteps;
+            const db = (bMax - bMin) / bSteps;
+
+            for (let i = 0; i <= aSteps; i++) {
+                const a = aMin + i * da;
+                for (let j = 0; j <= bSteps; j++) {
+                    const b = bMin + j * db;
+                    const p = pointFn(a, b);
+                    vertices.push(p.x * SCALE, p.y * SCALE, p.z * SCALE);
+
+                    const hue = (((a - aMin) / (aMax - aMin)) * 0.55 + ((b - bMin) / (bMax - bMin)) * 0.45) % 1.0;
+                    const { r, g, b: bl } = hslToRgb(hue, 0.85, 0.55);
+                    colors.push(r, g, bl);
+                }
+            }
+
+            for (let i = 0; i < aSteps; i++) {
+                const a1 = aMin + i * da;
+                const a2 = aMin + (i + 1) * da;
+                if (skipA && (skipA(a1) || skipA(a2))) continue;
+                for (let j = 0; j < bSteps; j++) {
+                    const a = i * (bSteps + 1) + j;
+                    const b = a + (bSteps + 1);
+                    const c = a + 1;
+                    const d = b + 1;
+
+                    indices.push(a, b, c);
+                    indices.push(c, b, d);
+                }
+            }
+
+            const geometry = new THREE.BufferGeometry();
+            geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+            geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+            geometry.setIndex(indices);
+            geometry.computeVertexNormals();
+
+            return geometry;
+        }
+
+        function buildSurface() {
+            const segmentsU = parseInt(document.getElementById('segmentsU').value);
+            const segmentsV = parseInt(document.getElementById('segmentsV').value);
+
+            // Remove old meshes (dispose only geometries; materials are shared)
+            [surfaceMesh, handleMesh, wireframeMesh, handleWireMesh].forEach(m => {
+                if (m) { scene.remove(m); if (m.geometry) m.geometry.dispose(); }
+            });
+
+            const vMax = numTurns * 2 * Math.PI;
+
+            // Main helicoid with a hole near the axis
+            const mainGeo = createSurface(
+                helicoidPoint, -U_MAX, U_MAX, segmentsU, 0, vMax, segmentsV,
+                (a) => Math.abs(a) < HOLE
+            );
+            surfaceMesh = new THREE.Mesh(mainGeo, surfaceMaterial);
+            surfaceMesh.castShadow = true;
+            surfaceMesh.receiveShadow = true;
+            scene.add(surfaceMesh);
+
+            // Handle tube through the center
+            const handleGeo = createSurface(handlePoint, 0, 2 * Math.PI, 40, 0, 2 * Math.PI, 20);
+            handleMesh = new THREE.Mesh(handleGeo, handleMaterial);
+            handleMesh.castShadow = true;
+            handleMesh.receiveShadow = true;
+            scene.add(handleMesh);
+
+            // Wireframes
+            const wireGeo = new THREE.WireframeGeometry(mainGeo);
+            wireframeMesh = new THREE.LineSegments(wireGeo, wireMaterial);
+            wireframeMesh.visible = showWireframe;
+            scene.add(wireframeMesh);
+
+            const handleWireGeo = new THREE.WireframeGeometry(handleGeo);
+            handleWireMesh = new THREE.LineSegments(handleWireGeo, handleWireMaterial);
+            handleWireMesh.visible = showWireframe;
+            scene.add(handleWireMesh);
+        }
+
+        buildSurface();
+
+        // ─── Controls ───
+        const sliderBindings = [
+            ['segmentsU', 'segmentsUVal', (v) => parseInt(v)],
+            ['segmentsV', 'segmentsVVal', (v) => parseInt(v)],
+            ['turns', 'turnsVal', (v) => parseFloat(v)],
+            ['handle', 'handleVal', (v) => parseInt(v) / 100]
+        ];
+
+        const displayFormat = {
+            segmentsUVal: (v) => v,
+            segmentsVVal: (v) => v,
+            turnsVal: (v) => v.toFixed(1),
+            handleVal: (v) => v.toFixed(2)
+        };
+
+        sliderBindings.forEach(([inputId, displayId, parse]) => {
+            const el = document.getElementById(inputId);
+            const disp = document.getElementById(displayId);
+            el.addEventListener('input', () => {
+                const value = parse(el.value);
+                if (inputId === 'turns') numTurns = value;
+                if (inputId === 'handle') handleSize = value;
+                disp.textContent = displayFormat[displayId](value);
+                buildSurface();
+            });
+        });
+
+        document.getElementById('toggleWireframe').addEventListener('click', function() {
+            showWireframe = !showWireframe;
+            if (wireframeMesh) wireframeMesh.visible = showWireframe;
+            if (handleWireMesh) handleWireMesh.visible = showWireframe;
+            this.classList.toggle('active', showWireframe);
+        });
+
+        document.getElementById('toggleAutoRotate').addEventListener('click', function() {
+            controls.autoRotate = !controls.autoRotate;
+            this.classList.toggle('active', controls.autoRotate);
+        });
+
+        document.getElementById('resetView').addEventListener('click', () => {
+            camera.position.set(4, 3, 5);
+            controls.target.set(0, 0, 0);
+            controls.update();
+        });
+
+        // ─── Animation Loop ───
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // ─── Resize ───
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
 </body>
 </html>
