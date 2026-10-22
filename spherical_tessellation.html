@@ -71,6 +71,7 @@ scene.background = new THREE.Color(0x0b0e14);
 
 const camera = new THREE.PerspectiveCamera(45, innerWidth/innerHeight, .1, 100);
 camera.position.set(0, 1.2, 4.2);
+camera.lookAt(0, 0, 0); // keep the tessellation centered in the view
 
 scene.add(new THREE.AmbientLight(0xffffff, .55));
 const light = new THREE.DirectionalLight(0xffffff, 1.1);
