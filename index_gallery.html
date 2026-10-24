@@ -8,8 +8,16 @@ title: "Gallery"
 <body>
 {% include monograph-masthead.html %}
 
+{% assign gallery_limit = 4 %}
+{% assign gallery_shown = 0 %}
+{% for cat in site.data.visualization_categories %}
+  {% assign cat_shown = cat.items.size %}
+  {% if cat_shown > gallery_limit %}{% assign cat_shown = gallery_limit %}{% endif %}
+  {% assign gallery_shown = gallery_shown | plus: cat_shown %}
+{% endfor %}
+
 <div class="ma-frontispiece">
-  <p class="ma-lede">{{ site.data.visualization_categories.size }} topics · {{ site.data.visualizations.size }} interactive pages — every card below is a live snapshot of the real page. Click any card to open the full visualization.</p>
+  <p class="ma-lede">{{ site.data.visualization_categories.size }} topics · {{ gallery_shown }} of {{ site.data.visualizations.size }} interactive pages — up to four previews per topic, each card a live snapshot of the real page. Click any card to open the full visualization.</p>
 </div>
 
 <nav class="ma-pills" aria-label="Categories">
@@ -20,7 +28,7 @@ title: "Gallery"
 
 <div class="ma-search">
   <input id="gallery-filter" type="search"
-         placeholder="Filter {{ site.data.visualizations.size }} pages — try “hypotrochoid”, “mandelbrot”, “interactive”…"
+         placeholder="Filter {{ gallery_shown }} previews — try “hypotrochoid”, “mandelbrot”, “interactive”…"
          aria-label="Filter visualizations">
   <span id="gallery-filter-count" class="ma-count" hidden></span>
 </div>
@@ -29,11 +37,11 @@ title: "Gallery"
 <section class="ma-section" id="{{ cat.slug }}" data-catname="{{ cat.name | escape }}">
   <div class="ma-section-head">
     <h2>{{ cat.name }}</h2>
-    <span class="ma-count">{{ cat.items.size }}</span>
+    <span class="ma-count">{% if cat.items.size > gallery_limit %}{{ gallery_limit }} of {{ cat.items.size }}{% else %}{{ cat.items.size }}{% endif %}</span>
   </div>
   <p class="ma-section-note">{{ cat.description }}</p>
   <div class="ma-figure-grid">
-    {% for item in cat.items %}
+    {% for item in cat.items limit: gallery_limit %}
     <article class="ma-figure" data-search="{{ item.file | escape }} {{ item.title | escape }} {{ cat.name | escape }} {{ item.tags | join: ' ' | escape }}">
       <a class="ma-figure-link" href="{{ item.file }}" target="_blank" rel="noopener" title="{{ item.title | escape }} — open full page">
         <div class="ma-plate">
