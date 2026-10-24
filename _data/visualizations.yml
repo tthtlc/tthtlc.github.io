@@ -99,6 +99,9 @@
 - elliptical-torus.html
 - enneper.html
 - enneper_animation.html
+- enneper_order2.html
+- enneper_order3.html
+- enneper_order4.html
 - enneper_rotating.html
 - enneper_rotating1.html
 - epicycloid_add_epicycloid_explore.html
@@ -310,6 +313,7 @@
 - spiral_tube.html
 - spiral_tube_explore.html
 - spirograph.html
+- spirograph_dual.html
 - spirograph_ellipse_explore.html
 - spirograph_explore.html
 - spirograph_outline.html

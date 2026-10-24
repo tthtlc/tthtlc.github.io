@@ -233,6 +233,9 @@
   - file: spirograph.html
     title: Circle Rotation Contour
     tags: []
+  - file: spirograph_dual.html
+    title: Dual Spirograph — Two Inner Circles
+    tags: []
   - file: spirograph_ellipse_explore.html
     title: Circle Rotating Around a Circle Contour with Trail
     tags:
@@ -689,19 +692,17 @@
     title: Elliptical Torus — Interactive Study
     tags: []
   - file: enneper.html
-    title: Enneper Surface
+    title: Enneper Surface — Interactive Study
     tags: []
-  - file: enneper_animation.html
-    title: Enneper Surface Animation
+  - file: enneper_order2.html
+    title: Enneper Surface, Order 2 — Interactive Study
     tags: []
-  - file: enneper_rotating.html
-    title: Rotating Enneper Surface
-    tags:
-    - Rotating
-  - file: enneper_rotating1.html
-    title: Dynamic Enneper Surface
-    tags:
-    - Rotating
+  - file: enneper_order3.html
+    title: Enneper Surface, Order 3 — Interactive Study
+    tags: []
+  - file: enneper_order4.html
+    title: Enneper Surface, Order 4 — Interactive Study
+    tags: []
   - file: exploded-torus.html
     title: Exploded Torus — Interactive Study
     tags: []
@@ -820,10 +821,7 @@
     title: Sinusoidal Waves Around a Sphere (Side View)
     tags: []
   - file: spherical_tessellation.html
-    title: Spherical Tessellation
-    tags: []
-  - file: spherical_tessellation_hexagon.html
-    title: Sphere Tessellation with Hexagons
+    title: Sphere Tessellation
     tags: []
   - file: spiral-grooved-torus.html
     title: Spiral-grooved Torus — Interactive Study
@@ -840,13 +838,6 @@
   - file: torus.html
     title: Klein Bottle Transformation
     tags: []
-  - file: torus2.html
-    title: Dynamic 3D Spiral Surface - WebGL
-    tags: []
-  - file: torus2_rotating.html
-    title: Dynamic 3D Spiral Surface with Random Rotation - WebGL
-    tags:
-    - Rotating
   - file: truncated_dodecahedron_one_corner.html
     title: Truncated Dodecahedron Line Graphics
     tags: []
