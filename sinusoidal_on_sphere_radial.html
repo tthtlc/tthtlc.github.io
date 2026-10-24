@@ -1,0 +1,390 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sinusoidal Waves on a Sphere</title>
+<style>
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    overflow: hidden;
+    background: #050b17;
+    color: #e4f2ff;
+    font-family: system-ui, sans-serif;
+  }
+
+  canvas {
+    display: block;
+    width: 100vw;
+    height: 100vh;
+    cursor: grab;
+    touch-action: none;
+  }
+
+  canvas:active { cursor: grabbing; }
+
+  .panel {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    width: min(310px, calc(100vw - 40px));
+    padding: 19px;
+    border: 1px solid #8bcaff30;
+    border-radius: 16px;
+    background: #081426d9;
+    backdrop-filter: blur(14px);
+    box-shadow: 0 12px 45px #0005;
+  }
+
+  h1 {
+    margin: 0 0 7px;
+    font-size: 19px;
+    font-weight: 650;
+  }
+
+  p {
+    margin: 0 0 18px;
+    color: #9bb1cb;
+    font-size: 12px;
+    line-height: 1.6;
+  }
+
+  label {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 14px;
+    font-size: 12px;
+  }
+
+  output {
+    color: #65e9ff;
+    font-variant-numeric: tabular-nums;
+  }
+
+  input[type="range"] {
+    width: 100%;
+    margin: 9px 0 0;
+    accent-color: #50d7f5;
+  }
+
+  .buttons {
+    display: flex;
+    gap: 9px;
+    margin-top: 18px;
+  }
+
+  button {
+    flex: 1;
+    padding: 9px;
+    border: 1px solid #78cfff40;
+    border-radius: 8px;
+    background: #14314a;
+    color: #e4f2ff;
+    cursor: pointer;
+  }
+
+  button:hover { background: #1b4260; }
+
+  .hint {
+    position: fixed;
+    bottom: 22px;
+    width: 100%;
+    text-align: center;
+    color: #8aa8c7;
+    font-size: 12px;
+    pointer-events: none;
+  }
+
+  @media (max-width: 650px) {
+    .panel {
+      top: 12px;
+      left: 12px;
+      padding: 14px;
+      width: 250px;
+    }
+
+    p { margin-bottom: 8px; }
+    label { margin-top: 9px; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="canvas" aria-label="Animated sinusoidal waves on a 3D sphere"></canvas>
+
+<section class="panel">
+  <h1>Waves on a sphere</h1>
+  <p>A travelling sinusoid displaces the surface radially.</p>
+
+  <label for="amplitude">
+    Amplitude <output id="amplitudeValue"></output>
+  </label>
+  <input id="amplitude" type="range"
+         min="0" max="0.24" step="0.005" value="0.10">
+
+  <label for="frequency">
+    Wave count <output id="frequencyValue"></output>
+  </label>
+  <input id="frequency" type="range"
+         min="1" max="12" step="1" value="5">
+
+  <label for="speed">
+    Speed <output id="speedValue"></output>
+  </label>
+  <input id="speed" type="range"
+         min="-3" max="3" step="0.1" value="1">
+
+  <div class="buttons">
+    <button id="pause">Pause</button>
+    <button id="rotate" aria-pressed="true">Rotation: on</button>
+  </div>
+</section>
+
+<div class="hint">Drag to rotate · Negative speed reverses the wave</div>
+
+<script>
+"use strict";
+
+const canvas = document.querySelector("#canvas");
+const ctx = canvas.getContext("2d");
+
+const controls = {
+  amplitude: document.querySelector("#amplitude"),
+  frequency: document.querySelector("#frequency"),
+  speed: document.querySelector("#speed")
+};
+
+const params = {};
+
+function updateControls() {
+  for (const [name, input] of Object.entries(controls)) {
+    params[name] = Number(input.value);
+    document.querySelector(`#${name}Value`).value =
+      name === "frequency"
+        ? input.value
+        : Number(input.value).toFixed(2);
+  }
+}
+
+for (const input of Object.values(controls)) {
+  input.addEventListener("input", updateControls);
+}
+updateControls();
+
+let width, height, scale;
+let yaw = 0.45;
+let pitch = -0.24;
+let phase = 0;
+let paused = false;
+let autoRotate = true;
+let dragging = false;
+let lastX = 0;
+let lastY = 0;
+
+function resize() {
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  width = window.innerWidth;
+  height = window.innerHeight;
+
+  canvas.width = Math.round(width * dpr);
+  canvas.height = Math.round(height * dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  scale = Math.min(width * 0.34, height * 0.34);
+}
+
+window.addEventListener("resize", resize);
+resize();
+
+document.querySelector("#pause").addEventListener("click", event => {
+  paused = !paused;
+  event.target.textContent = paused ? "Resume" : "Pause";
+});
+
+document.querySelector("#rotate").addEventListener("click", event => {
+  autoRotate = !autoRotate;
+  event.target.textContent = `Rotation: ${autoRotate ? "on" : "off"}`;
+  event.target.setAttribute("aria-pressed", String(autoRotate));
+});
+
+canvas.addEventListener("pointerdown", event => {
+  dragging = true;
+  lastX = event.clientX;
+  lastY = event.clientY;
+  canvas.setPointerCapture(event.pointerId);
+});
+
+canvas.addEventListener("pointermove", event => {
+  if (!dragging) return;
+
+  yaw += (event.clientX - lastX) * 0.006;
+  pitch += (event.clientY - lastY) * 0.006;
+  pitch = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, pitch));
+
+  lastX = event.clientX;
+  lastY = event.clientY;
+});
+
+function stopDragging() {
+  dragging = false;
+}
+
+canvas.addEventListener("pointerup", stopDragging);
+canvas.addEventListener("pointercancel", stopDragging);
+canvas.addEventListener("lostpointercapture", stopDragging);
+
+// Sphere mesh: latitude rows and longitude columns.
+const LAT = 64;
+const LON = 112;
+const vertices = [];
+const edges = [];
+
+for (let i = 0; i <= LAT; i++) {
+  const theta = Math.PI * i / LAT;
+
+  for (let j = 0; j < LON; j++) {
+    const phi = 2 * Math.PI * j / LON;
+    vertices.push({
+      theta,
+      x: Math.sin(theta) * Math.cos(phi),
+      y: Math.cos(theta),
+      z: Math.sin(theta) * Math.sin(phi),
+      envelope: Math.sin(theta) ** 2
+    });
+
+    const index = i * LON + j;
+
+    // Latitude rings; omit the degenerate rings at the poles.
+    if (i > 0 && i < LAT) {
+      edges.push([index, i * LON + (j + 1) % LON]);
+    }
+
+    // Draw fewer longitude curves for a cleaner mesh.
+    if (i < LAT && j % 4 === 0) {
+      edges.push([index, index + LON]);
+    }
+  }
+}
+
+const projected = vertices.map(() => ({
+  x: 0, y: 0, z: 0, wave: 0
+}));
+
+const segments = edges.map(([a, b]) => ({
+  a, b, depth: 0
+}));
+
+function render() {
+  ctx.clearRect(0, 0, width, height);
+
+  // Move the sphere slightly right on wide screens to clear the panel.
+  const cx = width * (width > 850 ? 0.60 : 0.50);
+  const cy = height * (width < 650 ? 0.64 : 0.53);
+
+  const glow = ctx.createRadialGradient(
+    cx, cy, scale * 0.15,
+    cx, cy, scale * 1.65
+  );
+  glow.addColorStop(0, "#10375366");
+  glow.addColorStop(0.65, "#0a263433");
+  glow.addColorStop(1, "#050b1700");
+
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, width, height);
+
+  const cosY = Math.cos(yaw);
+  const sinY = Math.sin(yaw);
+  const cosX = Math.cos(pitch);
+  const sinX = Math.sin(pitch);
+
+  const cameraDistance = 4.5;
+
+  for (let n = 0; n < vertices.length; n++) {
+    const v = vertices[n];
+
+    const wave = Math.sin(
+      2 * params.frequency * v.theta - phase
+    );
+
+    const radius = 1 + params.amplitude * v.envelope * wave;
+
+    const x = radius * v.x;
+    const y = radius * v.y;
+    const z = radius * v.z;
+
+    // Rotate around Y, then X.
+    const rx = cosY * x + sinY * z;
+    const rz = -sinY * x + cosY * z;
+
+    const ry = cosX * y - sinX * rz;
+    const depth = sinX * y + cosX * rz;
+
+    const perspective = cameraDistance / (cameraDistance - depth);
+    const p = projected[n];
+
+    p.x = cx + rx * scale * perspective;
+    p.y = cy - ry * scale * perspective;
+    p.z = depth;
+    p.wave = wave;
+  }
+
+  // Painter's ordering gives the front mesh visual priority.
+  for (const segment of segments) {
+    segment.depth = (
+      projected[segment.a].z + projected[segment.b].z
+    ) / 2;
+  }
+  segments.sort((a, b) => a.depth - b.depth);
+
+  ctx.lineCap = "round";
+
+  for (const segment of segments) {
+    const a = projected[segment.a];
+    const b = projected[segment.b];
+
+    const frontness = Math.max(
+      0,
+      Math.min(1, (segment.depth + 1.25) / 2.5)
+    );
+    const crest = (a.wave + b.wave + 2) / 4;
+
+    const hue = 205 - 38 * crest;
+    const lightness = 35 + 30 * frontness + 10 * crest;
+    const alpha = 0.07 + 0.73 * frontness ** 2;
+
+    ctx.strokeStyle =
+      `hsla(${hue}, 92%, ${lightness}%, ${alpha})`;
+    ctx.lineWidth = 0.45 + 0.8 * frontness;
+
+    ctx.beginPath();
+    ctx.moveTo(a.x, a.y);
+    ctx.lineTo(b.x, b.y);
+    ctx.stroke();
+  }
+}
+
+let previousTime = null;
+
+function animate(timestamp) {
+  const dt = previousTime === null
+    ? 0
+    : Math.min((timestamp - previousTime) / 1000, 0.05);
+
+  previousTime = timestamp;
+
+  if (!paused) {
+    phase += dt * params.speed * 2;
+    if (autoRotate && !dragging) yaw += dt * 0.16;
+  }
+
+  render();
+  requestAnimationFrame(animate);
+}
+
+requestAnimationFrame(animate);
+</script>
+</body>
+</html>

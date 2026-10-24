@@ -1,0 +1,420 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Equatorial Waves on a Sphere</title>
+<style>
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    overflow: hidden;
+    background: #050b17;
+    color: #e4f2ff;
+    font-family: system-ui, sans-serif;
+  }
+
+  canvas {
+    display: block;
+    width: 100vw;
+    height: 100vh;
+    cursor: grab;
+    touch-action: none;
+  }
+
+  canvas:active { cursor: grabbing; }
+
+  .panel {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    width: min(300px, calc(100vw - 40px));
+    padding: 18px;
+    border: 1px solid #83cfff35;
+    border-radius: 16px;
+    background: #081426e6;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 12px 40px #0005;
+  }
+
+  h1 {
+    margin: 0 0 8px;
+    font-size: 19px;
+  }
+
+  p {
+    margin: 0 0 15px;
+    color: #a1b7cd;
+    font-size: 12px;
+    line-height: 1.6;
+  }
+
+  label {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 13px;
+    font-size: 12px;
+  }
+
+  output {
+    color: #6aeaff;
+    font-variant-numeric: tabular-nums;
+  }
+
+  input[type="range"] {
+    width: 100%;
+    margin-top: 8px;
+    accent-color: #51d9f7;
+  }
+
+  .buttons {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  button {
+    flex: 1;
+    padding: 9px;
+    border: 1px solid #78cfff40;
+    border-radius: 8px;
+    background: #14314a;
+    color: #e4f2ff;
+    cursor: pointer;
+  }
+
+  button:hover { background: #204764; }
+
+  .hint {
+    position: fixed;
+    bottom: 18px;
+    width: 100%;
+    text-align: center;
+    color: #91aac5;
+    font-size: 12px;
+    pointer-events: none;
+  }
+
+  @media (max-width: 650px) {
+    .panel {
+      top: 12px;
+      left: 12px;
+      width: 245px;
+      padding: 13px;
+    }
+
+    label { margin-top: 8px; }
+    p { margin-bottom: 8px; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="canvas"
+        aria-label="Sinusoidal waves travelling around a sphere's equator">
+</canvas>
+
+<section class="panel">
+  <h1>Equatorial travelling waves</h1>
+  <p>
+    Crests circulate around the equator.
+    The deformation fades toward the poles.
+  </p>
+
+  <label for="amplitude">
+    Amplitude <output id="amplitudeValue"></output>
+  </label>
+  <input id="amplitude" type="range"
+         min="0" max="0.25" step="0.005" value="0.12">
+
+  <label for="waves">
+    Waves around equator <output id="wavesValue"></output>
+  </label>
+  <input id="waves" type="range"
+         min="1" max="12" step="1" value="6">
+
+  <label for="speed">
+    Travel speed <output id="speedValue"></output>
+  </label>
+  <input id="speed" type="range"
+         min="-1" max="1" step="0.05" value="0.35">
+
+  <label for="band">
+    Equatorial confinement <output id="bandValue"></output>
+  </label>
+  <input id="band" type="range"
+         min="0" max="16" step="1" value="4">
+
+  <div class="buttons">
+    <button id="pause">Pause</button>
+    <button id="reset">Reset view</button>
+  </div>
+</section>
+
+<div class="hint">
+  Drag to rotate · Negative speed reverses travel
+</div>
+
+<script>
+"use strict";
+
+const canvas = document.querySelector("#canvas");
+const ctx = canvas.getContext("2d");
+
+const params = {};
+const names = ["amplitude", "waves", "speed", "band"];
+
+function updateControls() {
+  for (const name of names) {
+    const input = document.getElementById(name);
+    params[name] = Number(input.value);
+
+    document.getElementById(name + "Value").value =
+      name === "waves" || name === "band"
+        ? input.value
+        : Number(input.value).toFixed(2);
+  }
+}
+
+for (const name of names) {
+  document.getElementById(name)
+    .addEventListener("input", updateControls);
+}
+updateControls();
+
+let width = 0;
+let height = 0;
+let scale = 0;
+
+let yaw = 0.35;
+let pitch = -0.38;
+let travelAngle = 0;
+let paused = false;
+let dragging = false;
+let lastX = 0;
+let lastY = 0;
+
+function resize() {
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+  width = window.innerWidth;
+  height = window.innerHeight;
+
+  canvas.width = Math.round(width * dpr);
+  canvas.height = Math.round(height * dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  scale = Math.min(width * 0.33, height * 0.33);
+}
+
+window.addEventListener("resize", resize);
+resize();
+
+document.querySelector("#pause").addEventListener("click", event => {
+  paused = !paused;
+  event.target.textContent = paused ? "Resume" : "Pause";
+});
+
+document.querySelector("#reset").addEventListener("click", () => {
+  yaw = 0.35;
+  pitch = -0.38;
+});
+
+canvas.addEventListener("pointerdown", event => {
+  dragging = true;
+  lastX = event.clientX;
+  lastY = event.clientY;
+  canvas.setPointerCapture(event.pointerId);
+});
+
+canvas.addEventListener("pointermove", event => {
+  if (!dragging) return;
+
+  yaw += (event.clientX - lastX) * 0.006;
+  pitch += (event.clientY - lastY) * 0.006;
+  pitch = Math.max(-1.5, Math.min(1.5, pitch));
+
+  lastX = event.clientX;
+  lastY = event.clientY;
+});
+
+for (const type of ["pointerup", "pointercancel", "lostpointercapture"]) {
+  canvas.addEventListener(type, () => {
+    dragging = false;
+  });
+}
+
+// Integer longitude wave counts ensure a seamless wrap.
+const LAT = 64;
+const LON = 160;
+const vertices = [];
+const edges = [];
+
+for (let i = 0; i <= LAT; i++) {
+  const theta = Math.PI * i / LAT;
+  const sinTheta = Math.sin(theta);
+  const cosTheta = Math.cos(theta);
+
+  for (let j = 0; j < LON; j++) {
+    const phi = 2 * Math.PI * j / LON;
+    const index = i * LON + j;
+
+    vertices.push({
+      phi,
+      sinTheta,
+      x: sinTheta * Math.cos(phi),
+      y: cosTheta,
+      z: sinTheta * Math.sin(phi)
+    });
+
+    if (i > 0 && i < LAT) {
+      edges.push({
+        a: index,
+        b: i * LON + (j + 1) % LON,
+        equator: i === LAT / 2,
+        depth: 0
+      });
+    }
+
+    if (i < LAT && j % 4 === 0) {
+      edges.push({
+        a: index,
+        b: index + LON,
+        equator: false,
+        depth: 0
+      });
+    }
+  }
+}
+
+const projected = vertices.map(() => ({
+  x: 0,
+  y: 0,
+  z: 0,
+  wave: 0,
+  envelope: 0
+}));
+
+function render() {
+  ctx.clearRect(0, 0, width, height);
+
+  const cx = width * (width > 850 ? 0.60 : 0.50);
+  const cy = height * (width < 650 ? 0.67 : 0.53);
+
+  const glow = ctx.createRadialGradient(
+    cx, cy, scale * 0.1,
+    cx, cy, scale * 1.6
+  );
+
+  glow.addColorStop(0, "#123f5866");
+  glow.addColorStop(0.65, "#0a263433");
+  glow.addColorStop(1, "#050b1700");
+
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, width, height);
+
+  const cosY = Math.cos(yaw);
+  const sinY = Math.sin(yaw);
+  const cosX = Math.cos(pitch);
+  const sinX = Math.sin(pitch);
+  const camera = 4.5;
+
+  for (let n = 0; n < vertices.length; n++) {
+    const v = vertices[n];
+
+    // Smooth pole behaviour:
+    // sin(theta)^m cos(m*phi - phase) is a smooth
+    // longitude mode; the extra even power narrows its band.
+    const exponent = params.waves + 2 * params.band;
+    const envelope = Math.pow(v.sinTheta, exponent);
+
+    const wave = Math.cos(
+      params.waves * (v.phi - travelAngle)
+    );
+
+    const radius = 1 + params.amplitude * envelope * wave;
+
+    const x = radius * v.x;
+    const y = radius * v.y;
+    const z = radius * v.z;
+
+    const rx = cosY * x + sinY * z;
+    const rz = -sinY * x + cosY * z;
+
+    const ry = cosX * y - sinX * rz;
+    const depth = sinX * y + cosX * rz;
+
+    const perspective = camera / (camera - depth);
+    const p = projected[n];
+
+    p.x = cx + rx * scale * perspective;
+    p.y = cy - ry * scale * perspective;
+    p.z = depth;
+    p.wave = wave;
+    p.envelope = envelope;
+  }
+
+  for (const edge of edges) {
+    edge.depth = (
+      projected[edge.a].z + projected[edge.b].z
+    ) / 2;
+  }
+
+  edges.sort((a, b) => a.depth - b.depth);
+  ctx.lineCap = "round";
+
+  for (const edge of edges) {
+    const a = projected[edge.a];
+    const b = projected[edge.b];
+
+    const front = Math.max(
+      0, Math.min(1, (edge.depth + 1.25) / 2.5)
+    );
+
+    const envelope = (a.envelope + b.envelope) / 2;
+    const crest = (a.wave + b.wave + 2) / 4;
+
+    const hue = 208 - 48 * envelope * crest;
+    const light = 33 + 27 * front + 13 * envelope * crest;
+    const alpha = 0.045 + 0.72 * front * front;
+
+    ctx.strokeStyle = edge.equator
+      ? `rgba(255, 202, 110, ${Math.min(1, alpha + 0.13)})`
+      : `hsla(${hue}, 90%, ${light}%, ${alpha})`;
+
+    ctx.lineWidth = edge.equator
+      ? 1.1 + front
+      : 0.4 + 0.7 * front;
+
+    ctx.beginPath();
+    ctx.moveTo(a.x, a.y);
+    ctx.lineTo(b.x, b.y);
+    ctx.stroke();
+  }
+}
+
+let previousTime = null;
+
+function animate(timestamp) {
+  const dt = previousTime === null
+    ? 0
+    : Math.min((timestamp - previousTime) / 1000, 0.05);
+
+  previousTime = timestamp;
+
+  if (!paused) {
+    travelAngle = (
+      travelAngle + params.speed * dt
+    ) % (2 * Math.PI);
+  }
+
+  render();
+  requestAnimationFrame(animate);
+}
+
+requestAnimationFrame(animate);
+</script>
+</body>
+</html>
