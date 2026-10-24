@@ -32,6 +32,7 @@ const params = ['aaaa', 'bbbb', 'cccc', 'dddd'];
 const STEP = Math.PI / 800;   // sampling resolution along the curve
 const BANDS = 64;             // number of centre-to-edge colour steps
 const COPIES = 4;             // the 90°-rotated copies that make the rosette
+const AAAA_REF = 7;           // default aaaa; larger aaaa scales the whole figure up
 
 // Parametric equations.
 function x(t) {
@@ -75,7 +76,9 @@ function draw() {
     }
     if (maxR <= 0 || pts.length < 2) return;
 
-    const drawScale = Math.min(width, height) * 0.42 / maxR;
+    // Auto-fit divides by maxR, which scales with aaaa, cancelling it out.
+    // Restore the amplitude here so aaaa visibly grows/shrinks the figure.
+    const drawScale = Math.min(width, height) * 0.42 / maxR * (state.aaaa / AAAA_REF);
     const cx = width / 2, cy = height / 2;
     ctx.lineWidth = 1;
 
@@ -228,7 +231,7 @@ animateBtn.onclick = () => {
     animateBtn.textContent = 'Stop animating';
     pickRandomPNG();
     animTick();
-    animTimer = setInterval(animTick, 80);
+    animTimer = setInterval(animTick, 160);
 };
 
 // Gallery: list committed parametric_curve23_explore_*.png files via the
