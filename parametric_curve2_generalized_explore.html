@@ -1,161 +1,462 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link rel="stylesheet" href="/assets/math-art.css">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Parametric Equation Visualization with Rotation</title>
-    <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f0f0f0;
-        }
-        canvas {
-            background-color: white;
-            border: 1px solid #ccc;
-        }
-        .controls {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-        }
-        .control-group {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-    </style>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Parametric Curve 2 (Generalized) — Interactive Study</title>
+<style>
+:root{color-scheme:dark;font-family:Inter,system-ui,sans-serif;background:#10151d;color:#eef2f8}*{box-sizing:border-box}body{margin:0}main{display:grid;grid-template-columns:1fr 300px;min-height:100vh}.stage{position:relative;min-height:650px;overflow:hidden;background:radial-gradient(ellipse at 50% 45%,#253247,#10151d 70%)}canvas{display:block;width:100%;height:100%;position:absolute}.topbar{position:absolute;top:32px;left:36px;right:36px;display:flex;align-items:flex-start;gap:36px;flex-wrap:wrap;z-index:2}.heading{pointer-events:none}h1{font-size:clamp(24px,3vw,40px);font-weight:500;letter-spacing:-.04em;margin:6px 0}.eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.22em;color:#91a5bf}.hint{position:absolute;bottom:28px;left:36px;color:#92a3b9;font-size:12px;pointer-events:none}aside{padding:32px 25px;background:#151c27;border-left:1px solid #2a3443}h2{font-size:17px;font-weight:500;margin:0 0 26px}label{display:block;font-size:13px;color:#c7d2e3;margin-bottom:22px}.row{display:flex;justify-content:space-between;margin-bottom:8px}output{font-variant-numeric:tabular-nums;color:#88dbc6}input[type=range]{width:100%;accent-color:#88dbc6}button{background:#202d3d;color:#eef2f8;border:1px solid #3a485b;border-radius:8px;padding:10px;font:inherit;width:100%}button{cursor:pointer;margin-top:10px}button:hover{background:#2b3e53}.note{font-size:12px;color:#91a5bf;line-height:1.65;margin-top:25px}details{font-size:12px;color:#91a5bf;line-height:1.65}summary{cursor:pointer;color:#c7d2e3}code{color:#a4e3d4}.geometry{pointer-events:auto;max-width:min(46vw,400px);background:rgba(21,28,39,.88);border:1px solid #2a3443;border-radius:12px;padding:10px 14px;backdrop-filter:blur(6px);margin-top:4px}.geometry p{margin:.6em 0}.gallery{border-top:1px solid #2a3443;margin-top:25px;padding-top:22px}.gallery h2{margin:0 0 8px}.gallery-note{font-size:11px;color:#91a5bf;line-height:1.6;margin:0 0 14px}.gallery-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.gallery-item{display:block;border:1px solid #2a3443;border-radius:8px;overflow:hidden;text-decoration:none;background:#10151d}.gallery-item:hover{border-color:#88dbc6}.gallery-item img{display:block;width:100%;height:64px;object-fit:cover}.gallery-item span{display:block;font-size:9px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#91a5bf;padding:4px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.gallery-empty{grid-column:1/-1;color:#6b7d94;font-size:12px;text-align:center;padding:14px 0}@media(max-width:760px){main{grid-template-columns:1fr}.stage{height:65vh;min-height:420px}aside{border-left:0;border-top:1px solid #2a3443}.topbar{left:24px;top:22px;right:24px;gap:24px}.hint{left:24px}}
+</style>
 <!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-GEX61LPT08"></script> <script>   window.dataLayer = window.dataLayer || [];   function gtag(){dataLayer.push(arguments);}   gtag('js', new Date());   gtag('config', 'G-GEX61LPT08'); </script> </head>
 <body>
-    <canvas id="canvas" width="1200" height="1200"></canvas>
-    <div class="controls">
-        <div class="control-group">
-            <label for="aaaa">aaaa:</label>
-            <input type="range" id="aaaa" min="1" max="20" step="0.1" value="7">
-            <span id="value-aaaa">7</span>
-        </div>
-        <div class="control-group">
-            <label for="bbbb">bbbb:</label>
-            <input type="range" id="bbbb" min="0" max="100" step="0.01" value="0.56">
-            <span id="value-bbbb">0.56</span>
-        </div>
-        <div class="control-group">
-            <label for="cccc">cccc:</label>
-            <input type="range" id="cccc" min="0" max="20" step="0.5" value="3">
-            <span id="value-cccc">3</span>
-        </div>
-        <div class="control-group">
-            <label for="dddd">DDDD:</label>
-            <input type="range" id="dddd" min="0" max="100" step="0.1" value="2.02">
-            <span id="value-dddd">2.02</span>
-        </div>
-    </div>
-    <script>
-        document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
-	document.querySelectorAll('input[type="range"]').forEach((slider) => {
-    slider.addEventListener('input', drawCurveWithRotation);
-});
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
-        const width = canvas.width;
-        const height = canvas.height;
-        const scale = 60;
+<main><section class="stage"><canvas id="canvas" aria-label="Interactive parametric curve. Lines are bright near the centre and cool toward the rim; use the sliders to change its shape."></canvas><div class="topbar"><div class="heading"><div class="eyebrow">Form study / 2 &middot; generalized</div><h1>Parametric curve 2 — generalized</h1></div><details class="geometry"><summary>Geometry</summary><p>The figure is one parametric curve drawn for <code>t</code> in <code>[&minus;c, c]</code>, then rotated four times by 90&deg; to form a symmetric rosette.</p><p><code>x(t) = a &middot; sin&sup2;(&minus;b&middot;t) &middot; 2<sup>cos(cos(d&middot;t))</sup></code><br><code>y(t) = a &middot; sin(sin(&minus;b&middot;t)) &middot; cos&sup2;(d&middot;t)</code></p><p>Colour encodes distance from the origin: warm and bright at the centre, cooling and dimming toward the rim. <strong>Animate</strong> sweeps <code>bbbb</code> up and down around its current value.</p></details></div><div class="hint">Adjust a slider to redraw &middot; Save PNG to export &middot; Animate sweeps a parameter</div></section>
+<aside><h2>Shape &amp; appearance</h2><div id="controls"></div>
+<button id="reset">Reset design</button><button id="export">Save PNG</button><button id="exportGif">Save GIF</button><button id="animate">Animate</button>
+<p class="note" id="status"></p>
+<section class="gallery"><h2>Saved PNGs</h2><p class="gallery-note">PNG captures are named with their parameter values. Commit the downloaded files to the repo and they will appear here automatically (fetched via the GitHub API).</p><div id="galleryItems" class="gallery-grid"></div></section>
+</aside></main>
+<script>
+'use strict';
+const $ = id => document.getElementById(id);
+const canvas = $('canvas'), ctx = canvas.getContext('2d');
+let width = 1, height = 1, dpr = 1;
 
-        let aaaa = parseFloat(document.getElementById('aaaa').value);
-        let bbbb = parseFloat(document.getElementById('bbbb').value);
-        let cccc = parseFloat(document.getElementById('cccc').value);
-        let dddd = parseFloat(document.getElementById('dddd').value);
+// Per-curve configuration: parameters, PNG filename prefix, animation target.
+const CONFIG = {
+    prefix: 'parametric_curve2_generalized_explore',
+    params: [
+        { id: 'aaaa', min: 1, max: 20, step: 0.1, value: 7, decimals: 1 },
+        { id: 'bbbb', min: -2, max: 100, step: 0.01, value: 0.56, decimals: 2 },
+        { id: 'cccc', min: 0, max: 20, step: 0.5, value: 3, decimals: 1 },
+        { id: 'dddd', min: 0, max: 100, step: 0.1, value: 2.02, decimals: 2 },
+    ],
+    animParam: 'bbbb',
+    animRange: 2.0,
+    animStep: 0.01,
+};
+const params = CONFIG.params.map(p => p.id);
+const state = {};
+const decimals = {};
+const defs = {};
+for (const p of CONFIG.params) { state[p.id] = p.value; decimals[p.id] = p.decimals; defs[p.id] = p; }
 
-        const valueAaaa = document.getElementById('value-aaaa');
-        const valueBbbb = document.getElementById('value-bbbb');
-        const valueCccc = document.getElementById('value-cccc');
-        const valueDddd = document.getElementById('value-dddd');
+const STEP = Math.PI / 800;   // sampling resolution along the curve
+const BANDS = 64;             // number of centre-to-edge colour steps
+const COPIES = 4;             // the 90°-rotated copies that make the rosette
 
-        // Center the canvas
-        ctx.translate(width / 2, height / 2);
-        ctx.lineWidth = 1;
-        ctx.strokeStyle = '#333';
+// Parametric equations.
+function x(t) {
+    return state.aaaa * Math.pow(Math.sin(-state.bbbb * t), 2) * Math.pow(2, Math.cos(Math.cos(state.dddd * t)));
+}
+function y(t) {
+    return state.aaaa * Math.sin(Math.sin(-state.bbbb * t)) * Math.pow(Math.cos(state.dddd * t), 2);
+}
 
-        // Parametric equations
+// Colour for a normalized radius f (0 = centre, 1 = rim): bright and warm
+// near the centre, cooler and dimmer toward the edge.
+function colorFor(f) {
+    const hue = 50 + 160 * f;       // gold centre -> blue rim
+    const lightness = 82 - 34 * f;  // bright centre -> dimmer edge
+    return `hsl(${hue}, 95%, ${lightness}%)`;
+}
 
-        function x(t) {
- 	    //return aaaa*Math.cos(bbbb*t)*Math.sin(bbbb*t)/(1+Math.pow(2,(Math.cos(dddd*t)*Math.cos(dddd*t))));
-            return aaaa * Math.pow(Math.sin(-bbbb * t), 2) * Math.pow(2, Math.cos(Math.cos(dddd* t)));
-        }
-  	    ///return aaaa*Math.cos(bbbb*t)*Math.sin(bbbb*t)/(1+Math.pow(2,(Math.cos(dddd*t)*Math.cos(dddd*t))));
+function resize() {
+    const box = canvas.parentElement.getBoundingClientRect();
+    width = box.width; height = box.height;
+    dpr = Math.min(devicePixelRatio || 1, 2);
+    canvas.width = Math.round(width * dpr);
+    canvas.height = Math.round(height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    draw();
+}
 
-        function y(t) {
- 	    ///return aaaa*Math.sin(bbbb*t)/(1+Math.sin(dddd*t)*Math.sin(dddd*t));
-            return aaaa * Math.sin(Math.sin(-bbbb * t)) * Math.pow(Math.cos(dddd * t), 2);
-        }
-  	    ///return aaaa*Math.sin(bbbb*t)/(1+Math.sin(dddd*t)*Math.sin(dddd*t));
+function render(g, w, h) {
+    // Sample the raw curve once; the max radius drives both the fit-to-view
+    // scale and the centre-to-edge colour gradient.
+    const pts = [];
+    let maxR = 0;
+    for (let t = -state.cccc; t <= state.cccc; t += STEP) {
+        const rx = x(t), ry = y(t);
+        const r = Math.hypot(rx, ry);
+        if (r > maxR) maxR = r;
+        pts.push([rx, ry]);
+    }
+    if (maxR <= 0 || pts.length < 2) return;
 
+    const drawScale = Math.min(w, h) * 0.42 / maxR;
+    const cx = w / 2, cy = h / 2;
+    g.lineWidth = 1;
 
-        // Draw the parametric curve with rotation
-        function drawCurveWithRotation() {
-            ctx.clearRect(-width / 2, -height / 2, width, height);
+    // Draw the same curve four times, rotating 90° between copies.
+    for (let rot = 0; rot < COPIES; rot++) {
+        const a = rot * Math.PI / 2;
+        const cosA = Math.cos(a), sinA = Math.sin(a);
+        const r0x = pts[0][0], r0y = pts[0][1];
+        let prevX = cx + drawScale * (r0x * cosA - r0y * sinA);
+        let prevY = cy + drawScale * (r0x * sinA + r0y * cosA);
+        let bucket = -1;
+        g.beginPath();
+        g.moveTo(prevX, prevY);
 
-            for (let i = 0; i < 4; i++) {
-                drawCurve();
-                ctx.rotate(Math.PI / 2); // Rotate by 90 degrees
+        for (let i = 1; i < pts.length; i++) {
+            const rx = pts[i][0], ry = pts[i][1];
+            const newX = cx + drawScale * (rx * cosA - ry * sinA);
+            const newY = cy + drawScale * (rx * sinA + ry * cosA);
+            const norm = Math.min(1, Math.hypot(rx, ry) / maxR);
+            const b = Math.min(BANDS - 1, Math.floor(norm * BANDS));
+
+            // Only re-stroke when the colour band changes, so the gradient
+            // stays gradual without issuing one stroke() per segment.
+            if (b !== bucket) {
+                g.stroke();
+                g.beginPath();
+                g.moveTo(prevX, prevY);
+                bucket = b;
+                g.strokeStyle = colorFor(b / (BANDS - 1));
             }
+            g.lineTo(newX, newY);
+            prevX = newX; prevY = newY;
         }
+        g.stroke();
+    }
+}
 
-        // Draw the parametric curve
-        function drawCurve() {
-            ctx.beginPath();
-            let startX = x(-cccc) * scale;
-            let startY = y(-cccc) * scale;
-            ctx.moveTo(startX, startY);
+function draw() {
+    ctx.clearRect(0, 0, width, height);
+    render(ctx, width, height);
+}
 
-            for (let t = -cccc; t <= cccc; t += Math.PI/800) {
-                const newX = x(t) * scale;
-                const newY = y(t) * scale;
-                ctx.lineTo(newX, newY);
+function updateStatus() {
+    let s = params.map(id => `${id} ${state[id].toFixed(decimals[id])}`).join(' · ');
+    if (animating) s += ` — animating ${CONFIG.animParam}`;
+    $('status').textContent = s;
+}
+
+function syncOutputs() {
+    for (const id of params) $(id + 'Out').value = state[id].toFixed(decimals[id]);
+}
+
+// Build the sliders from the configuration.
+const controlsEl = $('controls');
+for (const p of CONFIG.params) {
+    const label = document.createElement('label');
+    const row = document.createElement('span');
+    row.className = 'row';
+    const name = document.createElement('span');
+    name.textContent = p.id;
+    const out = document.createElement('output');
+    out.id = p.id + 'Out';
+    row.appendChild(name); row.appendChild(out);
+    label.appendChild(row);
+    const input = document.createElement('input');
+    input.id = p.id;
+    input.type = 'range';
+    input.min = p.min; input.max = p.max; input.step = p.step; input.value = p.value;
+    label.appendChild(input);
+    controlsEl.appendChild(label);
+}
+
+for (const id of params) {
+    $(id).addEventListener('input', () => {
+        state[id] = parseFloat($(id).value);
+        $(id + 'Out').value = state[id].toFixed(decimals[id]);
+        updateStatus();
+        draw();
+    });
+}
+
+$('reset').onclick = () => {
+    for (const p of CONFIG.params) { state[p.id] = p.value; $(p.id).value = p.value; }
+    syncOutputs();
+    updateStatus();
+    draw();
+};
+
+// Save PNG — the filename records the parameter values so each capture is
+// self-describing and shows up in the gallery once committed to the repo.
+$('export').onclick = () => {
+    draw();
+    const out = document.createElement('canvas');
+    out.width = canvas.width;
+    out.height = canvas.height;
+    const c = out.getContext('2d');
+    c.fillStyle = '#10151d';
+    c.fillRect(0, 0, out.width, out.height);
+    c.drawImage(canvas, 0, 0);
+    out.toBlob(blob => {
+        if (!blob) return;
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = CONFIG.prefix + '_' + CONFIG.params.map(p => p.id + state[p.id].toFixed(p.decimals)).join('_') + '.png';
+        link.click();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }, 'image/png');
+};
+
+// Save GIF — capture a short sweep of the animated parameter and encode an
+// animated GIF with a self-contained encoder (no external dependencies).
+
+function triangleWave(base, hi, lo, phase) {
+    // phase in [0,1); one full cycle base -> hi -> lo -> base
+    if (phase < 0.25) return base + (hi - base) * (phase / 0.25);
+    if (phase < 0.75) return hi + (lo - hi) * ((phase - 0.25) / 0.5);
+    return lo + (base - lo) * ((phase - 0.75) / 0.25);
+}
+
+// LZW compression of palette indices for one GIF frame.
+function lzwEncode(indices, minCodeSize) {
+    const clearCode = 1 << minCodeSize;
+    const eoiCode = clearCode + 1;
+    let codeSize = minCodeSize + 1;
+    let nextCode = eoiCode + 1;
+    const dict = new Map();
+    const out = [];
+    let cur = 0, bits = 0;
+    function write(code) {
+        cur |= code << bits;
+        bits += codeSize;
+        while (bits >= 8) { out.push(cur & 0xff); cur >>= 8; bits -= 8; }
+    }
+    if (indices.length === 0) { write(clearCode); write(eoiCode); if (bits > 0) out.push(cur & 0xff); return new Uint8Array(out); }
+    write(clearCode);
+    let prefix = indices[0];
+    for (let i = 1; i < indices.length; i++) {
+        const k = indices[i];
+        const key = prefix * 4096 + k;
+        const c = dict.get(key);
+        if (c !== undefined) { prefix = c; }
+        else {
+            write(prefix);
+            if (nextCode < 4096) {
+                dict.set(key, nextCode++);
+                if (nextCode > (1 << codeSize) && codeSize < 12) codeSize++;
+            } else {
+                write(clearCode);
+                dict.clear();
+                codeSize = minCodeSize + 1;
+                nextCode = eoiCode + 1;
             }
-
-            ctx.stroke();
+            prefix = k;
         }
+    }
+    write(prefix);
+    write(eoiCode);
+    if (bits > 0) out.push(cur & 0xff);
+    return new Uint8Array(out);
+}
 
-        // Initial drawing
-        drawCurveWithRotation();
-
-        // Update value display and variables
-        function updateValueDisplay(id, value) {
-            document.getElementById(`value-${id}`).textContent = value;
+// Assemble a GIF89a file from indexed frames.
+function buildGif(frames, width, height, palette, delayCs) {
+    const pal = new Array(256);
+    for (let i = 0; i < 256; i++) pal[i] = palette[i] || [0, 0, 0];
+    const bytes = [];
+    const u8 = b => bytes.push(b & 0xff);
+    const u16 = v => { bytes.push(v & 0xff, (v >> 8) & 0xff); };
+    const str = s => { for (let i = 0; i < s.length; i++) bytes.push(s.charCodeAt(i)); };
+    str('GIF89a');
+    u16(width); u16(height);
+    u8(0xF7); u8(0); u8(0);
+    for (let i = 0; i < 256; i++) { u8(pal[i][0]); u8(pal[i][1]); u8(pal[i][2]); }
+    u8(0x21); u8(0xFF); u8(0x0B); str('NETSCAPE2.0');
+    u8(0x03); u8(0x01); u16(0); u8(0x00);
+    for (const idx of frames) {
+        u8(0x21); u8(0xF9); u8(0x04);
+        u8(0x04);
+        u16(delayCs); u8(0x00); u8(0x00);
+        u8(0x2C);
+        u16(0); u16(0); u16(width); u16(height);
+        u8(0x00);
+        u8(8); // LZW minimum code size for a 256-entry palette
+        const lzw = lzwEncode(idx, 8);
+        for (let i = 0; i < lzw.length; i += 255) {
+            const n = Math.min(255, lzw.length - i);
+            u8(n);
+            for (let j = 0; j < n; j++) u8(lzw[i + j]);
         }
+        u8(0x00);
+    }
+    u8(0x3B);
+    return new Uint8Array(bytes);
+}
 
-        // Event listeners for scrollbars
-        document.getElementById('aaaa').addEventListener('input', (event) => {
-            aaaa = parseFloat(event.target.value);
-            updateValueDisplay('aaaa', aaaa);
-        });
+// Quantize RGBA frames to a shared <=256-colour palette plus per-frame indices.
+function quantizeFrames(frames) {
+    const N = 1 << 15;
+    const count = new Uint32Array(N);
+    const rsum = new Uint32Array(N), gsum = new Uint32Array(N), bsum = new Uint32Array(N);
+    const buckets = [];
+    for (const fr of frames) {
+        const d = fr.data;
+        for (let i = 0; i < d.length; i += 4) {
+            const r = d[i], g = d[i + 1], b = d[i + 2];
+            const bk = ((r >> 3) << 10) | ((g >> 3) << 5) | (b >> 3);
+            if (count[bk] === 0) buckets.push(bk);
+            count[bk]++; rsum[bk] += r; gsum[bk] += g; bsum[bk] += b;
+        }
+    }
+    buckets.sort((a, b) => count[b] - count[a]);
+    const chosen = buckets.slice(0, 256);
+    const palette = [];
+    for (const bk of chosen) {
+        const n = count[bk];
+        palette.push([Math.round(rsum[bk] / n), Math.round(gsum[bk] / n), Math.round(bsum[bk] / n)]);
+    }
+    if (palette.length === 0) palette.push([0, 0, 0]);
 
-        document.getElementById('bbbb').addEventListener('input', (event) => {
-            bbbb = parseFloat(event.target.value);
-            updateValueDisplay('bbbb', bbbb);
-        });
+    // Precompute nearest palette entry for every 5-5-5 bucket.
+    const lut = new Uint8Array(N);
+    for (let bk = 0; bk < N; bk++) {
+        const r = (bk >> 10) << 3, g = ((bk >> 5) & 31) << 3, b = (bk & 31) << 3;
+        let best = 0, bestD = Infinity;
+        for (let p = 0; p < palette.length; p++) {
+            const dr = palette[p][0] - r, dg = palette[p][1] - g, db = palette[p][2] - b;
+            const d = dr * dr + dg * dg + db * db;
+            if (d < bestD) { bestD = d; best = p; }
+        }
+        lut[bk] = best;
+    }
 
-        document.getElementById('cccc').addEventListener('input', (event) => {
-            cccc = parseFloat(event.target.value);
-            updateValueDisplay('cccc', cccc);
-        });
+    const indices = [];
+    for (const fr of frames) {
+        const d = fr.data;
+        const idx = new Uint8Array(fr.w * fr.h);
+        let p = 0;
+        for (let i = 0; i < d.length; i += 4) {
+            const bk = ((d[i] >> 3) << 10) | ((d[i + 1] >> 3) << 5) | (d[i + 2] >> 3);
+            idx[p++] = lut[bk];
+        }
+        indices.push(idx);
+    }
+    return { palette, indices };
+}
 
-        document.getElementById('dddd').addEventListener('input', (event) => {
-            dddd = parseFloat(event.target.value);
-            updateValueDisplay('dddd', dddd);
-        });
+$('exportGif').onclick = () => {
+    const btn = $('exportGif');
+    const size = 400;
+    const p = defs[CONFIG.animParam];
+    const base = state[CONFIG.animParam];
+    const hi = Math.min(p.max, base + CONFIG.animRange);
+    const lo = Math.max(p.min, base - CONFIG.animRange);
+    const frames = [];
+    for (let i = 0; i < 20; i++) {
+        state[CONFIG.animParam] = triangleWave(base, hi, lo, i / 20);
+        const c = document.createElement('canvas');
+        c.width = size; c.height = size;
+        const g = c.getContext('2d');
+        g.fillStyle = '#10151d';
+        g.fillRect(0, 0, size, size);
+        render(g, size, size);
+        frames.push({ w: size, h: size, data: g.getImageData(0, 0, size, size).data });
+    }
+    state[CONFIG.animParam] = base;
+    $(CONFIG.animParam).value = base;
+    syncOutputs();
+    updateStatus();
+    draw();
 
-        // Redraw curve on mouse release
-        //document.querySelectorAll('input[type="range"]').forEach((slider) => {
-        //    slider.addEventListener('mouseup', drawCurveWithRotation);
-        //});
-    </script>
-</body>
-</html>
+    const name = CONFIG.prefix + '_' + CONFIG.params.map(pp => pp.id + state[pp.id].toFixed(pp.decimals)).join('_') + '.gif';
+    btn.textContent = 'Encoding…';
+    setTimeout(() => {
+        const { palette, indices } = quantizeFrames(frames);
+        const gif = buildGif(indices, size, size, palette, 12);
+        const blob = new Blob([gif], { type: 'image/gif' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = name;
+        link.click();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        btn.textContent = 'Save GIF';
+    }, 30);
+};
 
+// Animate: sweep a chosen parameter up and down around its current value.
+const animateBtn = $('animate');
+let animating = false;
+let animTimer = null;
+let animBase = 0;
+let animTarget = 0;
+
+function animTick() {
+    if (!animating) return;
+    const p = defs[CONFIG.animParam];
+    const hi = Math.min(p.max, animBase + CONFIG.animRange);
+    const lo = Math.max(p.min, animBase - CONFIG.animRange);
+    const cur = state[CONFIG.animParam];
+    if (Math.abs(animTarget - cur) <= CONFIG.animStep / 2) {
+        state[CONFIG.animParam] = animTarget;
+        animTarget = animTarget >= hi ? lo : hi;
+    } else {
+        state[CONFIG.animParam] += (cur < animTarget ? 1 : -1) * CONFIG.animStep;
+    }
+    $(CONFIG.animParam).value = state[CONFIG.animParam];
+    syncOutputs();
+    updateStatus();
+    draw();
+}
+
+animateBtn.onclick = () => {
+    if (animating) {
+        animating = false;
+        clearInterval(animTimer);
+        animTimer = null;
+        animateBtn.textContent = 'Animate';
+        updateStatus();
+        return;
+    }
+    animating = true;
+    animateBtn.textContent = 'Stop animating';
+    animBase = state[CONFIG.animParam];
+    animTarget = Math.min(defs[CONFIG.animParam].max, animBase + CONFIG.animRange);
+    animTick();
+    animTimer = setInterval(animTick, 80);
+};
+
+// Gallery: list committed <prefix>_*.png files via the GitHub API so they
+// appear automatically.
+const gallery = $('galleryItems');
+const FALLBACK_PNG_NAMES = []; // mirrors committed PNGs; the GitHub API path below is preferred
+function renderGallery(items) {
+    gallery.innerHTML = '';
+    if (!items.length) {
+        const e = document.createElement('div');
+        e.className = 'gallery-empty';
+        e.textContent = 'No saved PNGs yet.';
+        gallery.appendChild(e);
+        return;
+    }
+    for (const item of items) {
+        const w = document.createElement('a');
+        w.className = 'gallery-item';
+        w.href = item.url;
+        w.target = '_blank';
+        w.rel = 'noopener';
+        w.title = 'Open ' + item.name;
+        const img = document.createElement('img');
+        img.src = item.url;
+        img.alt = item.name;
+        img.loading = 'lazy';
+        w.appendChild(img);
+        const l = document.createElement('span');
+        l.textContent = item.name;
+        w.appendChild(l);
+        gallery.appendChild(w);
+    }
+}
+fetch('https://api.github.com/repos/tthtlc/tthtlc.github.io/contents/')
+    .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+    .then(files => {
+        if (!Array.isArray(files)) throw new Error('unexpected response');
+        renderGallery(files
+            .filter(f => f.type === 'file' && f.name.startsWith(CONFIG.prefix + '_') && f.name.toLowerCase().endsWith('.png'))
+            .map(f => ({ name: f.name, url: f.download_url }))
+            .sort((a, b) => a.name < b.name ? -1 : 1));
+    })
+    .catch(() => renderGallery(FALLBACK_PNG_NAMES.map(n => ({ name: n, url: n }))));
+
+new ResizeObserver(resize).observe(canvas.parentElement);
+syncOutputs();
+updateStatus();
+resize();
+</script>
+</body></html>
