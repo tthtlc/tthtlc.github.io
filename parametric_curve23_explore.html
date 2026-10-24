@@ -166,13 +166,14 @@ $('export').onclick = () => {
     }, 'image/png');
 };
 
-// Animate: hop among saved PNGs and sweep bbbb slowly between +2.0 and -2.0.
+// Animate: hop among saved PNGs and sweep bbbb slowly around each saved value by ±2.0.
 const animateBtn = $('animate');
 let animating = false;
 let animTimer = null;
 let savedPNGs = [];   // parsed gallery PNGs, filled by the GitHub fetch below
 let animCurrent = null;
-let animBbbbTarget = 2.0;
+let animBbbbBase = 0;
+let animBbbbTarget = 0;
 let animHopAt = 0;
 
 function parseName(name) {
@@ -186,19 +187,20 @@ function pickRandomPNG() {
     state.aaaa = animCurrent.aaaa;
     state.cccc = animCurrent.cccc;
     state.dddd = animCurrent.dddd;
-    state.bbbb = Math.max(-2, Math.min(2, animCurrent.bbbb)); // enter the sweep range at the saved bbbb
-    animBbbbTarget = 2.0;   // head for the +2.0 ceiling first, then fall to -2.0
+    state.bbbb = animCurrent.bbbb;             // start at the saved bbbb value
+    animBbbbBase = animCurrent.bbbb;
+    animBbbbTarget = animCurrent.bbbb + 2.0;   // sweep up first, then swing down past the base
     animHopAt = Date.now() + 9000 + Math.random() * 11000;
     return true;
 }
 
 function animTick() {
     if (!animating) return;
-    // Move bbbb toward its target in 0.01 steps, reversing direction at
-    // +2.0 and -2.0 so the value sweeps up and down forever.
+    // Move bbbb toward its target in 0.01 steps, reversing direction at the
+    // saved value ±2.0 so it sweeps up and down forever around that value.
     if (Math.abs(animBbbbTarget - state.bbbb) <= 0.005) {
         state.bbbb = animBbbbTarget;
-        animBbbbTarget = animBbbbTarget >= 2 ? -2 : 2;
+        animBbbbTarget = animBbbbTarget >= animBbbbBase + 2.0 ? animBbbbBase - 2.0 : animBbbbBase + 2.0;
     } else {
         state.bbbb += (state.bbbb < animBbbbTarget ? 1 : -1) * 0.01;
     }
@@ -226,7 +228,7 @@ animateBtn.onclick = () => {
     animateBtn.textContent = 'Stop animating';
     pickRandomPNG();
     animTick();
-    animTimer = setInterval(animTick, 30);
+    animTimer = setInterval(animTick, 80);
 };
 
 // Gallery: list committed parametric_curve23_explore_*.png files via the
