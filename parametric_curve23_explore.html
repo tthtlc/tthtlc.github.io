@@ -8,13 +8,13 @@
 </style>
 <!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-GEX61LPT08"></script> <script>   window.dataLayer = window.dataLayer || [];   function gtag(){dataLayer.push(arguments);}   gtag('js', new Date());   gtag('config', 'G-GEX61LPT08'); </script> </head>
 <body>
-<main><section class="stage"><canvas id="canvas" aria-label="Interactive parametric curve. Lines are bright near the centre and cool toward the rim; use the sliders to change its shape."></canvas><div class="topbar"><div class="heading"><div class="eyebrow">Form study / 23</div><h1>Parametric curve</h1></div><details class="geometry"><summary>Geometry</summary><p>The figure is one parametric curve drawn for <code>t</code> in <code>[&minus;c, c]</code>, then rotated four times by 90&deg; to form a symmetric rosette.</p><p><code>x(t) = a &middot; sin&sup3;(&minus;b&middot;t) &middot; 3<sup>cos(cos(d&middot;t))</sup></code><br><code>y(t) = a &middot; sin(sin(&minus;b&middot;t)) &middot; cos&sup3;(d&middot;t)</code></p><p>Colour encodes distance from the origin: warm and bright at the centre, cooling and dimming gradually toward the rim.</p></details></div><div class="hint">Adjust a slider to redraw &middot; Save PNG to export</div></section>
+<main><section class="stage"><canvas id="canvas" aria-label="Interactive parametric curve. Lines are bright near the centre and cool toward the rim; use the sliders to change its shape."></canvas><div class="topbar"><div class="heading"><div class="eyebrow">Form study / 23</div><h1>Parametric curve</h1></div><details class="geometry"><summary>Geometry</summary><p>The figure is one parametric curve drawn for <code>t</code> in <code>[&minus;c, c]</code>, then rotated four times by 90&deg; to form a symmetric rosette.</p><p><code>x(t) = a &middot; sin&sup3;(&minus;b&middot;t) &middot; 3<sup>cos(cos(d&middot;t))</sup></code><br><code>y(t) = a &middot; sin(sin(&minus;b&middot;t)) &middot; cos&sup3;(d&middot;t)</code></p><p>Colour encodes distance from the origin: warm and bright at the centre, cooling and dimming gradually toward the rim.</p></details></div><div class="hint">Adjust a slider to redraw &middot; Save PNG to export &middot; Animate sweeps saved PNGs</div></section>
 <aside><h2>Shape &amp; appearance</h2>
 <label><span class="row"><span>aaaa</span><output id="aaaaOut"></output></span><input id="aaaa" type="range" min="1" max="20" step="0.1" value="7"></label>
-<label><span class="row"><span>bbbb</span><output id="bbbbOut"></output></span><input id="bbbb" type="range" min="0" max="100" step="0.01" value="0.56"></label>
+<label><span class="row"><span>bbbb</span><output id="bbbbOut"></output></span><input id="bbbb" type="range" min="-2" max="100" step="0.01" value="0.56"></label>
 <label><span class="row"><span>cccc</span><output id="ccccOut"></output></span><input id="cccc" type="range" min="0" max="200" step="0.5" value="3"></label>
 <label><span class="row"><span>dddd</span><output id="ddddOut"></output></span><input id="dddd" type="range" min="0" max="100" step="0.1" value="2.02"></label>
-<button id="reset">Reset design</button><button id="export">Save PNG</button>
+<button id="reset">Reset design</button><button id="export">Save PNG</button><button id="animate">Animate</button>
 <p class="note" id="status"></p>
 <section class="gallery"><h2>Saved PNGs</h2><p class="gallery-note">PNG captures are named with their parameter values. Commit the downloaded files to the repo and they will appear here automatically (fetched via the GitHub API).</p><div id="galleryItems" class="gallery-grid"></div></section>
 </aside></main>
@@ -114,9 +114,10 @@ function draw() {
 }
 
 function updateStatus() {
-    $('status').textContent =
-        `aaaa ${state.aaaa.toFixed(1)} · bbbb ${state.bbbb.toFixed(2)} · ` +
+    let s = `aaaa ${state.aaaa.toFixed(1)} · bbbb ${state.bbbb.toFixed(2)} · ` +
         `cccc ${state.cccc.toFixed(1)} · dddd ${state.dddd.toFixed(2)}`;
+    if (animating && animCurrent) s += ` — animating ${animCurrent.name}`;
+    $('status').textContent = s;
 }
 
 function syncOutputs() {
@@ -165,6 +166,69 @@ $('export').onclick = () => {
     }, 'image/png');
 };
 
+// Animate: hop among saved PNGs and sweep bbbb slowly between +2.0 and -2.0.
+const animateBtn = $('animate');
+let animating = false;
+let animTimer = null;
+let savedPNGs = [];   // parsed gallery PNGs, filled by the GitHub fetch below
+let animCurrent = null;
+let animBbbbTarget = 2.0;
+let animHopAt = 0;
+
+function parseName(name) {
+    const m = name.match(/aaaa(\d+(?:\.\d+)?)_bbbb(-?\d+(?:\.\d+)?)_cccc(\d+(?:\.\d+)?)_dddd(\d+(?:\.\d+)?)/);
+    return m ? { aaaa: parseFloat(m[1]), bbbb: parseFloat(m[2]), cccc: parseFloat(m[3]), dddd: parseFloat(m[4]) } : null;
+}
+
+function pickRandomPNG() {
+    if (!savedPNGs.length) return false;
+    animCurrent = savedPNGs[Math.floor(Math.random() * savedPNGs.length)];
+    state.aaaa = animCurrent.aaaa;
+    state.cccc = animCurrent.cccc;
+    state.dddd = animCurrent.dddd;
+    state.bbbb = Math.max(-2, Math.min(2, animCurrent.bbbb)); // enter the sweep range at the saved bbbb
+    animBbbbTarget = 2.0;   // head for the +2.0 ceiling first, then fall to -2.0
+    animHopAt = Date.now() + 9000 + Math.random() * 11000;
+    return true;
+}
+
+function animTick() {
+    if (!animating) return;
+    // Move bbbb toward its target in 0.01 steps, reversing direction at
+    // +2.0 and -2.0 so the value sweeps up and down forever.
+    if (Math.abs(animBbbbTarget - state.bbbb) <= 0.005) {
+        state.bbbb = animBbbbTarget;
+        animBbbbTarget = animBbbbTarget >= 2 ? -2 : 2;
+    } else {
+        state.bbbb += (state.bbbb < animBbbbTarget ? 1 : -1) * 0.01;
+    }
+    if (Date.now() >= animHopAt) pickRandomPNG();
+    for (const id of params) $(id).value = state[id];
+    syncOutputs();
+    updateStatus();
+    draw();
+}
+
+animateBtn.onclick = () => {
+    if (animating) {
+        animating = false;
+        clearInterval(animTimer);
+        animTimer = null;
+        animateBtn.textContent = 'Animate';
+        updateStatus();
+        return;
+    }
+    if (!savedPNGs.length) {
+        $('status').textContent = 'No saved PNGs to animate yet.';
+        return;
+    }
+    animating = true;
+    animateBtn.textContent = 'Stop animating';
+    pickRandomPNG();
+    animTick();
+    animTimer = setInterval(animTick, 30);
+};
+
 // Gallery: list committed parametric_curve23_explore_*.png files via the
 // GitHub API so they appear automatically.
 const gallery = $('galleryItems');
@@ -200,10 +264,14 @@ fetch('https://api.github.com/repos/tthtlc/tthtlc.github.io/contents/')
     .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
     .then(files => {
         if (!Array.isArray(files)) throw new Error('unexpected response');
-        renderGallery(files
+        const items = files
             .filter(f => f.type === 'file' && f.name.startsWith('parametric_curve23_explore_') && f.name.toLowerCase().endsWith('.png'))
             .map(f => ({ name: f.name, url: f.download_url }))
-            .sort((a, b) => a.name < b.name ? -1 : 1));
+            .sort((a, b) => a.name < b.name ? -1 : 1);
+        renderGallery(items);
+        savedPNGs = items
+            .map(it => { const p = parseName(it.name); return p ? { name: it.name, url: it.url, ...p } : null; })
+            .filter(Boolean);
     })
     .catch(() => renderGallery(FALLBACK_PNG_NAMES.map(n => ({ name: n, url: n }))));
 
