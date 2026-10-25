@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mathematical Rose — Phyllotaxis</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #000;
+    overflow: hidden;
+    font-family: 'Georgia', serif;
+    color: #fff;
+  }
+  canvas { display: block; }
+
+  #info {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    pointer-events: none;
+    z-index: 10;
+  }
+  #info .formula {
+    font-size: 1.3rem;
+    margin-bottom: 6px;
+    color: #eee;
+    letter-spacing: 0.5px;
+  }
+  #info .formula2 {
+    font-size: 1rem;
+    color: #aaa;
+    letter-spacing: 0.5px;
+  }
+  #info .title {
+    font-size: 0.85rem;
+    color: #666;
+    margin-top: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  #controls {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  #controls label {
+    font-size: 0.8rem;
+    color: #999;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  #controls input[type="range"] {
+    width: 120px;
+    accent-color: #c0392b;
+  }
+  #controls span {
+    color: #ddd;
+    min-width: 30px;
+    font-size: 0.8rem;
+  }
+
+  .loading {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.2rem;
+    color: #c0392b;
+    z-index: 100;
+    transition: opacity 0.8s;
+  }
+</style>
+</head>
+<body>
+
+<div class="loading" id="loading">Growing rose…</div>
+
+<div id="info">
+  <div class="formula">α<sub>n</sub> = nπ(3 − √5)</div>
+  <div class="formula2">P<sub>n</sub>(u, v) = Rot<sub>z</sub>(α<sub>n</sub>) [ρ, w, z]<sup>T</sup></div>
+  <div class="title">Phyllotaxis Rose · Golden Angle ≈ 137.508°</div>
+</div>
+
+<div id="controls">
+  <label>Petals <input type="range" id="petalCount" min="30" max="200" value="120"> <span id="petalVal">120</span></label>
+  <label>Curl <input type="range" id="curlAmount" min="0" max="100" value="60"> <span id="curlVal">60</span></label>
+  <label>Open <input type="range" id="openAmount" min="0" max="100" value="70"> <span id="openVal">70</span></label>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.164.1/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+// ─── Scene Setup ───────────────────────────────────────────
+const scene = new THREE.Scene();
+scene.fog = new THREE.FogExp2(0x000000, 0.015);
+
+const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+camera.position.set(0, 8, 14);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.2;
+document.body.appendChild(renderer.domElement);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.05;
+controls.target.set(0, 1, 0);
+controls.minDistance = 5;
+controls.maxDistance = 30;
+
+// ─── Lighting ──────────────────────────────────────────────
+const ambientLight = new THREE.AmbientLight(0x221111, 0.6);
+scene.add(ambientLight);
+
+const mainLight = new THREE.DirectionalLight(0xffeedd, 2.5);
+mainLight.position.set(5, 12, 8);
+mainLight.castShadow = true;
+mainLight.shadow.mapSize.set(2048, 2048);
+mainLight.shadow.camera.near = 0.1;
+mainLight.shadow.camera.far = 50;
+mainLight.shadow.camera.left = -10;
+mainLight.shadow.camera.right = 10;
+mainLight.shadow.camera.top = 10;
+mainLight.shadow.camera.bottom = -10;
+scene.add(mainLight);
+
+const fillLight = new THREE.DirectionalLight(0xff6644, 0.8);
+fillLight.position.set(-5, 4, -6);
+scene.add(fillLight);
+
+const rimLight = new THREE.DirectionalLight(0xff3322, 0.5);
+rimLight.position.set(0, -2, -10);
+scene.add(rimLight);
+
+const pointLight = new THREE.PointLight(0xff4422, 1.5, 20);
+pointLight.position.set(0, 5, 0);
+scene.add(pointLight);
+
+// ─── Constants ─────────────────────────────────────────────
+const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5)); // ≈ 2.39996 rad ≈ 137.508°
+
+// ─── Rose Geometry Builder ─────────────────────────────────
+let roseGroup = new THREE.Group();
+scene.add(roseGroup);
+
+function buildRose(numPetals, curlFactor, openFactor) {
+  // Clear previous
+  while (roseGroup.children.length > 0) {
+    const child = roseGroup.children[0];
+    roseGroup.remove(child);
+    if (child.geometry) child.geometry.dispose();
+    if (child.material) {
+      if (Array.isArray(child.material)) child.material.forEach(m => m.dispose());
+      else child.material.dispose();
+    }
+  }
+
+  const petalResU = 20;
+  const petalResV = 12;
+
+  for (let n = 0; n < numPetals; n++) {
+    const alpha_n = n * GOLDEN_ANGLE;
+
+    // Petal size grows with n (outer petals larger)
+    const t = n / numPetals; // 0..1
+    const petalScale = 0.3 + 2.2 * Math.pow(t, 0.7);
+    const petalLength = petalScale * 1.0;
+    const petalWidth = petalScale * 0.55;
+
+    // Height: inner petals sit higher, outer petals spread out
+    const baseHeight = 2.5 * (1 - t * 0.6);
+    const curlAmount = curlFactor / 100;
+    const openAmount = openFactor / 100;
+
+    // Build petal geometry
+    const geometry = new THREE.BufferGeometry();
+    const vertices = [];
+    const normals = [];
+    const uvs = [];
+    const indices = [];
+
+    for (let i = 0; i <= petalResU; i++) {
+      for (let j = 0; j <= petalResV; j++) {
+        const u = i / petalResU; // 0..1 along petal length
+        const v = j / petalResV; // 0..1 across petal width
+
+        // Petal shape in local coords [ρ, w, z]
+        // ρ: radial distance from stem
+        const rho = u * petalLength;
+
+        // w: width offset (bell curve across petal)
+        const vNorm = (v - 0.5) * 2; // -1..1
+        const widthProfile = Math.cos(vNorm * Math.PI * 0.5);
+        const w = vNorm * petalWidth * widthProfile * (1 - u * 0.3);
+
+        // z: height/curvature of petal
+        // Petals curve upward at the edges and tip
+        const edgeCurl = widthProfile * curlAmount * 1.5 * (1 - u * 0.5);
+        const tipCurl = curlAmount * 0.8 * u * u;
+        const z = baseHeight + edgeCurl + tipCurl - u * 0.5 * openAmount;
+
+        // Apply rotation around z-axis by alpha_n
+        const cosA = Math.cos(alpha_n);
+        const sinA = Math.sin(alpha_n);
+
+        const x = rho * cosA - w * sinA;
+        const y = rho * sinA + w * cosA;
+        const zz = z;
+
+        vertices.push(x, y, zz);
+        uvs.push(u, v);
+
+        // Approximate normal
+        normals.push(0, 0, 1);
+      }
+    }
+
+    // Indices
+    for (let i = 0; i < petalResU; i++) {
+      for (let j = 0; j < petalResV; j++) {
+        const a = i * (petalResV + 1) + j;
+        const b = a + 1;
+        const c = a + (petalResV + 1);
+        const d = c + 1;
+        indices.push(a, c, b);
+        indices.push(b, c, d);
+      }
+    }
+
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+    geometry.setAttribute('normal', new THREE.Float32BufferAttribute(normals, 3));
+    geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+    geometry.setIndex(indices);
+    geometry.computeVertexNormals();
+
+    // Color: deeper red for outer petals, slightly brighter for inner
+    const hue = 0.0 + t * 0.02;
+    const sat = 0.85 - t * 0.15;
+    const light = 0.25 + t * 0.15;
+    const color = new THREE.Color().setHSL(hue, sat, light);
+
+    const material = new THREE.MeshStandardMaterial({
+      color: color,
+      roughness: 0.55,
+      metalness: 0.05,
+      side: THREE.DoubleSide,
+      flatShading: false,
+    });
+
+    const mesh = new THREE.Mesh(geometry, material);
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    roseGroup.add(mesh);
+  }
+
+  // Add stem
+  const stemGeo = new THREE.CylinderGeometry(0.08, 0.12, 4, 12);
+  const stemMat = new THREE.MeshStandardMaterial({ color: 0x1a4a1a, roughness: 0.8 });
+  const stem = new THREE.Mesh(stemGeo, stemMat);
+  stem.position.y = -1.5;
+  stem.castShadow = true;
+  roseGroup.add(stem);
+
+  // Add a few leaves
+  for (let i = 0; i < 3; i++) {
+    const leafGeo = new THREE.SphereGeometry(0.6, 8, 6);
+    leafGeo.scale(1, 0.1, 2);
+    const leafMat = new THREE.MeshStandardMaterial({ color: 0x2a6a2a, roughness: 0.7, side: THREE.DoubleSide });
+    const leaf = new THREE.Mesh(leafGeo, leafMat);
+    const angle = (i / 3) * Math.PI * 2 + 0.5;
+    leaf.position.set(Math.cos(angle) * 0.5, -1.5 + i * 0.3, Math.sin(angle) * 0.5);
+    leaf.rotation.set(0.3, angle, 0.5);
+    leaf.castShadow = true;
+    roseGroup.add(leaf);
+  }
+}
+
+// ─── Animation: Grow the rose ──────────────────────────────
+let growthProgress = 0;
+let isGrowing = true;
+
+function animateGrowth() {
+  if (!isGrowing) return;
+  growthProgress += 0.008;
+  if (growthProgress >= 1) {
+    growthProgress = 1;
+    isGrowing = false;
+    document.getElementById('loading').style.opacity = '0';
+    setTimeout(() => document.getElementById('loading').style.display = 'none', 800);
+  }
+
+  const currentPetals = Math.floor(growthProgress * 120);
+  const curl = 60;
+  const open = 70;
+
+  // Only rebuild if petal count changed
+  if (currentPetals !== roseGroup.userData.lastPetals) {
+    buildRose(Math.max(currentPetals, 1), curl, open);
+    roseGroup.userData.lastPetals = currentPetals;
+  }
+
+  // Scale animation
+  const scale = easeOutCubic(Math.min(growthProgress * 1.2, 1));
+  roseGroup.scale.set(scale, scale, scale);
+}
+
+function easeOutCubic(t) {
+  return 1 - Math.pow(1 - t, 3);
+}
+
+// ─── Controls ──────────────────────────────────────────────
+const petalSlider = document.getElementById('petalCount');
+const curlSlider = document.getElementById('curlAmount');
+const openSlider = document.getElementById('openAmount');
+
+petalSlider.addEventListener('input', () => {
+  document.getElementById('petalVal').textContent = petalSlider.value;
+  isGrowing = false;
+  buildRose(parseInt(petalSlider.value), parseInt(curlSlider.value), parseInt(openSlider.value));
+});
+curlSlider.addEventListener('input', () => {
+  document.getElementById('curlVal').textContent = curlSlider.value;
+  isGrowing = false;
+  buildRose(parseInt(petalSlider.value), parseInt(curlSlider.value), parseInt(openSlider.value));
+});
+openSlider.addEventListener('input', () => {
+  document.getElementById('openVal').textContent = openSlider.value;
+  isGrowing = false;
+  buildRose(parseInt(petalSlider.value), parseInt(curlSlider.value), parseInt(openSlider.value));
+});
+
+// ── Render Loop ───────────────────────────────────────────
+const clock = new THREE.Clock();
+
+function render() {
+  requestAnimationFrame(render);
+
+  const elapsed = clock.getElapsedTime();
+
+  if (isGrowing) {
+    animateGrowth();
+  } else {
+    // Gentle floating animation
+    roseGroup.position.y = Math.sin(elapsed * 0.5) * 0.15;
+    roseGroup.rotation.y = Math.sin(elapsed * 0.2) * 0.05;
+  }
+
+  // Subtle light animation
+  pointLight.intensity = 1.2 + Math.sin(elapsed * 1.5) * 0.3;
+
+  controls.update();
+  renderer.render(scene, camera);
+}
+
+// ─── Resize ────────────────────────────────────────────────
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+// ─── Start ────────────────────────────────────────────────
+render();
+</script>
+</body>
+</html>

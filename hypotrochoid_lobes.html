@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="stylesheet" href="/assets/math-art.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hypotrochoid Curves with Lobes Slider and Color Palette</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        canvas {
+            border: 1px solid black;
+        }
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .control-group {
+            margin: 8px 0;
+            display: flex;
+            align-items: center;
+        }
+        .control-group label {
+            margin-right: 10px;
+        }
+        input[type="range"] {
+            width: 200px;
+        }
+        .value-label {
+            margin-left: 10px;
+            font-weight: bold;
+        }
+        .derived-label {
+            margin-left: 10px;
+            color: #555;
+        }
+        .palette-strip {
+            margin: 10px 0;
+            border: 1px solid #999;
+            cursor: pointer;
+        }
+        .selected-label {
+            font-size: 14px;
+            color: #333;
+        }
+    </style>
+<!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-GEX61LPT08"></script> <script>   window.dataLayer = window.dataLayer || [];   function gtag(){dataLayer.push(arguments);}   gtag('js', new Date());   gtag('config', 'G-GEX61LPT08'); </script>
+</head>
+<body>
+    <canvas id="canvas" width="600" height="600"></canvas>
+
+    <div class="controls">
+        <div class="control-group">
+            <label for="lobes">Lobes (R / r):</label>
+            <input type="range" id="lobes" min="2" max="20" step="1" value="5">
+            <span id="lobes-value" class="value-label">5</span>
+            <span id="r-derived" class="derived-label">r = 40</span>
+        </div>
+        <div class="control-group">
+            <label for="R">R (Outer radius):</label>
+            <input type="range" id="R" min="0" max="400" value="200">
+            <span id="R-value" class="value-label">200</span>
+        </div>
+        <div class="control-group">
+            <label for="d">d (Max pen distance):</label>
+            <input type="range" id="d" min="0" max="300" value="60">
+            <span id="d-value" class="value-label">60</span>
+        </div>
+        <div class="control-group">
+            <label for="iterations">Iterations:</label>
+            <input type="range" id="iterations" min="1" max="24" step="1" value="6">
+            <span id="iterations-value" class="value-label">6</span>
+            <span id="d-derived" class="derived-label">d: 10 → 60</span>
+        </div>
+        <div class="control-group">
+            <label for="hueStep">Hue step:</label>
+            <input type="range" id="hueStep" min="0" max="16" step="1" value="1">
+            <span id="hueStep-value" class="value-label">1</span>
+            <span id="hue-derived" class="derived-label">11.3° per iteration</span>
+        </div>
+        <div class="control-group">
+            <label for="lineWidth">Line width:</label>
+            <input type="range" id="lineWidth" min="0.5" max="4" step="0.5" value="1.5">
+            <span id="lineWidth-value" class="value-label">1.5</span>
+        </div>
+        <canvas id="paletteCanvas" width="480" height="36" class="palette-strip"></canvas>
+        <div id="selected-label" class="selected-label"></div>
+    </div>
+
+    <script>
+        document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
+
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const paletteCanvas = document.getElementById('paletteCanvas');
+        const paletteCtx = paletteCanvas.getContext('2d');
+
+        // Static parameters, tuned via sliders (no animation)
+        let lobes = 5;     // Number of lobes = R / r
+        let R = 200;       // Outer radius
+        let d = 60;        // Maximum pen distance from rolling circle center
+        let iterations = 6; // Number of overlaid curves, each proportionately larger
+        let hueStep = 1;    // Palette cells advanced per iteration (0 = one color)
+        let lineWidth = 1.5;
+
+        // 32-color palette: a full cycle of hues around the color wheel.
+        // Clicking a cell selects the base color of iteration 0; each
+        // subsequent iteration steps one cell further in hue.
+        const PALETTE_SIZE = 32;
+        const palette = Array.from({ length: PALETTE_SIZE }, (_, i) =>
+            `hsl(${(i * 360 / PALETTE_SIZE).toFixed(1)}, 100%, 50%)`
+        );
+        let selectedIndex = 21; // default: hsl(236.3, 100%, 50%) — a blue
+
+        const SEGMENTS = 640; // number of points per curve
+
+        function drawHypotrochoid() {
+            const width = canvas.width;
+            const height = canvas.height;
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const r = R / lobes; // inner radius follows from the lobe count
+
+            ctx.clearRect(0, 0, width, height);
+            drawFormulaStrip();
+            if (r === 0) return; // degenerate: nothing to draw at R = 0
+
+            // Scale the drawing down just enough to fit the canvas
+            // when the outer radius would overflow it.
+            const maxRadius = (R - r) + d;
+            const limit = Math.min(width, height) / 2 - 5;
+            const scale = Math.min(1, limit / maxRadius);
+
+            ctx.lineWidth = lineWidth;
+            ctx.lineCap = 'round';
+
+            // Draw several overlaid curves. Iteration i steps hueStep
+            // palette cells away from the selected base color, so
+            // consecutive iterations differ in hue by hueStep * 11.25°.
+            // Each curve uses pen distance d * (i + 1) / iterations, so it
+            // is proportionately larger than the previous one (like the
+            // sweeping pen distance of hypotrochoid_animate_d1.html).
+            for (let i = 0; i < iterations; i++) {
+                const di = d * (i + 1) / iterations;
+                const px = t => centerX + scale * ((R - r) * Math.cos(t) + di * Math.cos(((R - r) / r) * t));
+                const py = t => centerY + scale * ((R - r) * Math.sin(t) - di * Math.sin(((R - r) / r) * t));
+
+                ctx.strokeStyle = palette[(selectedIndex + i * hueStep) % PALETTE_SIZE];
+                ctx.beginPath();
+                for (let seg = 0; seg <= SEGMENTS; seg++) {
+                    const t = seg * 2 * Math.PI / SEGMENTS;
+                    if (seg === 0)
+                        ctx.moveTo(px(t), py(t));
+                    else
+                        ctx.lineTo(px(t), py(t));
+                }
+                ctx.stroke();
+            }
+        }
+
+        // Micro-font formula strip, drawn on the canvas, centered at the bottom
+        function drawFormulaStrip() {
+            const width = canvas.width;
+            const height = canvas.height;
+            const h = 46;
+            const r = R / lobes;
+            ctx.fillStyle = 'rgba(13, 17, 23, .85)';
+            ctx.fillRect(0, height - h, width, h);
+            ctx.font = '9px "Courier New", monospace';
+            ctx.textAlign = 'center';
+            ctx.fillStyle = '#a4e3d4';
+            ctx.fillText('x(t) = (R − r)·cos t + d·cos((R − r)/r · t)    y(t) = (R − r)·sin t − d·sin((R − r)/r · t)',
+                         width / 2, height - h + 15);
+            ctx.fillStyle = '#91a5bf';
+            ctx.fillText(`R = ${R} · r = R/lobes = ${r.toFixed(1)} · lobes = ${lobes} · d = ${d} · ${iterations} curves · hue step ${(hueStep * 360 / PALETTE_SIZE).toFixed(1)}° · t ∈ [0, 2π)`,
+                         width / 2, height - h + 30);
+        }
+
+        // Draw the 32-color palette as a picker strip, marking the selected cell
+        function drawPaletteStrip() {
+            const cellWidth = paletteCanvas.width / PALETTE_SIZE;
+            palette.forEach((color, i) => {
+                paletteCtx.fillStyle = color;
+                paletteCtx.fillRect(i * cellWidth, 0, cellWidth, paletteCanvas.height);
+            });
+
+            // Black border around the currently selected color
+            paletteCtx.strokeStyle = '#000';
+            paletteCtx.lineWidth = 2;
+            paletteCtx.strokeRect(selectedIndex * cellWidth + 1, 1,
+                                  cellWidth - 2, paletteCanvas.height - 2);
+
+            document.getElementById('selected-label').innerText =
+                'Selected: ' + palette[selectedIndex];
+        }
+
+        // Click on the strip to pick the color used for the whole drawing
+        paletteCanvas.addEventListener('click', function(e) {
+            const rect = paletteCanvas.getBoundingClientRect();
+            const x = e.clientX - rect.left - paletteCanvas.clientLeft;
+            const i = Math.floor(x / rect.width * PALETTE_SIZE);
+            if (i >= 0 && i < PALETTE_SIZE) {
+                selectedIndex = i;
+                drawPaletteStrip();
+                drawHypotrochoid();
+            }
+        });
+
+        function updateDerived() {
+            document.getElementById('r-derived').innerText = 'r = ' + (R / lobes).toFixed(1);
+            document.getElementById('d-derived').innerText =
+                'd: ' + (d / iterations).toFixed(1) + ' → ' + d;
+            document.getElementById('hue-derived').innerText =
+                (hueStep * 360 / PALETTE_SIZE).toFixed(1) + '° per iteration';
+        }
+
+        function bindSlider(id, apply) {
+            const el = document.getElementById(id);
+            el.addEventListener('input', function() {
+                apply(parseFloat(this.value));
+                document.getElementById(id + '-value').innerText = this.value;
+                updateDerived();
+                drawHypotrochoid();
+            });
+        }
+
+        bindSlider('lobes', v => lobes = v);
+        bindSlider('R', v => R = v);
+        bindSlider('d', v => d = v);
+        bindSlider('iterations', v => iterations = v);
+        bindSlider('hueStep', v => hueStep = v);
+        bindSlider('lineWidth', v => lineWidth = v);
+
+        // Initial static drawing on page load
+        window.onload = function() {
+            updateDerived();
+            drawHypotrochoid();
+            drawPaletteStrip();
+        };
+    </script>
+</body>
+</html>

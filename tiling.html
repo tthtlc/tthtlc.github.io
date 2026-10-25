@@ -1,0 +1,261 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Animated 4-Isohedral Tiling GIF Generator</title>
+<style>
+  :root { color-scheme: dark; }
+  body {
+    margin: 0; min-height: 100vh; display: grid;
+    grid-template-columns: 340px 1fr;
+    font: 14px/1.45 system-ui, sans-serif;
+    background: #101418; color: #e8edf2;
+  }
+  aside {
+    padding: 18px; border-right: 1px solid #263038;
+    background: #151b21; overflow: auto;
+  }
+  main { display: grid; place-items: center; padding: 24px; }
+  h1 { font-size: 18px; margin: 0 0 14px; }
+  label { display: block; margin: 12px 0 4px; color: #aeb8c2; }
+  input, select, button {
+    width: 100%; box-sizing: border-box; padding: 8px;
+    border-radius: 7px; border: 1px solid #33414c;
+    background: #0d1216; color: inherit;
+  }
+  button { margin-top: 14px; cursor: pointer; font-weight: 600; }
+  button:disabled { opacity: .5; cursor: progress; }
+  canvas {
+    max-width: 100%; border-radius: 10px;
+    background: white; box-shadow: 0 12px 40px #0008;
+  }
+  .note { color: #8b98a4; font-size: 12px; margin-top: 14px; }
+  .row { display: flex; gap: 8px; }
+  .row > * { flex: 1; }
+  a { color: #7cc4ff; }
+</style>
+</head>
+<body>
+
+<aside>
+  <h1>Animated 4-isohedral tiling</h1>
+
+  <label>Canvas size</label>
+  <div class="row">
+    <input id="width" type="number" value="480" min="120" max="1200">
+    <input id="height" type="number" value="480" min="120" max="1200">
+  </div>
+
+  <label>Tile scale</label>
+  <input id="scale" type="range" min="30" max="180" value="86">
+
+  <label>Animation speed</label>
+  <input id="speed" type="range" min="1" max="20" value="7">
+
+  <label>Frames</label>
+  <input id="frames" type="number" value="24" min="4" max="96">
+
+  <label>Frame delay (ms)</label>
+  <input id="delay" type="number" value="80" min="20" max="500">
+
+  <label>Colour mode</label>
+  <select id="mode">
+    <option value="cycle">Cycle tile classes</option>
+    <option value="wave">Travelling colour wave</option>
+    <option value="static">Static four colours</option>
+  </select>
+
+  <button id="render">Generate GIF</button>
+  <button id="download" disabled>Download GIF</button>
+
+  <p class="note">
+    This generates a periodic tiling with four distinguishable tile orbits,
+    analogous to Jaap Scherphuis’s <code>n4-*</code> tiling images. His Tiling
+    Viewer uses separate colours for the isohedrality classes.
+  </p>
+</aside>
+
+<main>
+  <canvas id="view" width="480" height="480"></canvas>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/gif.js.optimized@0.2.0/dist/gif.js"></script>
+<script>
+const canvas = document.getElementById('view');
+const ctx = canvas.getContext('2d');
+const workerScript = 'https://cdn.jsdelivr.net/npm/gif.js.optimized@0.2.0/dist/gif.worker.js';
+
+// A fundamental unit containing four congruent quadrilateral tiles.
+// Edit these four polygons to reproduce a different n4 tiling exactly.
+const TILE = [
+  [[0.00, 0.00], [0.50, 0.00], [0.50, 0.42], [0.00, 0.58]],
+  [[0.50, 0.00], [1.00, 0.00], [1.00, 0.58], [0.50, 0.42]],
+  [[0.00, 0.58], [0.50, 0.42], [0.50, 1.00], [0.00, 1.00]],
+  [[0.50, 0.42], [1.00, 0.58], [1.00, 1.00], [0.50, 1.00]]
+];
+
+// Translation vectors of the periodic lattice, in unit-cell coordinates.
+const LATTICE = [
+  [1, 0],
+  [0, 1]
+];
+
+const PALETTE = ['#e63946', '#2a9d8f', '#457b9d', '#e9c46a'];
+
+function drawFrame(t, mode) {
+  const w = canvas.width, h = canvas.height;
+  const scale = +document.getElementById('scale').value;
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, w, h);
+
+  const margin = scale * 1.2;
+  const cols = Math.ceil((w + 2 * margin) / scale) + 1;
+  const rows = Math.ceil((h + 2 * margin) / scale) + 1;
+
+  for (let iy = -1; iy < rows; iy++) {
+    for (let ix = -1; ix < cols; ix++) {
+      for (let k = 0; k < 4; k++) {
+        const pts = TILE[k].map(([x, y]) => [
+          ix * scale + x * scale,
+          iy * scale + y * scale
+        ]);
+
+        let colorIndex = k;
+
+        if (mode === 'cycle') {
+          colorIndex = (k + Math.floor(t * 4)) % 4;
+        } else if (mode === 'wave') {
+          const phase = (ix + iy + t * 4) % 4;
+          colorIndex = Math.floor(((phase + 4) % 4));
+        }
+
+        ctx.beginPath();
+        ctx.moveTo(pts[0][0], pts[0][1]);
+        for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1]);
+        ctx.closePath();
+
+        ctx.fillStyle = PALETTE[colorIndex];
+        ctx.fill();
+
+        ctx.lineWidth = Math.max(1, scale / 55);
+        ctx.strokeStyle = '#101418';
+        ctx.stroke();
+      }
+    }
+  }
+}
+
+function animate() {
+  const mode = document.getElementById('mode').value;
+  const speed = +document.getElementById('speed').value / 400;
+  let t = 0;
+
+  function loop() {
+    drawFrame(t, mode);
+    t += speed;
+    requestAnimationFrame(loop);
+  }
+  loop();
+}
+
+function makeGif() {
+  const frames = +document.getElementById('frames').value;
+  const delay = +document.getElementById('delay').value;
+  const mode = document.getElementById('mode').value;
+  const renderButton = document.getElementById('render');
+  const downloadButton = document.getElementById('download');
+
+  renderButton.disabled = true;
+  downloadButton.disabled = true;
+  renderButton.textContent = 'Rendering…';
+
+  const gif = new GIF({
+    workers: 2,
+    quality: 8,
+    width: canvas.width,
+    height: canvas.height,
+    workerScript
+  });
+
+  for (let f = 0; f < frames; f++) {
+    const off = document.createElement('canvas');
+    off.width = canvas.width;
+    off.height = canvas.height;
+    const c = off.getContext('2d');
+
+    // Draw directly into an offscreen canvas.
+    const saved = ctx.canvas;
+    const temp = drawFrame;
+    drawFrameTo(c, f / frames, mode);
+
+    gif.addFrame(off, { delay, copy: true });
+  }
+
+  gif.on('finished', blob => {
+    const url = URL.createObjectURL(blob);
+    downloadButton.disabled = false;
+    downloadButton.onclick = () => {
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'n4-tiling-animation.gif';
+      a.click();
+    };
+    renderButton.disabled = false;
+    renderButton.textContent = 'Generate GIF';
+  });
+
+  gif.render();
+}
+
+// Same renderer, but targeted at an arbitrary 2D context.
+function drawFrameTo(c, t, mode) {
+  const w = canvas.width, h = canvas.height;
+  const scale = +document.getElementById('scale').value;
+  c.fillStyle = '#ffffff';
+  c.fillRect(0, 0, w, h);
+
+  const cols = Math.ceil(w / scale) + 2;
+  const rows = Math.ceil(h / scale) + 2;
+
+  for (let iy = -1; iy < rows; iy++) {
+    for (let ix = -1; ix < cols; ix++) {
+      for (let k = 0; k < 4; k++) {
+        const pts = TILE[k].map(([x, y]) => [
+          ix * scale + x * scale,
+          iy * scale + y * scale
+        ]);
+
+        let colorIndex = k;
+        if (mode === 'cycle') colorIndex = (k + Math.floor(t * 4)) % 4;
+        if (mode === 'wave') colorIndex = Math.floor(((ix + iy + t * 4) % 4 + 4) % 4);
+
+        c.beginPath();
+        c.moveTo(...pts[0]);
+        for (let i = 1; i < pts.length; i++) c.lineTo(...pts[i]);
+        c.closePath();
+
+        c.fillStyle = PALETTE[colorIndex];
+        c.fill();
+        c.lineWidth = Math.max(1, scale / 55);
+        c.strokeStyle = '#101418';
+        c.stroke();
+      }
+    }
+  }
+}
+
+document.getElementById('render').addEventListener('click', makeGif);
+
+for (const id of ['width', 'height']) {
+  document.getElementById(id).addEventListener('change', () => {
+    canvas.width = +document.getElementById('width').value;
+    canvas.height = +document.getElementById('height').value;
+  });
+}
+
+animate();
+</script>
+</body>
+</html>
