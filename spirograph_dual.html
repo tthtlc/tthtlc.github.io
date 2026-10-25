@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dual Spirograph — Two Inner Circles</title>
+<style>
+:root{color-scheme:dark;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#0b111b;color:#eef2f8}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0}
+main{display:grid;grid-template-columns:1fr 320px;min-height:100vh}
+.stage{position:relative;min-height:650px;overflow:hidden;background:radial-gradient(ellipse at 50% 48%,#1d2c42,#0a111b 72%)}
+canvas{display:block;width:100%;height:100%;position:absolute;inset:0;touch-action:none}
+.topbar{position:absolute;top:32px;left:36px;right:36px;display:flex;align-items:flex-start;gap:36px;flex-wrap:wrap;z-index:2}
+.heading{pointer-events:none}
+h1{font-size:clamp(24px,3vw,40px);font-weight:500;letter-spacing:-.04em;margin:6px 0}
+.eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.22em;color:#91a5bf}
+.hint{position:absolute;bottom:28px;left:36px;color:#92a3b9;font-size:12px;pointer-events:none}
+aside{padding:32px 25px;background:#151c27;border-left:1px solid #2a3443}
+h2{font-size:17px;font-weight:500;margin:0 0 26px}
+.wheel{margin-bottom:24px}
+.wheel .row{display:flex;align-items:center;gap:8px;margin-bottom:9px;font-size:13px;color:#c7d2e3}
+.wheel .row label{flex:1;margin:0}
+.swatch{flex:0 0 auto;width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:0 0 9px var(--accent)}
+output{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;font-size:12px;color:var(--accent,#88dbc6)}
+input[type=range]{width:100%;margin:0;accent-color:var(--accent,#88dbc6)}
+select,button{background:#202d3d;color:#eef2f8;border:1px solid #3a485b;border-radius:8px;padding:10px;font:inherit;width:100%}
+button{cursor:pointer;margin-top:10px}
+button:hover{background:#2b3e53}
+button.dir{background:transparent;border-color:var(--accent);color:var(--accent);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px}
+button.dir:hover{background:var(--accent);color:#08111c}
+button.primary{background:linear-gradient(135deg,#0e7490,#155e75);border-color:#22d3ee;color:#e6fbff}
+button.primary:hover{background:linear-gradient(135deg,#0891b2,#0e7490)}
+.note{font-size:12px;color:#91a5bf;line-height:1.65;margin-top:20px}
+details{font-size:12px;color:#91a5bf;line-height:1.65}
+summary{cursor:pointer;color:#c7d2e3}
+code{color:#a4e3d4}
+.geometry{pointer-events:auto;max-width:min(46vw,400px);background:rgba(21,28,39,.88);border:1px solid #2a3443;border-radius:12px;padding:10px 14px;backdrop-filter:blur(6px);margin-top:4px}
+.geometry p{margin:.6em 0}
+.gallery{border-top:1px solid #2a3443;margin-top:25px;padding-top:22px}
+.gallery h2{margin:0 0 8px}
+.gallery-note{font-size:11px;color:#91a5bf;line-height:1.6;margin:0 0 14px}
+.gallery-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.gallery-item{display:block;border:1px solid #2a3443;border-radius:8px;overflow:hidden;text-decoration:none;background:#10151d}
+.gallery-item:hover{border-color:#22d3ee}
+.gallery-item img{display:block;width:100%;height:64px;object-fit:cover}
+.gallery-item span{display:block;font-size:9px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#91a5bf;padding:4px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gallery-empty{grid-column:1/-1;color:#6b7d94;font-size:12px;text-align:center;padding:14px 0}
+@media(max-width:760px){
+  main{grid-template-columns:1fr}
+  .stage{height:65vh;min-height:420px}
+  aside{border-left:0;border-top:1px solid #2a3443}
+  .topbar{left:24px;top:22px;right:24px;gap:24px}
+  .hint{left:24px}
+  .geometry{max-width:calc(100vw - 48px)}
+}
+</style>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-GEX61LPT08"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-GEX61LPT08');
+</script>
+</head>
+<body>
+<main>
+  <section class="stage">
+    <canvas id="canvas" aria-label="Two circles rolling inside a large fixed circle, each leaving a persistent hypocycloid trace. Use the sliders to change the radii and the direction buttons to reverse each wheel."></canvas>
+    <div class="topbar">
+      <div class="heading">
+        <div class="eyebrow">Rolling curves / 02</div>
+        <h1>Dual spirograph</h1>
+      </div>
+      <details class="geometry">
+        <summary>Geometry</summary>
+        <p>Two wheels of radii r<sub>A</sub> and r<sub>B</sub> roll without slipping inside a fixed circle of radius R. A bright dot on each rim leaves a persistent hypocycloid contour.</p>
+        <p><code>P(θ) = (R − r)(cos θ, sin θ) + r(cos φ, sin φ)</code><br><code>φ = −(R/r − 1)θ</code></p>
+        <p>Reverse flips that wheel's rolling direction, mirroring its orbit. Changing a radius or pressing Reset clears both contours and restarts them from the rightmost point.</p>
+      </details>
+    </div>
+    <div class="hint">Both wheels roll inside the same fixed circle · CW / CCW reverses direction · traces persist until reset</div>
+  </section>
+
+  <aside>
+    <h2>Wheels &amp; motion</h2>
+
+    <div class="wheel" style="--accent:#22d3ee">
+      <div class="row">
+        <span class="swatch" aria-hidden="true"></span>
+        <label for="rA">Inner radius A</label>
+        <output id="rAOut" for="rA">150</output>
+      </div>
+      <input id="rA" type="range" min="10" max="448" step="1" value="150">
+      <button id="dirA" class="dir" type="button">Direction: CW</button>
+    </div>
+
+    <div class="wheel" style="--accent:#ffa62b">
+      <div class="row">
+        <span class="swatch" aria-hidden="true"></span>
+        <label for="rB">Inner radius B</label>
+        <output id="rBOut" for="rB">90</output>
+      </div>
+      <input id="rB" type="range" min="10" max="448" step="1" value="90">
+      <button id="dirB" class="dir" type="button">Direction: CW</button>
+    </div>
+
+    <div class="wheel" style="--accent:#7dd3fc">
+      <div class="row">
+        <label for="speed">Rolling speed</label>
+        <output id="speedOut" for="speed">1.00×</output>
+      </div>
+      <input id="speed" type="range" min="0.25" max="3" step="0.05" value="1">
+    </div>
+
+    <button id="reset" type="button">Reset contours</button>
+    <button id="export" class="primary" type="button">Save PNG</button>
+    <p class="note" id="status"></p>
+
+    <section class="gallery">
+      <h2>Saved PNGs</h2>
+      <p class="gallery-note">PNG captures are named with their parameter values. Commit the downloaded files to the repo and they will appear here automatically (fetched via the GitHub API).</p>
+      <div id="galleryItems" class="gallery-grid"></div>
+    </section>
+  </aside>
+</main>
+
+<script>
+'use strict';
+
+const $ = id => document.getElementById(id);
+const canvas = $('canvas');
+const ctx = canvas.getContext('2d');
+
+const TAU = Math.PI * 2;
+const OFF = 1000;            // persistent-trail layer resolution
+const CX = OFF / 2;
+const CY = OFF / 2;
+const R = 450;               // fixed outer radius (logical units)
+const BASE_SPEED = 1.2;      // radians per second at speed = 1
+
+// Persistent contour layer. It is never cleared during animation, so both
+// traces accumulate; only Reset or a radius change wipes it.
+const trail = document.createElement('canvas');
+trail.width = trail.height = OFF;
+const tctx = trail.getContext('2d');
+
+// Contrasting, bright colours for the two paths (cyan vs orange).
+const wheels = [
+  { radius: 150, angle: 0, direction: 1, last: null, color: '#22d3ee' },
+  { radius: 90,  angle: 0, direction: 1, last: null, color: '#ffa62b' }
+];
+
+let speed = 1;
+let viewW = 1, viewH = 1, dpr = 1;
+let lastTime = 0;
+
+function positionsOf(w) {
+  const orbit = R - w.radius;
+  const ox = CX + orbit * Math.cos(w.angle);
+  const oy = CY + orbit * Math.sin(w.angle);
+  const spin = -(R / w.radius - 1) * w.angle;
+  return {
+    ox: ox,
+    oy: oy,
+    x: ox + w.radius * Math.cos(spin),
+    y: oy + w.radius * Math.sin(spin)
+  };
+}
+
+function clearTrails() {
+  tctx.clearRect(0, 0, OFF, OFF);
+  for (const w of wheels) {
+    w.angle = 0;
+    w.last = null;
+  }
+}
+
+function trace(w, dTheta) {
+  // Small increments keep the persistent contours smooth even when the
+  // wheel's spin multiplier R/r is large.
+  const steps = Math.max(1, Math.min(64, Math.ceil(Math.abs(dTheta) / 0.0015)));
+  const step = dTheta / steps;
+  for (let i = 0; i < steps; i++) {
+    w.angle += step;
+    const p = positionsOf(w);
+    if (w.last) {
+      tctx.beginPath();
+      tctx.moveTo(w.last.x, w.last.y);
+      tctx.lineTo(p.x, p.y);
+      tctx.strokeStyle = w.color;
+      tctx.lineWidth = 3.2;
+      tctx.lineCap = 'round';
+      tctx.stroke();
+    }
+    w.last = { x: p.x, y: p.y };
+  }
+}
+
+function resize() {
+  const box = canvas.parentElement.getBoundingClientRect();
+  viewW = Math.max(1, box.width);
+  viewH = Math.max(1, box.height);
+  dpr = Math.min(window.devicePixelRatio || 1, 2);
+  canvas.width = Math.round(viewW * dpr);
+  canvas.height = Math.round(viewH * dpr);
+}
+
+function paintBackground(c, w, h) {
+  const g = c.createRadialGradient(w / 2, h * 0.48, 0, w / 2, h * 0.48, Math.max(w, h) * 0.75);
+  g.addColorStop(0, '#1d2c42');
+  g.addColorStop(1, '#0a111b');
+  c.fillStyle = g;
+  c.fillRect(0, 0, w, h);
+}
+
+function draw() {
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  paintBackground(ctx, viewW, viewH);
+
+  const scale = Math.min(viewW * 0.86, viewH * 0.74) / (2 * R);
+  const px = 1 / scale; // one CSS pixel expressed in logical units
+
+  ctx.save();
+  ctx.translate(viewW / 2, viewH * 0.54);
+  ctx.scale(scale, scale);
+  ctx.translate(-CX, -CY);
+
+  // Persistent contours sit beneath the moving geometry.
+  ctx.drawImage(trail, 0, 0);
+
+  // Fixed outer track.
+  ctx.beginPath();
+  ctx.arc(CX, CY, R, 0, TAU);
+  ctx.strokeStyle = 'rgba(198, 214, 236, 0.72)';
+  ctx.lineWidth = 2 * px;
+  ctx.stroke();
+
+  for (const w of wheels) {
+    const p = positionsOf(w);
+
+    // Inner circle.
+    ctx.beginPath();
+    ctx.arc(p.ox, p.oy, w.radius, 0, TAU);
+    ctx.strokeStyle = w.color;
+    ctx.lineWidth = 1.5 * px;
+    ctx.shadowColor = w.color;
+    ctx.shadowBlur = 6;
+    ctx.stroke();
+
+    // Rim dot.
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 4.5 * px, 0, TAU);
+    ctx.fillStyle = w.color;
+    ctx.shadowBlur = 14;
+    ctx.fill();
+  }
+
+  ctx.shadowBlur = 0;
+  ctx.restore();
+}
+
+function frame(now) {
+  if (!lastTime) lastTime = now;
+  const dt = Math.min((now - lastTime) / 1000, 0.05);
+  lastTime = now;
+
+  const dTheta = BASE_SPEED * speed * dt;
+  for (const w of wheels) trace(w, w.direction * dTheta);
+
+  draw();
+  requestAnimationFrame(frame);
+}
+
+function gcd(a, b) {
+  while (b) { const t = a % b; a = b; b = t; }
+  return a;
+}
+
+function cuspInfo(radius) {
+  const g = gcd(R, radius);
+  return { ratio: R / radius, cusps: R / g, laps: radius / g };
+}
+
+function updateStatus() {
+  const a = cuspInfo(wheels[0].radius);
+  const b = cuspInfo(wheels[1].radius);
+  const phrase = info =>
+    `${info.ratio.toFixed(3)} → ${info.cusps} cusp${info.cusps === 1 ? '' : 's'} closing after ${info.laps} orbit${info.laps === 1 ? '' : 's'}`;
+  $('status').textContent = `R/rA = ${phrase(a)} · R/rB = ${phrase(b)}.`;
+}
+
+function updateDirButton(w, button) {
+  const clockwise = w.direction === 1;
+  button.textContent = `Direction: ${clockwise ? 'CW' : 'CCW'}`;
+  button.title = clockwise
+    ? 'Rolling clockwise — click to reverse'
+    : 'Rolling counter-clockwise — click to reverse';
+  button.setAttribute('aria-label', button.title);
+}
+
+function bindWheel(index, sliderId, outputId, buttonId) {
+  const w = wheels[index];
+  const slider = $(sliderId);
+  const output = $(outputId);
+  const button = $(buttonId);
+
+  slider.addEventListener('input', function () {
+    w.radius = parseInt(this.value, 10);
+    output.value = String(w.radius);
+    clearTrails();
+    updateStatus();
+  });
+
+  button.addEventListener('click', function () {
+    w.direction *= -1;
+    updateDirButton(w, button);
+  });
+
+  output.value = String(w.radius);
+  updateDirButton(w, button);
+}
+
+$('speed').addEventListener('input', function () {
+  speed = parseFloat(this.value);
+  $('speedOut').value = speed.toFixed(2) + '×';
+});
+
+$('reset').addEventListener('click', clearTrails);
+
+function exportFilename() {
+  const dir = w => w.direction === 1 ? 'cw' : 'ccw';
+  return `spirograph_dual_rA${wheels[0].radius}_rB${wheels[1].radius}` +
+    `_dirA_${dir(wheels[0])}_dirB_${dir(wheels[1])}_speed${speed.toFixed(2)}.png`;
+}
+
+function drawSummary(c, w, h) {
+  const a = cuspInfo(wheels[0].radius);
+  const b = cuspInfo(wheels[1].radius);
+  const dir = wheel => wheel.direction === 1 ? 'clockwise' : 'counter-clockwise';
+  const count = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
+  const lines = [
+    `Dual spirograph — R = ${R} (fixed) · rA = ${wheels[0].radius} · rB = ${wheels[1].radius}`,
+    `Directions: A ${dir(wheels[0])} · B ${dir(wheels[1])} · speed ${speed.toFixed(2)}×`,
+    `R/rA = ${a.ratio.toFixed(3)} → ${count(a.cusps, 'cusp')} over ${count(a.laps, 'orbit')} · R/rB = ${b.ratio.toFixed(3)} → ${count(b.cusps, 'cusp')} over ${count(b.laps, 'orbit')}`
+  ];
+  const fontPx = Math.max(12, Math.round(Math.min(w, h) / 58));
+  const lineH = fontPx * 1.5;
+  const pad = fontPx * 0.7;
+  const bandH = lines.length * lineH + 2 * pad;
+  c.font = `${fontPx}px ui-monospace, SFMono-Regular, Menlo, monospace`;
+  c.fillStyle = 'rgba(7, 12, 20, 0.86)';
+  c.fillRect(0, h - bandH, w, bandH);
+  c.fillStyle = '#d6e4f5';
+  c.textBaseline = 'middle';
+  lines.forEach((line, i) => c.fillText(line, pad, h - bandH + pad + lineH * (i + 0.5)));
+}
+
+$('export').addEventListener('click', function () {
+  const out = document.createElement('canvas');
+  out.width = canvas.width;
+  out.height = canvas.height;
+  const c = out.getContext('2d');
+  c.drawImage(canvas, 0, 0);
+  drawSummary(c, out.width, out.height);
+
+  out.toBlob(function (blob) {
+    if (!blob) return;
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = exportFilename();
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }, 'image/png');
+});
+
+// Saved-PNG gallery. Files committed to the repo with this prefix appear
+// automatically through the GitHub API; the fallback mirrors them.
+const FALLBACK_PNG_NAMES = [];
+
+function renderGallery(items) {
+  const gallery = $('galleryItems');
+  gallery.innerHTML = '';
+  if (!items.length) {
+    const empty = document.createElement('div');
+    empty.className = 'gallery-empty';
+    empty.textContent = 'No saved PNGs yet.';
+    gallery.appendChild(empty);
+    return;
+  }
+  for (const item of items) {
+    const wrap = document.createElement('a');
+    wrap.className = 'gallery-item';
+    wrap.href = item.url;
+    wrap.target = '_blank';
+    wrap.rel = 'noopener';
+    wrap.title = 'Open ' + item.name;
+
+    const img = document.createElement('img');
+    img.src = item.url;
+    img.alt = item.name;
+    img.loading = 'lazy';
+    wrap.appendChild(img);
+
+    const label = document.createElement('span');
+    label.textContent = item.name;
+    wrap.appendChild(label);
+
+    gallery.appendChild(wrap);
+  }
+}
+
+fetch('https://api.github.com/repos/tthtlc/tthtlc.github.io/contents/')
+  .then(response => {
+    if (!response.ok) throw new Error('HTTP ' + response.status);
+    return response.json();
+  })
+  .then(files => {
+    if (!Array.isArray(files)) throw new Error('unexpected response');
+    renderGallery(files
+      .filter(f => f.type === 'file' && f.name.indexOf('spirograph_dual_') === 0 && f.name.toLowerCase().endsWith('.png'))
+      .map(f => ({ name: f.name, url: f.download_url }))
+      .sort((a, b) => a.name < b.name ? -1 : 1));
+  })
+  .catch(() => renderGallery(FALLBACK_PNG_NAMES.map(name => ({ name: name, url: name }))));
+
+bindWheel(0, 'rA', 'rAOut', 'dirA');
+bindWheel(1, 'rB', 'rBOut', 'dirB');
+updateStatus();
+
+new ResizeObserver(resize).observe(canvas.parentElement);
+resize();
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
