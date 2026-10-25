@@ -1,225 +1,363 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Superformula</title>
-    <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-            background-color: #0f0f13;
-            font-family: 'Courier New', Courier, monospace;
-        }
-        #title {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: #ffffff;
-            font-size: 2rem;
-            font-weight: bold;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-            pointer-events: none;
-            opacity: 0.8;
-        }
-        #formula {
-            position: absolute;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: #aaaaaa;
-            font-size: 1rem;
-            pointer-events: none;
-            background: rgba(0, 0, 0, 0.5);
-            padding: 10px 20px;
-            border-radius: 8px;
-            backdrop-filter: blur(5px);
-        }
-    </style>
-    <!-- Import Three.js and lil-gui -->
-    <script type="importmap">
-        {
-            "imports": {
-                "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/",
-                "lil-gui": "https://cdn.jsdelivr.net/npm/lil-gui@0.18.0/dist/lil-gui.esm.min.js"
-            }
-        }
-    </script>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The superformula — Interactive Study</title>
+<style>
+:root{color-scheme:dark;font-family:Inter,system-ui,sans-serif;background:#10151d;color:#eef2f8}*{box-sizing:border-box}body{margin:0}main{display:grid;grid-template-columns:1fr 300px;height:100vh;min-height:0}.stage{position:relative;height:100vh;min-height:0;overflow:hidden;background:radial-gradient(ellipse at 50% 45%,#253247,#10151d 70%)}canvas{display:block;width:100%;height:100%;position:absolute;touch-action:none;cursor:grab}canvas:active{cursor:grabbing}.topbar{position:absolute;top:32px;left:36px;right:36px;display:flex;align-items:flex-start;gap:36px;flex-wrap:wrap;z-index:2}.heading{pointer-events:none}h1{font-size:clamp(24px,3vw,40px);font-weight:500;letter-spacing:-.04em;margin:6px 0}.eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.22em;color:#91a5bf}.hint{position:absolute;bottom:28px;left:36px;color:#92a3b9;font-size:12px;pointer-events:none}aside{padding:32px 25px;background:#151c27;border-left:1px solid #2a3443;height:100vh;overflow-y:auto}aside::-webkit-scrollbar{width:8px}aside::-webkit-scrollbar-track{background:#10151d}aside::-webkit-scrollbar-thumb{background:#3a485b;border-radius:4px}aside::-webkit-scrollbar-thumb:hover{background:#4a5c74}h2{font-size:17px;font-weight:500;margin:0 0 26px}h3.group-title{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.18em;color:#88dbc6;margin:0 0 16px;padding-bottom:8px;border-bottom:1px solid #2a3443}label{display:block;font-size:13px;color:#c7d2e3;margin-bottom:22px}.row{display:flex;justify-content:space-between;margin-bottom:8px}output{font-variant-numeric:tabular-nums;color:#88dbc6}input[type=range]{width:100%;accent-color:#88dbc6}select,button{background:#202d3d;color:#eef2f8;border:1px solid #3a485b;border-radius:8px;padding:10px;font:inherit;width:100%}input[type=color]{width:100%;height:34px;background:none;border:0;padding:0}button{cursor:pointer;margin-top:10px}button:hover{background:#2b3e53}.check{display:flex;gap:10px;align-items:center}.note{font-size:12px;color:#91a5bf;line-height:1.65;margin-top:25px}details{font-size:12px;color:#91a5bf;line-height:1.65}summary{cursor:pointer;color:#c7d2e3}code{color:#a4e3d4}.geometry{pointer-events:auto;max-width:min(46vw,400px);background:rgba(21,28,39,.88);border:1px solid #2a3443;border-radius:12px;padding:10px 14px;backdrop-filter:blur(6px);margin-top:4px}.geometry p{margin:.6em 0}.gallery{border-top:1px solid #2a3443;margin-top:25px;padding-top:22px}.gallery h2{margin:0 0 8px}.gallery-note{font-size:11px;color:#91a5bf;line-height:1.6;margin:0 0 14px}.gallery-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.gallery-item{display:block;border:1px solid #2a3443;border-radius:8px;overflow:hidden;text-decoration:none;background:#10151d}.gallery-item:hover{border-color:#88dbc6}.gallery-item img{display:block;width:100%;height:64px;object-fit:cover}.gallery-item span{display:block;font-size:9px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#91a5bf;padding:4px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.gallery-empty{grid-column:1/-1;color:#6b7d94;font-size:12px;text-align:center;padding:14px 0}@media(max-width:760px){main{grid-template-columns:1fr;height:auto;min-height:100vh}.stage{height:65vh;min-height:420px}aside{border-left:0;border-top:1px solid #2a3443;height:auto;max-height:none;overflow:visible}.topbar{left:24px;top:22px;right:24px;gap:24px}.hint{left:24px}}
+</style>
 </head>
 <body>
-    <div id="formula">
-        r(ϑ) = ( |cos(mϑ/4) / a|<sup>n2</sup> + |sin(mϑ/4) / b|<sup>n3</sup> )<sup>-1/n1</sup>
-    </div>
-    <div id="title">THE SUPERFORMULA</div>
+<main><section class="stage"><canvas id="canvas" aria-label="Interactive three-dimensional supershape generated by Gielis' superformula. Drag to orbit; use controls to change the section and profile parameters."></canvas><div class="topbar"><div class="heading"><div class="eyebrow">Supershape / 01</div><h1>The superformula</h1></div><details class="geometry"><summary>Geometry</summary><p>Johan Gielis' superformula (2003) generalises the circle, ellipse and superellipse. In polar form:</p><p><code>r(θ) = ( |cos(mθ/4) / a|<sup>n2</sup> + |sin(mθ/4) / b|<sup>n3</sup> )<sup>−1/n1</sup></code></p><p>A 3D supershape is the spherical product of two such curves — a section <code>r<sub>ϑ</sub>(θ)</code> and a profile <code>r<sub>φ</sub>(φ)</code>:</p><p><code>x = r<sub>ϑ</sub> cos θ · r<sub>φ</sub> cos φ</code><br><code>y = r<sub>ϑ</sub> sin θ · r<sub>φ</sub> cos φ</code><br><code>z = r<sub>φ</sub> sin φ</code></p><p><code>m</code> sets the rotational symmetry; <code>n1</code>, <code>n2</code> and <code>n3</code> control roundness, pinching and spikiness; <code>a</code> and <code>b</code> stretch the axes.</p></details></div><div class="hint">Drag to orbit · Scroll to zoom · Save PNG captures the current view</div></section>
+<aside><h2>Shape &amp; appearance</h2>
+<h3 class="group-title">Section ϑ</h3>
+<label><span class="row"><span>m</span><output id="tmOut"></output></span><input id="tm" type="range" min="0" max="20" step="1" value="4"></label>
+<label><span class="row"><span>n1</span><output id="tn1Out"></output></span><input id="tn1" type="range" min="0.1" max="50" step="0.1" value="10"></label>
+<label><span class="row"><span>n2</span><output id="tn2Out"></output></span><input id="tn2" type="range" min="0.1" max="50" step="0.1" value="10"></label>
+<label><span class="row"><span>n3</span><output id="tn3Out"></output></span><input id="tn3" type="range" min="0.1" max="50" step="0.1" value="10"></label>
+<label><span class="row"><span>a</span><output id="taOut"></output></span><input id="ta" type="range" min="0.1" max="5" step="0.1" value="1"></label>
+<label><span class="row"><span>b</span><output id="tbOut"></output></span><input id="tb" type="range" min="0.1" max="5" step="0.1" value="1"></label>
+<h3 class="group-title">Profile φ</h3>
+<label><span class="row"><span>m</span><output id="pmOut"></output></span><input id="pm" type="range" min="0" max="20" step="1" value="4"></label>
+<label><span class="row"><span>n1</span><output id="pn1Out"></output></span><input id="pn1" type="range" min="0.1" max="50" step="0.1" value="10"></label>
+<label><span class="row"><span>n2</span><output id="pn2Out"></output></span><input id="pn2" type="range" min="0.1" max="50" step="0.1" value="10"></label>
+<label><span class="row"><span>n3</span><output id="pn3Out"></output></span><input id="pn3" type="range" min="0.1" max="50" step="0.1" value="10"></label>
+<label><span class="row"><span>a</span><output id="paOut"></output></span><input id="pa" type="range" min="0.1" max="5" step="0.1" value="1"></label>
+<label><span class="row"><span>b</span><output id="pbOut"></output></span><input id="pb" type="range" min="0.1" max="5" step="0.1" value="1"></label>
+<h3 class="group-title">Appearance</h3>
+<label><span class="row"><span>Resolution</span><output id="resOut"></output></span><input id="res" type="range" min="32" max="192" step="16" value="128"></label>
+<label>Surface colour<input id="color" type="color" value="#44bbff"></label>
+<label>Rendering<select id="mode"><option value="solid">Satin surface</option><option value="both">Surface + mesh</option><option value="wire">Wireframe</option></select></label>
+<label class="check"><input id="spin" type="checkbox" checked>Auto-rotate</label>
+<button id="reset">Reset design</button><button id="export">Save PNG</button>
+<p class="note" id="status"></p>
+<section class="gallery"><h2>Saved PNGs</h2><p class="gallery-note">PNG captures are named with their parameter values. Commit the downloaded files to the repo and they will appear here automatically (fetched via the GitHub API).</p><div id="galleryItems" class="gallery-grid"></div></section>
+</aside></main>
 
-    <script type="module">
-        import * as THREE from 'three';
-        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-        import GUI from 'lil-gui';
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.164.1/examples/jsm/"
+  }
+}
+</script>
 
-        // --- 1. Scene Setup ---
-        const scene = new THREE.Scene();
-        // Add a subtle fog for depth
-        scene.fog = new THREE.FogExp2(0x0f0f13, 0.05);
+<script type="module">
+'use strict';
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 0, 6);
+const $ = id => document.getElementById(id);
+const stage = document.querySelector('.stage');
 
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(window.devicePixelRatio);
-        document.body.appendChild(renderer.domElement);
+// ─── Scene ──────────────────────────────────────────────────
+const scene = new THREE.Scene();
+scene.fog = new THREE.FogExp2(0x10151d, 0.04);
 
-        const controls = new OrbitControls(camera, renderer.domElement);
-        controls.enableDamping = true;
-        controls.dampingFactor = 0.05;
-        controls.autoRotate = true;
-        controls.autoRotateSpeed = 1.5;
+const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
+camera.position.set(0, 0, 6);
 
-        // --- 2. Lighting ---
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-        scene.add(ambientLight);
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+stage.appendChild(renderer.domElement);
 
-        const mainLight = new THREE.DirectionalLight(0xffffff, 2);
-        mainLight.position.set(5, 10, 7);
-        scene.add(mainLight);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.05;
+controls.autoRotate = true;
+controls.autoRotateSpeed = 1.5;
+controls.minDistance = 2;
+controls.maxDistance = 30;
 
-        const fillLight = new THREE.DirectionalLight(0x88bbff, 1);
-        fillLight.position.set(-5, -5, -5);
-        scene.add(fillLight);
+// ─── Lighting ───────────────────────────────────────────────
+scene.add(new THREE.AmbientLight(0xffffff, 0.6));
 
-        // --- 3. Superformula Math ---
-        function superformula(angle, m, n1, n2, n3, a, b) {
-            const part1 = Math.pow(Math.abs(Math.cos(m * angle / 4) / a), n2);
-            const part2 = Math.pow(Math.abs(Math.sin(m * angle / 4) / b), n3);
-            return Math.pow(part1 + part2, -1 / n1);
-        }
+const mainLight = new THREE.DirectionalLight(0xffffff, 2.2);
+mainLight.position.set(5, 10, 7);
+scene.add(mainLight);
 
-        // --- 4. Parameters (Default values to create a shape similar to the image) ---
-        const params = {
-            theta: { m: 4, n1: 10, n2: 10, n3: 10, a: 1, b: 1 }, // Section
-            phi:   { m: 4, n1: 10, n2: 10, n3: 10, a: 1, b: 1 }  // Profile
-        };
+const fillLight = new THREE.DirectionalLight(0x88bbff, 1);
+fillLight.position.set(-5, -5, -5);
+scene.add(fillLight);
 
-        let mesh;
+// ─── Superformula ───────────────────────────────────────────
+function superformula(angle, m, n1, n2, n3, a, b) {
+  const part1 = Math.pow(Math.abs(Math.cos(m * angle / 4) / a), n2);
+  const part2 = Math.pow(Math.abs(Math.sin(m * angle / 4) / b), n3);
+  return Math.pow(part1 + part2, -1 / n1);
+}
 
-        // --- 5. Geometry Generation ---
-        function updateGeometry() {
-            if (mesh) {
-                scene.remove(mesh);
-                mesh.geometry.dispose();
-            }
+const params = {
+  theta: { m: 4, n1: 10, n2: 10, n3: 10, a: 1, b: 1 }, // section
+  phi:   { m: 4, n1: 10, n2: 10, n3: 10, a: 1, b: 1 }  // profile
+};
 
-            const geometry = new THREE.BufferGeometry();
-            const vertices = [];
-            const indices = [];
-            const normals = [];
-            const uvs = [];
+let mesh = null, wireMesh = null, pendingRebuild = true;
 
-            const segments = 128; // Resolution
-            const uSteps = segments;
-            const vSteps = segments;
+function disposeObject() {
+  if (mesh) {
+    scene.remove(mesh);
+    mesh.geometry.dispose();
+    mesh.material.dispose();
+    mesh = null;
+  }
+  if (wireMesh) {
+    scene.remove(wireMesh);
+    wireMesh.material.dispose(); // shares the solid mesh's geometry
+    wireMesh = null;
+  }
+}
 
-            for (let i = 0; i <= vSteps; i++) {
-                // Latitude (φ in the formula's context)
-                const v = -Math.PI / 2 + (i / vSteps) * Math.PI;
-                
-                for (let j = 0; j <= uSteps; j++) {
-                    // Longitude (ϑ in the formula's context)
-                    const u = -Math.PI + (j / uSteps) * Math.PI * 2;
+function updateGeometry() {
+  disposeObject();
 
-                    // Calculate radii for both angles
-                    const r1 = superformula(u, params.theta.m, params.theta.n1, params.theta.n2, params.theta.n3, params.theta.a, params.theta.b);
-                    const r2 = superformula(v, params.phi.m, params.phi.n1, params.phi.n2, params.phi.n3, params.phi.a, params.phi.b);
+  const geometry = new THREE.BufferGeometry();
+  const vertices = [], uvs = [], indices = [];
+  const uSteps = +$('res').value;
+  const vSteps = uSteps;
 
-                    // 3D Spherical Product
-                    const x = r1 * Math.cos(u) * r2 * Math.cos(v);
-                    const y = r1 * Math.sin(u) * r2 * Math.cos(v);
-                    const z = r2 * Math.sin(v);
+  for (let i = 0; i <= vSteps; i++) {
+    const v = -Math.PI / 2 + (i / vSteps) * Math.PI; // latitude, φ
+    for (let j = 0; j <= uSteps; j++) {
+      const u = -Math.PI + (j / uSteps) * Math.PI * 2; // longitude, θ
 
-                    vertices.push(x, y, z);
-                    uvs.push(j / uSteps, i / vSteps);
-                }
-            }
+      const r1 = superformula(u, params.theta.m, params.theta.n1, params.theta.n2, params.theta.n3, params.theta.a, params.theta.b);
+      const r2 = superformula(v, params.phi.m, params.phi.n1, params.phi.n2, params.phi.n3, params.phi.a, params.phi.b);
 
-            // Generate indices for triangles
-            for (let i = 0; i < vSteps; i++) {
-                for (let j = 0; j < uSteps; j++) {
-                    const a = i * (uSteps + 1) + j;
-                    const b = i * (uSteps + 1) + j + 1;
-                    const c = (i + 1) * (uSteps + 1) + j;
-                    const d = (i + 1) * (uSteps + 1) + j + 1;
+      // Spherical product of the section and the profile.
+      vertices.push(
+        r1 * Math.cos(u) * r2 * Math.cos(v),
+        r1 * Math.sin(u) * r2 * Math.cos(v),
+        r2 * Math.sin(v)
+      );
+      uvs.push(j / uSteps, i / vSteps);
+    }
+  }
 
-                    // Two triangles per quad
-                    indices.push(a, b, d);
-                    indices.push(a, d, c);
-                }
-            }
+  for (let i = 0; i < vSteps; i++) {
+    for (let j = 0; j < uSteps; j++) {
+      const a = i * (uSteps + 1) + j;
+      const b = a + 1;
+      const c = (i + 1) * (uSteps + 1) + j;
+      const d = c + 1;
+      indices.push(a, b, d, a, d, c);
+    }
+  }
 
-            geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
-            geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
-            geometry.setIndex(indices);
-            
-            // Flat shading is used to get the faceted look from the image
-            geometry.computeVertexNormals();
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+  geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+  geometry.setIndex(indices);
+  geometry.computeVertexNormals();
 
-            const material = new THREE.MeshStandardMaterial({
-                color: 0x44bbff,
-                roughness: 0.3,
-                metalness: 0.1,
-                flatShading: true, // Gives the sharp geometric look
-                side: THREE.DoubleSide
-            });
+  const color = new THREE.Color($('color').value);
+  const mode = $('mode').value;
 
-            mesh = new THREE.Mesh(geometry, material);
-            scene.add(mesh);
-        }
+  if (mode === 'wire') {
+    mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ color, wireframe: true }));
+  } else {
+    mesh = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({
+      color, roughness: 0.3, metalness: 0.1,
+      flatShading: true, // the sharp faceted look
+      side: THREE.DoubleSide,
+      polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1 // keeps the mesh overlay from z-fighting
+    }));
+  }
+  scene.add(mesh);
 
-        // Initial build
-        updateGeometry();
+  if (mode === 'both') {
+    wireMesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({
+      color: 0x88dbc6, wireframe: true, transparent: true, opacity: 0.18
+    }));
+    scene.add(wireMesh);
+  }
 
-        // --- 6. GUI Setup ---
-        const gui = new GUI({ title: 'Parameters' });
-        
-        // Add custom styling to the GUI to match the dark theme
-        gui.domElement.style.backgroundColor = 'rgba(20, 20, 25, 0.9)';
+  updateOutputs();
+  pendingRebuild = false;
+}
 
-        const thetaFolder = gui.addFolder('ϑ (Section)');
-        thetaFolder.add(params.theta, 'm', 0, 20, 1).name('m').onChange(updateGeometry);
-        thetaFolder.add(params.theta, 'n1', 0.1, 50, 0.1).name('n1').onChange(updateGeometry);
-        thetaFolder.add(params.theta, 'n2', 0.1, 50, 0.1).name('n2').onChange(updateGeometry);
-        thetaFolder.add(params.theta, 'n3', 0.1, 50, 0.1).name('n3').onChange(updateGeometry);
-        thetaFolder.add(params.theta, 'a', 0.1, 5, 0.1).name('a').onChange(updateGeometry);
-        thetaFolder.add(params.theta, 'b', 0.1, 5, 0.1).name('b').onChange(updateGeometry);
+// ─── Controls ───────────────────────────────────────────────
+const bindings = [
+  ['tm', 'theta', 'm', 0], ['tn1', 'theta', 'n1', 1], ['tn2', 'theta', 'n2', 1],
+  ['tn3', 'theta', 'n3', 1], ['ta', 'theta', 'a', 1], ['tb', 'theta', 'b', 1],
+  ['pm', 'phi', 'm', 0], ['pn1', 'phi', 'n1', 1], ['pn2', 'phi', 'n2', 1],
+  ['pn3', 'phi', 'n3', 1], ['pa', 'phi', 'a', 1], ['pb', 'phi', 'b', 1]
+];
 
-        const phiFolder = gui.addFolder('φ (Profile)');
-        phiFolder.add(params.phi, 'm', 0, 20, 1).name('m').onChange(updateGeometry);
-        phiFolder.add(params.phi, 'n1', 0.1, 50, 0.1).name('n1').onChange(updateGeometry);
-        phiFolder.add(params.phi, 'n2', 0.1, 50, 0.1).name('n2').onChange(updateGeometry);
-        phiFolder.add(params.phi, 'n3', 0.1, 50, 0.1).name('n3').onChange(updateGeometry);
-        phiFolder.add(params.phi, 'a', 0.1, 5, 0.1).name('a').onChange(updateGeometry);
-        phiFolder.add(params.phi, 'b', 0.1, 5, 0.1).name('b').onChange(updateGeometry);
+function fmt(value, decimals) {
+  return decimals === 0 ? String(value) : (+value).toFixed(decimals);
+}
 
-        // --- 7. Window Resize Handling ---
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
+function updateOutputs() {
+  for (const [id, group, key, decimals] of bindings) {
+    const value = params[group][key];
+    $(id + 'Out').value = fmt(value, decimals);
+  }
+  const res = +$('res').value;
+  $('resOut').value = res + ' × ' + res;
+  const t = params.theta, p = params.phi;
+  $('status').textContent =
+    `ϑ m=${fmt(t.m, 0)} n=(${t.n1.toFixed(1)}, ${t.n2.toFixed(1)}, ${t.n3.toFixed(1)}) a=${t.a.toFixed(1)} b=${t.b.toFixed(1)} · ` +
+    `φ m=${fmt(p.m, 0)} n=(${p.n1.toFixed(1)}, ${p.n2.toFixed(1)}, ${p.n3.toFixed(1)}) a=${p.a.toFixed(1)} b=${p.b.toFixed(1)} · ` +
+    `${res} × ${res} grid`;
+}
 
-        // --- 8. Render Loop ---
-        function animate() {
-            requestAnimationFrame(animate);
-            controls.update(); // Required for auto-rotation and damping
-            renderer.render(scene, camera);
-        }
+for (const [id, group, key, decimals] of bindings) {
+  $(id).addEventListener('input', function () {
+    params[group][key] = +this.value;
+    $(id + 'Out').value = fmt(this.value, decimals);
+    pendingRebuild = true;
+  });
+}
+$('res').addEventListener('input', () => { $('resOut').value = $('res').value + ' × ' + $('res').value; pendingRebuild = true; });
+$('mode').addEventListener('change', () => { pendingRebuild = true; });
+$('color').addEventListener('input', function () {
+  if (mesh) mesh.material.color.set(this.value);
+  if (wireMesh) wireMesh.material.color.set(this.value);
+});
+$('spin').addEventListener('change', () => { controls.autoRotate = $('spin').checked; });
 
-        animate();
-    </script>
-</body>
-</html>
+$('reset').onclick = () => {
+  params.theta = { m: 4, n1: 10, n2: 10, n3: 10, a: 1, b: 1 };
+  params.phi = { m: 4, n1: 10, n2: 10, n3: 10, a: 1, b: 1 };
+  Object.entries({
+    tm: 4, tn1: 10, tn2: 10, tn3: 10, ta: 1, tb: 1,
+    pm: 4, pn1: 10, pn2: 10, pn3: 10, pa: 1, pb: 1,
+    res: 128, color: '#44bbff', mode: 'solid'
+  }).forEach(([id, v]) => $(id).value = v);
+  $('spin').checked = true;
+  controls.autoRotate = true;
+  pendingRebuild = true;
+  updateOutputs();
+};
+
+// ─── Export ─────────────────────────────────────────────────
+function paramBand(w, h) {
+  const t = params.theta, p = params.phi;
+  const lines = [
+    `superformula · 3D supershape · ${$('mode').value} · ${$('res').value} × ${$('res').value}`,
+    `ϑ m ${fmt(t.m, 0)} n1 ${t.n1.toFixed(1)} n2 ${t.n2.toFixed(1)} n3 ${t.n3.toFixed(1)} a ${t.a.toFixed(1)} b ${t.b.toFixed(1)}`,
+    `φ m ${fmt(p.m, 0)} n1 ${p.n1.toFixed(1)} n2 ${p.n2.toFixed(1)} n3 ${p.n3.toFixed(1)} a ${p.a.toFixed(1)} b ${p.b.toFixed(1)}`,
+    'r(θ) = ( |cos(mθ/4)/a|ⁿ² + |sin(mθ/4)/b|ⁿ³ )⁻¹ᐟⁿ¹',
+    'x = rϑ cosθ · rφ cosφ    y = rϑ sinθ · rφ cosφ    z = rφ sinφ',
+    `colour ${$('color').value} · background #10151d`
+  ];
+  const font = Math.max(11, Math.round(Math.min(w, h) / 70));
+  const lineH = font * 1.5, pad = font * 0.7, bandH = lines.length * lineH + pad * 2;
+  return { lines, font, lineH, pad, bandH };
+}
+
+function paintParamBand(c, band, w, h) {
+  const { lines, font, lineH, pad, bandH } = band;
+  const top = h - bandH;
+  c.fillStyle = 'rgba(16,21,29,.92)';
+  c.fillRect(0, top, w, bandH);
+  c.strokeStyle = 'rgba(136,219,198,.45)';
+  c.lineWidth = Math.max(1, font / 12);
+  c.beginPath(); c.moveTo(0, top + 0.5); c.lineTo(w, top + 0.5); c.stroke();
+  c.font = `${font}px ui-monospace,SFMono-Regular,Menlo,monospace`;
+  c.textAlign = 'left';
+  c.textBaseline = 'middle';
+  lines.forEach((line, i) => {
+    c.fillStyle = i === 0 ? '#a4e3d4' : '#91a5bf';
+    c.fillText(line, pad, top + pad + lineH * (i + 0.5));
+  });
+}
+
+$('export').onclick = () => {
+  if (pendingRebuild) updateGeometry();
+  controls.update();
+  renderer.render(scene, camera);
+
+  const t = params.theta, p = params.phi;
+  const src = renderer.domElement;
+  const band = paramBand(src.width, src.height);
+  const out = document.createElement('canvas');
+  out.width = src.width;
+  out.height = src.height + band.bandH;
+  const c = out.getContext('2d');
+  c.fillStyle = '#10151d';
+  c.fillRect(0, 0, out.width, out.height);
+  c.drawImage(src, 0, 0);
+  paintParamBand(c, band, out.width, out.height);
+
+  out.toBlob(blob => {
+    if (!blob) return;
+    const url = URL.createObjectURL(blob), a = document.createElement('a');
+    a.href = url;
+    a.download =
+      `super_3d_object_tm${fmt(t.m, 0)}_tn1${t.n1.toFixed(1)}_tn2${t.n2.toFixed(1)}_tn3${t.n3.toFixed(1)}_ta${t.a.toFixed(1)}_tb${t.b.toFixed(1)}` +
+      `_pm${fmt(p.m, 0)}_pn1${p.n1.toFixed(1)}_pn2${p.n2.toFixed(1)}_pn3${p.n3.toFixed(1)}_pa${p.a.toFixed(1)}_pb${p.b.toFixed(1)}` +
+      `_res${$('res').value}_${$('color').value.slice(1)}_${$('mode').value}.png`;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }, 'image/png');
+};
+
+// ─── Gallery ────────────────────────────────────────────────
+const gallery = $('galleryItems');
+const FALLBACK_PNG_NAMES = ['super_3d_object_tm4_tn110.0_tn210.0_tn310.0_ta1.0_tb1.0_pm4_pn110.0_pn210.0_pn310.0_pa1.0_pb1.0_res128_44bbff_solid.png']; // mirrors the committed super_3d_object_*.png files; the GitHub API path below is preferred
+function renderGallery(items) {
+  gallery.innerHTML = '';
+  if (!items.length) {
+    const e = document.createElement('div');
+    e.className = 'gallery-empty';
+    e.textContent = 'No saved PNGs yet. Use Save PNG, then commit the download.';
+    gallery.appendChild(e);
+    return;
+  }
+  for (const item of items) {
+    const w = document.createElement('a');
+    w.className = 'gallery-item';
+    w.href = item.url;
+    w.target = '_blank';
+    w.rel = 'noopener';
+    w.title = 'Open ' + item.name;
+    const img = document.createElement('img');
+    img.src = item.url;
+    img.alt = item.name;
+    img.loading = 'lazy';
+    w.appendChild(img);
+    const l = document.createElement('span');
+    l.textContent = item.name;
+    w.appendChild(l);
+    gallery.appendChild(w);
+  }
+}
+fetch('https://api.github.com/repos/tthtlc/tthtlc.github.io/contents/')
+  .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+  .then(files => {
+    if (!Array.isArray(files)) throw new Error('unexpected response');
+    renderGallery(files.filter(f => f.type === 'file' && f.name.startsWith('super_3d_object_') && f.name.toLowerCase().endsWith('.png'))
+      .map(f => ({ name: f.name, url: f.download_url }))
+      .sort((a, b) => a.name < b.name ? -1 : 1));
+  })
+  .catch(() => renderGallery(FALLBACK_PNG_NAMES.map(n => ({ name: n, url: n }))));
+
+// ─── Resize + render loop ───────────────────────────────────
+function resize() {
+  const w = Math.max(1, stage.clientWidth), h = Math.max(1, stage.clientHeight);
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+  renderer.setSize(w, h, false);
+}
+new ResizeObserver(resize).observe(stage);
+resize();
+
+if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  $('spin').checked = false;
+  controls.autoRotate = false;
+}
+
+function animate() {
+  requestAnimationFrame(animate);
+  if (pendingRebuild) updateGeometry();
+  controls.update();
+  renderer.render(scene, camera);
+}
+
+updateOutputs();
+updateGeometry();
+animate();
+</script>
+</body></html>
