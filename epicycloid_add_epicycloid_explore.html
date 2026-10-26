@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Epicycloid + epicycloid — Interactive Study</title>
+<style>
+:root{color-scheme:dark;font-family:Inter,system-ui,sans-serif;background:#10151d;color:#eef2f8}*{box-sizing:border-box}body{margin:0}main{display:grid;grid-template-columns:1fr 300px;height:100vh;min-height:0}.stage{position:relative;height:100vh;min-height:0;overflow:hidden;background:radial-gradient(ellipse at 50% 45%,#253247,#10151d 70%)}canvas{display:block;width:100%;height:100%;position:absolute;touch-action:auto}.topbar{position:absolute;top:32px;left:36px;right:36px;display:flex;align-items:flex-start;gap:36px;flex-wrap:wrap;z-index:2}.heading{pointer-events:none}h1{font-size:clamp(24px,3vw,40px);font-weight:500;letter-spacing:-.04em;margin:6px 0}.eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.22em;color:#91a5bf}.hint{position:absolute;bottom:28px;left:36px;color:#92a3b9;font-size:12px;pointer-events:none;z-index:2}.formula{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);z-index:3;max-width:calc(100% - 48px);background:rgba(16,21,29,.9);border:1px solid #2a3443;border-radius:9px;padding:7px 12px;font-size:10px;line-height:1.55;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#a4e3d4;text-align:center;white-space:pre;pointer-events:none;box-shadow:0 4px 18px rgba(0,0,0,.35)}aside{padding:32px 25px;background:#151c27;border-left:1px solid #2a3443;height:100vh;overflow-y:auto}aside::-webkit-scrollbar{width:8px}aside::-webkit-scrollbar-track{background:#10151d}aside::-webkit-scrollbar-thumb{background:#3a485b;border-radius:4px}aside::-webkit-scrollbar-thumb:hover{background:#4a5c74}h2{font-size:17px;font-weight:500;margin:0 0 26px}label{display:block;font-size:13px;color:#c7d2e3;margin-bottom:22px}.row{display:flex;justify-content:space-between;margin-bottom:8px}output{font-variant-numeric:tabular-nums;color:#88dbc6}input[type=range]{width:100%;accent-color:#88dbc6}select,button{background:#202d3d;color:#eef2f8;border:1px solid #3a485b;border-radius:8px;padding:10px;font:inherit;width:100%}input[type=color]{width:100%;height:34px;background:none;border:0;padding:0}button{cursor:pointer;margin-top:10px}button:hover{background:#2b3e53}button:disabled{opacity:.55;cursor:wait}.check{display:flex;gap:10px;align-items:center;margin:16px 0 0;font-size:13px;color:#c7d2e3}.check input[type=checkbox]{width:auto;accent-color:#88dbc6}.note{font-size:12px;color:#91a5bf;line-height:1.65;margin-top:25px}details{font-size:12px;color:#91a5bf;line-height:1.65}summary{cursor:pointer;color:#c7d2e3}code{color:#a4e3d4}.geometry{pointer-events:auto;max-width:min(46vw,400px);background:rgba(21,28,39,.88);border:1px solid #2a3443;border-radius:12px;padding:10px 14px;backdrop-filter:blur(6px);margin-top:4px}.geometry p{margin:.6em 0}.gallery{border-top:1px solid #2a3443;margin-top:25px;padding-top:22px}.gallery h2{margin:0 0 8px}.gallery-note{font-size:11px;color:#91a5bf;line-height:1.6;margin:0 0 14px}.gallery-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.gallery-item{display:block;border:1px solid #2a3443;border-radius:8px;overflow:hidden;text-decoration:none;background:#10151d}.gallery-item:hover{border-color:#88dbc6}.gallery-item img{display:block;width:100%;height:64px;object-fit:cover}.gallery-item span{display:block;font-size:9px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#91a5bf;padding:4px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.gallery-empty{grid-column:1/-1;color:#6b7d94;font-size:12px;text-align:center;padding:14px 0}@media(max-width:760px){main{grid-template-columns:1fr;height:auto;min-height:100vh}.stage{height:65vh;min-height:420px}aside{border-left:0;border-top:1px solid #2a3443;height:auto;max-height:none;overflow:visible}.topbar{left:24px;top:22px;right:24px;gap:24px}.hint{left:24px}.formula{left:24px;right:24px;transform:none;max-width:none;text-align:left}}
+</style>
+<!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-GEX61LPT08"></script> <script>   window.dataLayer = window.dataLayer || [];   function gtag(){dataLayer.push(arguments);}   gtag('js', new Date());   gtag('config', 'G-GEX61LPT08'); </script> </head>
+<body>
+<main><section class="stage"><canvas id="canvas" aria-label="Interactive parametric curve. Lines are bright near the centre and cool toward the rim; use the sliders to change its shape."></canvas><div class="topbar"><div class="heading"><div class="eyebrow">Rolling curve / 15</div><h1>Epicycloid + epicycloid</h1></div><details class="geometry"><summary>Geometry</summary><p>A fixed five-lobed epicycloid (<code>200·cos t − 96·cos 5t</code>) is added point by point to a standard epicycloid of radius <code>R + r</code>.</p><p><code>x(t) = 200·cos t − 96·cos 5t + (R + r)·cos t − d·cos((R + r)/r · t)</code><br><code>y(t) = 200·sin t − 96·sin 5t + (R + r)·sin t − d·sin((R + r)/r · t)</code></p></details></div><div class="formula" id="formula"></div><div class="hint">Adjust a slider to redraw &middot; Save PNG &amp; Save GIF export &middot; Animate traces the curve &middot; the first slider auto-sweeps</div></section>
+<aside><h2>Shape &amp; appearance</h2>
+<label><span class="row"><span>Outer radius R</span><output id="ROut"></output></span><input id="R" type="range" min="50" max="300" step="1" value="125"></label>
+<label><span class="row"><span>Inner radius r</span><output id="rOut"></output></span><input id="r" type="range" min="10" max="150" step="1" value="40"></label>
+<label><span class="row"><span>Pen distance d</span><output id="dOut"></output></span><input id="d" type="range" min="10" max="150" step="1" value="150"></label>
+<label><span class="row"><span>Line width</span><output id="lineWidthOut"></output></span><input id="lineWidth" type="range" min="0.2" max="3" step="0.05" value="1.2"></label>
+<label>Base colour<input id="color" type="color" value="#0000ff"></label>
+<button id="reset">Reset design</button><button id="export">Save PNG</button><button id="exportGif">Save GIF</button><button id="animate">Animate</button>
+<label class="check"><input type="checkbox" id="autoSweep" checked> Auto-sweep first slider</label>
+<p class="note" id="status"></p>
+<section class="gallery"><h2>Saved PNGs</h2><p class="gallery-note">PNG captures are named with their parameter values. Commit the downloaded files to the repo and they will appear here automatically (fetched via the GitHub API).</p><div id="galleryItems" class="gallery-grid"></div></section>
+</aside></main>
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const canvas=$('canvas'),ctx=canvas.getContext('2d');
+const TAU=Math.PI*2;
+let width=1,height=1,dpr=1;
+const BANDS=72;
+const SEGMENTS=4000;
+const PREFIX='epicycloid_add_epicycloid_explore_';
+const DEFAULT_COLOR='#0000ff';
+const SLIDERS=[{id:'R',min:50,max:300,step:1,value:125,dec:null},{id:'r',min:10,max:150,step:1,value:40,dec:null},{id:'d',min:10,max:150,step:1,value:150,dec:null},{id:'lineWidth',min:0.2,max:3,step:0.05,value:1.2,dec:2}];
+function rnd(v){return Math.round(v*1000)/1000;}
+function gcd(a,b){a=Math.abs(Math.round(a));b=Math.abs(Math.round(b));return b?gcd(b,a%b):a;}
+function lcm(a,b){a=Math.abs(Math.round(a));b=Math.abs(Math.round(b));return (a/gcd(a,b))*b;}
+function hexToHsl(hex){
+ const r=parseInt(hex.slice(1,3),16)/255,g=parseInt(hex.slice(3,5),16)/255,b=parseInt(hex.slice(5,7),16)/255;
+ const max=Math.max(r,g,b),min=Math.min(r,g,b),l=(max+min)/2;
+ let h=0,s=0;
+ if(max!==min){
+  const d=max-min;
+  s=l>.5?d/(2-max-min):d/(max+min);
+  if(max===r)h=(g-b)/d+(g<b?6:0);
+  else if(max===g)h=(b-r)/d+2;
+  else h=(r-g)/d+4;
+  h*=60;
+ }
+ return {h,s,l};
+}
+function baseHsl(p){const c=hexToHsl(p.color);return {h:Math.round(c.h),s:Math.round(c.s*100)};}
+function colorFor(f,hue,sat){const L=Math.round(88-58*f);return 'hsl('+hue+', '+sat+'%, '+L+'%)';}
+function fitScale(W,H,maxR,zoom,margin){zoom=zoom||1;margin=margin||0;return (Math.min(W,H)*0.46-margin)/Math.max(maxR,0.001)*zoom;}
+function strokeRadial(ctx,cx,cy,scale,pts,maxR,hue,sat,lw,maxIndex){
+ if(maxIndex==null||maxIndex<0)maxIndex=pts.length-1;
+ maxIndex=Math.min(maxIndex,pts.length-1);
+ ctx.lineWidth=lw;ctx.lineCap='round';ctx.lineJoin='round';
+ let bucket=-1,prevX=0,prevY=0;
+ ctx.beginPath();
+ for(let i=0;i<=maxIndex;i++){
+  const x=pts[i][0],y=pts[i][1];
+  const nx=cx+x*scale,ny=cy-y*scale;
+  if(i===0){ctx.moveTo(nx,ny);prevX=nx;prevY=ny;continue;}
+  const norm=Math.min(1,Math.hypot(x,y)/(maxR||1));
+  const b=Math.min(BANDS-1,Math.floor(norm*BANDS));
+  if(b!==bucket){ctx.stroke();ctx.beginPath();ctx.moveTo(prevX,prevY);bucket=b;ctx.strokeStyle=colorFor(b/(BANDS-1),hue,sat);}
+  ctx.lineTo(nx,ny);prevX=nx;prevY=ny;
+ }
+ ctx.stroke();
+}
+function readParams(){
+ const p={};
+ for(const s of SLIDERS)p[s.id]=parseFloat($(s.id).value);
+ p.color=$('color').value;
+ return p;
+}
+function syncOutputs(p){
+ for(const s of SLIDERS){
+  const out=$(s.id+'Out');
+  if(out)out.value=(s.dec!=null)?p[s.id].toFixed(s.dec):String(p[s.id]);
+ }
+}
+function paintBackground(g,W,H){
+ const grd=g.createRadialGradient(W/2,H*0.45,0,W/2,H*0.45,Math.max(W,H)*0.78);
+ grd.addColorStop(0,'#253247');grd.addColorStop(1,'#10151d');
+ g.fillStyle=grd;g.fillRect(0,0,W,H);
+}
+function resize(){
+ const box=canvas.parentElement.getBoundingClientRect();
+ width=box.width;height=box.height;dpr=Math.min(window.devicePixelRatio||1,2);
+ canvas.width=Math.max(1,Math.round(width*dpr));canvas.height=Math.max(1,Math.round(height*dpr));
+ ctx.setTransform(dpr,0,0,dpr,0,0);
+ draw();
+}
+const overlay=$('formula');
+const statusEl=$('status');
+function updateOverlay(p){overlay.textContent=formulaLines(p).join('\n');}
+function updateStatus(p){
+ let s=SLIDERS.map(sd=>sd.id+' '+(sd.dec!=null?p[sd.id].toFixed(sd.dec):p[sd.id])).join(' \u00b7 ');
+ if(animId)s+=' \u2014 tracing';
+ if(autoTimer)s+=' \u2014 auto-sweeping '+SLIDERS[0].id;
+ statusEl.textContent=s;
+}
+function draw(){
+ if(width<=1||height<=1)return;
+ const p=readParams();
+ syncOutputs(p);updateOverlay(p);updateStatus(p);
+ paintBackground(ctx,width,height);
+ drawScene(ctx,width,height,p);
+}
+const firstDef=SLIDERS[0];
+let autoTimer=null,autoDir=1;
+function stopAuto(){if(autoTimer){clearInterval(autoTimer);autoTimer=null;}}
+function startAuto(){
+ stopAuto();
+ const el=$(firstDef.id);
+ el.value=firstDef.min;
+ autoDir=1;
+ autoTimer=setInterval(autoTick,1300);
+ draw();
+}
+function autoTick(){
+ const el=$(firstDef.id);
+ const st=parseFloat(el.step)||1;
+ const inc=st>=1?1:st;
+ let v=parseFloat(el.value)+autoDir*inc;
+ const mn=parseFloat(el.min),mx=parseFloat(el.max);
+ if(v>=mx){v=mx;autoDir=-1;}
+ else if(v<=mn){v=mn;autoDir=1;}
+ el.value=v;
+ draw();
+}
+const animateBtn=$('animate');
+let animId=null,animStart=0;
+const ANIM_MS=60000;
+function animate(){
+ if(animId){cancelAnimationFrame(animId);animId=null;animateBtn.textContent='Animate';draw();return;}
+ stopAuto();if($('autoSweep').checked)$('autoSweep').checked=false;
+ animateBtn.textContent='Stop';
+ animStart=performance.now();
+ function frame(now){
+  const prog=Math.min(1,(now-animStart)/ANIM_MS);
+  const p=readParams();
+  syncOutputs(p);updateOverlay(p);updateStatus(p);
+  paintBackground(ctx,width,height);
+  drawScene(ctx,width,height,p,prog);
+  if(prog<1)animId=requestAnimationFrame(frame);
+  else{animId=null;animateBtn.textContent='Animate';}
+ }
+ animId=requestAnimationFrame(frame);
+}
+function paramBand(w,h,p){
+ const lines=formulaLines(p).concat(['line '+p.lineWidth.toFixed(2)+'px \u00b7 colour '+p.color+' \u00b7 background #10151d']);
+ const font=Math.max(11,Math.round(Math.min(w,h)/70));
+ const lineH=font*1.5,pad=font*.7,bandH=lines.length*lineH+pad*2;
+ return {lines,font,lineH,pad,bandH};
+}
+function paintParamBand(c,band,w,h){
+ const top=h-band.bandH;
+ c.fillStyle='rgba(16,21,29,.95)';c.fillRect(0,top,w,band.bandH);
+ c.strokeStyle='rgba(136,219,198,.45)';c.lineWidth=Math.max(1,band.font/12);
+ c.beginPath();c.moveTo(0,top+.5);c.lineTo(w,top+.5);c.stroke();
+ c.font=band.font+'px ui-monospace,SFMono-Regular,Menlo,monospace';
+ c.textAlign='left';c.textBaseline='middle';
+ band.lines.forEach(function(line,i){
+  c.fillStyle=i===0?'#a4e3d4':'#91a5bf';
+  c.fillText(line,band.pad,top+band.pad+band.lineH*(i+.5));
+ });
+}
+function paramSlug(p){
+ return SLIDERS.map(sd=>sd.id+(sd.dec!=null?p[sd.id].toFixed(sd.dec):Math.round(p[sd.id]))).join('_')+'_'+p.color.slice(1);
+}
+function exportPng(){
+ draw();
+ const p=readParams();
+ const band=paramBand(canvas.width,canvas.height,p);
+ const out=document.createElement('canvas');
+ out.width=canvas.width;out.height=canvas.height+band.bandH;
+ const c=out.getContext('2d');
+ c.drawImage(canvas,0,0);
+ paintParamBand(c,band,out.width,out.height);
+ out.toBlob(function(blob){
+  if(!blob)return;
+  const url=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=url;a.download=PREFIX+paramSlug(p)+'.png';a.click();
+  setTimeout(function(){URL.revokeObjectURL(url);},1000);
+ },'image/png');
+ statusEl.textContent='PNG saved with parameter summary.';
+}
+const GIF_SIZE=400,GIF_FRAME_COUNT=24,GIF_DELAY_CS=120;
+function sweepVal(i,n,lo,hi){const ph=(i%n)/(n-1);return ph<0.5?lo+(hi-lo)*(ph*2):hi-(hi-lo)*((ph-0.5)*2);}
+function lzwEncode(indices,minCodeSize){
+ const clearCode=1<<minCodeSize,eoiCode=clearCode+1;
+ let codeSize=minCodeSize+1,nextCode=eoiCode+1;
+ const dict=new Map(),out=[];let cur=0,bits=0;
+ function write(code){cur|=code<<bits;bits+=codeSize;while(bits>=8){out.push(cur&0xff);cur>>=8;bits-=8;}}
+ if(indices.length===0){write(clearCode);write(eoiCode);if(bits>0)out.push(cur&0xff);return new Uint8Array(out);}
+ write(clearCode);
+ let prefix=indices[0];
+ for(let i=1;i<indices.length;i++){
+  const k=indices[i],key=prefix*4096+k,c=dict.get(key);
+  if(c!==undefined){prefix=c;}
+  else{
+   write(prefix);
+   if(nextCode<4096){dict.set(key,nextCode++);if(nextCode>(1<<codeSize)&&codeSize<12)codeSize++;}
+   else{write(clearCode);dict.clear();codeSize=minCodeSize+1;nextCode=eoiCode+1;}
+   prefix=k;
+  }
+ }
+ write(prefix);write(eoiCode);
+ if(bits>0)out.push(cur&0xff);
+ return new Uint8Array(out);
+}
+function buildGif(frames,width,height,palette,delayCs){
+ const pal=new Array(256);for(let i=0;i<256;i++)pal[i]=palette[i]||[0,0,0];
+ const bytes=[];const u8=b=>bytes.push(b&0xff);const u16=v=>{bytes.push(v&0xff,(v>>8)&0xff);};
+ const str=s=>{for(let i=0;i<s.length;i++)bytes.push(s.charCodeAt(i));};
+ str('GIF89a');u16(width);u16(height);u8(0xF7);u8(0);u8(0);
+ for(let i=0;i<256;i++){u8(pal[i][0]);u8(pal[i][1]);u8(pal[i][2]);}
+ u8(0x21);u8(0xFF);u8(0x0B);str('NETSCAPE2.0');u8(0x03);u8(0x01);u16(0);u8(0x00);
+ for(const idx of frames){
+  u8(0x21);u8(0xF9);u8(0x04);u8(0x04);u16(delayCs);u8(0x00);u8(0x00);
+  u8(0x2C);u16(0);u16(0);u16(width);u16(height);u8(0x00);u8(8);
+  const lzw=lzwEncode(idx,8);
+  for(let i=0;i<lzw.length;i+=255){const n=Math.min(255,lzw.length-i);u8(n);for(let j=0;j<n;j++)u8(lzw[i+j]);}
+  u8(0x00);
+ }
+ u8(0x3B);return new Uint8Array(bytes);
+}
+function quantizeFrames(frames){
+ const N=1<<15;const count=new Uint32Array(N),rsum=new Uint32Array(N),gsum=new Uint32Array(N),bsum=new Uint32Array(N);const buckets=[];
+ for(const fr of frames){const d=fr.data;for(let i=0;i<d.length;i+=4){const r=d[i],g=d[i+1],b=d[i+2];const bk=((r>>3)<<10)|((g>>3)<<5)|(b>>3);if(count[bk]===0)buckets.push(bk);count[bk]++;rsum[bk]+=r;gsum[bk]+=g;bsum[bk]+=b;}}
+ buckets.sort((a,b)=>count[b]-count[a]);
+ const chosen=buckets.slice(0,256),palette=[];
+ for(const bk of chosen){const n=count[bk];palette.push([Math.round(rsum[bk]/n),Math.round(gsum[bk]/n),Math.round(bsum[bk]/n)]);}
+ if(palette.length===0)palette.push([0,0,0]);
+ const lut=new Uint8Array(N);
+ for(let bk=0;bk<N;bk++){const r=(bk>>10)<<3,g=((bk>>5)&31)<<3,b=(bk&31)<<3;let best=0,bestD=Infinity;for(let p=0;p<palette.length;p++){const dr=palette[p][0]-r,dg=palette[p][1]-g,db=palette[p][2]-b;const d=dr*dr+dg*dg+db*db;if(d<bestD){bestD=d;best=p;}}lut[bk]=best;}
+ const indices=[];
+ for(const fr of frames){const d=fr.data,idx=new Uint8Array(fr.w*fr.h);let p=0;for(let i=0;i<d.length;i+=4){const bk=((d[i]>>3)<<10)|((d[i+1]>>3)<<5)|(d[i+2]>>3);idx[p++]=lut[bk];}indices.push(idx);}
+ return {palette,indices};
+}
+function saveGif(){
+ const btn=$('exportGif');
+ const p=readParams();
+ const first=SLIDERS[0];
+ const lo=parseFloat($(first.id).min),hi=parseFloat($(first.id).max);
+ btn.disabled=true;btn.textContent='Encoding\u2026';
+ statusEl.textContent='Capturing GIF frames\u2026';
+ setTimeout(function(){
+  const frames=[];
+  for(let i=0;i<GIF_FRAME_COUNT;i++){
+   const val=sweepVal(i,GIF_FRAME_COUNT,lo,hi);
+   const frameCanvas=document.createElement('canvas');
+   frameCanvas.width=GIF_SIZE;frameCanvas.height=GIF_SIZE;
+   const g=frameCanvas.getContext('2d');
+   paintBackground(g,GIF_SIZE,GIF_SIZE);
+   const fp=Object.assign({},p);fp[first.id]=val;
+   drawScene(g,GIF_SIZE,GIF_SIZE,fp);
+   frames.push({w:GIF_SIZE,h:GIF_SIZE,data:g.getImageData(0,0,GIF_SIZE,GIF_SIZE).data});
+  }
+  statusEl.textContent='Encoding GIF\u2026';
+  setTimeout(function(){
+   const q=quantizeFrames(frames);
+   const gif=buildGif(q.indices,GIF_SIZE,GIF_SIZE,q.palette,GIF_DELAY_CS);
+   const url=URL.createObjectURL(new Blob([gif],{type:'image/gif'}));
+   const a=document.createElement('a');
+   a.href=url;a.download=PREFIX+'sweep_'+first.id+'_'+lo+'-'+hi+'.gif';
+   document.body.appendChild(a);a.click();document.body.removeChild(a);
+   setTimeout(function(){URL.revokeObjectURL(url);},1000);
+   btn.disabled=false;btn.textContent='Save GIF';
+   statusEl.textContent='GIF saved ('+GIF_FRAME_COUNT+' frames, '+lo+' \u2194 '+hi+').';
+  },30);
+ },30);
+}
+
+function period(p){return TAU*(Math.round(p.r)/gcd(p.R,p.r));}
+function fx(t,p){return 200*Math.cos(t)-96*Math.cos(5*t)+(p.R+p.r)*Math.cos(t)-p.d*Math.cos(((p.R+p.r)/p.r)*t);}
+function fy(t,p){return 200*Math.sin(t)-96*Math.sin(5*t)+(p.R+p.r)*Math.sin(t)-p.d*Math.sin(((p.R+p.r)/p.r)*t);}
+function formulaLines(p){return [['x(t) = 200·cos(t) − 96·cos(5t) + ('+rnd(p.R)+'+'+rnd(p.r)+')·cos(t) − '+rnd(p.d)+'·cos('+rnd((p.R+p.r)/p.r)+'·t)', 'y(t) = 200·sin(t) − 96·sin(5t) + ('+rnd(p.R)+'+'+rnd(p.r)+')·sin(t) − '+rnd(p.d)+'·sin('+rnd((p.R+p.r)/p.r)+'·t)']];}
+function drawScene(ctx,W,H,p,prog){
+ if(prog==null)prog=1;
+ const per=period(p);if(!(per>0))return;
+ const pts=[];let maxR=0;
+ for(let i=0;i<=SEGMENTS;i++){
+  const t=(i/SEGMENTS)*per;
+  const x=fx(t,p),y=fy(t,p);
+  const r=Math.hypot(x,y);if(r>maxR)maxR=r;
+  pts.push([x,y]);
+ }
+ if(!(maxR>0))return;
+ const c=baseHsl(p);
+ const maxIndex=Math.round(prog*(pts.length-1));
+ strokeRadial(ctx,W/2,H/2,fitScale(W,H,maxR),pts,maxR,c.h,c.s,p.lineWidth,maxIndex);
+}
+
+for(const sd of SLIDERS)$(sd.id).addEventListener('input',function(){draw();});
+$('color').addEventListener('input',function(){draw();});
+$(firstDef.id).addEventListener('input',function(){if($('autoSweep').checked){$('autoSweep').checked=false;stopAuto();}});
+$('reset').onclick=function(){
+ for(const sd of SLIDERS)$(sd.id).value=sd.value;
+ $('color').value=DEFAULT_COLOR;
+ $('autoSweep').checked=true;
+ startAuto();
+ draw();
+};
+$('export').onclick=exportPng;
+$('exportGif').onclick=saveGif;
+animateBtn.onclick=animate;
+$('autoSweep').addEventListener('change',function(){
+ if(this.checked)startAuto();else stopAuto();
+});
+const gallery=$('galleryItems');
+const FALLBACK=[];
+function renderGallery(items){
+ gallery.innerHTML='';
+ if(!items.length){const e=document.createElement('div');e.className='gallery-empty';e.textContent='No saved PNGs yet. Use Save PNG, then commit the download.';gallery.appendChild(e);return;}
+ for(const item of items){const w=document.createElement('a');w.className='gallery-item';w.href=item.url;w.target='_blank';w.rel='noopener';w.title='Open '+item.name;const img=document.createElement('img');img.src=item.url;img.alt=item.name;img.loading='lazy';w.appendChild(img);const l=document.createElement('span');l.textContent=item.name;w.appendChild(l);gallery.appendChild(w);}
+}
+fetch('https://api.github.com/repos/tthtlc/tthtlc.github.io/contents/')
+ .then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.json();})
+ .then(files=>{if(!Array.isArray(files))throw new Error('unexpected response');renderGallery(files.filter(f=>f.type==='file'&&f.name.startsWith(PREFIX)&&f.name.toLowerCase().endsWith('.png')).map(f=>({name:f.name,url:f.download_url})).sort((a,b)=>a.name<b.name?-1:1));})
+ .catch(function(){renderGallery(FALLBACK.map(n=>({name:n,url:n})));});
+new ResizeObserver(function(){resize();}).observe(canvas.parentElement);
+syncOutputs(readParams());
+resize();
+startAuto();
+</script>
+</body></html>

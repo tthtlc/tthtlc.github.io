@@ -119,7 +119,7 @@ function startAuto(){
  const el=$(firstDef.id);
  el.value=firstDef.min;
  autoDir=1;
- autoTimer=setInterval(autoTick,130);
+ autoTimer=setInterval(autoTick,1300);
  draw();
 }
 function autoTick(){
@@ -135,7 +135,7 @@ function autoTick(){
 }
 const animateBtn=$('animate');
 let animId=null,animStart=0;
-const ANIM_MS=6000;
+const ANIM_MS=60000;
 function animate(){
  if(animId){cancelAnimationFrame(animId);animId=null;animateBtn.textContent='Animate';draw();return;}
  stopAuto();if($('autoSweep').checked)$('autoSweep').checked=false;
@@ -190,7 +190,7 @@ function exportPng(){
  },'image/png');
  statusEl.textContent='PNG saved with parameter summary.';
 }
-const GIF_SIZE=400,GIF_FRAME_COUNT=24,GIF_DELAY_CS=12;
+const GIF_SIZE=400,GIF_FRAME_COUNT=24,GIF_DELAY_CS=120;
 function sweepVal(i,n,lo,hi){const ph=(i%n)/(n-1);return ph<0.5?lo+(hi-lo)*(ph*2):hi-(hi-lo)*((ph-0.5)*2);}
 function lzwEncode(indices,minCodeSize){
  const clearCode=1<<minCodeSize,eoiCode=clearCode+1;
