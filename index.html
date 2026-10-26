@@ -9,7 +9,7 @@ title: "Mathematical Art"
 {% include monograph-masthead.html %}
 
 <div class="ma-frontispiece">
-  <p class="ma-lede">A collection of interactive webpages — dynamic geometry, curves, fractals, and animations — each a working figure you can open and play.</p>
+  <p class="ma-lede">A collection of interactive webpages — dynamic geometry, curves, fractals, and animations — each a working figure you can open and play. Browse by topic below, and use the arrows to page through each topic's remaining figures.</p>
   <div class="ma-actions">
     <a class="ma-action ma-action-primary" href="/index_gallery.html">Browse the full gallery — {{ site.data.visualizations.size }} pages by topic →</a>
     <a class="ma-action" href="/index_search.html">Search the collection</a>
@@ -25,83 +25,22 @@ title: "Mathematical Art"
   <div id="recent-list-container" class="ma-figure-grid"></div>
 </section>
 
-<section class="ma-section">
-  <div class="ma-section-head">
-    <h2>Curves for further exploration</h2>
-  </div>
-  <div id="master-list-container" class="ma-figure-grid"></div>
-</section>
-
-<section class="ma-section">
-  <div class="ma-section-head">
-    <h2>Randomly selected curves</h2>
-  </div>
-  <div id="random-list-container" class="ma-figure-grid"></div>
-</section>
+<div id="categories"></div>
 
 <div class="ma-notes">{% include gitalk.html %}</div>
 
 {% include monograph-footer.html %}
 
+{% include category-pager.html %}
+
 <script>
   document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
-  const htmlFiles = [{% for f in site.data.visualizations %}'{{ f }}',{% endfor %}];
-
-  function lazyLoad(root) {
-    const frames = root.querySelectorAll('iframe[data-src]');
-    if ('IntersectionObserver' in window) {
-      const io = new IntersectionObserver(function (entries) {
-        entries.forEach(function (e) {
-          if (e.isIntersecting) {
-            const f = e.target; f.src = f.dataset.src; f.removeAttribute('data-src'); io.unobserve(f);
-          }
-        });
-      }, { rootMargin: '400px 0px' });
-      frames.forEach(function (f) { io.observe(f); });
-    } else {
-      frames.forEach(function (f) { f.src = f.dataset.src; });
-    }
-  }
-
-  function pretty(f) {
-    return f.replace(/\.html$/, '').replace(/[_-]/g, ' ').replace(/\b\w/g, function (c) { return c.toUpperCase(); });
-  }
-  function renderHtmlFiles(fileList, containerId) {
-    const container = document.getElementById(containerId);
-    fileList.forEach(function (file, idx) {
-      const fig = document.createElement('div');
-      fig.className = 'ma-figure';
-      const a = document.createElement('a');
-      a.className = 'ma-figure-link';
-      a.href = file;
-      a.target = '_blank';
-      a.rel = 'noopener';
-      a.innerHTML =
-        '<div class="ma-plate"><iframe data-src="' + file + '" loading="lazy" title="' + file + ' preview"></iframe><span class="ma-plate-open">Open</span></div>' +
-        '<div class="ma-figure-body"><div class="ma-figure-title">' + pretty(file) + '</div>' +
-        '<div class="ma-figure-file">Fig. ' + (idx + 1) + ' · ' + file + '</div></div>';
-      fig.appendChild(a);
-      container.appendChild(fig);
-    });
-    lazyLoad(container);
-  }
-
-  function getRandomFiles(arr, num, ex) {
-    return arr.filter(function (f) { return !f.includes(ex); })
-              .sort(function () { return 0.5 - Math.random(); })
-              .slice(0, num);
-  }
-
-  renderHtmlFiles(getRandomFiles(htmlFiles.filter(function (f) { return f.includes('explore'); }), 4, 'AAAAAAA'), 'master-list-container');
-  renderHtmlFiles(getRandomFiles(htmlFiles.filter(function (f) { return !f.includes('explore'); }), 4, 'explore'), 'random-list-container');
-
-  const recentFiles = [
+  window.mathArtCategories.renderFiles([
     'enneper_order4.html',
     'enneper_order3.html',
     'enneper_order2.html',
     'enneper.html'
-  ];
-  renderHtmlFiles(recentFiles, 'recent-list-container');
+  ], 'recent-list-container');
 </script>
 </body>
 </html>

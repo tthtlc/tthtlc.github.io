@@ -372,6 +372,46 @@ html { scrollbar-color: var(--hairline-strong) var(--paper); }
 }
 .ma-section-note { color: var(--marginalia); max-width: 70ch; margin: -0.4rem 0 1.2rem; }
 
+/* Category pager — "previous" / "next" arrows that page through a category's
+   files without leaving the section. */
+.ma-pager {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+.ma-pager-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border: 1px solid var(--hairline-strong);
+  border-radius: 50%;
+  background: var(--paper-deep);
+  color: var(--ink);
+  cursor: pointer;
+  transition: border-color 0.18s ease, color 0.18s ease, background 0.18s ease;
+}
+.ma-pager-btn:hover:not(:disabled) {
+  border-color: var(--gilt);
+  color: var(--gilt-deep);
+  background: #fff;
+}
+.ma-pager-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+.ma-pager-label {
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  color: var(--marginalia);
+  min-width: 9ch;
+  text-align: center;
+}
+
 /* Figure grid + cards */
 .ma-figure-grid {
   display: grid;
