@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gradient halo — Interactive Study</title>
+<style>
+:root{color-scheme:dark;font-family:Inter,system-ui,sans-serif;background:#10151d;color:#eef2f8}*{box-sizing:border-box}body{margin:0}main{display:grid;grid-template-columns:1fr 300px;min-height:100vh}.stage{position:relative;min-height:650px;overflow:hidden;background:radial-gradient(ellipse at 50% 45%,#253247,#10151d 70%)}canvas{display:block;width:100%;height:100%;position:absolute;touch-action:none;cursor:grab}canvas:active{cursor:grabbing}.topbar{position:absolute;top:32px;left:36px;right:36px;display:flex;align-items:flex-start;gap:36px;flex-wrap:wrap;z-index:2}.heading{pointer-events:none}h1{font-size:clamp(24px,3vw,40px);font-weight:500;letter-spacing:-.04em;margin:6px 0}.eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.22em;color:#91a5bf}.hint{position:absolute;bottom:28px;left:36px;color:#92a3b9;font-size:12px;pointer-events:none}aside{padding:32px 25px;background:#151c27;border-left:1px solid #2a3443}h2{font-size:17px;font-weight:500;margin:0 0 26px}label{display:block;font-size:13px;color:#c7d2e3;margin-bottom:22px}.row{display:flex;justify-content:space-between;margin-bottom:8px}output{font-variant-numeric:tabular-nums;color:#88dbc6}input[type=range]{width:100%;accent-color:#88dbc6}select,button{background:#202d3d;color:#eef2f8;border:1px solid #3a485b;border-radius:8px;padding:10px;font:inherit;width:100%}input[type=color]{width:100%;height:34px;background:none;border:0;padding:0}button{cursor:pointer;margin-top:10px}button:hover{background:#2b3e53}.check{display:flex;gap:10px;align-items:center}.note{font-size:12px;color:#91a5bf;line-height:1.65;margin-top:25px}details{font-size:12px;color:#91a5bf;line-height:1.65}summary{cursor:pointer;color:#c7d2e3}code{color:#a4e3d4}.geometry{pointer-events:auto;max-width:min(46vw,400px);background:rgba(21,28,39,.88);border:1px solid #2a3443;border-radius:12px;padding:10px 14px;backdrop-filter:blur(6px);margin-top:4px}.geometry p{margin:.6em 0}.gallery{border-top:1px solid #2a3443;margin-top:25px;padding-top:22px}.gallery h2{margin:0 0 8px}.gallery-note{font-size:11px;color:#91a5bf;line-height:1.6;margin:0 0 14px}.gallery-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.gallery-item{display:block;border:1px solid #2a3443;border-radius:8px;overflow:hidden;text-decoration:none;background:#10151d}.gallery-item:hover{border-color:#88dbc6}.gallery-item img{display:block;width:100%;height:64px;object-fit:cover}.gallery-item span{display:block;font-size:9px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#91a5bf;padding:4px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.gallery-empty{grid-column:1/-1;color:#6b7d94;font-size:12px;text-align:center;padding:14px 0}@media(max-width:760px){main{grid-template-columns:1fr}.stage{height:65vh;min-height:420px}aside{border-left:0;border-top:1px solid #2a3443}.topbar{left:24px;top:22px;right:24px;gap:24px}.hint{left:24px}}
+.formula{position:absolute;top:14px;left:50%;transform:translateX(-50%);z-index:1;pointer-events:none;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:9px;letter-spacing:.05em;line-height:1.7;color:#bcd1e9;background:rgba(13,18,27,.62);border:1px solid rgba(42,52,67,.9);border-radius:999px;padding:4px 14px;max-width:min(74vw,780px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;backdrop-filter:blur(4px)}</style>
+</head>
+<body>
+<main><section class="stage"><canvas id="canvas" aria-label="Interactive gradient halo: an annulus filled with a linear gradient through an off-centre highlight, indigo to violet to coral."></canvas><div class="formula">A = {x : Rᵢ ≤ |x| ≤ R₀} · fill = ∇ h−d → h+d · h = hOff(cos hAng, sin hAng)</div><div class="topbar"><div class="heading"><div class="eyebrow">Form study / 23</div><h1>Gradient halo</h1></div><details class="geometry"><summary>Geometry</summary><p>The torus is reduced to a flat annulus: an outer circle <code>Ro</code> and an inner circle <code>Ri</code>, traced in opposite directions inside one path so the middle stays open.</p><p><code>Ro = 2.4, Ri = 0.95</code> · highlight at <code>h = (hOff cos hAng, hOff sin hAng)</code></p><p>That path is filled with a single linear gradient running from <code>h − (d,d)</code> to <code>h + (d,d)</code>, with <code>d = spread × scale</code>. The stops walk indigo → violet → coral, so the halo is not lit from the outside but from wherever the highlight point sits; drag it around and the whole field re-grades around it, the violet mid-stop acting as a soft, off-centre core.</p><p>The opening is then cut crisply: a 1&nbsp;px <code>rgba(255,255,255,0.25)</code> stroke on the inner rim and a 1&nbsp;px <code>rgba(0,0,0,0.3)</code> stroke on the outer rim, giving the soft fill two hard edges.</p></details></div><div class="hint">Drag to move the highlight · Scroll to zoom</div></section>
+<aside><h2>Shape &amp; appearance</h2>
+<label><span class="row"><span>Outer radius Ro</span><output id="RoOut"></output></span><input id="Ro" type="range" min="1.4" max="3" step="0.01" value="2.4"></label>
+<label><span class="row"><span>Inner radius Ri</span><output id="RiOut"></output></span><input id="Ri" type="range" min="0.4" max="1.6" step="0.01" value="0.95"></label>
+<label><span class="row"><span>Highlight offset</span><output id="hOffOut"></output></span><input id="hOff" type="range" min="0" max="1.4" step="0.01" value="0.75"></label>
+<label><span class="row"><span>Highlight angle</span><output id="hAngOut"></output></span><input id="hAng" type="range" min="0" max="360" step="1" value="135"></label>
+<label><span class="row"><span>Spread</span><output id="spreadOut"></output></span><input id="spread" type="range" min="0.5" max="2.5" step="0.01" value="1.4"></label>
+<label><span class="row"><span>Zoom</span><output id="zoomOut"></output></span><input id="zoom" type="range" min="0.6" max="1.7" step="0.01" value="1"></label>
+<label>Indigo stop<input id="color" type="color" value="#3a3a8f"></label>
+<label>Violet stop<input id="color2" type="color" value="#8a4fb8"></label>
+<label>Coral stop<input id="color3" type="color" value="#ff8466"></label>
+<button id="reset">Reset design</button><button id="export">Save PNG</button>
+<p class="note" id="status"></p>
+<section class="gallery"><h2>Saved PNGs</h2><p class="gallery-note">PNG captures are named with their parameter values. Commit the downloaded files to the repo and they will appear here automatically (fetched via the GitHub API).</p><div id="galleryItems" class="gallery-grid"></div></section>
+</aside></main>
+<script>
+'use strict';
+const $ = id => document.getElementById(id);
+const canvas=$('canvas'), ctx=canvas.getContext('2d');
+const TAU=Math.PI*2;
+const controls=['Ro','Ri','hOff','hAng','spread','zoom','color','color2','color3'];
+let width=1,height=1,dpr=1,drag=null,dragX=0,dragY=0,dirty=true;
+function clamp(){const max=Math.max(.4,+$('Ro').value-.5);$('Ri').max=max.toFixed(2);if(+$('Ri').value>max)$('Ri').value=max.toFixed(2)}
+function sync(){
+ clamp();
+ for(const id of controls){
+  if(id.startsWith('color'))continue;
+  $(id+'Out').value=(id==='hAng')?String(Math.round(+$(id).value)):(+$(id).value).toFixed(2);
+ }
+ $('status').textContent=`Ro:Ri = ${(+$('Ro').value/+$('Ri').value).toFixed(2)} : 1 · highlight offset ${(+$('hOff').value).toFixed(2)}`;
+}
+function resize(){const box=canvas.parentElement.getBoundingClientRect();width=box.width;height=box.height;dpr=Math.min(devicePixelRatio||1,2);canvas.width=Math.round(width*dpr);canvas.height=Math.round(height*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);dirty=true}
+function draw(){
+ ctx.clearRect(0,0,width,height);
+ sync();
+ const Ro=+$('Ro').value,Ri=Math.min(+$('Ri').value,Ro-.5),hOff=+$('hOff').value;
+ const hAng=+$('hAng').value*Math.PI/180,spread=+$('spread').value,zoom=+$('zoom').value;
+ const scale=Math.min(width,height)*.42*zoom/3;
+ const cx=width/2,cy=height*.42,ro=Ro*scale,ri=Ri*scale,d=spread*scale;
+ const hx=cx+hOff*Math.cos(hAng)*scale+dragX, hy=cy-hOff*Math.sin(hAng)*scale+dragY;
+ const g=ctx.createLinearGradient(hx-d,hy-d,hx+d,hy+d);
+ g.addColorStop(0,$('color').value);g.addColorStop(.55,$('color2').value);g.addColorStop(1,$('color3').value);
+ ctx.beginPath();ctx.arc(cx,cy,ro,0,TAU);ctx.arc(cx,cy,ri,0,TAU,true);
+ ctx.fillStyle=g;ctx.fill();
+ ctx.lineWidth=1;
+ ctx.strokeStyle='rgba(255,255,255,.25)';ctx.beginPath();ctx.arc(cx,cy,ri,0,TAU);ctx.stroke();
+ ctx.strokeStyle='rgba(0,0,0,.3)';ctx.beginPath();ctx.arc(cx,cy,ro,0,TAU);ctx.stroke();
+ dirty=false;
+}
+function animate(){if(dirty)draw();requestAnimationFrame(animate)}
+for(const id of controls)$(id).addEventListener('input',()=>{sync();dirty=true});
+canvas.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY};canvas.setPointerCapture(e.pointerId)});
+canvas.addEventListener('pointermove',e=>{if(!drag)return;dragX+=e.clientX-drag.x;dragY+=e.clientY-drag.y;drag={x:e.clientX,y:e.clientY};dirty=true});
+for(const type of ['pointerup','pointercancel','lostpointercapture'])canvas.addEventListener(type,()=>drag=null);
+canvas.addEventListener('wheel',e=>{e.preventDefault();$('zoom').value=Math.max(.6,Math.min(1.7,+$('zoom').value-e.deltaY*.001));sync();dirty=true},{passive:false});
+$('reset').onclick=()=>{Object.entries({Ro:2.4,Ri:.95,hOff:.75,hAng:135,spread:1.4,zoom:1,color:'#3a3a8f',color2:'#8a4fb8',color3:'#ff8466'}).forEach(([id,v])=>$(id).value=v);dragX=0;dragY=0;sync();dirty=true};
+$('export').onclick=()=>{draw();const out=document.createElement('canvas');out.width=canvas.width;out.height=canvas.height;const c=out.getContext('2d');c.fillStyle='#10151d';c.fillRect(0,0,out.width,out.height);c.drawImage(canvas,0,0);out.toBlob(blob=>{if(!blob)return;const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`gradient-halo-torus_Ro${(+$('Ro').value).toFixed(2)}_Ri${(+$('Ri').value).toFixed(2)}_hOff${(+$('hOff').value).toFixed(2)}_hAng${(+$('hAng').value).toFixed(2)}_spread${(+$('spread').value).toFixed(2)}_zoom${(+$('zoom').value).toFixed(2)}_${$('color').value.slice(1)}_${$('color2').value.slice(1)}_${$('color3').value.slice(1)}.png`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)},'image/png')};
+const gallery=$('galleryItems');
+const FALLBACK_PNG_NAMES=[]; // mirrors the committed gradient-halo-torus_*.png files; the GitHub API path below is preferred
+function renderGallery(items){gallery.innerHTML='';if(!items.length){const e=document.createElement('div');e.className='gallery-empty';e.textContent='No saved PNGs yet.';gallery.appendChild(e);return}for(const item of items){const w=document.createElement('a');w.className='gallery-item';w.href=item.url;w.target='_blank';w.rel='noopener';w.title='Open '+item.name;const img=document.createElement('img');img.src=item.url;img.alt=item.name;img.loading='lazy';w.appendChild(img);const l=document.createElement('span');l.textContent=item.name;w.appendChild(l);gallery.appendChild(w)}}
+fetch('https://api.github.com/repos/tthtlc/tthtlc.github.io/contents/').then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.json()}).then(files=>{if(!Array.isArray(files))throw new Error('unexpected response');renderGallery(files.filter(f=>f.type==='file'&&f.name.startsWith('gradient-halo-torus_')&&f.name.toLowerCase().endsWith('.png')).map(f=>({name:f.name,url:f.download_url})).sort((a,b)=>a.name<b.name?-1:1))}).catch(()=>renderGallery(FALLBACK_PNG_NAMES.map(n=>({name:n,url:n}))));
+new ResizeObserver(resize).observe(canvas.parentElement);
+sync();resize();requestAnimationFrame(animate);
+</script>
+</body></html>

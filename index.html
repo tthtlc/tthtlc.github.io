@@ -36,10 +36,7 @@ title: "Mathematical Art"
 <script>
   document.addEventListener("contextmenu", function(event) { event.preventDefault(); });
   window.mathArtCategories.renderFiles([
-    'enneper_order4.html',
-    'enneper_order3.html',
-    'enneper_order2.html',
-    'enneper.html'
+    {% for f in site.data.recent_pages %}'{{ f }}',{% endfor %}
   ], 'recent-list-container');
 </script>
 </body>

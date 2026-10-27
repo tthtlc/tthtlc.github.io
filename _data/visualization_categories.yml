@@ -5,15 +5,6 @@
   description: Epitrochoids, hypotrochoids and other rolling-circle curves — the classic spirograph family,
     from simple loops to multi-wheel explorers.
   items:
-  - file: cardiod.html
-    title: Cardioid Shape
-    tags: []
-  - file: cardiod_line.html
-    title: Cardioid Shape
-    tags: []
-  - file: cardiod_line1.html
-    title: Cardioid Shape with Point Labels
-    tags: []
   - file: cardiod_line2.html
     title: Cardioid Shape with Point Labels
     tags: []
@@ -31,11 +22,11 @@
     title: Hypotrochoid Curves
     tags: []
   - file: double_hypotrochoid_explore.html
-    title: Composite Hypotrochoid Curves
+    title: Double hypotrochoid — Interactive Study
     tags:
     - Interactive
   - file: double_hypotrochoid_moving_offset_explore.html
-    title: Hypotrochoid Curves with Rotation and Offset Control
+    title: Double hypotrochoid · moving offset — Interactive Study
     tags:
     - Interactive
     - Motion
@@ -44,7 +35,7 @@
     tags:
     - Rotating
   - file: double_hypotrochoid_rotating_offset_explore.html
-    title: Hypotrochoid Curves with Slow Rotation and Offset Control
+    title: Double hypotrochoid · rotating offset — Interactive Study
     tags:
     - Interactive
     - Rotating
@@ -106,6 +97,9 @@
   - file: double_triangle1.html
     title: Triangle Animation
     tags: []
+  - file: dualfold_variation.html
+    title: Dual-fold hypotrochoid — Interactive Study
+    tags: []
   - file: ellipse_double_sinusoidal_moving_color_background_explore.html
     title: Animated Sinusoidal Wave on Ellipse
     tags:
@@ -125,25 +119,25 @@
     tags:
     - Rotating
   - file: epicycloid_add_epicycloid_explore.html
-    title: Epicycloid Curves with Scrollbars, Labels, and Color Picker
+    title: Epicycloid + epicycloid — Interactive Study
     tags:
     - Interactive
   - file: epicycloid_explore_savepng.html
-    title: Epicycloid Curves with Scrollbars, Labels, and Color Picker
+    title: Epicycloid — Interactive Study
     tags:
     - Interactive
     - Save PNG
   - file: epicycloid_variant_explore_savepng.html
-    title: Epicycloid Curves with Scrollbars, Labels, and Color Picker
+    title: Epicycloid variant — Interactive Study
     tags:
     - Interactive
     - Save PNG
   - file: epitrochoid2_explore.html
-    title: Epitrochoid (v2) Curves with Scrollbars, Labels, and Color Picker
+    title: Epitrochoid v2 — Interactive Study
     tags:
     - Interactive
   - file: epitrochoid_explore.html
-    title: Epitrochoid (v1) Curves with Scrollbars, Labels, and Color Picker
+    title: Epitrochoid — Interactive Study
     tags:
     - Interactive
   - file: figure_eight_double_wheel.html
@@ -152,8 +146,11 @@
   - file: four-petal-spirograph.html
     title: Four-petal Spirograph
     tags: []
+  - file: fourfold_variation.html
+    title: Four-fold hypotrochoid — Interactive Study
+    tags: []
   - file: hypocycloid_explore.html
-    title: Hypotrochoid Curves with Scrollbars, Labels, and Color Picker
+    title: Hypocycloid — Interactive Study
     tags:
     - Interactive
   - file: hypotrochoid.html
@@ -193,25 +190,31 @@
     - Animated
     - Rotating
   - file: hypotrochoid_explore.html
-    title: Hypotrochoid Curves with Scrollbars, Labels, and Color Picker
+    title: Hypotrochoid — Interactive Study
     tags:
     - Interactive
   - file: hypotrochoid_explore_savepng.html
-    title: Hypotrochoid Curves with Scrollbars, Labels, and Color Picker
+    title: Hypotrochoid — Interactive Study
     tags:
     - Interactive
     - Save PNG
+  - file: hypotrochoid_lobes.html
+    title: Hypotrochoid lobes — Interactive Study
+    tags: []
   - file: hypotrochoid_rotate5_animated.html
     title: Hypotrochoid Curves
     tags:
     - Animated
     - Rotating
   - file: hypotrochoidv3_explore.html
-    title: Hypotrochoid Curve with Additional Scrollbars
+    title: Hypotrochoid v3 — Interactive Study
     tags:
     - Interactive
+  - file: pentafold_variation.html
+    title: Five-fold hypotrochoid — Interactive Study
+    tags: []
   - file: petal_add_epicycloid_explore.html
-    title: Epicycloid Curves with Petal with Scrollbars, Labels, and Color Picker
+    title: Petal + epicycloid — Interactive Study
     tags:
     - Interactive
   - file: rotating_cardiod2.html
@@ -251,6 +254,9 @@
     title: Circle Rotating Around a Circle Contour with Trail
     tags:
     - Interactive
+  - file: trifold_variation.html
+    title: Tri-fold hypotrochoid — Interactive Study
+    tags: []
   - file: triple_motion.html
     title: Dynamic Complex Line Drawing
     tags: []
@@ -540,9 +546,6 @@
   emoji: ⭕
   description: Regular polygons inscribed around other polygons, layered into rings of rotating symmetry.
   items:
-  - file: 3gon_around_3gon.html
-    title: Triangle rotation and translation
-    tags: []
   - file: 3gon_around_3gon_animated.html
     title: Triangle Rotation and Translation
     tags:
@@ -552,9 +555,6 @@
     tags:
     - Animated
     - Color
-  - file: 4gon_around_4gon.html
-    title: Square Rotation and Translation
-    tags: []
   - file: 4gon_around_4gon_animated.html
     title: Square Rotation and Translation
     tags:
@@ -664,17 +664,11 @@
   description: 'Three-dimensional geometry: minimal surfaces, Klein bottles, tori, Platonic solids, Möbius
     strips and tessellations.'
   items:
-  - file: beaded-torus.html
-    title: Beaded torus — Interactive Study
-    tags: []
   - file: braided-torus.html
     title: Braided torus — Interactive Study
     tags: []
   - file: contour-slice-torus.html
     title: Contour-slice torus — Interactive Study
-    tags: []
-  - file: cut-paper-torus.html
-    title: Cut-paper torus — Interactive Study
     tags: []
   - file: dodecahedron.html
     title: Dodecahedron Line Graphics
@@ -703,25 +697,9 @@
   - file: enneper_order4.html
     title: Enneper Surface, Order 4 — Interactive Study
     tags: []
-  - file: exploded-torus.html
-    title: Exploded Torus — Interactive Study
-    tags: []
-  - file: faceted-gemstone-torus.html
-    title: Faceted Gemstone Torus — Interactive Study
-    tags: []
-  - file: flattened-pebble-torus.html
-    title: Flattened Pebble Torus — Interactive Study
-    tags: []
-  - file: fluted-torus.html
-    title: Fluted Torus — Interactive Study
-    tags: []
   - file: generalized_mobius_strip.html
     title: Möbius Strip Wireframe — twists · density · size
     tags: []
-  - file: gradient-halo-torus.html
-    title: Gradient halo — Interactive Study
-    tags:
-    - Gradient
   - file: heart-loop-torus.html
     title: Heart-loop torus — Interactive Study
     tags: []
@@ -770,11 +748,11 @@
   - file: mobius_radiating.html
     title: Möbius Strip Wireframe Animation
     tags: []
+  - file: mobius_strip.html
+    title: 5-Fold Möbius Strip – Parametric Surface
+    tags: []
   - file: moire-torus.html
     title: Moiré torus — Interactive Study
-    tags: []
-  - file: orbital-torus-bouquet.html
-    title: Orbital Torus Bouquet — Interactive Study
     tags: []
   - file: petal-torus.html
     title: Petal torus — Interactive Study
@@ -801,24 +779,14 @@
   - file: saddle-wave-torus.html
     title: Saddle-Wave Torus — Interactive Study
     tags: []
-  - file: sinusoidal_on_sphere_explore.html
-    title: Cardioid Shape
-    tags:
-    - Interactive
-  - file: solid_torus.html
-    title: 3D Wireframe Shapes with Three.js
+  - file: sinusoidal_on_sphere_equator.html
+    title: Equatorial Waves on a Sphere
+    tags: []
+  - file: sinusoidal_on_sphere_radial.html
+    title: Sinusoidal Waves on a Sphere
     tags: []
   - file: sphere.html
     title: Sphere Triangulation
-    tags: []
-  - file: spherical_sinusoid.html
-    title: Sinusoidal Waves Around a Sphere with Perspective Control
-    tags: []
-  - file: spherical_sinusoid1.html
-    title: Sinusoidal Waves Around a Sphere with Perspective Control
-    tags: []
-  - file: spherical_sinusoid3.html
-    title: Sinusoidal Waves Around a Sphere (Side View)
     tags: []
   - file: spherical_tessellation.html
     title: Sphere Tessellation
@@ -832,11 +800,11 @@
   - file: tapered-torus.html
     title: Tapered Torus — Interactive Study
     tags: []
+  - file: tiling.html
+    title: Animated 4-Isohedral Tiling GIF Generator
+    tags: []
   - file: torus-knot-sculpture.html
     title: Torus-Knot Sculpture — Interactive Study
-    tags: []
-  - file: torus.html
-    title: Klein Bottle Transformation
     tags: []
   - file: truncated_dodecahedron_one_corner.html
     title: Truncated Dodecahedron Line Graphics
@@ -844,15 +812,21 @@
   - file: twisted-oval-tube-torus.html
     title: Twisted Oval-Tube Torus — Interactive Study
     tags: []
-  - file: wireframe-torus.html
-    title: Wireframe Torus — Interactive Study
-    tags: []
 - name: Minimal Surfaces
   slug: minimal-surfaces
   emoji: 🫧
   description: Soap-film-like minimal surfaces and their immersions — Boy's surface and other zero-mean-curvature
     forms rendered as interactive meshes.
   items:
+  - file: boy_surface.html
+    title: Boy's Surface – Parametric Surface
+    tags: []
+  - file: genus_one_helicoid.html
+    title: Genus-One Helicoid — Rotating 3D
+    tags: []
+  - file: genus_one_helicoid1.html
+    title: Genus-One Helicoid – Parametric Surface
+    tags: []
   - file: interactive_boy_surface.html
     title: Interactive Boy's Surface
     tags:
@@ -870,6 +844,9 @@
     title: Generating and Rendering Minimal Surfaces — with Costa Samples
     tags:
     - Interactive
+  - file: simple_boy_surface.html
+    title: Interactive Boy's Surface - Dynamic Dot Mesh
+    tags: []
 - name: Waves & Oscillations
   slug: waves
   emoji: 🌊
@@ -887,27 +864,12 @@
     - Interactive
     - Motion
     - Color
-  - file: sinewave.html
-    title: Traveling Sine Wave
-    tags: []
   - file: sinewave_animated.html
     title: Sine Wave Animation
     tags:
     - Animated
   - file: sinewave_circle.html
     title: Revolving Sine Wave
-    tags: []
-  - file: sinewave_root.html
-    title: Traveling Sine Wave
-    tags: []
-  - file: sinewave_root_multiple.html
-    title: Traveling Sine Wave
-    tags: []
-  - file: sinsoidal5.html
-    title: Sinusoidal Wave Animation
-    tags: []
-  - file: sinusoidal.html
-    title: Sinusoidal Wave Animation
     tags: []
   - file: sinusoidal_plane.html
     title: Animated 3D Sine Waves
@@ -933,18 +895,8 @@
     title: Revolving Square Wave with Fourier Series
     tags:
     - Rotating
-  - file: triangle_sinusoidal_explore.html
-    title: Sinusoidal Wave on Triangle Edges
-    tags:
-    - Interactive
   - file: triangle_sinusoidal_moving_color_background_explore.html
     title: Animated Sinusoidal Wave on Triangle Edges with Background Color Morph
-    tags:
-    - Interactive
-    - Motion
-    - Color
-  - file: triangle_sinusoidal_moving_color_explore.html
-    title: Animated Sinusoidal Wave on Triangle Edges with Color Gradient
     tags:
     - Interactive
     - Motion
@@ -1069,6 +1021,9 @@
   description: Flower-like curves built from rotated petals, from simple blossoms to complex multi-petal
     motion.
   items:
+  - file: flower.html
+    title: Animated Flower Pattern
+    tags: []
   - file: flower_in_motion.html
     title: Dynamic Complex Line Drawing
     tags: []
@@ -1082,6 +1037,9 @@
     title: Four Petal Lines Animation
     tags:
     - Rotating
+  - file: rose.html
+    title: Golden-angle rose — Interactive Study
+    tags: []
   - file: rotating_petal_animated.html
     title: Dynamic Petals with Red-to-Blue Gradient
     tags:
@@ -1169,10 +1127,6 @@
   description: Line drawings across polygon vertices, spokes and randomized sectors — polygonal scribble
     art.
   items:
-  - file: counter_rotating_sector.html
-    title: Canvas Pattern
-    tags:
-    - Rotating
   - file: diamond4_random_sector.html
     title: Diamond Shape with Randomized nnn
     tags:
@@ -1181,9 +1135,6 @@
     title: Diamond Shape with Randomized nnn
     tags:
     - Random
-  - file: drawsector.html
-    title: Sector of a Circle
-    tags: []
   - file: five_edged_random_sector.html
     title: Diamond Shape with Randomized nnn
     tags:
@@ -1289,9 +1240,6 @@
   - file: cubic.html
     title: Rotating Cubic
     tags: []
-  - file: diamond2.html
-    title: Diamond Shape with Labels
-    tags: []
   - file: diamond3.html
     title: Diamond Shape with Labels
     tags: []
@@ -1306,9 +1254,6 @@
   - file: diamond4_translate.html
     title: Diamond Shape with Labels
     tags: []
-  - file: diamond6.html
-    title: Radial Symmetry Animated Diamonds
-    tags: []
   - file: diamond_generalized_animate.html
     title: Diamond Shape with Randomized Angles
     tags:
@@ -1319,27 +1264,24 @@
   - file: geometric-studies.html
     title: 20 Geometric Studies — Interactive Canvas Gallery
     tags: []
-  - file: parametric_curve1.html
-    title: Parametric Equation Visualization
-    tags: []
   - file: parametric_curve1_param_rotate.html
-    title: Parametric Equation Visualization with Gradient
+    title: Parametric Curve 1 — Interactive Study
     tags:
     - Rotating
   - file: parametric_curve23_explore.html
-    title: Parametric Equation Visualization with Rotation
+    title: Parametric Curve — Interactive Study
     tags:
     - Interactive
   - file: parametric_curve2_explore.html
-    title: Parametric Equation Visualization with Rotation
+    title: Parametric Curve 2 — Interactive Study
     tags:
     - Interactive
   - file: parametric_curve2_generalized_explore.html
-    title: Parametric Equation Visualization with Rotation
+    title: Parametric Curve 2 (Generalized) — Interactive Study
     tags:
     - Interactive
   - file: parametric_curve3_explore.html
-    title: Parametric Equation Visualization with Rotation
+    title: Parametric Curve 3 — Interactive Study
     tags:
     - Interactive
   - file: parametric_equation.html
@@ -1364,6 +1306,9 @@
   - file: quart_motion.html
     title: Dynamic Complex Line Drawing
     tags: []
+  - file: running_star.html
+    title: Growing Star (10 nested stars)
+    tags: []
   - file: simple_quart_motion.html
     title: Psychedelic line drawing
     tags: []
@@ -1373,6 +1318,9 @@
     - Interactive
   - file: square_triangle.html
     title: Triangle Animation
+    tags: []
+  - file: super_3d_object.html
+    title: The superformula — Interactive Study
     tags: []
   - file: turtle_forwarding_pattern.html
     title: Turtle Graphics Pentagon

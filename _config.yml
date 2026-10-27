@@ -83,3 +83,6 @@ exclude:
   - node_modules
   - vendor
   - README.md
+  # Archived content — kept in the repo but not published:
+  - weave
+  - old

@@ -23,7 +23,7 @@ CATEGORIES = [
      "Epitrochoids, hypotrochoids and other rolling-circle curves — the classic "
      "spirograph family, from simple loops to multi-wheel explorers.",
      [r"hypotrochoid", r"epicycloid", r"epitrochoid", r"spirograph", r"cardiod",
-      r"hypocycloid", r"double_(?!ellipse)", r"triple_", r"rotating_circle"]),
+      r"hypocycloid", r"double_(?!ellipse)", r"triple_", r"rotating_circle", r"fold"]),
     ("lemniscates", "Lemniscates & Figure-Eights", "∞",
      "The lemniscate family — figure-eight curves radiating, rotating and "
      "multiplying.",
@@ -49,11 +49,11 @@ CATEGORIES = [
      "Platonic solids, Möbius strips and tessellations.",
      [r"enneper", r"klein", r"torus", r"tori", r"interlocked", r"sphere",
       r"spherical", r"icosahedron", r"dodecahedron", r"rhombic", r"mobius",
-      r"tessellation"]),
+      r"tessellation", r"tiling"]),
     ("minimal-surfaces", "Minimal Surfaces", "🫧",
      "Soap-film-like minimal surfaces and their immersions — Boy's surface and "
      "other zero-mean-curvature forms rendered as interactive meshes.",
-     [r"boy", r"gyroid", r"schwarz", r"neovius", r"minimal"]),
+     [r"boy", r"gyroid", r"schwarz", r"neovius", r"minimal", r"helicoid"]),
     ("waves", "Waves & Oscillations", "🌊",
      "Sine waves, square waves and sinusoidal ribbons — oscillation drawn in "
      "animated color.",
@@ -73,7 +73,7 @@ CATEGORIES = [
     ("petals", "Petals & Flowers", "🌸",
      "Flower-like curves built from rotated petals, from simple blossoms to "
      "complex multi-petal motion.",
-     [r"petal", r"flower"]),
+     [r"petal", r"flower", r"rose"]),
     ("spirals", "Spirals & Islamic Patterns", "🐚",
      "Spirals, vortexes and Islamic geometric star patterns in rotation.",
      [r"spiral", r"vortex", r"islamic"]),
@@ -91,7 +91,7 @@ CATEGORIES = [
      [r"diamond", r"boomerang", r"windmill", r"chopstick", r"turtle",
       r"parametric", r"cubic", r"psychedlic", r"sin_cos", r"pinterest",
       r"quart", r"square_triangle", r"twotriangle", r"pentagon_star",
-      r"geometric", r"poincare"]),
+      r"geometric", r"poincare", r"super", r"star"]),
 ]
 
 TAG_RULES = [
