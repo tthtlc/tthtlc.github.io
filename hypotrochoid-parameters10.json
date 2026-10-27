@@ -1,0 +1,53 @@
+{
+  "format": "hyperbolic-hypotrochoid-parameters",
+  "version": 1,
+  "exportedAt": "2026-10-21T08:40:14.744Z",
+  "construction": {
+    "euclidean": {
+      "type": "hypotrochoid",
+      "coordinateSpace": "Euclidean 2D",
+      "equation": "x(t)=(R-r)cos(t)+d cos(((R-r)/r)t); y(t)=(R-r)sin(t)-d sin(((R-r)/r)t)",
+      "parameters": {
+        "R": 4.2,
+        "r": 2.1,
+        "d": 2.7,
+        "turns": 15,
+        "samples": 7000,
+        "scale": 0.8923950024006466
+      }
+    },
+    "hyperbolic": {
+      "type": "poincare_disk_mobius_automorphism",
+      "coordinateSpace": "Poincare disk",
+      "map": "z -> exp(i*rotation) * (z-a)/(1-conj(a)z)",
+      "parameters": {
+        "hyperR": 0.480523895525378,
+        "centerX": -0.03718877032520329,
+        "centerY": -0.010607215447154483,
+        "rotation": 44.85079677907446
+      }
+    },
+    "rendering": {
+      "lineWidth": 2,
+      "glow": 1.1,
+      "boundary": 1,
+      "contrast": 0.55
+    }
+  },
+  "flatParameters": {
+    "R": 4.2,
+    "r": 2.1,
+    "d": 2.7,
+    "turns": 15,
+    "samples": 7000,
+    "hyperR": 0.480523895525378,
+    "centerX": -0.03718877032520329,
+    "centerY": -0.010607215447154483,
+    "rotation": 44.85079677907446,
+    "scale": 0.8923950024006466,
+    "lineWidth": 2,
+    "glow": 1.1,
+    "boundary": 1,
+    "contrast": 0.55
+  }
+}

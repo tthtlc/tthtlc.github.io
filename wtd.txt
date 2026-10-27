@@ -1,0 +1,14 @@
+Curves:
+hypotrochoid_animate_d1.html
+hypotrochoid_animate_d.html
+
+x = Cos(t) - Cos^5(250t) // y = Sin(t) - Sin^3(250t)
+x = Cos(t) - Cos^3(550t) // y = Sin(1t) - Sin^3(550t)
+
+spider-waves.html
+boomerang.html
+double_hypotrochoid_explore.html
+
+
+
+

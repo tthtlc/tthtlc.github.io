@@ -1,0 +1,135 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Triangular looping curve</title>
+<style>
+  body {
+    margin: 0;
+    font-family: system-ui, sans-serif;
+    background: #fafafa;
+    color: #222;
+    display: grid;
+    justify-items: center;
+  }
+
+  canvas {
+    width: min(92vw, 760px);
+    height: auto;
+    background: white;
+  }
+
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    padding: 18px;
+  }
+
+  label {
+    display: grid;
+    gap: 6px;
+  }
+</style>
+</head>
+<body>
+
+<div class="controls">
+  <label>
+    <span>Loop radius: <output id="radiusValue"></output></span>
+    <input id="radius" type="range"
+           min="0.3" max="1.5" step="0.01" value="1">
+  </label>
+
+  <label>
+    <span>Frequency: <output id="frequencyValue"></output></span>
+    <input id="frequency" type="range"
+           min="25" max="199" step="3" value="100">
+  </label>
+</div>
+
+<canvas id="canvas" width="900" height="900"></canvas>
+
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+const radiusInput = document.getElementById("radius");
+const frequencyInput = document.getElementById("frequency");
+
+function draw() {
+  const a = Number(radiusInput.value);
+  const n = Number(frequencyInput.value);
+  const b = 1;
+
+  document.getElementById("radiusValue").textContent = a.toFixed(2);
+  document.getElementById("frequencyValue").textContent = n;
+
+  // Sample densely enough to resolve each small loop.
+  const samples = Math.max(30000, n * 400);
+  const points = [];
+
+  let minX = Infinity, maxX = -Infinity;
+  let minY = Infinity, maxY = -Infinity;
+
+  for (let i = 0; i <= samples; i++) {
+    const t = 2 * Math.PI * i / samples;
+
+    const x =
+      2 * b * Math.cos(t) +
+      b * Math.cos(2 * t) +
+      a * Math.cos(n * t);
+
+    const y =
+      2 * b * Math.sin(t) -
+      b * Math.sin(2 * t) +
+      a * Math.sin(n * t);
+
+    points.push([x, y]);
+
+    minX = Math.min(minX, x);
+    maxX = Math.max(maxX, x);
+    minY = Math.min(minY, y);
+    maxY = Math.max(maxY, y);
+  }
+
+  const padding = 48;
+  const scale = Math.min(
+    (canvas.width - 2 * padding) / (maxX - minX),
+    (canvas.height - 2 * padding) / (maxY - minY)
+  );
+
+  const centerX = (minX + maxX) / 2;
+  const centerY = (minY + maxY) / 2;
+
+  ctx.fillStyle = "white";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  ctx.beginPath();
+
+  points.forEach(([x, y], i) => {
+    const px = canvas.width / 2 + scale * (x - centerX);
+    const py = canvas.height / 2 - scale * (y - centerY);
+
+    if (i === 0) ctx.moveTo(px, py);
+    else ctx.lineTo(px, py);
+  });
+
+  ctx.closePath();
+  ctx.strokeStyle = "rgba(65, 55, 210, 0.30)";
+  ctx.lineWidth = 0.65;
+  ctx.lineJoin = "round";
+  ctx.stroke();
+}
+
+radiusInput.addEventListener("input", draw);
+frequencyInput.addEventListener("input", draw);
+
+draw();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Hyperbolic saddle — Checkerboard</title><style>
+:root{color-scheme:dark;font-family:Inter,system-ui,sans-serif;background:#10151d;color:#eef2f8}*{box-sizing:border-box}body{margin:0}main{display:grid;grid-template-columns:1fr 300px;height:100vh;min-height:0}.stage{position:relative;height:100vh;min-height:0;overflow:hidden;background:radial-gradient(ellipse at 50% 45%,#253247,#10151d 70%)}canvas{display:block;width:100%;height:100%;position:absolute;touch-action:auto}.topbar{position:absolute;top:32px;left:36px;right:36px;display:flex;align-items:flex-start;gap:36px;flex-wrap:wrap;z-index:2}.heading{pointer-events:none}h1{font-size:clamp(24px,3vw,40px);font-weight:500;letter-spacing:-.04em;margin:6px 0}.eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.22em;color:#91a5bf}.hint{position:absolute;bottom:28px;left:36px;color:#92a3b9;font-size:12px;pointer-events:none;z-index:2}.formula{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);z-index:3;max-width:calc(100% - 48px);background:rgba(16,21,29,.9);border:1px solid #2a3443;border-radius:9px;padding:7px 12px;font-size:10px;line-height:1.55;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#a4e3d4;text-align:center;white-space:pre;pointer-events:none;box-shadow:0 4px 18px rgba(0,0,0,.35)}aside{padding:32px 25px;background:#151c27;border-left:1px solid #2a3443;height:100vh;overflow-y:auto}aside::-webkit-scrollbar{width:8px}aside::-webkit-scrollbar-track{background:#10151d}aside::-webkit-scrollbar-thumb{background:#3a485b;border-radius:4px}aside::-webkit-scrollbar-thumb:hover{background:#4a5c74}h2{font-size:17px;font-weight:500;margin:0 0 26px}label{display:block;font-size:13px;color:#c7d2e3;margin-bottom:22px}.row{display:flex;justify-content:space-between;margin-bottom:8px}output{font-variant-numeric:tabular-nums;color:#88dbc6}input[type=range]{width:100%;accent-color:#88dbc6}select,button{background:#202d3d;color:#eef2f8;border:1px solid #3a485b;border-radius:8px;padding:10px;font:inherit;width:100%}input[type=color]{width:100%;height:34px;background:none;border:0;padding:0}button{cursor:pointer;margin-top:10px}button:hover{background:#2b3e53}button:disabled{opacity:.55;cursor:wait}.check{display:flex;gap:10px;align-items:center;margin:16px 0 0;font-size:13px;color:#c7d2e3}.check input[type=checkbox]{width:auto;accent-color:#88dbc6}.note{font-size:12px;color:#91a5bf;line-height:1.65;margin-top:25px}details{font-size:12px;color:#91a5bf;line-height:1.65}summary{cursor:pointer;color:#c7d2e3}code{color:#a4e3d4}.geometry{pointer-events:auto;max-width:min(46vw,400px);background:rgba(21,28,39,.88);border:1px solid #2a3443;border-radius:12px;padding:10px 14px;backdrop-filter:blur(6px);margin-top:4px}.geometry p{margin:.6em 0}.gallery{border-top:1px solid #2a3443;margin-top:25px;padding-top:22px}.gallery h2{margin:0 0 8px}.gallery-note{font-size:11px;color:#91a5bf;line-height:1.6;margin:0 0 14px}.gallery-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.gallery-item{display:block;border:1px solid #2a3443;border-radius:8px;overflow:hidden;text-decoration:none;background:#10151d}.gallery-item:hover{border-color:#88dbc6}.gallery-item img{display:block;width:100%;height:64px;object-fit:cover}.gallery-item span{display:block;font-size:9px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#91a5bf;padding:4px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.gallery-empty{grid-column:1/-1;color:#6b7d94;font-size:12px;text-align:center;padding:14px 0}@media(max-width:760px){main{grid-template-columns:1fr;height:auto;min-height:100vh}.stage{height:65vh;min-height:420px}aside{border-left:0;border-top:1px solid #2a3443;height:auto;max-height:none;overflow:visible}.topbar{left:24px;top:22px;right:24px;gap:24px}.hint{left:24px}.formula{left:24px;right:24px;transform:none;max-width:none;text-align:left}}
+
+canvas{touch-action:none;cursor:grab}.topbar{pointer-events:none}.geometry{pointer-events:auto}.hint{bottom:66px;right:24px}.formula{white-space:normal;width:max-content}.geometry{max-width:360px}h1{font-size:clamp(23px,3vw,37px)}
+</style></head><body><main><section class="stage"><canvas id="canvas" aria-label="Rotatable black and white checkerboard hyperbolic paraboloid"></canvas><div class="topbar"><div class="heading"><div class="eyebrow">Ruled surface / interactive study</div><h1>Hyperbolic checkerboard</h1></div><details class="geometry"><summary>Geometry &amp; terminology</summary><p>This saddle is a hyperbolic paraboloid, not the constant-curvature hyperbolic plane.</p><p><code>S(u,v) = (u, v, k·u·v)</code></p><p>Holding either parameter fixed gives a straight line. Two crossing families of these lines bound four-sided cells, colored by the parity of their grid indices.</p><p>These cells are quadrilaterals, not generally intrinsic squares. Each colored cell follows the curved surface. The saddle has variable negative Gaussian curvature when k ≠ 0.</p></details></div><div class="hint">Drag to rotate · Scroll to zoom · Change the sliders to reshape the surface</div><div class="formula" id="formula"></div></section><aside><h2>Surface &amp; appearance</h2>
+<label><span class="row"><span>Saddle curvature k</span><output id="kOut"></output></span><input id="k" type="range" min="0" max="1.5" step="0.01" value="0.65"></label>
+<label><span class="row"><span>Cells per direction</span><output id="nOut"></output></span><input id="n" type="range" min="4" max="40" step="2" value="16"></label>
+<label><span class="row"><span>Surface extent</span><output id="extentOut"></output></span><input id="extent" type="range" min="0.5" max="3" step="0.05" value="1.8"></label>
+<label><span class="row"><span>Line width</span><output id="lwOut"></output></span><input id="lw" type="range" min="0.2" max="2" step="0.1" value="0.6"></label>
+<label><span class="row"><span>Zoom</span><output id="zoomOut"></output></span><input id="zoom" type="range" min="0.5" max="2" step="0.01" value="1"></label>
+<label>Dark cells<input id="dark" type="color" value="#000000"></label><label>Light cells<input id="light" type="color" value="#ffffff"></label>
+<label class="check"><input id="grid" type="checkbox" checked> Show crossing straight lines</label><label class="check"><input id="swap" type="checkbox"> Swap black and white</label>
+<button id="reset">Reset design &amp; view</button><button id="export">Save PNG</button><button id="exportGif">Save rotating GIF</button><button id="animate">Animate rotation</button><p class="note" id="status" aria-live="polite"></p><p class="note">Two families of straight rulings form a checkerboard on the saddle. Drag for an edge-on view to see the criss-crossing lines. Exports are created locally; no external libraries or network connection are needed.</p></aside></main><script>
+'use strict';
+const $=id=>document.getElementById(id),canvas=$('canvas'),ctx=canvas.getContext('2d');
+let width=1,height=1,dpr=1,yaw=-0.65,pitch=0.62,spin=false,last=0,exporting=false;
+const defaults={k:0.65,n:16,extent:1.8,lw:0.6,zoom:1};
+function params(){let p={};for(const id in defaults){p[id]=+$ (id).value;$(id+'Out').value=id==='n'?p[id]:p[id].toFixed(2);}p.dark=$('dark').value;p.light=$('light').value;p.grid=$('grid').checked;p.swap=$('swap').checked;return p;}
+function background(g,w,h){const gr=g.createRadialGradient(w/2,h*.45,0,w/2,h*.45,Math.max(w,h)*.8);gr.addColorStop(0,'#253247');gr.addColorStop(1,'#10151d');g.fillStyle=gr;g.fillRect(0,0,w,h);}
+function scene(g,w,h,p,angle=yaw){
+ background(g,w,h);
+ const a=p.extent,maxZ=p.k*a*a,bound=Math.sqrt(2*a*a+maxZ*maxZ),scale=Math.min(w,h)*.39*p.zoom/bound;
+ const cy=Math.cos(angle),sy=Math.sin(angle),cp=Math.cos(pitch),sp=Math.sin(pitch);
+ function project(u,v){const z=p.k*u*v,x=cy*u-sy*v,y=sy*u+cy*v;return [w/2+x*scale,h*.53-(cp*z-sp*y)*scale,cp*y+sp*z];}
+ const step=2*a/p.n,faces=[],sub=3;
+ for(let i=0;i<p.n;i++)for(let j=0;j<p.n;j++){
+ const color=((i+j+(p.swap?1:0))%2)?p.dark:p.light;
+ for(let r=0;r<sub;r++)for(let t=0;t<sub;t++){
+ const u=-a+(i+r/sub)*step,v=-a+(j+t/sub)*step,d=step/sub;
+ const vs=[project(u,v),project(u+d,v),project(u+d,v+d),project(u,v+d)];
+ faces.push({vs,color,depth:vs.reduce((s,v)=>s+v[2],0)/4});
+ }}
+ faces.sort((a,b)=>a.depth-b.depth);
+ g.lineJoin='round';
+ for(const f of faces){g.beginPath();f.vs.forEach((v,i)=>i?g.lineTo(v[0],v[1]):g.moveTo(v[0],v[1]));g.closePath();g.fillStyle=f.color;g.fill();g.strokeStyle=f.color;g.lineWidth=.35;g.stroke();}
+ if(p.grid){
+ // Visibility is tested against the analytic saddle along an orthographic viewing ray.
+ function visible(u,v){const x=cy*u-sy*v,y=sy*u+cy*v,z=p.k*u*v;
+ const A=-p.k*sy*cy*cp*cp,B=sp-p.k*(u*cy+v*sy)*cp;
+ if(Math.abs(A)<1e-10)return true;
+ const t=-B/A;if(t<1e-5)return true;
+ const uu=u+sy*cp*t,vv=v+cy*cp*t;
+ return Math.abs(uu)>a+1e-6||Math.abs(vv)>a+1e-6;
+ }
+ g.strokeStyle='#708195';g.lineWidth=p.lw;
+ for(let family=0;family<2;family++)for(let i=0;i<=p.n;i++){
+ const fixed=-a+i*step;let pen=false;g.beginPath();
+ for(let j=0;j<=240;j++){const t=-a+2*a*j/240,u=family?t:fixed,v=family?fixed:t,P=project(u,v);
+ if(visible(u,v)){if(pen)g.lineTo(P[0],P[1]);else g.moveTo(P[0],P[1]);pen=true;}else pen=false;
+ }g.stroke();
+ }
+ }
+}
+function draw(){const p=params();scene(ctx,width,height,p);$('formula').textContent='S(u,v) = (u, v, '+p.k.toFixed(2)+'uv)  ·  '+p.n+' × '+p.n+' alternating cells';$('status').textContent=(p.n*p.n)+' four-sided cells · '+(2*(p.n+1))+' straight grid lines';}
+function resize(){const b=canvas.parentElement.getBoundingClientRect();width=b.width;height=b.height;dpr=Math.min(devicePixelRatio||1,2);canvas.width=Math.round(width*dpr);canvas.height=Math.round(height*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);draw();}
+function download(blob,name){const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),2000);}
+for(const id of [...Object.keys(defaults),'dark','light','grid','swap'])$(id).addEventListener('input',draw);
+let drag=null;canvas.onpointerdown=e=>{drag={x:e.clientX,y:e.clientY};canvas.setPointerCapture(e.pointerId);canvas.style.cursor='grabbing';};canvas.onpointermove=e=>{if(!drag)return;yaw+=(e.clientX-drag.x)*.008;pitch=Math.max(-1.45,Math.min(1.45,pitch+(e.clientY-drag.y)*.008));drag={x:e.clientX,y:e.clientY};draw();};function release(){drag=null;canvas.style.cursor='grab';}canvas.onpointerup=release;canvas.onpointercancel=release;canvas.onwheel=e=>{e.preventDefault();$('zoom').value=Math.max(.5,Math.min(2,+$('zoom').value*Math.exp(-e.deltaY*.001)));draw();};
+function tick(t){if(spin&&!drag&&!exporting){yaw+=(t-last)*.00022;draw();}last=t;requestAnimationFrame(tick);}requestAnimationFrame(tick);
+$('animate').onclick=()=>{spin=!spin;$('animate').textContent=spin?'Stop rotation':'Animate rotation';};
+$('reset').onclick=()=>{for(const id in defaults)$(id).value=defaults[id];$('dark').value='#000000';$('light').value='#ffffff';$('grid').checked=true;$('swap').checked=false;yaw=-.65;pitch=.62;spin=false;$('animate').textContent='Animate rotation';draw();};
+$('export').onclick=()=>{const p=params(),out=document.createElement('canvas');out.width=1800;out.height=1800;const g=out.getContext('2d');scene(g,1800,1740,p);g.fillStyle='#10151d';g.fillRect(0,1740,1800,60);g.fillStyle='#a4e3d4';g.font='22px monospace';g.fillText('S(u,v)=(u,v,'+p.k+'uv) | '+p.n+'x'+p.n+' cells | extent '+p.extent,35,1778);out.toBlob(b=>{if(b)download(b,'hyperbolic_checkerboard.png');});};
+function lzwEncode(indices,minCodeSize){
+ const clearCode=1<<minCodeSize,eoiCode=clearCode+1;
+ let codeSize=minCodeSize+1,nextCode=eoiCode+1;
+ const dict=new Map(),out=[];let cur=0,bits=0;
+ function write(code){cur|=code<<bits;bits+=codeSize;while(bits>=8){out.push(cur&0xff);cur>>=8;bits-=8;}}
+ if(indices.length===0){write(clearCode);write(eoiCode);if(bits>0)out.push(cur&0xff);return new Uint8Array(out);}
+ write(clearCode);
+ let prefix=indices[0];
+ for(let i=1;i<indices.length;i++){
+  const k=indices[i],key=prefix*4096+k,c=dict.get(key);
+  if(c!==undefined){prefix=c;}
+  else{
+   write(prefix);
+   if(nextCode<4096){dict.set(key,nextCode++);if(nextCode>(1<<codeSize)&&codeSize<12)codeSize++;}
+   else{write(clearCode);dict.clear();codeSize=minCodeSize+1;nextCode=eoiCode+1;}
+   prefix=k;
+  }
+ }
+ write(prefix);write(eoiCode);
+ if(bits>0)out.push(cur&0xff);
+ return new Uint8Array(out);
+}
+function buildGif(frames,width,height,palette,delayCs){
+ const pal=new Array(256);for(let i=0;i<256;i++)pal[i]=palette[i]||[0,0,0];
+ const bytes=[];const u8=b=>bytes.push(b&0xff);const u16=v=>{bytes.push(v&0xff,(v>>8)&0xff);};
+ const str=s=>{for(let i=0;i<s.length;i++)bytes.push(s.charCodeAt(i));};
+ str('GIF89a');u16(width);u16(height);u8(0xF7);u8(0);u8(0);
+ for(let i=0;i<256;i++){u8(pal[i][0]);u8(pal[i][1]);u8(pal[i][2]);}
+ u8(0x21);u8(0xFF);u8(0x0B);str('NETSCAPE2.0');u8(0x03);u8(0x01);u16(0);u8(0x00);
+ for(const idx of frames){
+  u8(0x21);u8(0xF9);u8(0x04);u8(0x04);u16(delayCs);u8(0x00);u8(0x00);
+  u8(0x2C);u16(0);u16(0);u16(width);u16(height);u8(0x00);u8(8);
+  const lzw=lzwEncode(idx,8);
+  for(let i=0;i<lzw.length;i+=255){const n=Math.min(255,lzw.length-i);u8(n);for(let j=0;j<n;j++)u8(lzw[i+j]);}
+  u8(0x00);
+ }
+ u8(0x3B);return new Uint8Array(bytes);
+}
+function quantizeFrames(frames){
+ const N=1<<15;const count=new Uint32Array(N),rsum=new Uint32Array(N),gsum=new Uint32Array(N),bsum=new Uint32Array(N);const buckets=[];
+ for(const fr of frames){const d=fr.data;for(let i=0;i<d.length;i+=4){const r=d[i],g=d[i+1],b=d[i+2];const bk=((r>>3)<<10)|((g>>3)<<5)|(b>>3);if(count[bk]===0)buckets.push(bk);count[bk]++;rsum[bk]+=r;gsum[bk]+=g;bsum[bk]+=b;}}
+ buckets.sort((a,b)=>count[b]-count[a]);
+ const chosen=buckets.slice(0,256),palette=[];
+ for(const bk of chosen){const n=count[bk];palette.push([Math.round(rsum[bk]/n),Math.round(gsum[bk]/n),Math.round(bsum[bk]/n)]);}
+ if(palette.length===0)palette.push([0,0,0]);
+ const lut=new Uint8Array(N);
+ for(let bk=0;bk<N;bk++){const r=(bk>>10)<<3,g=((bk>>5)&31)<<3,b=(bk&31)<<3;let best=0,bestD=Infinity;for(let p=0;p<palette.length;p++){const dr=palette[p][0]-r,dg=palette[p][1]-g,db=palette[p][2]-b;const d=dr*dr+dg*dg+db*db;if(d<bestD){bestD=d;best=p;}}lut[bk]=best;}
+ const indices=[];
+ for(const fr of frames){const d=fr.data,idx=new Uint8Array(fr.w*fr.h);let p=0;for(let i=0;i<d.length;i+=4){const bk=((d[i]>>3)<<10)|((d[i+1]>>3)<<5)|(d[i+2]>>3);idx[p++]=lut[bk];}indices.push(idx);}
+ return {palette,indices};
+}
+
+$('exportGif').onclick=async()=>{if(exporting)return;exporting=true;const btn=$('exportGif');btn.disabled=true;btn.textContent='Rendering GIF…';try{const p=params(),frames=[],c=document.createElement('canvas');c.width=c.height=400;const g=c.getContext('2d');for(let i=0;i<36;i++){scene(g,400,400,p,yaw+2*Math.PI*i/36);frames.push({w:400,h:400,data:g.getImageData(0,0,400,400).data});if(i%3===0)await new Promise(r=>setTimeout(r,0));}const q=quantizeFrames(frames);download(new Blob([buildGif(q.indices,400,400,q.palette,10)],{type:'image/gif'}),'hyperbolic_checkerboard_rotation.gif');}catch(e){$('status').textContent='Export failed: '+e.message;}finally{exporting=false;btn.disabled=false;btn.textContent='Save rotating GIF';}};
+new ResizeObserver(resize).observe(canvas.parentElement);resize();
+</script></body></html>

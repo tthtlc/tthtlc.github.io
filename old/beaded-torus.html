@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Beaded torus — Interactive Study</title>
+<style>
+:root{color-scheme:dark;font-family:Inter,system-ui,sans-serif;background:#10151d;color:#eef2f8}*{box-sizing:border-box}body{margin:0}main{display:grid;grid-template-columns:1fr 300px;min-height:100vh}.stage{position:relative;min-height:650px;overflow:hidden;background:radial-gradient(ellipse at 50% 45%,#253247,#10151d 70%)}canvas{display:block;width:100%;height:100%;position:absolute;touch-action:none;cursor:grab}canvas:active{cursor:grabbing}.topbar{position:absolute;top:32px;left:36px;right:36px;display:flex;align-items:flex-start;gap:36px;flex-wrap:wrap;z-index:2}.heading{pointer-events:none}h1{font-size:clamp(24px,3vw,40px);font-weight:500;letter-spacing:-.04em;margin:6px 0}.eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.22em;color:#91a5bf}.hint{position:absolute;bottom:28px;left:36px;color:#92a3b9;font-size:12px;pointer-events:none}aside{padding:32px 25px;background:#151c27;border-left:1px solid #2a3443}h2{font-size:17px;font-weight:500;margin:0 0 26px}label{display:block;font-size:13px;color:#c7d2e3;margin-bottom:22px}.row{display:flex;justify-content:space-between;margin-bottom:8px}output{font-variant-numeric:tabular-nums;color:#88dbc6}input[type=range]{width:100%;accent-color:#88dbc6}select,button{background:#202d3d;color:#eef2f8;border:1px solid #3a485b;border-radius:8px;padding:10px;font:inherit;width:100%}input[type=color]{width:100%;height:34px;background:none;border:0;padding:0}button{cursor:pointer;margin-top:10px}button:hover{background:#2b3e53}.check{display:flex;gap:10px;align-items:center}.note{font-size:12px;color:#91a5bf;line-height:1.65;margin-top:25px}details{font-size:12px;color:#91a5bf;line-height:1.65}summary{cursor:pointer;color:#c7d2e3}code{color:#a4e3d4}.geometry{pointer-events:auto;max-width:min(46vw,400px);background:rgba(21,28,39,.88);border:1px solid #2a3443;border-radius:12px;padding:10px 14px;backdrop-filter:blur(6px);margin-top:4px}.geometry p{margin:.6em 0}.gallery{border-top:1px solid #2a3443;margin-top:25px;padding-top:22px}.gallery h2{margin:0 0 8px}.gallery-note{font-size:11px;color:#91a5bf;line-height:1.6;margin:0 0 14px}.gallery-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.gallery-item{display:block;border:1px solid #2a3443;border-radius:8px;overflow:hidden;text-decoration:none;background:#10151d}.gallery-item:hover{border-color:#88dbc6}.gallery-item img{display:block;width:100%;height:64px;object-fit:cover}.gallery-item span{display:block;font-size:9px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#91a5bf;padding:4px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.gallery-empty{grid-column:1/-1;color:#6b7d94;font-size:12px;text-align:center;padding:14px 0}@media(max-width:760px){main{grid-template-columns:1fr}.stage{height:65vh;min-height:420px}aside{border-left:0;border-top:1px solid #2a3443}.topbar{left:24px;top:22px;right:24px;gap:24px}.hint{left:24px}}
+.formula{position:absolute;top:14px;left:50%;transform:translateX(-50%);z-index:1;pointer-events:none;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:9px;letter-spacing:.05em;line-height:1.7;color:#bcd1e9;background:rgba(13,18,27,.62);border:1px solid rgba(42,52,67,.9);border-radius:999px;padding:4px 14px;max-width:min(74vw,780px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;backdrop-filter:blur(4px)}</style>
+</head>
+<body>
+<main><section class="stage"><canvas id="canvas" aria-label="Interactive shaded ring of glassy beads along a circular path. Drag to rotate; use controls to change its geometry." tabindex="0"></canvas><div class="formula">uₖ = 2πk/n · Pₖ = (R cos uₖ, R sin uₖ, 0) · sₖ = s₀(1 + a·sin(m·uₖ))</div><div class="topbar"><div class="heading"><div class="eyebrow">Form study / 17</div><h1>Beaded torus</h1></div><details class="geometry"><summary>Geometry</summary><p>Instead of a continuous tube, the ring is built from <code>n</code> beads strung along the circle of radius <code>R</code>. Each bead is a shaded sphere drawn as a billboard disc on the canvas.</p><p><code>u_k = 2πk/n</code><br><code>P_k = (R cos u_k, R sin u_k, 0)</code><br><code>s_k = s₀·(1 + a·sin(m·u_k))</code></p><p>The sinusoidal size term gives the ring a rhythm: the beads swell and shrink <code>m</code> times per loop, so the eye reads a repeating pulse rather than a uniform necklace. Raise <code>a</code> to exaggerate it, drop it to zero for equal beads.</p><p>Beads are depth-sorted and filled with a radial gradient whose highlight centre is pushed along the light direction, which fakes a sphere without any real geometry. The optional dashed circle marks the hidden path the beads travel along.</p></details></div><div class="hint">Drag to rotate · Scroll to zoom · Arrow keys to rotate</div></section>
+<aside><h2>Shape & appearance</h2>
+<label><span class="row"><span>Ring radius R</span><output id="ROut"></output></span><input id="R" type="range" min="1.4" max="2.8" step="0.01" value="2.1"></label>
+<label><span class="row"><span>Bead count n</span><output id="nOut"></output></span><input id="n" type="range" min="8" max="36" step="1" value="20"></label>
+<label><span class="row"><span>Bead size s₀</span><output id="sizeOut"></output></span><input id="size" type="range" min="0.08" max="0.3" step="0.01" value="0.16"></label>
+<label><span class="row"><span>Size variation a</span><output id="varyOut"></output></span><input id="vary" type="range" min="0" max="0.6" step="0.01" value="0.45"></label>
+<label><span class="row"><span>Rhythm m</span><output id="mOut"></output></span><input id="m" type="range" min="1" max="4" step="1" value="2"></label>
+<label><span class="row"><span>Zoom</span><output id="zoomOut"></output></span><input id="zoom" type="range" min="0.6" max="1.7" step="0.01" value="1"></label>
+<label>Bead colour<input id="color" type="color" value="#7fd0c3"></label>
+<label>Rendering<select id="mode"><option value="solid">Glossy beads</option><option value="wire">Line-art beads</option></select></label>
+<label>View<select id="view"><option value="perspective">Perspective / 3D</option><option value="top">Top / 2D silhouette</option></select></label>
+<label class="check"><input id="path" type="checkbox">Show ring path</label>
+<label class="check"><input id="spin" type="checkbox" checked>Auto-rotate</label>
+<button id="reset">Reset design</button><button id="export">Save PNG</button>
+<p class="note" id="status"></p>
+<section class="gallery"><h2>Saved PNGs</h2><p class="gallery-note">PNG captures are named with their parameter values. Commit the downloaded files to the repo and they will appear here automatically (fetched via the GitHub API).</p><div id="galleryItems" class="gallery-grid"></div></section>
+</aside></main>
+<script>
+'use strict';
+const $ = id => document.getElementById(id);
+const canvas=$('canvas'), ctx=canvas.getContext('2d');
+const controls=['R','n','size','vary','m','zoom','color','mode','view','path','spin'];
+let width=1,height=1,dpr=1,beads=[],yaw=.35,pitch=-.9,drag=null,lastTime=0,dirty=true,cyaw=1,syaw=0,cpit=1,spit=0;
+const TAU=Math.PI*2;
+const normalize=v=>{const l=Math.hypot(v[0],v[1],v[2])||1;return [v[0]/l,v[1]/l,v[2]/l]};
+const light=normalize([-.45,-.65,1]);
+const mix=(c,t,f)=>Math.round(c+(t-c)*f);
+function buildMesh(){
+ const R=+$('R').value,n=Math.round(+$('n').value),s0=+$('size').value,a=+$('vary').value,m=Math.round(+$('m').value);
+ for(const id of ['R','n','size','vary','m','zoom'])$(id+'Out').value=(+$(id).value).toFixed(2);
+ beads=[];
+ for(let k=0;k<n;k++){const u=k/n*TAU;beads.push({p:[R*Math.cos(u),R*Math.sin(u),0],s:s0*(1+a*Math.sin(m*u))})}
+ let mn=Infinity,mx=0;
+ for(const b of beads){mn=Math.min(mn,b.s);mx=Math.max(mx,b.s)}
+ $('status').textContent=`${n} beads · size range ${mn.toFixed(2)} → ${mx.toFixed(2)}`;
+ dirty=true;
+}
+function resize(){const box=canvas.parentElement.getBoundingClientRect();width=box.width;height=box.height;dpr=Math.min(devicePixelRatio||1,2);canvas.width=Math.round(width*dpr);canvas.height=Math.round(height*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);dirty=true}
+function setRotation(){const top=$('view').value==='top';cyaw=top?1:Math.cos(yaw);syaw=top?0:Math.sin(yaw);cpit=top?1:Math.cos(pitch);spit=top?0:Math.sin(pitch)}
+function rotation(p){const x=cyaw*p[0]-syaw*p[1],y=syaw*p[0]+cyaw*p[1];return [x,cpit*y-spit*p[2],spit*y+cpit*p[2]]}
+function draw(){
+ setRotation();
+ ctx.clearRect(0,0,width,height);
+ const top=$('view').value==='top',mode=$('mode').value,zoom=+$('zoom').value,R=+$('R').value;
+ let smax=0;
+ for(const b of beads)smax=Math.max(smax,b.s);
+ const scale=Math.min(width*.82,height*.64)/(2*(R+smax))*zoom;
+ const cx=width/2,cy=height*.42;
+ const base=[1,3,5].map(i=>parseInt($('color').value.slice(i,i+2),16));
+ const hi=base.map(c=>mix(c,255,.5)),dk=base.map(c=>Math.round(c*.45));
+ const proj=p=>{const q=rotation(p),k=top?1:9/(9-q[2]);return {p:q,xy:[cx+q[0]*scale*k,cy-q[1]*scale*k],k}};
+ if($('path').checked){
+  ctx.save();ctx.setLineDash([5,7]);ctx.lineWidth=1;ctx.strokeStyle='rgba(152,231,215,.32)';ctx.beginPath();
+  for(let i=0;i<=180;i++){const u=i/180*TAU,q=proj([R*Math.cos(u),R*Math.sin(u),0]);i?ctx.lineTo(q.xy[0],q.xy[1]):ctx.moveTo(q.xy[0],q.xy[1])}
+  ctx.stroke();ctx.restore();
+ }
+ const list=beads.map(b=>{const q=proj(b.p);return {q,r:Math.max(1,b.s*scale*q.k)}}).sort((a,b)=>a.q.p[2]-b.q.p[2]);
+ for(const it of list){
+  const [x,y]=it.q.xy,r=it.r;
+  if(mode==='wire'){ctx.strokeStyle='rgba(152,231,215,.7)';ctx.lineWidth=1;ctx.beginPath();ctx.arc(x,y,r,0,TAU);ctx.stroke();continue}
+  const ox=.35*r*light[0],oy=-.35*r*light[1];
+  const g=ctx.createRadialGradient(x+ox,y+oy,r*.06,x,y,r);
+  g.addColorStop(0,`rgb(${hi.join(',')})`);
+  g.addColorStop(.55,`rgb(${base.join(',')})`);
+  g.addColorStop(1,`rgb(${dk.join(',')})`);
+  ctx.beginPath();ctx.arc(x,y,r,0,TAU);
+  ctx.fillStyle=g;ctx.fill();
+  ctx.strokeStyle=`rgb(${dk.join(',')})`;ctx.lineWidth=1;ctx.stroke();
+ }
+ dirty=false;
+}
+function animate(t){const dt=Math.min((t-lastTime)/1000,.05);lastTime=t;if($('spin').checked&&!drag&&$('view').value!=='top'&&!document.hidden){yaw+=dt*.22;dirty=true}if(dirty)draw();requestAnimationFrame(animate)}
+for(const id of controls)$(id).addEventListener('input',()=>{if(['R','n','size','vary','m'].includes(id))buildMesh();else{if(id==='zoom')$('zoomOut').value=(+$('zoom').value).toFixed(2);dirty=true}});
+canvas.addEventListener('pointerdown',e=>{if($('view').value==='top')return;drag={x:e.clientX,y:e.clientY};canvas.setPointerCapture(e.pointerId)});
+canvas.addEventListener('pointermove',e=>{if(!drag)return;yaw+=(e.clientX-drag.x)*.008;pitch=Math.max(-1.5,Math.min(1.5,pitch+(e.clientY-drag.y)*.008));drag={x:e.clientX,y:e.clientY};dirty=true});
+for(const type of ['pointerup','pointercancel','lostpointercapture'])canvas.addEventListener(type,()=>drag=null);
+canvas.addEventListener('wheel',e=>{e.preventDefault();$('zoom').value=Math.max(.6,Math.min(1.7,+$('zoom').value-e.deltaY*.001));$('zoomOut').value=(+$('zoom').value).toFixed(2);dirty=true},{passive:false});
+canvas.addEventListener('keydown',e=>{if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key))return;e.preventDefault();if(e.key==='ArrowLeft')yaw-=.1;if(e.key==='ArrowRight')yaw+=.1;if(e.key==='ArrowUp')pitch=Math.max(-1.5,pitch-.1);if(e.key==='ArrowDown')pitch=Math.min(1.5,pitch+.1);dirty=true});
+$('reset').onclick=()=>{Object.entries({R:2.1,n:20,size:.16,vary:.45,m:2,zoom:1,color:'#7fd0c3',mode:'solid',view:'perspective'}).forEach(([id,v])=>$(id).value=v);$('path').checked=false;$('spin').checked=true;yaw=.35;pitch=-.9;buildMesh()};
+$('export').onclick=()=>{draw();const out=document.createElement('canvas');out.width=canvas.width;out.height=canvas.height;const c=out.getContext('2d');c.fillStyle='#10151d';c.fillRect(0,0,out.width,out.height);c.drawImage(canvas,0,0);out.toBlob(blob=>{if(!blob)return;const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`beaded-torus_R${(+$('R').value).toFixed(2)}_n${(+$('n').value).toFixed(2)}_size${(+$('size').value).toFixed(2)}_vary${(+$('vary').value).toFixed(2)}_m${(+$('m').value).toFixed(2)}_zoom${(+$('zoom').value).toFixed(2)}_${$('color').value.slice(1)}_${$('mode').value}_${$('view').value}.png`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)},'image/png')};
+const gallery=$('galleryItems');
+const FALLBACK_PNG_NAMES=[]; // mirrors the committed beaded-torus_*.png files; the GitHub API path below is preferred
+function renderGallery(items){gallery.innerHTML='';if(!items.length){const e=document.createElement('div');e.className='gallery-empty';e.textContent='No saved PNGs yet.';gallery.appendChild(e);return}for(const item of items){const w=document.createElement('a');w.className='gallery-item';w.href=item.url;w.target='_blank';w.rel='noopener';w.title='Open '+item.name;const img=document.createElement('img');img.src=item.url;img.alt=item.name;img.loading='lazy';w.appendChild(img);const l=document.createElement('span');l.textContent=item.name;w.appendChild(l);gallery.appendChild(w)}}
+fetch('https://api.github.com/repos/tthtlc/tthtlc.github.io/contents/').then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.json()}).then(files=>{if(!Array.isArray(files))throw new Error('unexpected response');renderGallery(files.filter(f=>f.type==='file'&&f.name.startsWith('beaded-torus_')&&f.name.toLowerCase().endsWith('.png')).map(f=>({name:f.name,url:f.download_url})).sort((a,b)=>a.name<b.name?-1:1))}).catch(()=>renderGallery(FALLBACK_PNG_NAMES.map(n=>({name:n,url:n}))));
+new ResizeObserver(resize).observe(canvas.parentElement);
+if(matchMedia('(prefers-reduced-motion: reduce)').matches)$('spin').checked=false;
+buildMesh();resize();requestAnimationFrame(animate);
+</script>
+</body></html>
