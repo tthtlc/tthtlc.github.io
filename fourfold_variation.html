@@ -14,7 +14,7 @@
 <label><span class="row"><span>Inner radius r</span><output id="rOut"></output></span><input id="r" type="range" min="10" max="150" step="1" value="40"></label>
 <label><span class="row"><span>Pen distance d</span><output id="dOut"></output></span><input id="d" type="range" min="10" max="150" step="1" value="150"></label>
 <label><span class="row"><span>Line width</span><output id="lineWidthOut"></output></span><input id="lineWidth" type="range" min="0.2" max="3" step="0.05" value="1.2"></label>
-<label>Base colour<input id="color" type="color" value="#0000ff"></label>
+<label>Base colour<input id="color" type="color" value="#ffff00"></label>
 <button id="reset">Reset design</button><button id="export">Save PNG</button><button id="exportGif">Save GIF</button><button id="animate">Animate</button>
 <label class="check"><input type="checkbox" id="autoSweep" checked> Auto-sweep first slider</label>
 <p class="note" id="status"></p>
@@ -29,7 +29,7 @@ let width=1,height=1,dpr=1;
 const BANDS=72;
 const SEGMENTS=4000;
 const PREFIX='fourfold_variation_';
-const DEFAULT_COLOR='#0000ff';
+const DEFAULT_COLOR='#ffff00';
 const SLIDERS=[{id:'R',min:50,max:300,step:1,value:240,dec:null},{id:'r',min:10,max:150,step:1,value:40,dec:null},{id:'d',min:10,max:150,step:1,value:150,dec:null},{id:'lineWidth',min:0.2,max:3,step:0.05,value:1.2,dec:2}];
 function rnd(v){return Math.round(v*1000)/1000;}
 function gcd(a,b){a=Math.abs(Math.round(a));b=Math.abs(Math.round(b));return b?gcd(b,a%b):a;}
