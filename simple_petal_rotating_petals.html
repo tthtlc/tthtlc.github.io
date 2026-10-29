@@ -62,7 +62,7 @@ function strokePetals(ctx,cx,cy,scale,pts,petals,hue,sat,lw,maxIndex,phase){
   if(i===0){ctx.moveTo(nx,ny);prevX=nx;prevY=ny;continue;}
   const petal=((pts[i][2]%petals)+petals)%petals;
   if(petal!==prevPetal){
-   ctx.stroke();ctx.beginPath();ctx.moveTo(prevX,prevY);
+   ctx.stroke();ctx.beginPath();ctx.moveTo(nx,ny);
    prevPetal=petal;
    ctx.strokeStyle='hsl('+wrapHue(hue+(petal+phase)/petals*360)+', '+sat+'%, 58%)';
   }

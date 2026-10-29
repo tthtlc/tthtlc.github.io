@@ -10,6 +10,7 @@ todo_design/ and any page matching no rule are excluded from the gallery.
 Re-run after adding new pages:
     python3 scripts/categorize_visualizations.py
 """
+import html
 import os
 import re
 import yaml
@@ -49,7 +50,7 @@ CATEGORIES = [
      "Platonic solids, Möbius strips and tessellations.",
      [r"enneper", r"klein", r"torus", r"tori", r"interlocked", r"sphere",
       r"spherical", r"icosahedron", r"dodecahedron", r"rhombic", r"mobius",
-      r"tessellation", r"tiling"]),
+      r"tessellation", r"tiling", r"hyperbolic"]),
     ("minimal-surfaces", "Minimal Surfaces", "🫧",
      "Soap-film-like minimal surfaces and their immersions — Boy's surface and "
      "other zero-mean-curvature forms rendered as interactive meshes.",
@@ -81,7 +82,7 @@ CATEGORIES = [
      "Line drawings across polygon vertices, spokes and randomized sectors — "
      "polygonal scribble art.",
      [r"line_rotate", r"line_drawing", r"drawsector", r"sector", r"spoke",
-      r"string_art"]),
+      r"string_art", r"line_art"]),
     ("circles", "Circles & Concentric Rings", "🎯",
      "Circles on circles, concentric rings and polar-coordinate drawings.",
      [r"concentric", r"circle", r"circular", r"hexagon_circle"]),
@@ -91,7 +92,7 @@ CATEGORIES = [
      [r"diamond", r"boomerang", r"windmill", r"chopstick", r"turtle",
       r"parametric", r"cubic", r"psychedlic", r"sin_cos", r"pinterest",
       r"quart", r"square_triangle", r"twotriangle", r"pentagon_star",
-      r"geometric", r"poincare", r"super", r"star"]),
+      r"geometric", r"poincare", r"super", r"star", r"weird"]),
 ]
 
 TAG_RULES = [
@@ -134,7 +135,7 @@ def extract_title(filename):
         head = fh.read(3000)
     m = re.search(r"<title>(.*?)</title>", head, re.S | re.I)
     if m and m.group(1).strip():
-        return " ".join(m.group(1).split())
+        return " ".join(html.unescape(m.group(1)).split())
     return None
 
 

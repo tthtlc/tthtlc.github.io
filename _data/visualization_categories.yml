@@ -5,11 +5,8 @@
   description: Epitrochoids, hypotrochoids and other rolling-circle curves — the classic spirograph family,
     from simple loops to multi-wheel explorers.
   items:
-  - file: cardiod_line2.html
-    title: Cardioid Shape with Point Labels
-    tags: []
   - file: cardiod_line3.html
-    title: Animated Cardioid Shape with Point Labels
+    title: Concentric Breathing Cardioids with Colored Connections
     tags: []
   - file: cardiod_line4.html
     title: Animated Cardioid Shape with Point Labels
@@ -272,14 +269,8 @@
   - file: figure_eight.html
     title: Multiple Figure of 8 joined by Gradient Lines
     tags: []
-  - file: figure_eight_double.html
-    title: Figure of 8 using Polar Coordinates
-    tags: []
   - file: figure_eight_fifth.html
     title: Figure of 8 using Polar Coordinates
-    tags: []
-  - file: figure_eight_radiating.html
-    title: Figure of 8 radiating with Rotating Offset Chords
     tags: []
   - file: figure_eight_radiating_fixed.html
     title: Figure of 8 with Growing Lobes
@@ -664,6 +655,9 @@
   description: 'Three-dimensional geometry: minimal surfaces, Klein bottles, tori, Platonic solids, Möbius
     strips and tessellations.'
   items:
+  - file: braided-torus-lines.html
+    title: Braided torus — threads in colour
+    tags: []
   - file: braided-torus.html
     title: Braided torus — Interactive Study
     tags: []
@@ -697,6 +691,9 @@
   - file: enneper_order4.html
     title: Enneper Surface, Order 4 — Interactive Study
     tags: []
+  - file: enneper_order_checkerboard.html
+    title: Higher-order Enneper checkerboard
+    tags: []
   - file: generalized_mobius_strip.html
     title: Möbius Strip Wireframe — twists · density · size
     tags: []
@@ -705,6 +702,9 @@
     tags: []
   - file: hexagon_tessellation.html
     title: Hexagon Circle Tessellation
+    tags: []
+  - file: hyperbolic_checkerboard.html
+    title: Hyperbolic saddle — Checkerboard
     tags: []
   - file: icosahedron.html
     title: Icosahedron Wireframe
@@ -756,6 +756,9 @@
     tags: []
   - file: petal-torus.html
     title: Petal torus — Interactive Study
+    tags: []
+  - file: poincare_hemisphere_checkerboard.html
+    title: Checkerboard — Poincaré disk & hemisphere
     tags: []
   - file: rhombicDodecahedron.html
     title: Resizable Rhombic Dodecahedron
@@ -912,18 +915,6 @@
   emoji: 💗
   description: Heart-shaped curves and clickable valentine games.
   items:
-  - file: heart3.html
-    title: Heart-shaped Line Art
-    tags: []
-  - file: heart4.html
-    title: Heart-shaped Line Art
-    tags: []
-  - file: heart5.html
-    title: Heart-shaped Line Art
-    tags: []
-  - file: heart6.html
-    title: Heart-shaped Line Art
-    tags: []
   - file: heart_click_game.html
     title: Heart Click Game
     tags:
@@ -1046,7 +1037,7 @@
     - Animated
     - Rotating
   - file: simple_petal_animated.html
-    title: Dynamic Petals with Red-to-Blue Gradient
+    title: Petal Curve — Interactive Study
     tags:
     - Animated
   - file: simple_petal_line.html
@@ -1056,6 +1047,14 @@
     title: Dynamic Petals with Red-Blue-Yellow Gradient
     tags:
     - Color
+  - file: simple_petal_rotating_petals.html
+    title: Petal Curve — Rotating Petals
+    tags:
+    - Rotating
+  - file: simple_petal_rotating_petalsv2.html
+    title: Petal Curve — Rotating Petals
+    tags:
+    - Rotating
   - file: three_petal.html
     title: Three Petal Shape Animation
     tags: []
@@ -1155,6 +1154,10 @@
     title: Hexagon Animation
     tags:
     - Rotating
+  - file: line_art_explorer.html
+    title: Line Art Explorer
+    tags:
+    - Interactive
   - file: line_drawing.html
     title: Geometric Line Drawing
     tags: []
@@ -1293,10 +1296,6 @@
   - file: pentagon_star_full.html
     title: Pentagon to Star Morphing Animation
     tags: []
-  - file: pinterest_generalization_explore.html
-    title: Pinterests Curve 1
-    tags:
-    - Interactive
   - file: poincare_disk.html
     title: Poincaré Disk Explorer
     tags: []
@@ -1334,6 +1333,10 @@
   - file: turtle_forwarding_pattern5.html
     title: Turtle Graphics Pentagon
     tags: []
+  - file: weird_shape_explore.html
+    title: Pinterest Curve — Interactive Study
+    tags:
+    - Interactive
   - file: windmill.html
     title: Windmill Curves
     tags: []

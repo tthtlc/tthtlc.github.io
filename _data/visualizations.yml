@@ -5,8 +5,8 @@
 - barnsley_fern_fractal.html
 - boomerang.html
 - boy_surface.html
+- braided-torus-lines.html
 - braided-torus.html
-- cardiod_line2.html
 - cardiod_line3.html
 - cardiod_line4.html
 - chasing_3gon.html
@@ -92,16 +92,15 @@
 - enneper_order2.html
 - enneper_order3.html
 - enneper_order4.html
+- enneper_order_checkerboard.html
 - epicycloid_add_epicycloid_explore.html
 - epicycloid_explore_savepng.html
 - epicycloid_variant_explore_savepng.html
 - epitrochoid2_explore.html
 - epitrochoid_explore.html
 - figure_eight.html
-- figure_eight_double.html
 - figure_eight_double_wheel.html
 - figure_eight_fifth.html
-- figure_eight_radiating.html
 - figure_eight_radiating_fixed.html
 - figure_eight_rotating.html
 - figure_eight_running.html
@@ -125,10 +124,6 @@
 - genus_one_helicoid1.html
 - geometric-studies.html
 - heart-loop-torus.html
-- heart3.html
-- heart4.html
-- heart5.html
-- heart6.html
 - heart_click_game.html
 - heart_click_game2.html
 - hexaflake.html
@@ -140,6 +135,7 @@
 - hexagon_line_rotate.html
 - hexagon_tessellation.html
 - hilbert_curve.html
+- hyperbolic_checkerboard.html
 - hypocycloid_explore.html
 - hypotrochoid.html
 - hypotrochoid_animate_d.html
@@ -183,6 +179,7 @@
 - lemniscate8_radiating.html
 - lemniscate_radiating.html
 - lemniscate_random.html
+- line_art_explorer.html
 - line_drawing.html
 - mandelbrot.html
 - mandelbrot_color.html
@@ -222,8 +219,8 @@
 - pentapentagon.html
 - petal-torus.html
 - petal_add_epicycloid_explore.html
-- pinterest_generalization_explore.html
 - poincare_disk.html
+- poincare_hemisphere_checkerboard.html
 - psychedlic_art.html
 - pythagorean_tree_explore.html
 - quart_motion.html
@@ -276,6 +273,8 @@
 - simple_petal_animated.html
 - simple_petal_line.html
 - simple_petal_line_color.html
+- simple_petal_rotating_petals.html
+- simple_petal_rotating_petalsv2.html
 - simple_quart_motion.html
 - sin_cos_abstract_explore.html
 - sinewave_animated.html
@@ -347,5 +346,6 @@
 - vortex_explore.html
 - wavylines.html
 - wavylines2.html
+- weird_shape_explore.html
 - windmill.html
 - zooming_mandelbrot.html
