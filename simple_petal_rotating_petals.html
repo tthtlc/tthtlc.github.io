@@ -30,6 +30,7 @@ let width=1,height=1,dpr=1;
 const SEGMENTS=4000;
 const PREFIX='simple_petal_rotating_';
 const DEFAULT_COLOR='#ff3366';
+const RADIUS_REF=160;  // radius at which the curve fills the canvas (slider default)
 const SLIDERS=[{id:'radius',min:50,max:300,step:1,value:160,dec:null},{id:'a',min:1,max:30,step:1,value:5,dec:null},{id:'b',min:1,max:30,step:1,value:8,dec:null},{id:'lineWidth',min:0.2,max:3,step:0.05,value:1.2,dec:2},{id:'petalDeg',min:1,max:180,step:1,value:20,dec:null}];
 function rnd(v){return Math.round(v*1000)/1000;}
 function gcd(a,b){a=Math.abs(Math.round(a));b=Math.abs(Math.round(b));return b?gcd(b,a%b):a;}
@@ -306,7 +307,7 @@ function drawScene(ctx,W,H,p,prog){
  if(!(maxR>0))return;
  const c=baseHsl(p);
  const maxIndex=Math.round(prog*(pts.length-1));
- strokePetals(ctx,W/2,H/2,fitScale(W,H,maxR),pts,petals,c.h,c.s,p.lineWidth,maxIndex,phase);
+ strokePetals(ctx,W/2,H/2,fitScale(W,H,maxR*RADIUS_REF/p.radius),pts,petals,c.h,c.s,p.lineWidth,maxIndex,phase);
 }
 
 for(const sd of SLIDERS)$(sd.id).addEventListener('input',function(){draw();});

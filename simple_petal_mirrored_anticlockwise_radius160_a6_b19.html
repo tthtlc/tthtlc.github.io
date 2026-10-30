@@ -30,6 +30,7 @@ let width=1,height=1,dpr=1;
 const SEGMENTS=4000;
 const PREFIX='simple_petal_mirrored_anticlockwise_';
 const DEFAULT_COLOR='#ff3366';
+const RADIUS_REF=160;  // radius at which the curve fills the canvas (slider default)
 const SLIDERS=[{id:'radius',min:50,max:300,step:1,value:160,dec:null},{id:'a',min:1,max:30,step:1,value:6,dec:null},{id:'b',min:1,max:30,step:1,value:19,dec:null},{id:'lineWidth',min:0.2,max:3,step:0.05,value:3,dec:2},{id:'petalDeg',min:1,max:180,step:1,value:41,dec:null}];
 function rnd(v){return Math.round(v*1000)/1000;}
 function gcd(a,b){a=Math.abs(Math.round(a));b=Math.abs(Math.round(b));return b?gcd(b,a%b):a;}
@@ -311,7 +312,7 @@ function drawScene(ctx,W,H,p,prog,angle){
  ctx.translate(W/2,H/2);
  ctx.rotate(angle);
  ctx.scale(-1,1);
- strokePetals(ctx,0,0,fitScale(W,H,maxR),pts,petals,c.h,c.s,p.lineWidth,maxIndex,0);
+ strokePetals(ctx,0,0,fitScale(W,H,maxR*RADIUS_REF/p.radius),pts,petals,c.h,c.s,p.lineWidth,maxIndex,0);
  ctx.restore();
 }
 
