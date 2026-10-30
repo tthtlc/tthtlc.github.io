@@ -1,0 +1,138 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Silk ribbons — flow & light</title><style>
+:root{color-scheme:dark;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;background:#0e131b;color:#eef2f8}
+*{box-sizing:border-box}
+body{margin:0}
+main{display:grid;grid-template-columns:minmax(0,1fr) 312px;min-height:100vh}
+.stage{position:sticky;top:0;align-self:start;height:100vh;min-height:0;overflow:hidden;background:radial-gradient(ellipse at 50% 44%,#22314a 0%,#0e131b 74%)}
+canvas{position:absolute;inset:0;display:block;width:100%;height:100%;touch-action:none;cursor:grab}
+canvas:active{cursor:grabbing}
+canvas:focus-visible{outline:2px solid #88dbc6;outline-offset:-5px}
+.topbar{position:absolute;top:30px;left:34px;right:34px;display:flex;align-items:flex-start;gap:34px;flex-wrap:wrap;z-index:2}
+.heading{pointer-events:none}
+.eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.22em;color:#8fa3bd}
+h1{font-size:clamp(25px,3vw,41px);font-weight:500;letter-spacing:-.045em;margin:7px 0 0}
+.hint{position:absolute;bottom:26px;left:34px;z-index:1;pointer-events:none;color:#8297b0;font-size:12px}
+.formula{position:absolute;left:34px;bottom:62px;z-index:1;pointer-events:none;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:10px;line-height:1.75;letter-spacing:.03em;color:#b8cde5;background:rgba(11,16,24,.66);border:1px solid rgba(39,49,65,.9);border-radius:14px;padding:5px 15px;max-width:min(calc(100% - 68px),780px);backdrop-filter:blur(4px)}
+.formula div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.geometry{pointer-events:auto;max-width:min(46vw,420px);background:rgba(18,25,36,.88);border:1px solid #283345;border-radius:12px;padding:10px 15px;backdrop-filter:blur(7px);font-size:12px;line-height:1.62;color:#8fa3bd}
+.geometry summary{cursor:pointer;color:#c7d2e3}
+.geometry p{margin:.65em 0}
+.geometry strong{color:#c7d2e3;font-weight:500}
+.geometry code,.note code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:#9fe7d4;font-size:.94em}
+aside{padding:30px 24px 40px;background:#141b26;border-left:1px solid #273141}
+h2{font-size:17px;font-weight:500;margin:0 0 20px}
+h3{font-size:10.5px;font-weight:500;text-transform:uppercase;letter-spacing:.19em;color:#8fa3bd;margin:24px 0 13px}
+h3:first-of-type{margin-top:0}
+label{display:block;font-size:13px;color:#c7d2e3;margin-bottom:18px}
+.row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+output{font-variant-numeric:tabular-nums;color:#88dbc6;font-size:12.5px}
+input[type=range]{width:100%;accent-color:#88dbc6;display:block}
+select,button{background:#1f2c3c;color:#eef2f8;border:1px solid #394a5f;border-radius:8px;padding:9px 10px;font:inherit;width:100%}
+select:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid #88dbc6;outline-offset:2px}
+input[type=color]{width:100%;height:36px;background:none;border:0;padding:0;cursor:pointer}
+button{cursor:pointer;transition:background .15s}
+button:hover{background:#2a3d52}
+button.primary{background:#1d3a38;border-color:#2f5b55;color:#a9f0df}
+button.primary:hover{background:#245049}
+.check{display:flex;gap:10px;align-items:center;font-size:13px;color:#c7d2e3;margin-bottom:14px}
+.check input{accent-color:#88dbc6;width:15px;height:15px}
+.buttons{display:grid;gap:8px;margin-top:6px}
+.note{font-size:12px;color:#8fa3bd;line-height:1.62;margin:20px 0 0}
+.swatches{display:flex;gap:3px;margin:6px 0 8px;border-radius:6px;overflow:hidden}
+.swatches span{flex:1;height:11px;min-width:0}
+.swatch-note{font-size:11px;color:#8297b0;margin:0 0 18px;font-variant-numeric:tabular-nums}
+.gallery{border-top:1px solid #273141;margin-top:26px;padding-top:20px}
+.gallery h2{margin:0 0 8px}
+.gallery-note{font-size:11px;color:#8fa3bd;line-height:1.55;margin:0 0 13px}
+.gallery-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.gallery-item{display:block;border:1px solid #273141;border-radius:8px;overflow:hidden;text-decoration:none;background:#0e131b}
+.gallery-item:hover{border-color:#88dbc6}
+.gallery-item img{display:block;width:100%;height:64px;object-fit:cover}
+.gallery-item span{display:block;font-size:9px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#8fa3bd;padding:4px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gallery-empty{grid-column:1/-1;color:#6b7d94;font-size:12px;text-align:center;padding:14px 0}
+@media(max-width:780px){
+ main{grid-template-columns:1fr}
+ .stage{position:relative;top:auto;height:68vh;min-height:440px}
+ aside{border-left:0;border-top:1px solid #273141}
+ .topbar{left:22px;top:20px;right:22px;gap:20px}
+ .hint{left:22px;bottom:18px}
+ .geometry{max-width:100%}
+ .formula{left:22px;right:22px;bottom:52px;max-width:none;font-size:9px}
+ .formula div{white-space:normal;overflow:visible}
+}
+.stage{background:#000}canvas{cursor:default;touch-action:auto}canvas:active{cursor:default}.brief{color:#a0b4ae;font-size:12px;line-height:1.6;max-width:290px;margin:10px 0 0}.clean main{grid-template-columns:1fr}.clean aside,.clean .topbar,.clean .formula,.clean .hint{display:none}#show{position:fixed;right:20px;bottom:20px;width:auto;z-index:10}.clean .stage{height:100vh;position:relative}</style></head><body><main><section class="stage"><canvas id="canvas" aria-label="Translucent flowing rainbow silk ribbons on black" tabindex="0"></canvas>
+<div class="topbar"><div class="heading"><div class="eyebrow">Light study / silk</div><h1>Silk ribbons</h1><p class="brief">Translucent ribbons flow and twist, catching light along their edges.</p></div>
+<details class="geometry"><summary>Geometry &amp; light</summary><p>Each ribbon is a narrow surface drawn around a flowing sinusoidal centreline. Its width turns and tapers along the curve, giving the appearance of twisting silk.</p><p>Thin translucent colour bands build the surface; fine luminous edges and additive colour blending brighten the overlaps. The colours stay attached to their ribbons.</p><p>Flow speed changes the motion. Ribbon width changes the surface breadth. Luminosity adjusts brightness, and Ribbon count sets the number of layered ribbons.</p></details></div>
+<div class="formula"><div>Ribbon surface = flowing centreline + tapered, twisting width</div><div id="formulaParams"></div></div><div class="hint">Space: pause / resume · H: hide controls · Save PNG captures the artwork</div></section>
+<aside><h2>Flow &amp; appearance</h2><h3>Ribbons</h3><label><span class="row"><span>Flow speed</span><output id="speedOut"></output></span><input id="speed" type="range" min="0" max="2" step="0.05" value="0.45"></label><label><span class="row"><span>Ribbon width</span><output id="widthOut"></output></span><input id="width" type="range" min="0.3" max="2" step="0.05" value="1"></label><label><span class="row"><span>Luminosity</span><output id="glowOut"></output></span><input id="glow" type="range" min="0.2" max="2" step="0.05" value="1"></label><label><span class="row"><span>Ribbon count</span><output id="countOut"></output></span><input id="count" type="range" min="3" max="18" step="1" value="10"></label><h3>Animation</h3><label class="check"><input id="animate" type="checkbox" checked>Animate ribbons</label>
+<div class="buttons"><button id="reset">Reset design</button><button id="export">Save PNG</button><button id="hide">Hide controls</button></div><p class="note" id="status"></p>
+<section class="gallery"><h2>Saved PNGs</h2><p class="gallery-note">PNG filenames include the current settings. Captures appear below for this session. Commit downloaded silk-ribbons_ PNGs to the template's repository to load them automatically on future visits.</p><div id="galleryItems" class="gallery-grid"></div></section></aside></main><button id="show" hidden>Show controls</button><script>
+'use strict';
+const $=id=>document.getElementById(id),canvas=$('canvas'),ctx=canvas.getContext('2d',{alpha:false});
+const defaults={speed:.45,width:1,glow:1,count:10};
+const hues=[174,48,203,12,265,135,185,338,64,222,30,158,282,194,8,95,250,180];
+let W=1,H=1,dpr=1,time=0,last=0,dirty=true,localItems=[],remoteItems=[];
+const urls=[];
+function sync(){
+ for(const id in defaults)$(id+'Out').textContent=id==='count'?$(id).value:Number($(id).value).toFixed(2);
+ const text=`speed ${Number($('speed').value).toFixed(2)} · width ${Number($('width').value).toFixed(2)} · luminosity ${Number($('glow').value).toFixed(2)} · ribbons ${$('count').value}`;
+ $('formulaParams').textContent=text;$('status').textContent=text+($('animate').checked?' · animating':' · paused');
+}
+function resize(){const box=canvas.parentElement.getBoundingClientRect();W=box.width;H=box.height;dpr=Math.min(devicePixelRatio||1,2);canvas.width=Math.round(W*dpr);canvas.height=Math.round(H*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);dirty=true;}
+function ribbonPoint(u,k,v){
+ const phase=k*.53,timeShift=time*.25,wave=u*7.8+phase*.58+timeShift;
+ const x=W*(.22+.25*Math.sin(wave)+.09*Math.sin(u*14-phase+time*.13));
+ const y=H*(-.22+u*1.55)+H*.065*Math.sin(wave*1.3+phase);
+ const envelope=Math.pow(Math.max(0,Math.sin(Math.PI*u)),.6);
+ const breadth=Math.min(W,H)*(.060+.020*Math.sin(u*5+phase))*Number($('width').value)*envelope;
+ const twist=Math.sin(u*10.5-phase+time*.33);
+ return [x+v*breadth*twist,y+v*breadth*.48*Math.cos(u*8+phase+time*.2)];
+}
+function draw(){
+ ctx.globalCompositeOperation='source-over';ctx.globalAlpha=1;ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);
+ const n=+$('count').value,g=+$('glow').value,N=190,bands=24;
+ ctx.globalCompositeOperation='lighter';
+ for(let k=0;k<n;k++){
+  const hue=hues[k%hues.length];
+  const pts=Array.from({length:N+1},(_,i)=>Array.from({length:bands+1},(_,j)=>ribbonPoint(i/N,k,j/bands*2-1)));
+  for(let j=0;j<bands;j++){
+   const v=(j+.5)/bands*2-1;
+   for(let i=0;i<N;i++){
+    const u=(i+.5)/N,fade=Math.pow(Math.sin(Math.PI*u),.9),edge=Math.pow(Math.abs(v),7),silk=.6+.4*Math.sin(u*12+k*.7+v*2+time*.3);
+    const alpha=(.022+.045*edge+.025*silk)*fade*g;
+    ctx.fillStyle=`hsla(${hue+12*Math.sin(u*6+k)},90%,${52+edge*16}%,${alpha})`;
+    ctx.beginPath();ctx.moveTo(...pts[i][j]);ctx.lineTo(...pts[i+1][j]);ctx.lineTo(...pts[i+1][j+1]);ctx.lineTo(...pts[i][j+1]);ctx.closePath();ctx.fill();
+   }
+  }
+  for(const j of [0,1,5,12,19,23,24]){
+   ctx.beginPath();for(let i=0;i<=N;i++){if(i===0)ctx.moveTo(...pts[i][j]);else ctx.lineTo(...pts[i][j]);}
+   ctx.strokeStyle=`hsla(${hue},95%,73%,${(j===0||j===24?.24:.055)*g})`;
+   ctx.lineWidth=j===0||j===24?.85:.5;ctx.shadowColor=`hsl(${hue},90%,55%)`;ctx.shadowBlur=5*g;ctx.stroke();ctx.shadowBlur=0;
+  }
+ }
+ ctx.globalCompositeOperation='source-over';dirty=false;
+}
+function frame(now){const dt=last?Math.min((now-last)/1000,.05):0;last=now;if($('animate').checked&&!document.hidden&&+$('speed').value>0){time+=dt*+$('speed').value;dirty=true;}if(dirty)draw();requestAnimationFrame(frame);}
+function gallery(){
+ const parent=$('galleryItems');parent.textContent='';const items=[...localItems,...remoteItems];
+ if(!items.length){const el=document.createElement('div');el.className='gallery-empty';el.textContent='No saved PNGs yet.';parent.appendChild(el);return;}
+ for(const item of items){const a=document.createElement('a');a.className='gallery-item';a.href=item.url;a.target='_blank';a.rel='noopener';a.title=item.name;
+ const img=document.createElement('img');img.src=item.url;img.alt=item.name;img.loading='lazy';const label=document.createElement('span');label.textContent=item.name;a.append(img,label);parent.appendChild(a);}
+}
+for(const id in defaults)$(id).addEventListener('input',()=>{sync();dirty=true;});
+$('animate').onchange=()=>{sync();dirty=true;};
+$('reset').onclick=()=>{for(const id in defaults)$(id).value=defaults[id];time=0;$('animate').checked=!matchMedia('(prefers-reduced-motion: reduce)').matches;sync();dirty=true;};
+$('export').onclick=()=>{
+ draw();
+ const name=`silk-ribbons_speed${(+$('speed').value).toFixed(2)}_width${(+$('width').value).toFixed(2)}_glow${(+$('glow').value).toFixed(2)}_count${$('count').value}_t${time.toFixed(2)}_${Date.now()}.png`;
+ canvas.toBlob(blob=>{if(!blob){$('status').textContent='PNG export failed. Please retry.';return;}
+ const url=URL.createObjectURL(blob);urls.push(url);const a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();localItems.unshift({name,url});gallery();$('status').textContent='PNG exported and added to this session’s gallery.';},'image/png');
+};
+function toggleUI(){document.body.classList.toggle('clean');$('show').hidden=!document.body.classList.contains('clean');resize();}
+$('hide').onclick=toggleUI;$('show').onclick=toggleUI;
+addEventListener('keydown',e=>{if(/INPUT|BUTTON|SELECT|TEXTAREA/.test(e.target.tagName))return;if(e.code==='Space'){e.preventDefault();$('animate').checked=!$('animate').checked;sync();}if(e.key.toLowerCase()==='h')toggleUI();});
+fetch('https://api.github.com/repos/tthtlc/tthtlc.github.io/contents/').then(r=>{if(!r.ok)throw Error(r.status);return r.json();}).then(files=>{if(!Array.isArray(files))return;remoteItems=files.filter(f=>f.type==='file'&&f.name.startsWith('silk-ribbons_')&&f.name.toLowerCase().endsWith('.png')).map(f=>({name:f.name,url:f.download_url})).sort((a,b)=>a.name.localeCompare(b.name));gallery();}).catch(()=>{});
+addEventListener('beforeunload',()=>urls.forEach(URL.revokeObjectURL));
+if(matchMedia('(prefers-reduced-motion: reduce)').matches)$('animate').checked=false;
+new ResizeObserver(resize).observe(canvas.parentElement);gallery();sync();resize();requestAnimationFrame(frame);
+</script></body></html>
