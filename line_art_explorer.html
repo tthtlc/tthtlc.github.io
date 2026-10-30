@@ -66,6 +66,18 @@ function circleFit(maxR,W,H,margin){
  const scale=(Math.min(W,H)/2-margin)/Math.max(maxR,1e-6);
  return (x,y)=>[W/2+x*scale,H/2+y*scale];
 }
+function radiusFit(pts,rNow,R0,W,H,margin){
+ // Scale by the radius slider. `R0` is the slider's default value: at rNow === R0 the
+ // shape is fitted to the canvas exactly as before, and moving the slider scales it
+ // linearly, keeping the drawing centred on its own bounding box.
+ let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
+ for(const p of pts){const x=p[0],y=p[1];if(x<minX)minX=x;if(x>maxX)maxX=x;if(y<minY)minY=y;if(y>maxY)maxY=y;}
+ const cx=(minX+maxX)/2,cy=(minY+maxY)/2;
+ const spanW=Math.max(maxX-minX,1e-6),spanH=Math.max(maxY-minY,1e-6);
+ const fit0=Math.min((W-2*margin)/(spanW*R0/rNow),(H-2*margin)/(spanH*R0/rNow));
+ const scale=fit0*(rNow/R0);
+ return (x,y)=>[W/2+(x-cx)*scale,H/2+(y-cy)*scale];
+}
 
 const MODES=[
  {id:'times',name:'Times Table (Heart)',eyebrow:'Modular multiplication',
@@ -80,7 +92,8 @@ const MODES=[
   draw:function(g,W,H,p,prog,hueOff,t){
    const N=Math.max(3,Math.round(p.totalPoints)),m=p.multiplier,c=baseHsl(p);
    const pts=[];for(let i=0;i<N;i++){const a=TAU*i/N;pts.push([p.radius*Math.cos(a),p.radius*Math.sin(a)]);}
-   const T=fitPoints(pts,W,H,24);
+   const R0=mode.sliders.find(s=>s.id==='radius').value;
+   const T=radiusFit(pts,p.radius,R0,W,H,24);
    g.fillStyle='rgba(238,242,248,0.30)';
    for(let i=0;i<N;i++){const xy=T(pts[i][0],pts[i][1]);g.beginPath();g.arc(xy[0],xy[1],1.4,0,TAU);g.fill();}
    g.lineCap='round';g.lineWidth=p.lineWidth;
@@ -105,7 +118,8 @@ const MODES=[
   draw:function(g,W,H,p,prog,hueOff,t){
    const N=Math.max(3,Math.round(p.totalPoints)),r=p.radius,c=baseHsl(p);
    const pts=[];for(let i=0;i<N;i++){const th=TAU*i/N;pts.push([r*(1-Math.cos(th))*Math.cos(th),r*(1-Math.cos(th))*Math.sin(th)]);}
-   const T=fitPoints(pts,W,H,24);
+   const R0=mode.sliders.find(s=>s.id==='radius').value;
+   const T=radiusFit(pts,r,R0,W,H,24);
    g.lineCap='round';g.lineJoin='round';
    g.strokeStyle='hsl('+wrapHue(c.h+hueOff)+', '+c.s+'%, 60%)';
    g.lineWidth=Math.max(1.5,p.lineWidth);
@@ -177,7 +191,8 @@ const MODES=[
   draw:function(g,W,H,p,prog,hueOff,t){
    const parts=Math.max(20,Math.round(p.parts)),step=p.maxThetaPi*Math.PI/parts,c=baseHsl(p);
    const pts=[];for(let i=0;i<=parts;i++){const th=step*i;const r=p.scale*Math.cos(2*th/p.freq);pts.push([r*Math.cos(th),r*Math.sin(th)]);}
-   const T=fitPoints(pts,W,H,24);
+   const R0=mode.sliders.find(s=>s.id==='scale').value;
+   const T=radiusFit(pts,p.scale,R0,W,H,24);
    g.lineWidth=Math.max(1,p.lineWidth);g.lineCap='round';g.lineJoin='round';
    const maxSeg=Math.round(prog*parts);
    for(let i=0;i<maxSeg;i++){
@@ -208,10 +223,17 @@ const MODES=[
     const r=Math.sqrt(Math.max(0,Math.cos(2*th)));
     unit.push([r*Math.cos(th),r*Math.sin(th)]);
    }
-   const T=circleFit(p.orbitRadius+p.baseScale*1.6,W,H,24);
+   // Fixed reference extent (the defaults), so the Scale and Orbit-radius sliders
+   // directly resize/reposition the scene instead of being normalised away.
+   const oR0=mode.sliders.find(s=>s.id==='orbitRadius').value;
+   const s0=mode.sliders.find(s=>s.id==='baseScale').value;
+   const T=circleFit(oR0+s0*1.6,W,H,24);
    function pt(k,i,t){
-    const orbitAngle=t*(0.5+0.15*Math.sin(t*0.3+k))+k*TAU/K;
-    const spin=t*(0.8+0.4*Math.sin(t*0.5+k*2.1));
+    // Bounded phase wobble: add a small oscillation to the angle instead of
+    // multiplying time by a sine. Multiplying time made the phase grow faster
+    // and faster (t·sin(t) → accelerating spin/orbit over time).
+    const orbitAngle=t*0.5+0.6*Math.sin(t*0.3+k)+k*TAU/K;
+    const spin=t*0.8+0.5*Math.sin(t*0.5+k*2.1);
     const s=p.baseScale*(1+0.25*Math.sin(3*t+k*2.4));
     const ox=p.orbitRadius*Math.cos(orbitAngle),oy=p.orbitRadius*Math.sin(orbitAngle);
     const cosS=Math.cos(spin),sinS=Math.sin(spin);
