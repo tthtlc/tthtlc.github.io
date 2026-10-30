@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Quintic Slice Explorer</title>
+<style>
+:root{color-scheme:dark;font-family:Inter,system-ui,sans-serif;background:#10151d;color:#eef2f8}*{box-sizing:border-box}body{margin:0}main{display:grid;grid-template-columns:1fr 300px;height:100vh;min-height:0}.stage{position:relative;height:100vh;min-height:0;overflow:hidden;background:radial-gradient(ellipse at 50% 45%,#253247,#10151d 70%)}#view{position:absolute;inset:0}#view canvas{display:block;width:100%;height:100%;position:absolute;touch-action:auto}.topbar{position:absolute;top:32px;left:36px;right:36px;display:flex;align-items:flex-start;gap:36px;flex-wrap:wrap;z-index:2}.heading{pointer-events:none}h1{font-size:clamp(24px,3vw,40px);font-weight:500;letter-spacing:-.04em;margin:6px 0}.eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.22em;color:#91a5bf}.hint{position:absolute;bottom:28px;left:36px;color:#92a3b9;font-size:12px;pointer-events:none;z-index:2}.formula{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);z-index:3;max-width:calc(100% - 48px);background:rgba(16,21,29,.9);border:1px solid #2a3443;border-radius:9px;padding:7px 12px;font-size:11px;line-height:1.55;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#a4e3d4;text-align:center;white-space:pre;pointer-events:none;box-shadow:0 4px 18px rgba(0,0,0,.35)}aside{padding:32px 25px;background:#151c27;border-left:1px solid #2a3443;height:100vh;overflow-y:auto}aside::-webkit-scrollbar{width:8px}aside::-webkit-scrollbar-track{background:#10151d}aside::-webkit-scrollbar-thumb{background:#3a485b;border-radius:4px}aside::-webkit-scrollbar-thumb:hover{background:#4a5c74}h2{font-size:17px;font-weight:500;margin:0 0 18px}label{display:block;font-size:13px;color:#c7d2e3;margin-bottom:20px}.row{display:flex;justify-content:space-between;margin-bottom:8px}output{font-variant-numeric:tabular-nums;color:#88dbc6}input[type=range]{width:100%;accent-color:#88dbc6}select,button{background:#202d3d;color:#eef2f8;border:1px solid #3a485b;border-radius:8px;padding:10px;font:inherit;width:100%}select{margin-top:8px;margin-bottom:0}button{cursor:pointer;margin-top:10px}button:hover{background:#2b3e53}.check{display:flex;gap:10px;align-items:center;margin:16px 0 0;font-size:13px;color:#c7d2e3}.check input[type=checkbox]{width:auto;accent-color:#88dbc6}.note{font-size:12px;color:#91a5bf;line-height:1.65;margin-top:25px}details{margin-top:18px}summary{cursor:pointer;color:#a9deff;font-size:12px}.geometry{pointer-events:auto;max-width:min(46vw,400px);background:rgba(21,28,39,.88);border:1px solid #2a3443;border-radius:12px;padding:10px 14px;backdrop-filter:blur(6px);margin-top:4px}.geometry p{margin:.6em 0;font-size:12px;color:#91a5bf;line-height:1.65}.geometry code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#a4e3d4}@media(max-width:760px){main{grid-template-columns:1fr;height:auto;min-height:100vh}.stage{height:65vh;min-height:420px}aside{border-left:0;border-top:1px solid #2a3443;height:auto;max-height:none;overflow:visible}.topbar{left:24px;top:22px;right:24px;gap:24px}.hint{left:24px}.formula{left:24px;right:24px;transform:none;max-width:none;text-align:left}}
+</style>
+<!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-GEX61LPT08"></script> <script>   window.dataLayer = window.dataLayer || [];   function gtag(){dataLayer.push(arguments);}   gtag('js', new Date());   gtag('config', 'G-GEX61LPT08'); </script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+</head>
+<body>
+<main>
+<section class="stage" id="stage">
+<div id="view"></div>
+<div class="topbar"><div class="heading"><div class="eyebrow">Algebraic geometry / 01</div><h1>Quintic Slice Explorer</h1></div><details class="geometry"><summary>Geometry</summary><p>A real two-dimensional slice of the quintic threefold — the solution set of <code>p⁵ + q⁵ = 1</code> — projected from four real dimensions into three. Each coloured patch belongs to a pair of fifth-root sheets <code>(k, ℓ)</code>.</p></details></div>
+<div class="formula">p⁵ + q⁵ = 1
+X = Re(p),  Y = Re(q)
+Z = cos(α)·Im(p) + sin(α)·Im(q)</div>
+<div class="hint">Drag to orbit &middot; scroll or pinch to zoom &middot; right-drag to pan &middot; Save PNG exports the current view</div>
+</section>
+<aside>
+<h2>Projection</h2>
+<label><span class="row"><span>Projection angle α</span><output id="angleOut"></output></span><input id="angle" type="range" min="0" max="180" step="1" value="45"></label>
+<label><span class="row"><span>Imaginary extent |v|</span><output id="extentOut"></output></span><input id="extent" type="range" min="0.3" max="2" step="0.05" value="1.2"></label>
+<h2>Surface</h2>
+<label>Mesh resolution<select id="resolution"><option value="24">Low</option><option value="48" selected>Medium</option><option value="80">High</option></select></label>
+<label>Sheet selection<select id="sheets"><option value="all">All 25 sheets</option><option value="row">Five sheets (k = 0)</option><option value="one">One sheet (k = ℓ = 0)</option></select></label>
+<label class="check"><input type="checkbox" id="wire"> Wireframe</label>
+<label class="check"><input type="checkbox" id="spin" checked> Auto-rotate</label>
+<button id="reset">Reset view</button><button id="resetParams">Reset parameters</button><button id="save">Save PNG</button>
+<p class="note" id="status">Loading 3D renderer… Internet access is required for Three.js.</p>
+<details><summary>Mathematics &amp; controls</summary><p class="note">With t = u + iv, p = exp(2πik/5) cos(t)^(2/5) and q = exp(2πiℓ/5) sin(t)^(2/5). We use 0 ≤ u ≤ π/2 and −V ≤ v ≤ V, with k, ℓ = 0,…,4. The five root choices generate the 25 sheets. This is a finite visualization window, not the entire compact manifold.</p><p class="note">The displayed metric is not the Ricci-flat Calabi–Yau metric. This is a projected algebraic curve (real dimension 2), not the full threefold (real dimension 6).</p></details>
+</aside>
+</main>
+<script type="module">
+import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+const $=id=>document.getElementById(id);
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(40,1,.01,100);camera.position.set(3.7,2.8,4.4);
+const renderer=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true,alpha:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setClearColor(0x000000,0);renderer.outputColorSpace=THREE.SRGBColorSpace;$('view').appendChild(renderer.domElement);
+const controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.autoRotate=true;controls.autoRotateSpeed=.65;
+scene.add(new THREE.HemisphereLight(0xd4eaff,0x243050,2.2));const key=new THREE.DirectionalLight(0xffffff,3);key.position.set(3,5,4);scene.add(key);const rim=new THREE.DirectionalLight(0x64cfff,2);rim.position.set(-4,1,-3);scene.add(rim);
+let group=new THREE.Group();scene.add(group);
+const root=(x,y,phase)=>{const r=Math.pow(Math.hypot(x,y),.4),a=.4*Math.atan2(y,x)+phase;return [r*Math.cos(a),r*Math.sin(a)];};
+const RES_LABEL={24:'Low',48:'Medium',80:'High'};
+const SHEET_LABEL={all:'25 sheets',row:'5 sheets',one:'1 sheet'};
+function readState(){return {angle:+$('angle').value,extent:+$('extent').value,resolution:+$('resolution').value,sheets:$('sheets').value,wire:$('wire').checked,spin:$('spin').checked};}
+function build(){
+ const old=group;scene.remove(old);old.traverse(o=>{if(o.isMesh){o.geometry.dispose();o.material.dispose();}});group=new THREE.Group();scene.add(group);
+ const n=+$('resolution').value,V=+$('extent').value,alpha=+$('angle').value*Math.PI/180,mode=$('sheets').value;
+ $('angleOut').value=$('angle').value+'°';$('extentOut').value=V.toFixed(2);
+ let faces=0;
+ for(let k=0;k<5;k++)for(let l=0;l<5;l++){
+ if(mode==='row'&&k!==0||mode==='one'&&(k!==0||l!==0))continue;
+ const positions=[],indices=[];
+ for(let i=0;i<=n;i++)for(let j=0;j<=n;j++){
+ const u=(Math.PI/2)*i/n,v=-V+2*V*j/n;
+ // Clamp endpoint roundoff: real parts stay nonnegative on this parameter strip.
+ const p=root(Math.max(0,Math.cos(u))*Math.cosh(v),-Math.sin(u)*Math.sinh(v),2*Math.PI*k/5);
+ const q=root(Math.sin(u)*Math.cosh(v),Math.max(0,Math.cos(u))*Math.sinh(v),2*Math.PI*l/5);
+ positions.push(p[0],q[0],Math.cos(alpha)*p[1]+Math.sin(alpha)*q[1]);
+ }
+ for(let i=0;i<n;i++)for(let j=0;j<n;j++){const a=i*(n+1)+j,b=a+n+1;indices.push(a,b,a+1,b,b+1,a+1);}
+ const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));geo.setIndex(indices);geo.computeVertexNormals();
+ const color=new THREE.Color().setHSL((k*5+l)/25,.63,.57);
+ const mat=new THREE.MeshStandardMaterial({color,metalness:.22,roughness:.38,side:THREE.DoubleSide,wireframe:$('wire').checked});group.add(new THREE.Mesh(geo,mat));faces+=indices.length/3;
+ }
+ $('status').textContent=group.children.length+' sheets · '+faces.toLocaleString()+' triangles · drag to orbit';
+}
+let pending=false;function schedule(){if(!pending){pending=true;requestAnimationFrame(()=>{pending=false;build();});}}
+for(const id of ['angle','extent','resolution','sheets'])$(id).addEventListener('input',schedule);
+$('wire').onchange=()=>group.children.forEach(o=>o.material.wireframe=$('wire').checked);
+$('spin').onchange=()=>controls.autoRotate=$('spin').checked;
+$('reset').onclick=()=>{camera.position.set(3.7,2.8,4.4);controls.target.set(0,0,0);controls.update();};
+$('resetParams').onclick=()=>{$('angle').value=45;$('extent').value=1.2;$('resolution').value=48;$('sheets').value='all';$('wire').checked=false;$('spin').checked=true;controls.autoRotate=true;schedule();};
+function paramBand(p){
+ const lines=[
+  'p⁵ + q⁵ = 1  ·  α '+p.angle+'°  ·  |v| '+p.extent.toFixed(2),
+  'res '+(RES_LABEL[p.resolution]||p.resolution)+'  ·  '+(SHEET_LABEL[p.sheets]||p.sheets)+'  ·  wire '+(p.wire?'on':'off')+'  ·  spin '+(p.spin?'on':'off')
+ ];
+ const w=renderer.domElement.width,h=renderer.domElement.height;
+ const font=Math.max(11,Math.round(Math.min(w,h)/70));
+ const lineH=font*1.5,pad=font*.7,bandH=lines.length*lineH+pad*2;
+ return {lines,font,lineH,pad,bandH};
+}
+function paintParamBand(c,band,w,h){
+ const top=h-band.bandH;
+ c.fillStyle='rgba(16,21,29,.95)';c.fillRect(0,top,w,band.bandH);
+ c.strokeStyle='rgba(136,219,198,.45)';c.lineWidth=Math.max(1,band.font/12);
+ c.beginPath();c.moveTo(0,top+.5);c.lineTo(w,top+.5);c.stroke();
+ c.font=band.font+'px ui-monospace,SFMono-Regular,Menlo,monospace';
+ c.textAlign='left';c.textBaseline='middle';
+ band.lines.forEach(function(line,i){
+  c.fillStyle=i===0?'#a4e3d4':'#91a5bf';
+  c.fillText(line,band.pad,top+band.pad+band.lineH*(i+.5));
+ });
+}
+function exportPng(){
+ renderer.render(scene,camera);
+ const p=readState(),band=paramBand(p),src=renderer.domElement;
+ const out=document.createElement('canvas');
+ out.width=src.width;out.height=src.height+band.bandH;
+ const c=out.getContext('2d');
+ c.drawImage(src,0,0);
+ paintParamBand(c,band,out.width,out.height);
+ out.toBlob(function(blob){
+  if(!blob)return;
+  const url=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=url;a.download='quintic_a'+p.angle+'_v'+p.extent.toFixed(2)+'_'+(RES_LABEL[p.resolution]||p.resolution).toLowerCase()+'_'+p.sheets+'.png';a.click();
+  setTimeout(function(){URL.revokeObjectURL(url);},1000);
+ },'image/png');
+ $('status').textContent='PNG saved with parameter summary.';
+}
+$('save').onclick=exportPng;
+function resize(){
+ const box=$('stage').getBoundingClientRect();
+ const w=Math.max(1,box.width),h=Math.max(1,box.height);
+ camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h);
+}
+new ResizeObserver(resize).observe($('stage'));
+resize();build();renderer.setAnimationLoop(()=>{controls.update();renderer.render(scene,camera);});
+</script>
+</body></html>
