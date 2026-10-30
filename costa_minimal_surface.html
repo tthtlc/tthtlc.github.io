@@ -1,0 +1,124 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Costa Minimal Surface</title><style>
+:root{color-scheme:dark;font-family:Inter,system-ui,sans-serif;background:#10151d;color:#eef2f8}*{box-sizing:border-box}body{margin:0}main{display:grid;grid-template-columns:1fr 300px;height:100vh;min-height:0}.stage{position:relative;height:100vh;min-height:0;overflow:hidden;background:radial-gradient(ellipse at 50% 45%,#253247,#10151d 70%)}canvas{display:block;width:100%;height:100%;position:absolute;touch-action:auto}.topbar{position:absolute;top:32px;left:36px;right:36px;display:flex;align-items:flex-start;gap:36px;flex-wrap:wrap;z-index:2}.heading{pointer-events:none}h1{font-size:clamp(24px,3vw,40px);font-weight:500;letter-spacing:-.04em;margin:6px 0}.eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.22em;color:#91a5bf}.hint{position:absolute;bottom:28px;left:36px;color:#92a3b9;font-size:12px;pointer-events:none;z-index:2}.formula{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);z-index:3;max-width:calc(100% - 48px);background:rgba(16,21,29,.9);border:1px solid #2a3443;border-radius:9px;padding:7px 12px;font-size:10px;line-height:1.55;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#a4e3d4;text-align:center;white-space:pre;pointer-events:none;box-shadow:0 4px 18px rgba(0,0,0,.35)}aside{padding:32px 25px;background:#151c27;border-left:1px solid #2a3443;height:100vh;overflow-y:auto}aside::-webkit-scrollbar{width:8px}aside::-webkit-scrollbar-track{background:#10151d}aside::-webkit-scrollbar-thumb{background:#3a485b;border-radius:4px}aside::-webkit-scrollbar-thumb:hover{background:#4a5c74}h2{font-size:17px;font-weight:500;margin:0 0 26px}label{display:block;font-size:13px;color:#c7d2e3;margin-bottom:22px}.row{display:flex;justify-content:space-between;margin-bottom:8px}output{font-variant-numeric:tabular-nums;color:#88dbc6}input[type=range]{width:100%;accent-color:#88dbc6}select,button{background:#202d3d;color:#eef2f8;border:1px solid #3a485b;border-radius:8px;padding:10px;font:inherit;width:100%}input[type=color]{width:100%;height:34px;background:none;border:0;padding:0}button{cursor:pointer;margin-top:10px}button:hover{background:#2b3e53}button:disabled{opacity:.55;cursor:wait}.check{display:flex;gap:10px;align-items:center;margin:16px 0 0;font-size:13px;color:#c7d2e3}.check input[type=checkbox]{width:auto;accent-color:#88dbc6}.note{font-size:12px;color:#91a5bf;line-height:1.65;margin-top:25px}details{font-size:12px;color:#91a5bf;line-height:1.65}summary{cursor:pointer;color:#c7d2e3}code{color:#a4e3d4}.geometry{pointer-events:auto;max-width:min(46vw,400px);background:rgba(21,28,39,.88);border:1px solid #2a3443;border-radius:12px;padding:10px 14px;backdrop-filter:blur(6px);margin-top:4px}.geometry p{margin:.6em 0}.gallery{border-top:1px solid #2a3443;margin-top:25px;padding-top:22px}.gallery h2{margin:0 0 8px}.gallery-note{font-size:11px;color:#91a5bf;line-height:1.6;margin:0 0 14px}.gallery-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.gallery-item{display:block;border:1px solid #2a3443;border-radius:8px;overflow:hidden;text-decoration:none;background:#10151d}.gallery-item:hover{border-color:#88dbc6}.gallery-item img{display:block;width:100%;height:64px;object-fit:cover}.gallery-item span{display:block;font-size:9px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#91a5bf;padding:4px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.gallery-empty{grid-column:1/-1;color:#6b7d94;font-size:12px;text-align:center;padding:14px 0}@media(max-width:760px){main{grid-template-columns:1fr;height:auto;min-height:100vh}.stage{height:65vh;min-height:420px}aside{border-left:0;border-top:1px solid #2a3443;height:auto;max-height:none;overflow:visible}.topbar{left:24px;top:22px;right:24px;gap:24px}.hint{left:24px}.formula{left:24px;right:24px;transform:none;max-width:none;text-align:left}}
+canvas{touch-action:none}.hint{bottom:75px}.formula{white-space:normal;width:max-content}.geometry{max-width:380px}</style></head><body><main><section class="stage"><canvas id="canvas" aria-label="Interactive Costa minimal surface"></canvas><div class="topbar"><div class="heading"><div class="eyebrow">Minimal surfaces / genus one</div><h1>Costa Surface</h1></div><details class="geometry"><summary>Geometry & mathematics</summary><p>The Costa surface is an embedded minimal surface with one handle and three ends: two catenoidal ends and one planar end.</p><p>This viewer samples Gray’s parametrization on the square torus using Weierstrass ζ and ℘ functions. Infinite ends are truncated; boundary gaps reflect mesh sampling, not boundaries of the complete surface.</p><p>The square lattice has periods 1 and i; e₁ = ℘(½) ≈ 6.875185818. Fourier series evaluate the elliptic functions. No arbitrary shape deformation is applied.</p><p>Sources: <a href="https://mathworld.wolfram.com/CostaMinimalSurface.html" target="_blank" rel="noopener">MathWorld</a> · <a href="http://homepage.ntu.edu.tw/~anwang/riemann.tex" target="_blank" rel="noopener">Explicit Gray equations</a></p></details></div><div class="formula">X(u,v) = Gray’s elliptic-function parametrization · z = u + iv<br>Square torus minus three punctures · numerical, finite mesh</div><div class="hint">Drag to orbit · Scroll / pinch to zoom · Export PNG or rotating GIF</div></section><aside><h2>Surface & appearance</h2><label><span class="row"><span>End truncation radius</span><output id="extentOut"></output></span><input id="extent" type="range" min="3" max="12" step="0.25" value="5"></label><label><span class="row"><span>Zoom</span><output id="zoomOut"></output></span><input id="zoom" type="range" min="0.4" max="2.5" step="0.05" value="1"></label><label><span class="row"><span>Rotation speed</span><output id="speedOut"></output></span><input id="speed" type="range" min="0" max="1" step="0.02" value="0.18"></label><label><span class="row"><span>Wire opacity</span><output id="lineOut"></output></span><input id="line" type="range" min="0" max="1" step="0.05" value="0.2"></label><label>Mesh resolution<select id="resolution"><option value="64">Low · 64 × 64</option><option value="104" selected>Medium · 104 × 104</option><option value="160">High · 160 × 160</option></select></label><label>Rendering<select id="mode"><option value="solid">Shaded surface + mesh</option><option value="smooth">Shaded surface</option><option value="wire">Wireframe</option></select></label><label>Base colour<input id="color" type="color" value="#88dbc6"></label><label class="check"><input id="spin" type="checkbox" checked> Auto-rotate</label><label class="check"><input id="rainbow" type="checkbox"> Height colours</label><button id="reset">Reset view & settings</button><button id="export">Save PNG</button><button id="exportGif">Save rotating GIF</button><p class="note" id="status">Computing surface…</p><section class="gallery"><h2>Saved PNGs</h2><p class="gallery-note">Session-only previews. Images are downloaded locally, not uploaded.</p><div id="galleryItems" class="gallery-grid"></div></section></aside></main><script>'use strict';
+const $=id=>document.getElementById(id),canvas=$('canvas'),ctx=canvas.getContext('2d'),PI=Math.PI;
+let W=1,H=1,dpr=1,yaw=.65,pitch=-.48,triangles=[],vertices=[],drag=false,lastTime=0,busy=false;
+const add=(a,b)=>[a[0]+b[0],a[1]+b[1]],sub=(a,b)=>[a[0]-b[0],a[1]-b[1]],mul=(a,b)=>[a[0]*b[0]-a[1]*b[1],a[0]*b[1]+a[1]*b[0]],scale=(a,t)=>[a[0]*t,a[1]*t],div=(a,b)=>scale(mul(a,[b[0],-b[1]]),1/(b[0]*b[0]+b[1]*b[1]));
+function sn(z){return [Math.sin(z[0])*Math.cosh(z[1]),Math.cos(z[0])*Math.sinh(z[1])];}
+function cs(z){return [Math.cos(z[0])*Math.cosh(z[1]),-Math.sin(z[0])*Math.sinh(z[1])];}
+function elliptic(x,y){
+ const a=Math.floor(x+.5),b=Math.floor(y+.5);x-=a;y-=b;
+ const z=[x,y],pz=scale(z,PI),sin=sn(pz);
+ let ze=add(scale(z,PI),scale(div(cs(pz),sin),PI));
+ let wp=sub(scale(div([1,0],mul(sin,sin)),PI*PI),[PI,0]);
+ for(let n=1;n<=12;n++){const q=Math.exp(-2*PI*n),c=q/(1-q),t=scale(z,2*PI*n);ze=add(ze,scale(sn(t),4*PI*c));wp=sub(wp,scale(cs(t),8*PI*PI*n*c));}
+ ze=add(ze,[PI*a,-PI*b]);return {ze,wp};
+}
+const E=elliptic(.5,0).wp[0];
+function point(u,v){
+ const a=elliptic(u,v),b=elliptic(u-.5,v).ze,c=elliptic(u,v-.5).ze,d=sub(b,c),p=a.wp;
+ const x=.5*(-a.ze[0]+PI*u+PI/(2*E)*d[0]);
+ const y=.5*(a.ze[1]+PI*v+PI/(2*E)*d[1]);
+ const ratio=Math.hypot(p[0]-E,p[1])/Math.hypot(p[0]+E,p[1]);
+ const z=.25*Math.sqrt(2*PI)*Math.log(ratio);
+ return [x,y,z];
+}
+function build(){
+ const n=+$('resolution').value,R=+$('extent').value;vertices=[];triangles=[];
+ for(let i=0;i<=n;i++)for(let j=0;j<=n;j++){
+ const u=-.5+i/n,v=-.5+j/n;
+ let p=point(u,v);if(!p.every(Number.isFinite)||Math.hypot(...p)>R)p=null;vertices.push(p);
+ }
+ function tri(a,b,c){if(!vertices[a]||!vertices[b]||!vertices[c])return;const p=vertices[a],q=vertices[b],r=vertices[c];
+ if(Math.max(Math.hypot(...sub3(p,q)),Math.hypot(...sub3(q,r)),Math.hypot(...sub3(r,p)))>R*.45)return;
+ triangles.push([a,b,c]);}
+ for(let i=0;i<n;i++)for(let j=0;j<n;j++){const a=i*(n+1)+j,b=a+n+1;tri(a,b,a+1);tri(b,b+1,a+1);}
+ $('status').textContent=triangles.length.toLocaleString()+' triangles · finite truncation · elliptic Fourier series (12 terms)';sync();
+}
+function sub3(a,b){return a.map((x,i)=>x-b[i]);}
+function sync(){for(const id of ['extent','zoom','speed','line'])$(id+'Out').value=(+$(id).value).toFixed(2);}
+function bg(g,w,h){const b=g.createRadialGradient(w/2,h*.45,0,w/2,h*.45,Math.max(w,h)*.78);b.addColorStop(0,'#253247');b.addColorStop(1,'#10151d');g.fillStyle=b;g.fillRect(0,0,w,h);}
+function render(g,w,h,angle=yaw){
+ bg(g,w,h);const cy=Math.cos(angle),sy=Math.sin(angle),cp=Math.cos(pitch),sp=Math.sin(pitch),R=+$('extent').value,S=Math.min(w,h)*.40/R*+$('zoom').value;
+ const pts=vertices.map(p=>{if(!p)return null;const x=p[0]*cy-p[1]*sy,y=p[0]*sy+p[1]*cy;return [x,y*sp+p[2]*cp,y*cp-p[2]*sp];});
+ const ordered=triangles.map(t=>({t,d:(pts[t[0]][2]+pts[t[1]][2]+pts[t[2]][2])/3})).sort((a,b)=>a.d-b.d);
+ const hex=$('color').value,base=[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)),mode=$('mode').value;
+ for(const {t} of ordered){const a=pts[t[0]],b=pts[t[1]],c=pts[t[2]],u=sub3(b,a),v=sub3(c,a),n=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]],len=Math.hypot(...n)||1,light=.30+.70*Math.abs((n[0]*.3+n[1]*.5+n[2]*.81)/len);
+ g.beginPath();g.moveTo(w/2+a[0]*S,h*.51-a[1]*S);g.lineTo(w/2+b[0]*S,h*.51-b[1]*S);g.lineTo(w/2+c[0]*S,h*.51-c[1]*S);g.closePath();
+ if(mode!=='wire'){g.fillStyle=$('rainbow').checked?'hsl('+(175+(vertices[t[0]][2]/R)*130)+',55%,'+(light*60)+'%)':'rgb('+base.map(x=>Math.round(x*light)).join(',')+')';g.fill();}
+ if(mode==='wire'||mode==='solid'&&+$('line').value>0){g.strokeStyle=mode==='wire'?hex:'rgba(12,24,35,'+$('line').value+')';g.lineWidth=mode==='wire'?.55:.45;g.stroke();}
+ }
+}
+function resize(){const b=canvas.parentElement.getBoundingClientRect();W=b.width;H=b.height;dpr=Math.min(devicePixelRatio||1,2);canvas.width=Math.round(W*dpr);canvas.height=Math.round(H*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);render(ctx,W,H);}
+for(const id of ['extent','resolution'])$(id).onchange=()=>{build();render(ctx,W,H);};
+for(const id of ['zoom','speed','line','color','rainbow','mode'])$(id).oninput=()=>{sync();render(ctx,W,H);};
+const pointers=new Map();let pinch=0;
+canvas.onpointerdown=e=>{canvas.setPointerCapture(e.pointerId);pointers.set(e.pointerId,[e.clientX,e.clientY]);drag=true;pinch=0;};
+canvas.onpointermove=e=>{if(!pointers.has(e.pointerId))return;const old=pointers.get(e.pointerId);pointers.set(e.pointerId,[e.clientX,e.clientY]);if(pointers.size===1){yaw+=(e.clientX-old[0])*.008;pitch=Math.max(-1.5,Math.min(1.5,pitch+(e.clientY-old[1])*.008));}else{const p=[...pointers.values()],dist=Math.hypot(p[0][0]-p[1][0],p[0][1]-p[1][1]);if(pinch)$('zoom').value=Math.max(.4,Math.min(2.5,+$('zoom').value*dist/pinch));pinch=dist;sync();}render(ctx,W,H);};
+function release(e){pointers.delete(e.pointerId);drag=pointers.size>0;pinch=0;}canvas.onpointerup=release;canvas.onpointercancel=release;
+canvas.onwheel=e=>{e.preventDefault();$('zoom').value=Math.max(.4,Math.min(2.5,+$('zoom').value*Math.exp(-e.deltaY*.001)));sync();render(ctx,W,H);};
+$('reset').onclick=()=>{yaw=.65;pitch=-.48;for(const [id,v] of [['extent',5],['zoom',1],['speed',.18],['line',.2],['resolution',104],['mode','solid'],['color','#88dbc6']])$(id).value=v;$('spin').checked=true;$('rainbow').checked=false;build();render(ctx,W,H);};
+function download(blob,name){const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+$('export').onclick=()=>{render(ctx,W,H);canvas.toBlob(blob=>{if(!blob)return;download(blob,'costa_R'+$('extent').value+'.png');const a=document.createElement('a'),im=document.createElement('img');a.className='gallery-item';a.href=URL.createObjectURL(blob);a.target='_blank';im.src=a.href;im.alt='Costa surface capture';a.appendChild(im);$('galleryItems').prepend(a);});};
+function lzwEncode(indices,minCodeSize){
+ const clearCode=1<<minCodeSize,eoiCode=clearCode+1;
+ let codeSize=minCodeSize+1,nextCode=eoiCode+1;
+ const dict=new Map(),out=[];let cur=0,bits=0;
+ function write(code){cur|=code<<bits;bits+=codeSize;while(bits>=8){out.push(cur&0xff);cur>>=8;bits-=8;}}
+ if(indices.length===0){write(clearCode);write(eoiCode);if(bits>0)out.push(cur&0xff);return new Uint8Array(out);}
+ write(clearCode);
+ let prefix=indices[0];
+ for(let i=1;i<indices.length;i++){
+  const k=indices[i],key=prefix*4096+k,c=dict.get(key);
+  if(c!==undefined){prefix=c;}
+  else{
+   write(prefix);
+   if(nextCode<4096){dict.set(key,nextCode++);if(nextCode>(1<<codeSize)&&codeSize<12)codeSize++;}
+   else{write(clearCode);dict.clear();codeSize=minCodeSize+1;nextCode=eoiCode+1;}
+   prefix=k;
+  }
+ }
+ write(prefix);write(eoiCode);
+ if(bits>0)out.push(cur&0xff);
+ return new Uint8Array(out);
+}
+function buildGif(frames,width,height,palette,delayCs){
+ const pal=new Array(256);for(let i=0;i<256;i++)pal[i]=palette[i]||[0,0,0];
+ const bytes=[];const u8=b=>bytes.push(b&0xff);const u16=v=>{bytes.push(v&0xff,(v>>8)&0xff);};
+ const str=s=>{for(let i=0;i<s.length;i++)bytes.push(s.charCodeAt(i));};
+ str('GIF89a');u16(width);u16(height);u8(0xF7);u8(0);u8(0);
+ for(let i=0;i<256;i++){u8(pal[i][0]);u8(pal[i][1]);u8(pal[i][2]);}
+ u8(0x21);u8(0xFF);u8(0x0B);str('NETSCAPE2.0');u8(0x03);u8(0x01);u16(0);u8(0x00);
+ for(const idx of frames){
+  u8(0x21);u8(0xF9);u8(0x04);u8(0x04);u16(delayCs);u8(0x00);u8(0x00);
+  u8(0x2C);u16(0);u16(0);u16(width);u16(height);u8(0x00);u8(8);
+  const lzw=lzwEncode(idx,8);
+  for(let i=0;i<lzw.length;i+=255){const n=Math.min(255,lzw.length-i);u8(n);for(let j=0;j<n;j++)u8(lzw[i+j]);}
+  u8(0x00);
+ }
+ u8(0x3B);return new Uint8Array(bytes);
+}
+function quantizeFrames(frames){
+ const N=1<<15;const count=new Uint32Array(N),rsum=new Uint32Array(N),gsum=new Uint32Array(N),bsum=new Uint32Array(N);const buckets=[];
+ for(const fr of frames){const d=fr.data;for(let i=0;i<d.length;i+=4){const r=d[i],g=d[i+1],b=d[i+2];const bk=((r>>3)<<10)|((g>>3)<<5)|(b>>3);if(count[bk]===0)buckets.push(bk);count[bk]++;rsum[bk]+=r;gsum[bk]+=g;bsum[bk]+=b;}}
+ buckets.sort((a,b)=>count[b]-count[a]);
+ const chosen=buckets.slice(0,256),palette=[];
+ for(const bk of chosen){const n=count[bk];palette.push([Math.round(rsum[bk]/n),Math.round(gsum[bk]/n),Math.round(bsum[bk]/n)]);}
+ if(palette.length===0)palette.push([0,0,0]);
+ const lut=new Uint8Array(N);
+ for(let bk=0;bk<N;bk++){const r=(bk>>10)<<3,g=((bk>>5)&31)<<3,b=(bk&31)<<3;let best=0,bestD=Infinity;for(let p=0;p<palette.length;p++){const dr=palette[p][0]-r,dg=palette[p][1]-g,db=palette[p][2]-b;const d=dr*dr+dg*dg+db*db;if(d<bestD){bestD=d;best=p;}}lut[bk]=best;}
+ const indices=[];
+ for(const fr of frames){const d=fr.data,idx=new Uint8Array(fr.w*fr.h);let p=0;for(let i=0;i<d.length;i+=4){const bk=((d[i]>>3)<<10)|((d[i+1]>>3)<<5)|(d[i+2]>>3);idx[p++]=lut[bk];}indices.push(idx);}
+ return {palette,indices};
+}
+
+$('exportGif').onclick=async()=>{
+ if(busy)return;busy=true;const btn=$('exportGif');btn.disabled=true;const was=$('spin').checked;$('spin').checked=false;
+ try{const out=document.createElement('canvas');out.width=out.height=360;const g=out.getContext('2d',{willReadFrequently:true}),frames=[];
+ for(let i=0;i<24;i++){btn.textContent='Capturing '+(i+1)+'/24…';render(g,360,360,yaw+2*PI*i/24);frames.push({w:360,h:360,data:g.getImageData(0,0,360,360).data});await new Promise(r=>setTimeout(r,0));}
+ btn.textContent='Encoding…';await new Promise(r=>setTimeout(r,20));const q=quantizeFrames(frames),bytes=buildGif(q.indices,360,360,q.palette,10);download(new Blob([bytes],{type:'image/gif'}),'costa_rotation.gif');
+ }catch(e){$('status').textContent='Export failed: '+e.message;}finally{busy=false;btn.disabled=false;btn.textContent='Save rotating GIF';$('spin').checked=was;}
+};
+new ResizeObserver(resize).observe(canvas.parentElement);build();resize();
+function frame(t){const dt=Math.min(.05,(t-lastTime)/1000);lastTime=t;if($('spin').checked&&!drag&&!busy){yaw+=dt*+$('speed').value;render(ctx,W,H);}requestAnimationFrame(frame);}requestAnimationFrame(frame);
+</script></body></html>
