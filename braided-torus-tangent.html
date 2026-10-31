@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tangent streaks on a torus</title>
+<style>
+:root{color-scheme:dark;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;background:#0e131b;color:#eef2f8}
+*{box-sizing:border-box}
+body{margin:0}
+main{display:grid;grid-template-columns:minmax(0,1fr) 312px;min-height:100vh}
+.stage{position:sticky;top:0;align-self:start;height:100vh;min-height:0;overflow:hidden;background:radial-gradient(ellipse at 50% 44%,#22314a 0%,#0e131b 74%)}
+canvas{position:absolute;inset:0;display:block;width:100%;height:100%;touch-action:none;cursor:grab}
+canvas:active{cursor:grabbing}
+canvas:focus-visible{outline:2px solid #88dbc6;outline-offset:-5px}
+.topbar{position:absolute;top:30px;left:34px;right:34px;display:flex;align-items:flex-start;gap:34px;flex-wrap:wrap;z-index:2}
+.heading{pointer-events:none}
+.eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.22em;color:#8fa3bd}
+h1{font-size:clamp(25px,3vw,41px);font-weight:500;letter-spacing:-.045em;margin:7px 0 0}
+.hint{position:absolute;bottom:26px;left:34px;z-index:1;pointer-events:none;color:#8297b0;font-size:12px}
+.formula{position:absolute;left:34px;bottom:62px;z-index:1;pointer-events:none;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:10px;line-height:1.75;letter-spacing:.03em;color:#b8cde5;background:rgba(11,16,24,.66);border:1px solid rgba(39,49,65,.9);border-radius:14px;padding:5px 15px;max-width:min(calc(100% - 68px),780px);backdrop-filter:blur(4px)}
+.formula div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.geometry{pointer-events:auto;max-width:min(46vw,420px);background:rgba(18,25,36,.88);border:1px solid #283345;border-radius:12px;padding:10px 15px;backdrop-filter:blur(7px);font-size:12px;line-height:1.62;color:#8fa3bd}
+.geometry summary{cursor:pointer;color:#c7d2e3}
+.geometry p{margin:.65em 0}
+.geometry strong{color:#c7d2e3;font-weight:500}
+.geometry code,.note code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:#9fe7d4;font-size:.94em}
+aside{padding:30px 24px 40px;background:#141b26;border-left:1px solid #273141}
+h2{font-size:17px;font-weight:500;margin:0 0 20px}
+h3{font-size:10.5px;font-weight:500;text-transform:uppercase;letter-spacing:.19em;color:#8fa3bd;margin:24px 0 13px}
+h3:first-of-type{margin-top:0}
+label{display:block;font-size:13px;color:#c7d2e3;margin-bottom:18px}
+.row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+output{font-variant-numeric:tabular-nums;color:#88dbc6;font-size:12.5px}
+input[type=range]{width:100%;accent-color:#88dbc6;display:block}
+select,button{background:#1f2c3c;color:#eef2f8;border:1px solid #394a5f;border-radius:8px;padding:9px 10px;font:inherit;width:100%}
+select:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid #88dbc6;outline-offset:2px}
+input[type=color]{width:100%;height:36px;background:none;border:0;padding:0;cursor:pointer}
+button{cursor:pointer;transition:background .15s}
+button:hover{background:#2a3d52}
+button.primary{background:#1d3a38;border-color:#2f5b55;color:#a9f0df}
+button.primary:hover{background:#245049}
+.check{display:flex;gap:10px;align-items:center;font-size:13px;color:#c7d2e3;margin-bottom:14px}
+.check input{accent-color:#88dbc6;width:15px;height:15px}
+.buttons{display:grid;gap:8px;margin-top:6px}
+.note{font-size:12px;color:#8fa3bd;line-height:1.62;margin:20px 0 0}
+.swatches{display:flex;gap:3px;margin:6px 0 8px;border-radius:6px;overflow:hidden}
+.swatches span{flex:1;height:11px;min-width:0}
+.swatch-note{font-size:11px;color:#8297b0;margin:0 0 18px;font-variant-numeric:tabular-nums}
+.gallery{border-top:1px solid #273141;margin-top:26px;padding-top:20px}
+.gallery h2{margin:0 0 8px}
+.gallery-note{font-size:11px;color:#8fa3bd;line-height:1.55;margin:0 0 13px}
+.gallery-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.gallery-item{display:block;border:1px solid #273141;border-radius:8px;overflow:hidden;text-decoration:none;background:#0e131b}
+.gallery-item:hover{border-color:#88dbc6}
+.gallery-item img{display:block;width:100%;height:64px;object-fit:cover}
+.gallery-item span{display:block;font-size:9px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#8fa3bd;padding:4px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gallery-empty{grid-column:1/-1;color:#6b7d94;font-size:12px;text-align:center;padding:14px 0}
+@media(max-width:780px){
+ main{grid-template-columns:1fr}
+ .stage{position:relative;top:auto;height:68vh;min-height:440px}
+ aside{border-left:0;border-top:1px solid #273141}
+ .topbar{left:22px;top:20px;right:22px;gap:20px}
+ .hint{left:22px;bottom:18px}
+ .geometry{max-width:100%}
+ .formula{left:22px;right:22px;bottom:52px;max-width:none;font-size:9px}
+ .formula div{white-space:normal;overflow:visible}
+}
+</style>
+</head>
+<body>
+<main>
+<section class="stage">
+<canvas id="canvas" aria-label="A head travels around a braided torus, laying down short tangent-line streaks in series of ten with gaps between. Drag to rotate; use the sliders to change thread count, twist, streak length and speed." tabindex="0"></canvas>
+<div class="formula">
+<div>Cₖ(u) = ((R + a·cos w)·cos u, (R + a·cos w)·sin u, a·sin w) · w = ωu + 2πk/N</div>
+<div>Tₖ(u) = dCₖ/du · streak = Cₖ(u) ± L·T̂ₖ(u) · series of 10, gap, repeat</div>
+</div>
+<div class="topbar">
+<div class="heading"><div class="eyebrow">Line study / 20</div><h1>Tangent streaks</h1></div>
+<details class="geometry">
+<summary>Geometry &amp; streak rule</summary>
+<p><strong>N</strong> threads share one torus, evenly phased around the tube by <code>2π/N</code>. Thread <code>k</code> is</p>
+<p><code>C_k(u) = ((R + a cos w_k) cos u, (R + a cos w_k) sin u, a sin w_k)</code><br><code>w_k = ωu + 2πk/N</code></p>
+<p><strong>Tangent streaks.</strong> A head travels along <code>u</code>, wrapping the torus forever. At each tick position it computes the curve tangent <code>T_k(u) = dC_k/du</code>, normalises it, and lays down a short segment <code>C_k(u) ± L·T̂_k(u)</code>. Because the curve sits on the surface, the segment lies in the torus's tangent plane — it touches the surface without cutting into it.</p>
+<p><strong>Breaks.</strong> Streaks are laid in series of <code>10</code>. After the tenth the head keeps travelling for a short gap distance while drawing nothing, then the next series of 10 begins. Older streaks fade behind the head, leaving a dashed tangent trail.</p>
+</details>
+</div>
+<div class="hint">Drag to rotate · Scroll to zoom · Arrow keys to rotate</div>
+</section>
+<aside>
+<h2>Tangent streaks</h2>
+
+<h3>Shape</h3>
+<label><span class="row"><span>Coiling threads N</span><output id="threadsOut"></output></span><input id="threads" type="range" min="2" max="15" step="1" value="7"></label>
+<label><span class="row"><span>Twists ω</span><output id="twOut"></output></span><input id="tw" type="range" min="1" max="8" step="1" value="3"></label>
+<label><span class="row"><span>Ring radius R</span><output id="ROut"></output></span><input id="R" type="range" min="1.6" max="2.8" step="0.01" value="2.2"></label>
+<label><span class="row"><span>Coil radius a</span><output id="aOut"></output></span><input id="a" type="range" min="0.2" max="0.6" step="0.01" value="0.42"></label>
+
+<h3>Streaks</h3>
+<label><span class="row"><span>Streak length L</span><output id="streakLenOut"></output></span><input id="streakLen" type="range" min="0.03" max="0.5" step="0.01" value="0.12"></label>
+<label><span class="row"><span>Tick spacing</span><output id="tickSpacingOut"></output></span><input id="tickSpacing" type="range" min="0.03" max="0.4" step="0.01" value="0.14"></label>
+<label><span class="row"><span>Gap length</span><output id="gapOut"></output></span><input id="gap" type="range" min="0.05" max="2.5" step="0.01" value="0.6"></label>
+<label><span class="row"><span>Trace speed</span><output id="traceSpeedOut"></output></span><input id="traceSpeed" type="range" min="0" max="3" step="0.1" value="1.2"></label>
+<label><span class="row"><span>Trail length</span><output id="trailOut"></output></span><input id="trail" type="range" min="1" max="6.2" step="0.1" value="5.2"></label>
+
+<h3>Colour</h3>
+<label><span class="row"><span>Hue span</span><output id="spanOut"></output></span><input id="span" type="range" min="0" max="360" step="1" value="240"></label>
+<label>Base colour<input id="color" type="color" value="#5eead4"></label>
+<div class="swatches" id="swatches" aria-hidden="true"></div>
+<p class="swatch-note" id="swatchNote"></p>
+<label><span class="row"><span>Line width</span><output id="lwOut"></output></span><input id="lw" type="range" min="1" max="5" step="0.1" value="2.2"></label>
+
+<h3>View</h3>
+<label><span class="row"><span>Zoom</span><output id="zoomOut"></output></span><input id="zoom" type="range" min="0.6" max="1.7" step="0.01" value="1"></label>
+<label>Projection<select id="view"><option value="perspective">Perspective / line</option><option value="top">Top / flat</option></select></label>
+<label class="check"><input id="spin" type="checkbox">Auto-rotate</label>
+
+<div class="buttons">
+<button id="pauseBtn" class="primary">Pause tracing</button>
+<button id="reset">Reset design</button>
+<button id="export">Save PNG</button>
+</div>
+<p class="note" id="status"></p>
+<p class="note">The head never stops: it wraps the torus forever. Every 10 tangent streaks it lays down, it travels a short gap without drawing, then begins the next series of 10. Streaks fade with distance behind the head.</p>
+
+<section class="gallery"><h2>Saved PNGs</h2><p class="gallery-note">PNG captures are named with their parameter values. Commit the downloaded files to the repo and they will appear here automatically (fetched via the GitHub API).</p><div id="galleryItems" class="gallery-grid"></div></section>
+</aside>
+</main>
+<script>
+'use strict';
+const $ = id => document.getElementById(id);
+const canvas = $('canvas'), ctx = canvas.getContext('2d');
+const TAU = Math.PI * 2, D = 9, TICKS_PER_GROUP = 10;
+
+let width = 1, height = 1, dpr = 1;
+let N = 7, tw = 3, R = 2.2, a = 0.42;
+let paletteCss = [];
+let ticks = [];       // {k, u} — deposited in increasing u order
+let headU = 0;        // absolute u of the travelling head (unbounded)
+let nextTickU = 0;    // absolute u of the next tick position to deposit
+let paused = false;
+let yaw = .35, pitch = -.82, drag = null;
+let lastTime = 0;
+let cyaw = 1, syaw = 0, cpit = 1, spit = 0;
+
+const swatches = $('swatches'), swatchNote = $('swatchNote');
+const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+const hexRgb = hex => [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16) / 255);
+const rgb2hsl = (r, g, b) => {
+  const mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2;
+  if (mx === mn) return [0, 0, l];
+  const d = mx - mn, s = l > .5 ? d / (2 - mx - mn) : d / (mx + mn);
+  const h = (mx === r ? (g - b) / d + (g < b ? 6 : 0) : mx === g ? (b - r) / d + 2 : (r - g) / d + 4) / 6;
+  return [h, s, l];
+};
+const hue2rgb = (p, q, t) => {
+  t = (t + 1) % 1;
+  return t < 1 / 6 ? p + (q - p) * 6 * t : t < 1 / 2 ? q : t < 2 / 3 ? p + (q - p) * (2 / 3 - t) * 6 : p;
+};
+const hsl2rgb = (h, s, l) => {
+  if (!s) { const v = Math.round(l * 255); return [v, v, v]; }
+  const q = l < .5 ? l * (1 + s) : l + s - l * s, p = 2 * l - q;
+  return [hue2rgb(p, q, h + 1 / 3), hue2rgb(p, q, h), hue2rgb(p, q, h - 1 / 3)].map(v => Math.round(v * 255));
+};
+
+// Point on strand k at wrapped u, plus the curve tangent d/du.
+function pointTangent(k, u) {
+  const w = tw * u + TAU * k / N;
+  const cw = Math.cos(w), sw = Math.sin(w);
+  const cu = Math.cos(u), su = Math.sin(u);
+  const rr = R + a * cw;
+  const px = rr * cu, py = rr * su, pz = a * sw;
+  const dx = -a * tw * sw * cu - rr * su;
+  const dy = -a * tw * sw * su + rr * cu;
+  const dz = a * tw * cw;
+  return { px, py, pz, dx, dy, dz };
+}
+
+function project(x, y, z, top, scale, cx, cy) {
+  const x1 = cyaw * x - syaw * y;
+  const y0 = syaw * x + cyaw * y;
+  const y1 = cpit * y0 - spit * z;
+  const z1 = spit * y0 + cpit * z;
+  const persp = top ? 1 : D / (D - z1);
+  return { X: cx + x1 * scale * persp, Y: cy - y1 * scale * persp, Z: z1 };
+}
+
+function buildStrands() {
+  N = Math.round(+$('threads').value);
+  tw = Math.round(+$('tw').value);
+  R = +$('R').value;
+  a = +$('a').value;
+  buildPalette();
+  ticks = [];
+  headU = 0;
+  resyncTicks();
+  syncOutputs();
+  updateStatus();
+}
+
+function buildPalette() {
+  if (!N) return;
+  const hsl = rgb2hsl(...hexRgb($('color').value));
+  const span = +$('span').value / 360;
+  const sat = Math.max(hsl[1], .64), lum = clamp(hsl[2], .56, .7);
+  paletteCss = [];
+  for (let k = 0; k < N; k++) {
+    const rgb = hsl2rgb((hsl[0] + span * k / N) % 1, sat, lum);
+    paletteCss.push(`rgb(${rgb[0]},${rgb[1]},${rgb[2]})`);
+  }
+  renderSwatches();
+  updateStatus();
+}
+
+function renderSwatches() {
+  swatches.textContent = '';
+  for (let k = 0; k < N; k++) {
+    const el = document.createElement('span');
+    el.style.background = paletteCss[k];
+    swatches.appendChild(el);
+  }
+  swatchNote.textContent = `${N} thread colours · span ${Math.round(+$('span').value)}°`;
+}
+
+// Next tick position at or after the head, respecting the 10-then-gap pattern.
+function resyncTicks() {
+  const dTick = +$('tickSpacing').value, gap = +$('gap').value;
+  const P = TICKS_PER_GROUP * dTick + gap;
+  const g = Math.floor(headU / P);
+  const off = headU - g * P;
+  const j = Math.ceil(off / dTick - 1e-9);
+  nextTickU = j >= TICKS_PER_GROUP ? (g + 1) * P : g * P + j * dTick;
+}
+
+const fmt = {
+  threads: v => Math.round(v),
+  tw: v => Math.round(v),
+  R: v => (+v).toFixed(2),
+  a: v => (+v).toFixed(2),
+  streakLen: v => (+v).toFixed(2),
+  tickSpacing: v => (+v).toFixed(2),
+  gap: v => (+v).toFixed(2),
+  traceSpeed: v => (+v).toFixed(1) + ' rad/s',
+  trail: v => (+v).toFixed(1) + ' rad',
+  span: v => Math.round(v) + '°',
+  lw: v => (+v).toFixed(1),
+  zoom: v => (+v).toFixed(2)
+};
+function syncOutputs() {
+  for (const id in fmt) $(id + 'Out').textContent = fmt[id]($(id).value);
+}
+
+function updateStatus() {
+  if (!N) return;
+  $('status').textContent = `${N} threads · ω ${tw} · ${ticks.length} tangent streaks · series of ${TICKS_PER_GROUP} · ${paused ? 'paused' : 'tracing'}`;
+}
+
+function resize() {
+  const box = canvas.parentElement.getBoundingClientRect();
+  width = Math.max(1, box.width);
+  height = Math.max(1, box.height);
+  dpr = Math.min(window.devicePixelRatio || 1, 2);
+  canvas.width = Math.round(width * dpr);
+  canvas.height = Math.round(height * dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+
+function setRotation() {
+  const top = $('view').value === 'top';
+  cyaw = top ? 1 : Math.cos(yaw);
+  syaw = top ? 0 : Math.sin(yaw);
+  cpit = top ? 1 : Math.cos(pitch);
+  spit = top ? 0 : Math.sin(pitch);
+}
+
+function line(x1, y1, x2, y2) {
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2, y2);
+  ctx.stroke();
+}
+
+function drawHeads(top, scale, cx, cy) {
+  const u = ((headU % TAU) + TAU) % TAU;
+  for (let k = 0; k < N; k++) {
+    const p = pointTangent(k, u);
+    const pr = project(p.px, p.py, p.pz, top, scale, cx, cy);
+    ctx.fillStyle = paletteCss[k];
+    ctx.globalAlpha = .32;
+    ctx.beginPath(); ctx.arc(pr.X, pr.Y, 7, 0, TAU); ctx.fill();
+    ctx.globalAlpha = 1;
+    ctx.beginPath(); ctx.arc(pr.X, pr.Y, 3, 0, TAU); ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+}
+
+function draw() {
+  setRotation();
+  ctx.clearRect(0, 0, width, height);
+  if (!N) return;
+  const top = $('view').value === 'top';
+  const zoom = +$('zoom').value, baseW = +$('lw').value;
+  const L = +$('streakLen').value;
+  const scale = Math.min(width * .74, height * .74) / (2 * (R + a)) * zoom;
+  const cx = width * .5, cy = height * .46;
+
+  const items = [];
+  let lo = Infinity, hi = -Infinity;
+  for (const t of ticks) {
+    const u = ((t.u % TAU) + TAU) % TAU;
+    const p = pointTangent(t.k, u);
+    const tl = Math.hypot(p.dx, p.dy, p.dz) || 1;
+    const h = L / tl;
+    const e1 = project(p.px - h * p.dx, p.py - h * p.dy, p.pz - h * p.dz, top, scale, cx, cy);
+    const e2 = project(p.px + h * p.dx, p.py + h * p.dy, p.pz + h * p.dz, top, scale, cx, cy);
+    items.push({ k: t.k, x1: e1.X, y1: e1.Y, x2: e2.X, y2: e2.Y, z: (e1.Z + e2.Z) / 2, age: headU - t.u });
+    if (items[items.length - 1].z < lo) lo = items[items.length - 1].z;
+    if (items[items.length - 1].z > hi) hi = items[items.length - 1].z;
+  }
+
+  if (items.length) {
+    const span = Math.max(1e-6, hi - lo);
+    items.sort((p, q) => p.z - q.z);
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    for (const it of items) {
+      const t = (it.z - lo) / span;
+      const fade = clamp(1 - it.age / (+$('trail').value), 0, 1);
+      if (fade <= 0) continue;
+      const alpha = (.6 + .4 * t) * fade;
+      const w = baseW * (.85 + .35 * t) * (.6 + .4 * fade);
+      ctx.strokeStyle = paletteCss[it.k];
+      ctx.globalAlpha = alpha * .13;
+      ctx.lineWidth = w * 3.6;
+      line(it.x1, it.y1, it.x2, it.y2);
+      ctx.globalAlpha = alpha;
+      ctx.lineWidth = w;
+      line(it.x1, it.y1, it.x2, it.y2);
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  drawHeads(top, scale, cx, cy);
+}
+
+function update(dt) {
+  const speed = +$('traceSpeed').value;
+  if (!paused && speed > 0 && !document.hidden) {
+    headU += speed * dt;
+    const dTick = +$('tickSpacing').value, gap = +$('gap').value;
+    const P = TICKS_PER_GROUP * dTick + gap;
+    while (nextTickU <= headU + 1e-9) {
+      for (let k = 0; k < N; k++) ticks.push({ k, u: nextTickU });
+      const g = Math.floor(nextTickU / P);
+      const off = nextTickU - g * P;
+      const idx = Math.round(off / dTick);
+      nextTickU = idx < TICKS_PER_GROUP - 1 ? nextTickU + dTick : (g + 1) * P;
+    }
+  }
+  const trail = +$('trail').value;
+  while (ticks.length && headU - ticks[0].u > trail) ticks.shift();
+}
+
+function animate(now) {
+  if (!lastTime) lastTime = now;
+  const dt = Math.min((now - lastTime) / 1000, .1);
+  lastTime = now;
+  if ($('spin').checked && !drag && $('view').value !== 'top' && !document.hidden) yaw += dt * .18;
+  update(dt);
+  draw();
+  requestAnimationFrame(animate);
+}
+
+for (const id of ['R', 'a', 'tw', 'threads']) $(id).addEventListener('input', buildStrands);
+for (const id of ['streakLen', 'trail', 'lw', 'zoom']) $(id).addEventListener('input', () => { syncOutputs(); });
+for (const id of ['tickSpacing', 'gap']) $(id).addEventListener('input', () => { syncOutputs(); resyncTicks(); });
+$('traceSpeed').addEventListener('input', syncOutputs);
+$('span').addEventListener('input', () => { buildPalette(); syncOutputs(); });
+$('color').addEventListener('input', buildPalette);
+$('view').addEventListener('change', () => {
+  canvas.style.cursor = $('view').value === 'top' ? 'default' : 'grab';
+});
+
+$('pauseBtn').onclick = () => {
+  paused = !paused;
+  $('pauseBtn').textContent = paused ? 'Resume tracing' : 'Pause tracing';
+  updateStatus();
+};
+
+canvas.addEventListener('pointerdown', e => {
+  if ($('view').value === 'top') return;
+  drag = { x: e.clientX, y: e.clientY };
+  canvas.setPointerCapture(e.pointerId);
+});
+canvas.addEventListener('pointermove', e => {
+  if (!drag) return;
+  yaw += (e.clientX - drag.x) * .008;
+  pitch = clamp(pitch + (e.clientY - drag.y) * .008, -1.5, 1.5);
+  drag = { x: e.clientX, y: e.clientY };
+});
+for (const type of ['pointerup', 'pointercancel', 'lostpointercapture'])
+  canvas.addEventListener(type, () => { drag = null; });
+canvas.addEventListener('wheel', e => {
+  e.preventDefault();
+  $('zoom').value = clamp(+$('zoom').value - e.deltaY * .001, .6, 1.7);
+  syncOutputs();
+}, { passive: false });
+canvas.addEventListener('keydown', e => {
+  if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) return;
+  e.preventDefault();
+  if (e.key === 'ArrowLeft') yaw -= .1;
+  if (e.key === 'ArrowRight') yaw += .1;
+  if (e.key === 'ArrowUp') pitch = clamp(pitch - .1, -1.5, 1.5);
+  if (e.key === 'ArrowDown') pitch = clamp(pitch + .1, -1.5, 1.5);
+});
+
+$('reset').onclick = () => {
+  const d = { threads: 7, tw: 3, R: 2.2, a: .42, streakLen: .12, tickSpacing: .14, gap: .6, traceSpeed: 1.2, trail: 5.2, span: 240, lw: 2.2, zoom: 1, color: '#5eead4', view: 'perspective' };
+  for (const id in d) $(id).value = d[id];
+  $('spin').checked = false;
+  paused = false;
+  $('pauseBtn').textContent = 'Pause tracing';
+  yaw = .35;
+  pitch = -.82;
+  headU = 0;
+  canvas.style.cursor = 'grab';
+  buildStrands();
+};
+
+$('export').onclick = () => {
+  draw();
+  const out = document.createElement('canvas');
+  out.width = canvas.width;
+  out.height = canvas.height;
+  const c = out.getContext('2d');
+  const g = c.createRadialGradient(out.width / 2, out.height * .44, 0, out.width / 2, out.height * .44, Math.max(out.width, out.height) * .75);
+  g.addColorStop(0, '#22314a');
+  g.addColorStop(1, '#0e131b');
+  c.fillStyle = g;
+  c.fillRect(0, 0, out.width, out.height);
+  c.drawImage(canvas, 0, 0);
+  out.toBlob(blob => {
+    if (!blob) return;
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `braided-torus-tangent_N${N}_tw${tw}_R${R.toFixed(2)}_a${a.toFixed(2)}_L${(+$('streakLen').value).toFixed(2)}_gap${(+$('gap').value).toFixed(2)}_span${Math.round(+$('span').value)}_lw${(+$('lw').value).toFixed(1)}_${$('color').value.slice(1)}_${$('view').value}.png`;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }, 'image/png');
+};
+
+const gallery = $('galleryItems');
+const FALLBACK_PNG_NAMES = []; // mirrors committed braided-torus-tangent_*.png files; the GitHub API path below is preferred
+function renderGallery(items) {
+  gallery.textContent = '';
+  if (!items.length) {
+    const e = document.createElement('div');
+    e.className = 'gallery-empty';
+    e.textContent = 'No saved PNGs yet.';
+    gallery.appendChild(e);
+    return;
+  }
+  for (const item of items) {
+    const w = document.createElement('a');
+    w.className = 'gallery-item';
+    w.href = item.url;
+    w.target = '_blank';
+    w.rel = 'noopener';
+    w.title = 'Open ' + item.name;
+    const img = document.createElement('img');
+    img.src = item.url;
+    img.alt = item.name;
+    img.loading = 'lazy';
+    w.appendChild(img);
+    const l = document.createElement('span');
+    l.textContent = item.name;
+    w.appendChild(l);
+    gallery.appendChild(w);
+  }
+}
+fetch('https://api.github.com/repos/tthtlc/tthtlc.github.io/contents/')
+  .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+  .then(files => {
+    if (!Array.isArray(files)) throw new Error('unexpected response');
+    renderGallery(files
+      .filter(f => f.type === 'file' && f.name.startsWith('braided-torus-tangent_') && f.name.toLowerCase().endsWith('.png'))
+      .map(f => ({ name: f.name, url: f.download_url }))
+      .sort((a, b) => a.name < b.name ? -1 : 1));
+  })
+  .catch(() => renderGallery(FALLBACK_PNG_NAMES.map(n => ({ name: n, url: n }))));
+
+new ResizeObserver(resize).observe(canvas.parentElement);
+if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  $('spin').checked = false;
+  $('traceSpeed').value = 0;
+  syncOutputs();
+}
+buildStrands();
+resize();
+requestAnimationFrame(animate);
+</script>
+</body>
+</html>
