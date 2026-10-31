@@ -1,0 +1,96 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Spiral of dots — Interactive Study</title><style>
+:root{color-scheme:dark;font-family:Inter,system-ui,sans-serif;background:#10151d;color:#eef2f8}*{box-sizing:border-box}body{margin:0}main{display:grid;grid-template-columns:1fr 300px;height:100vh;min-height:0}.stage{position:relative;height:100vh;min-height:0;overflow:hidden;background:radial-gradient(ellipse at 50% 45%,#253247,#10151d 70%)}canvas{display:block;width:100%;height:100%;position:absolute;touch-action:auto}.topbar{position:absolute;top:32px;left:36px;right:36px;display:flex;align-items:flex-start;gap:36px;flex-wrap:wrap;z-index:2}.heading{pointer-events:none}h1{font-size:clamp(24px,3vw,40px);font-weight:500;letter-spacing:-.04em;margin:6px 0}.eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.22em;color:#91a5bf}.hint{position:absolute;bottom:28px;left:36px;color:#92a3b9;font-size:12px;pointer-events:none;z-index:2}.formula{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);z-index:3;max-width:calc(100% - 48px);background:rgba(16,21,29,.9);border:1px solid #2a3443;border-radius:9px;padding:7px 12px;font-size:10px;line-height:1.55;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#a4e3d4;text-align:center;white-space:pre;pointer-events:none;box-shadow:0 4px 18px rgba(0,0,0,.35)}aside{padding:32px 25px;background:#151c27;border-left:1px solid #2a3443;height:100vh;overflow-y:auto}aside::-webkit-scrollbar{width:8px}aside::-webkit-scrollbar-track{background:#10151d}aside::-webkit-scrollbar-thumb{background:#3a485b;border-radius:4px}aside::-webkit-scrollbar-thumb:hover{background:#4a5c74}h2{font-size:17px;font-weight:500;margin:0 0 26px}label{display:block;font-size:13px;color:#c7d2e3;margin-bottom:22px}.row{display:flex;justify-content:space-between;margin-bottom:8px}output{font-variant-numeric:tabular-nums;color:#88dbc6}input[type=range]{width:100%;accent-color:#88dbc6}select,button{background:#202d3d;color:#eef2f8;border:1px solid #3a485b;border-radius:8px;padding:10px;font:inherit;width:100%}input[type=color]{width:100%;height:34px;background:none;border:0;padding:0}button{cursor:pointer;margin-top:10px}button:hover{background:#2b3e53}button:disabled{opacity:.55;cursor:wait}.check{display:flex;gap:10px;align-items:center;margin:16px 0 0;font-size:13px;color:#c7d2e3}.check input[type=checkbox]{width:auto;accent-color:#88dbc6}.note{font-size:12px;color:#91a5bf;line-height:1.65;margin-top:25px}details{font-size:12px;color:#91a5bf;line-height:1.65}summary{cursor:pointer;color:#c7d2e3}code{color:#a4e3d4}.geometry{pointer-events:auto;max-width:min(46vw,400px);background:rgba(21,28,39,.88);border:1px solid #2a3443;border-radius:12px;padding:10px 14px;backdrop-filter:blur(6px);margin-top:4px}.geometry p{margin:.6em 0}.gallery{border-top:1px solid #2a3443;margin-top:25px;padding-top:22px}.gallery h2{margin:0 0 8px}.gallery-note{font-size:11px;color:#91a5bf;line-height:1.6;margin:0 0 14px}.gallery-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.gallery-item{display:block;border:1px solid #2a3443;border-radius:8px;overflow:hidden;text-decoration:none;background:#10151d}.gallery-item:hover{border-color:#88dbc6}.gallery-item img{display:block;width:100%;height:64px;object-fit:cover}.gallery-item span{display:block;font-size:9px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#91a5bf;padding:4px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.gallery-empty{grid-column:1/-1;color:#6b7d94;font-size:12px;text-align:center;padding:14px 0}@media(max-width:760px){main{grid-template-columns:1fr;height:auto;min-height:100vh}.stage{height:65vh;min-height:420px}aside{border-left:0;border-top:1px solid #2a3443;height:auto;max-height:none;overflow:visible}.topbar{left:24px;top:22px;right:24px;gap:24px}.hint{left:24px}.formula{left:24px;right:24px;transform:none;max-width:none;text-align:left}}
+
+.formula{white-space:normal;min-width:240px}.topbar{pointer-events:none}.geometry{pointer-events:auto}a{color:#88dbc6}.heading{max-width:75%}@media(max-width:760px){.stage{min-height:500px}.geometry{max-width:100%}}
+</style></head><body><main><section class="stage"><canvas id="canvas" role="img" aria-label="Spiral of dots: Dots advance along one spiral while a sparse wave passes through them."></canvas><div class="topbar"><div class="heading"><div class="eyebrow">Geometry in motion / 08</div><h1>Spiral of dots</h1></div><details class="geometry"><summary>Geometry &amp; idea</summary><p>Dots advance along one spiral while a sparse wave passes through them.</p><p><code>r = a + bφ; x = r cos φ; y = r sin φ</code></p></details></div><div class="formula">r = a + bφ; x = r cos φ; y = r sin φ</div></section><aside><h2>Shape &amp; appearance</h2><label><span class="row"><span>Turns</span><output id="o0"></output></span><input aria-label="Turns" id="p0" type="range" min="2" max="9" step="0.1" value="4.5"></label><label><span class="row"><span>Dots</span><output id="o1"></output></span><input aria-label="Dots" id="p1" type="range" min="100" max="700" step="1" value="360"></label><label><span class="row"><span>Dot size</span><output id="o2"></output></span><input aria-label="Dot size" id="p2" type="range" min="1" max="5" step="0.1" value="2.5"></label><label><span class="row"><span>Line width</span><output id="lwOut"></output></span><input aria-label="Line width" id="lw" type="range" min="0.3" max="3" step="0.1" value="1.2"></label><label><span class="row"><span>Zoom</span><output id="zoomOut"></output></span><input aria-label="Zoom" id="zoom" type="range" min="0.5" max="1.2" step="0.01" value="1"></label><label><span class="row"><span>Animation speed</span><output id="speedOut"></output></span><input aria-label="Animation speed" id="speed" type="range" min="0" max="3" step="0.05" value="1"></label><label>Base colour<input aria-label="Base colour" id="color" type="color" value="#e8c48f"></label><button id="play">Pause animation</button><button id="reset">Reset design</button><button id="export">Save PNG</button><button id="exportGif">Save GIF</button><p class="note">Dots advance along one spiral while a sparse wave passes through them. Space pauses or resumes. Reduced-motion preferences start the drawing paused.</p><p class="note" id="status" aria-live="polite">PNG captures the current artwork. GIF exports a short motion study.</p><p><a href="index.html">All ten studies</a></p><p><a href="orbiting_sculptures.html">← Previous</a> · <a href="negative_space_aperture.html">Next →</a></p></aside></main><script>'use strict';const CFG={"id": 7, "slug": "spiral_of_dots", "controls": [["Turns", 2, 9, 0.1, 4.5], ["Dots", 100, 700, 1, 360], ["Dot size", 1, 5, 0.1, 2.5]], "color": "#e8c48f"};function lzwEncode(indices,minCodeSize){
+ const clearCode=1<<minCodeSize,eoiCode=clearCode+1;
+ let codeSize=minCodeSize+1,nextCode=eoiCode+1;
+ const dict=new Map(),out=[];let cur=0,bits=0;
+ function write(code){cur|=code<<bits;bits+=codeSize;while(bits>=8){out.push(cur&0xff);cur>>=8;bits-=8;}}
+ if(indices.length===0){write(clearCode);write(eoiCode);if(bits>0)out.push(cur&0xff);return new Uint8Array(out);}
+ write(clearCode);
+ let prefix=indices[0];
+ for(let i=1;i<indices.length;i++){
+  const k=indices[i],key=prefix*4096+k,c=dict.get(key);
+  if(c!==undefined){prefix=c;}
+  else{
+   write(prefix);
+   if(nextCode<4096){dict.set(key,nextCode++);if(nextCode>(1<<codeSize)&&codeSize<12)codeSize++;}
+   else{write(clearCode);dict.clear();codeSize=minCodeSize+1;nextCode=eoiCode+1;}
+   prefix=k;
+  }
+ }
+ write(prefix);write(eoiCode);
+ if(bits>0)out.push(cur&0xff);
+ return new Uint8Array(out);
+}
+function buildGif(frames,width,height,palette,delayCs){
+ const pal=new Array(256);for(let i=0;i<256;i++)pal[i]=palette[i]||[0,0,0];
+ const bytes=[];const u8=b=>bytes.push(b&0xff);const u16=v=>{bytes.push(v&0xff,(v>>8)&0xff);};
+ const str=s=>{for(let i=0;i<s.length;i++)bytes.push(s.charCodeAt(i));};
+ str('GIF89a');u16(width);u16(height);u8(0xF7);u8(0);u8(0);
+ for(let i=0;i<256;i++){u8(pal[i][0]);u8(pal[i][1]);u8(pal[i][2]);}
+ u8(0x21);u8(0xFF);u8(0x0B);str('NETSCAPE2.0');u8(0x03);u8(0x01);u16(0);u8(0x00);
+ for(const idx of frames){
+  u8(0x21);u8(0xF9);u8(0x04);u8(0x04);u16(delayCs);u8(0x00);u8(0x00);
+  u8(0x2C);u16(0);u16(0);u16(width);u16(height);u8(0x00);u8(8);
+  const lzw=lzwEncode(idx,8);
+  for(let i=0;i<lzw.length;i+=255){const n=Math.min(255,lzw.length-i);u8(n);for(let j=0;j<n;j++)u8(lzw[i+j]);}
+  u8(0x00);
+ }
+ u8(0x3B);return new Uint8Array(bytes);
+}
+function quantizeFrames(frames){
+ const N=1<<15;const count=new Uint32Array(N),rsum=new Uint32Array(N),gsum=new Uint32Array(N),bsum=new Uint32Array(N);const buckets=[];
+ for(const fr of frames){const d=fr.data;for(let i=0;i<d.length;i+=4){const r=d[i],g=d[i+1],b=d[i+2];const bk=((r>>3)<<10)|((g>>3)<<5)|(b>>3);if(count[bk]===0)buckets.push(bk);count[bk]++;rsum[bk]+=r;gsum[bk]+=g;bsum[bk]+=b;}}
+ buckets.sort((a,b)=>count[b]-count[a]);
+ const chosen=buckets.slice(0,256),palette=[];
+ for(const bk of chosen){const n=count[bk];palette.push([Math.round(rsum[bk]/n),Math.round(gsum[bk]/n),Math.round(bsum[bk]/n)]);}
+ if(palette.length===0)palette.push([0,0,0]);
+ const lut=new Uint8Array(N);
+ for(let bk=0;bk<N;bk++){const r=(bk>>10)<<3,g=((bk>>5)&31)<<3,b=(bk&31)<<3;let best=0,bestD=Infinity;for(let p=0;p<palette.length;p++){const dr=palette[p][0]-r,dg=palette[p][1]-g,db=palette[p][2]-b;const d=dr*dr+dg*dg+db*db;if(d<bestD){bestD=d;best=p;}}lut[bk]=best;}
+ const indices=[];
+ for(const fr of frames){const d=fr.data,idx=new Uint8Array(fr.w*fr.h);let p=0;for(let i=0;i<d.length;i+=4){const bk=((d[i]>>3)<<10)|((d[i+1]>>3)<<5)|(d[i+2]>>3);idx[p++]=lut[bk];}indices.push(idx);}
+ return {palette,indices};
+}
+
+const $=id=>document.getElementById(id),canvas=$('canvas'),ctx=canvas.getContext('2d'),TAU=2*Math.PI;
+let W=1,H=1,dpr=1,time=0,last=null,playing=!matchMedia('(prefers-reduced-motion: reduce)').matches;
+function params(){return {v:CFG.controls.map((_,i)=>+$('p'+i).value),color:$('color').value,lw:+$('lw').value,zoom:+$('zoom').value,speed:+$('speed').value};}
+function sync(){CFG.controls.forEach((c,i)=>$('o'+i).value=(+$('p'+i).value).toFixed(c[3]<1?2:0));for(const id of ['lw','zoom','speed'])$(id+'Out').value=(+$(id).value).toFixed(2);$('play').textContent=playing?'Pause animation':'Resume animation';}
+function path(g,pts,close=true){g.beginPath();pts.forEach((p,i)=>i?g.lineTo(...p):g.moveTo(...p));if(close)g.closePath();g.stroke();}
+function poly(g,x,y,r,a,n=6){path(g,Array.from({length:n},(_,i)=>[x+r*Math.cos(a+i*TAU/n),y+r*Math.sin(a+i*TAU/n)]));}
+function dot(g,x,y,r,color){g.fillStyle=color;g.beginPath();g.arc(x,y,r,0,TAU);g.fill();}
+function rotate(p,a,b){let [x,y,z]=p;let y1=y*Math.cos(a)-z*Math.sin(a),z1=y*Math.sin(a)+z*Math.cos(a);return [x*Math.cos(b)+z1*Math.sin(b),y1,-x*Math.sin(b)+z1*Math.cos(b)];}
+function wire(g,verts,edges,ax,ay,center=[0,0,0],f=6){let vs=verts.map(p=>rotate(p,ax,ay).map((v,i)=>v+center[i]));edges.map(e=>({e,z:(vs[e[0]][2]+vs[e[1]][2])/2})).sort((a,b)=>a.z-b.z).forEach(({e,z})=>{g.globalAlpha=.24+.76*Math.max(0,Math.min(1,(z+3)/6));path(g,e.map(i=>{let [x,y,z]=vs[i],s=f/(f-z);return [x*s,y*s]}),false);});g.globalAlpha=1;}
+function scene(g,w,h,p,t){
+ g.fillStyle='#10151d';g.fillRect(0,0,w,h);
+ const size=Math.min(w*.44,(h-150)*.46)*p.zoom;
+ g.save();g.translate(w/2,h/2+22);g.scale(size,size);g.strokeStyle=p.color;g.fillStyle=p.color;g.lineWidth=p.lw/size;g.lineJoin='round';g.lineCap='round';
+ const v=p.v;
+ switch(CFG.id){
+ case 0:{let r=.27*v[1],b=(1-Math.cos(t))/2,d=Math.sqrt(3)*r+v[0]*.25*b;g.globalAlpha=.9;poly(g,0,0,r,0);for(let i=0;i<6;i++){let a=(i+.5)*TAU/6;g.globalAlpha=.7;poly(g,d*Math.cos(a),d*Math.sin(a),r,Math.PI/3*b);}break;}
+ case 1:{let r=.25,d=r*v[1];for(let i=-1;i<6;i++){let a=(i+.5)*TAU/6,cx=i<0?0:d*Math.cos(a),cy=i<0?0:d*Math.sin(a);for(let j=0;j<6;j++){let b=j*TAU/6+(i<0?0:(i%2?1:-1)*t);dot(g,cx+r*Math.cos(b),cy+r*Math.sin(b),v[0]/size,j===0&&i>=0?'#ed947f':p.color);}}break;}
+ case 2:{for(let k=0;k<v[0];k++){g.globalAlpha=.25+.75*(1-k/v[0]);poly(g,0,0,.94*Math.pow(v[2],k),k*v[1]*Math.sin(t));}break;}
+ case 3:{let verts=[];for(let x of [-1,1])for(let y of [-1,1])for(let z of [-1,1])verts.push([x*.45,y*.45,z*.45]);let edges=[];for(let i=0;i<8;i++)for(let j=i+1;j<8;j++)if(verts[i].filter((x,k)=>x!==verts[j][k]).length===1)edges.push([i,j]);wire(g,verts,edges,v[0]+t*.37,t*.61,[0,0,0],v[1]);break;}
+ case 4:{for(let k=0;k<6;k++){let a=k*TAU/6,opening=v[1]*.75*Math.sin(t);g.save();g.rotate(a);g.translate(.12,0);g.rotate(opening);let pts=[];for(let j=0;j<=160;j++){let u=j*TAU/160;pts.push([.38*(1-Math.cos(u)),v[0]*Math.sin(u)]);}g.globalAlpha=.78;path(g,pts);g.restore();}break;}
+ case 5:{for(let layer=0;layer<2;layer++){g.globalAlpha=layer?.4:.9;for(let j=0;j<v[0];j++){let a=j*TAU/v[0]+(layer?-1:1)*t*.18;path(g,[[v[1]*Math.cos(a),v[1]*Math.sin(a)],[.95*Math.cos(a),.95*Math.sin(a)]],false);}}break;}
+ case 6:{let verts=[[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]].map(p=>p.map(x=>x*v[1]));let edges=[];for(let i=0;i<6;i++)for(let j=i+1;j<6;j++)if(Math.floor(i/2)!==Math.floor(j/2))edges.push([i,j]);let bodies=Array.from({length:6},(_,i)=>{let a=i*TAU/6+t*.3;return {i,c:[.65*Math.cos(a),.65*Math.sin(a)*Math.cos(v[0]),.65*Math.sin(a)*Math.sin(v[0])]};}).sort((a,b)=>a.c[2]-b.c[2]);for(let b of bodies)wire(g,verts,edges,t*.6+b.i,t*.4+b.i,b.c);dot(g,0,0,2/size,p.color);break;}
+ case 7:{let N=v[1],turns=v[0];for(let j=0;j<N;j++){let f=(j/N+t*.025)%1,a=f*TAU*turns,r=.055+.88*f,wave=.5+.5*Math.sin(f*TAU*3-t);g.globalAlpha=.2+.8*wave;dot(g,r*Math.cos(a),r*Math.sin(a),v[2]*(.4+.6*f)/size,p.color);}break;}
+ case 8:{let R=v[0],amp=v[1]*Math.sin(t);g.fillStyle=p.color;g.beginPath();g.arc(0,0,1.03,0,TAU);g.fill();for(let k=0;k<6;k++){let pts=[];for(let j=0;j<=70;j++){let a=(k+j/70)*TAU/6,r=R*(1+amp*Math.cos(6*a));pts.push([r*Math.cos(a),r*Math.sin(a)]);}let a0=k*TAU/6,a1=(k+1)*TAU/6;pts.push([1.08*Math.cos(a1),1.08*Math.sin(a1)],[1.08*Math.cos(a0),1.08*Math.sin(a0)]);g.fillStyle=k%2?'#182130':'#141c28';g.beginPath();pts.forEach((p,i)=>i?g.lineTo(...p):g.moveTo(...p));g.closePath();g.fill();}break;}
+ case 9:{let pts=[],n=1500,a=v[0],phase=t*.6;for(let j=0;j<=n;j++){let u=TAU*(j/n*v[1]+(v[1]<.999?t*.04:0)),r=.9/(1+a);pts.push([r*(Math.cos(u)+a*Math.cos(5*u+phase)),r*(Math.sin(u)-a*Math.sin(5*u+phase))]);}path(g,pts,v[1]>.999);let end=pts[pts.length-1];dot(g,...end,3/size,'#ef947d');break;}
+ }
+ g.restore();
+}
+function draw(){scene(ctx,W,H,params(),time);sync();}
+function resize(){let b=canvas.parentElement.getBoundingClientRect();W=b.width;H=b.height;dpr=Math.min(devicePixelRatio||1,2);canvas.width=Math.round(W*dpr);canvas.height=Math.round(H*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);draw();}
+function tick(now){if(last!==null&&playing&&!document.hidden){time+=Math.min((now-last)/1000,.1)*params().speed*.5;draw();}last=now;requestAnimationFrame(tick);}
+function download(blob,name){let u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),3000);}
+$('play').onclick=()=>{playing=!playing;sync();};
+$('reset').onclick=()=>{CFG.controls.forEach((c,i)=>$('p'+i).value=c[4]);$('color').value=CFG.color;$('lw').value=1.2;$('zoom').value=1;$('speed').value=1;time=0;draw();};
+document.querySelectorAll('input').forEach(el=>el.addEventListener('input',draw));
+$('export').onclick=()=>{draw();canvas.toBlob(b=>{if(b)download(b,CFG.slug+'.png');},'image/png');};
+$('exportGif').onclick=async()=>{let btn=$('exportGif');btn.disabled=true;let was=playing;playing=false;try{let frames=[],p=params(),c=document.createElement('canvas');c.width=480;c.height=480;let g=c.getContext('2d');for(let i=0;i<36;i++){scene(g,480,480,p,time+i*TAU/36);frames.push({w:480,h:480,data:g.getImageData(0,0,480,480).data});btn.textContent='Capture '+(i+1)+'/36';await new Promise(r=>setTimeout(r,0));}btn.textContent='Encoding…';await new Promise(r=>setTimeout(r,30));let q=quantizeFrames(frames);download(new Blob([buildGif(q.indices,480,480,q.palette,8)],{type:'image/gif'}),CFG.slug+'.gif');$('status').textContent='Saved 36-frame motion study (not necessarily a seamless loop).';}catch(e){$('status').textContent='Export failed: '+e.message;}finally{playing=was;btn.disabled=false;btn.textContent='Save GIF';sync();}};
+document.addEventListener('keydown',e=>{if(e.code==='Space'&&!/INPUT|SELECT|BUTTON/.test(e.target.tagName)){e.preventDefault();playing=!playing;sync();}});
+new ResizeObserver(resize).observe(canvas.parentElement);resize();requestAnimationFrame(tick);
+</script></body></html>
