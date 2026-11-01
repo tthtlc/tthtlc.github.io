@@ -69,6 +69,7 @@
 
     let outerAngle = 0;
     let innerAngle = 0;
+    let lineHue = 0;
 
     function getPolygonVertices(centerX, centerY, radius, vertices, rotation) {
       const points = [];
@@ -105,16 +106,21 @@
     }
 
     function drawConnections(innerPoints, outerPoints) {
-      ctx.beginPath();
-      ctx.strokeStyle = "#666";
       ctx.lineWidth = 1;
+      const totalConnections = innerPoints.length * outerPoints.length;
+      let connectionIndex = 0;
       innerPoints.forEach((innerPoint) => {
         outerPoints.forEach((outerPoint) => {
+          // Spread the connections across the colour wheel, then slowly rotate the whole spectrum.
+          const hue = (lineHue + (connectionIndex / totalConnections) * 360) % 360;
+          ctx.strokeStyle = `hsl(${hue}, 100%, 60%)`;
+          ctx.beginPath();
           ctx.moveTo(innerPoint.x, innerPoint.y);
           ctx.lineTo(outerPoint.x, outerPoint.y);
+          ctx.stroke();
+          connectionIndex++;
         });
       });
-      ctx.stroke();
     }
 
     function animate() {
@@ -134,6 +140,7 @@
 
       outerAngle += (Math.PI / 180) * outerSpeed;
       innerAngle += (Math.PI / 180) * innerSpeed;
+      lineHue = (lineHue + 0.2) % 360;
 
       requestAnimationFrame(animate);
     }

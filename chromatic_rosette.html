@@ -1,0 +1,49 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Chromatic Triangle Rosette</title><style>
+*{box-sizing:border-box}body{margin:0;background:#eef0f5;color:#20283b;font:14px system-ui,sans-serif}main{max-width:1150px;margin:24px auto;padding:0 18px}h1{font-size:25px;margin:0 0 7px}.intro{color:#697185;margin:0 0 20px}section{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:20px}.picture{background:white;border-radius:16px;overflow:hidden;align-self:start;box-shadow:0 8px 35px #14214312}canvas{display:block;width:100%;aspect-ratio:1}aside{background:white;padding:20px;border-radius:16px}label{display:block;margin-bottom:17px}label span{display:flex;justify-content:space-between;margin-bottom:7px}select,input[type=range]{width:100%;accent-color:#7057dd}select{padding:9px;border:1px solid #d5d9e5;border-radius:7px;background:white;color:#243049}input[type=color]{width:100%;height:33px;border:0;padding:0;background:none}.check{display:flex;gap:8px;align-items:center}button{padding:9px 11px;border:1px solid #d7dbea;border-radius:7px;background:#f7f8fc;cursor:pointer;margin:3px 3px 3px 0}button:hover{background:#ede9ff}small{color:#758095;line-height:1.55;display:block;margin-top:15px}@media(max-width:760px){section{grid-template-columns:1fr}aside{display:grid;grid-template-columns:1fr 1fr;gap:12px}label{margin-bottom:8px}.wide{grid-column:1/-1}}
+</style></head><body><main><h1>Chromatic triangle rosette</h1><p class="intro">Explore flowing color fields on a woven geometry of straight lines.</p><section><div class="picture"><canvas id="canvas" role="img" aria-label="Colorful triangular string-art rosette"></canvas></div><aside>
+<label class="wide"><span>Color composition</span><select id="mode"><option value="aurora">Aurora flow</option><option value="radial">Radial rainbow</option><option value="jewel">Jewel mosaic</option><option value="sunset">Sunset silk</option><option value="neon">Midnight neon</option><option value="ocean">Ocean currents</option><option value="mono">Monochrome</option></select></label>
+<label><span>Color phase <output id="phaseOut"></output></span><input id="phase" type="range" min="0" max="360" value="0"></label>
+<label><span>Color contrast <output id="contrastOut"></output></span><input id="contrast" type="range" min="10" max="100" value="85"></label>
+<label><span>Subdivisions <output id="densityOut"></output></span><input id="density" type="range" min="6" max="32" value="14"></label>
+<label><span>Pattern radius <output id="radiusOut"></output></span><input id="radius" type="range" min="1.5" max="4" step="0.1" value="2.5"></label>
+<label><span>Thread offset <output id="offsetOut"></output></span><input id="offset" type="range" min="-8" max="8" value="0"></label>
+<label><span>Line width <output id="widthOut"></output></span><input id="width" type="range" min="0.3" max="1.5" step="0.1" value="0.7"></label>
+<label><span>Rotation <output id="rotationOut"></output></span><input id="rotation" type="range" min="0" max="60" value="30"></label>
+<label><span>Background</span><input id="background" type="color" value="#ffffff"></label>
+<label class="check wide"><input id="gradient" type="checkbox" checked> Blend colors along each thread</label>
+<label class="check wide"><input id="animateColor" type="checkbox"> Animate color flow</label>
+<label class="check wide"><input id="animateShape" type="checkbox"> Animate thread offset</label>
+<div class="wide"><button id="reset">Reset</button><button id="png">Save PNG</button><button id="svg">Save SVG</button></div>
+<small class="wide">Color follows each thread’s position, distance from the center, and triangle identity. Gradient threads blend between two independently sampled endpoint colors. Exports preserve the current colors and background.</small>
+</aside></section></main><script>
+'use strict';
+const $=id=>document.getElementById(id),canvas=$('canvas'),ctx=canvas.getContext('2d');
+const defaults={phase:0,contrast:85,density:14,radius:2.5,offset:0,width:.7,rotation:30};
+let phase=0,clock=0,last=0,shapeClock=0,raf=0;
+function read(){let s={};for(const k in defaults){s[k]=+$(k).value;$(k+'Out').textContent=s[k]+(k==='phase'||k==='rotation'?'°':'')}return {...s,mode:$('mode').value,bg:$('background').value,gradient:$('gradient').checked,phase:(s.phase+phase)%360}}
+function cells(radius){const out=[],h=Math.sqrt(3)/2,n=Math.ceil(2*radius+3);for(let j=-n;j<=n;j++)for(let i=-n;i<=n;i++){const a={x:i+j/2,y:j*h},b={x:a.x+1,y:a.y},c={x:a.x+.5,y:a.y+h},d={x:a.x+1.5,y:a.y+h};for(const t of [[a,b,c],[b,d,c]]){let x=t.reduce((a,p)=>a+p.x,0)/3,y=t.reduce((a,p)=>a+p.y,0)/3;if(Math.hypot(x,y)<=radius+1e-8)out.push({t,x,y,key:i*17+j*31+(t[0]===b?7:0)})}}return out}
+function geometry(s){const cs=cells(s.radius);let bound=0;for(const c of cs)for(const p of c.t)bound=Math.max(bound,Math.hypot(p.x,p.y));const scale=455/bound,a=s.rotation*Math.PI/180,co=Math.cos(a),si=Math.sin(a),lines=[];const map=p=>({x:500+scale*(p.x*co-p.y*si),y:500+scale*(p.x*si+p.y*co)});for(const c of cs){const t=c.t.map(map),points=[];for(let e=0;e<3;e++)for(let j=0;j<s.density;j++){const u=j/s.density;points.push({x:t[e].x*(1-u)+t[(e+1)%3].x*u,y:t[e].y*(1-u)+t[(e+1)%3].y*u})}const n=points.length,shift=((s.density+s.offset)%n+n)%n;for(let i=0;i<n;i++)lines.push({a:points[i],b:points[(i+shift)%n],key:c.key,index:i/n})}return lines}
+const mod=(x,n)=>(x%n+n)%n;
+function color(p,l,s){const x=(p.x-500)/455,y=(p.y-500)/455,r=Math.hypot(x,y),angle=Math.atan2(y,x)*180/Math.PI,phase=s.phase,sat=s.contrast;
+let h=0,light=43;
+switch(s.mode){
+case 'aurora':h=175+70*Math.sin(x*3+y*2+phase*Math.PI/180)+35*Math.sin(y*5-x*2);light=39+10*Math.sin(x*2-y*4+phase*Math.PI/180);break;
+case 'radial':h=angle+phase+110*r;light=43;break;
+case 'jewel':h=mod(l.key*137.508,360)+phase+18*Math.sin(l.index*6.283);light=34+12*l.index;break;
+case 'sunset':h=mod(phase+340+50*(y+1)/2+12*Math.sin(x*4),360);light=42+12*(x+1)/2;break;
+case 'neon':h=phase+angle+150*r;light=65;break;
+case 'ocean':h=190+30*Math.sin(x*4-y*3+phase*Math.PI/180)+15*r;light=30+22*(y+1)/2;break;
+case 'mono':return '#182337';
+}return `hsl(${mod(h,360).toFixed(2)},${sat}%,${light.toFixed(2)}%)`}
+function paint(context,size,s){context.setTransform(size/1000,0,0,size/1000,0,0);context.fillStyle=s.bg;context.fillRect(0,0,1000,1000);context.lineWidth=s.width*1.8;context.lineCap='round';for(const l of geometry(s)){const ca=color(l.a,l,s),cb=color(l.b,l,s);if(s.gradient&&(l.a.x!==l.b.x||l.a.y!==l.b.y)){const g=context.createLinearGradient(l.a.x,l.a.y,l.b.x,l.b.y);g.addColorStop(0,ca);g.addColorStop(1,cb);context.strokeStyle=g}else context.strokeStyle=ca;context.beginPath();context.moveTo(l.a.x,l.a.y);context.lineTo(l.b.x,l.b.y);context.stroke()}}
+function draw(){const size=Math.max(1,Math.round(canvas.getBoundingClientRect().width*Math.min(devicePixelRatio||1,2)));if(canvas.width!==size)canvas.width=canvas.height=size;paint(ctx,size,read())}
+function animate(t){raf=0;const dt=last?Math.min(t-last,80):0;last=t;if($('animateColor').checked)phase=(phase+dt*.018)%360;if($('animateShape').checked){shapeClock+=dt;if(shapeClock>=180){shapeClock=0;$('offset').value=+$('offset').value>=8?-8:+$('offset').value+1}}draw();if($('animateColor').checked||$('animateShape').checked)raf=requestAnimationFrame(animate);else last=0}
+function syncAnimation(){if(($('animateColor').checked||$('animateShape').checked)&&!raf){last=0;raf=requestAnimationFrame(animate)}}
+for(const el of document.querySelectorAll('input,select'))el.addEventListener('input',()=>{draw();syncAnimation()});
+$('mode').addEventListener('change',()=>{$('background').value=$('mode').value==='neon'?'#080d20':'#ffffff';draw()});
+$('reset').onclick=()=>{for(const k in defaults)$(k).value=defaults[k];$('mode').value='aurora';$('background').value='#ffffff';$('gradient').checked=true;$('animateColor').checked=$('animateShape').checked=false;phase=0;shapeClock=0;cancelAnimationFrame(raf);raf=0;last=0;draw()};
+function save(blob,name){if(!blob)return;const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),1500)}
+$('png').onclick=()=>{const c=document.createElement('canvas');c.width=c.height=2400;paint(c.getContext('2d'),2400,read());c.toBlob(b=>save(b,'chromatic-rosette.png'))};
+$('svg').onclick=()=>{const s=read(),lines=geometry(s);let defs='',paths='';lines.forEach((l,i)=>{const ca=color(l.a,l,s),cb=color(l.b,l,s);if(s.gradient)defs+=`<linearGradient id="g${i}" gradientUnits="userSpaceOnUse" x1="${l.a.x}" y1="${l.a.y}" x2="${l.b.x}" y2="${l.b.y}"><stop stop-color="${ca}"/><stop offset="1" stop-color="${cb}"/></linearGradient>`;paths+=`<path d="M${l.a.x},${l.a.y} L${l.b.x},${l.b.y}" stroke="${s.gradient?'url(#g'+i+')':ca}"/>`});save(new Blob([`<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1000" viewBox="0 0 1000 1000"><defs>${defs}</defs><rect width="1000" height="1000" fill="${s.bg}"/><g fill="none" stroke-width="${s.width*1.8}" stroke-linecap="round">${paths}</g></svg>`],{type:'image/svg+xml'}),'chromatic-rosette.svg')};
+new ResizeObserver(draw).observe(canvas);draw();
+</script></body></html>

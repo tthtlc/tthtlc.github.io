@@ -5,12 +5,6 @@
   description: Epitrochoids, hypotrochoids and other rolling-circle curves — the classic spirograph family,
     from simple loops to multi-wheel explorers.
   items:
-  - file: cardiod_line3.html
-    title: Concentric Breathing Cardioids with Colored Connections
-    tags: []
-  - file: cardiod_line4.html
-    title: Animated Cardioid Shape with Point Labels
-    tags: []
   - file: double_circle_rotating.html
     title: Dynamic Complex Line Drawing
     tags:
@@ -31,14 +25,6 @@
     title: Hypotrochoid Curves with Slow Rotation
     tags:
     - Rotating
-  - file: double_hypotrochoid_rotating_offset_explore.html
-    title: Double hypotrochoid · rotating offset — Interactive Study
-    tags:
-    - Interactive
-    - Rotating
-  - file: double_motion.html
-    title: Dynamic Complex Line Drawing
-    tags: []
   - file: double_motion_color.html
     title: Dynamic Complex Line Drawing
     tags:
@@ -55,20 +41,9 @@
     title: Polygon Animation
     tags:
     - Interactive
-  - file: double_ngon_explore_sharing_index.html
-    title: Polygon Animation
-    tags:
-    - Interactive
-  - file: double_pentagon.html
-    title: Pentagon Animation
-    tags: []
   - file: double_polygon_double_rotation.html
     title: Rotating Polygons with Connections
     tags: []
-  - file: double_ring_rotate.html
-    title: Rotating Perpendicular Rings in 3D
-    tags:
-    - Rotating
   - file: double_ring_rotate_line.html
     title: Rotating Perpendicular Rings in 3D
     tags:
@@ -214,10 +189,6 @@
     title: Petal + epicycloid — Interactive Study
     tags:
     - Interactive
-  - file: rotating_cardiod2.html
-    title: Rotating Cardioid Shape
-    tags:
-    - Rotating
   - file: rotating_cardiod_line4.html
     title: Rotating Cardioid Shape with Point Labels
     tags:
@@ -267,7 +238,7 @@
   description: The lemniscate family — figure-eight curves radiating, rotating and multiplying.
   items:
   - file: figure_eight.html
-    title: Multiple Figure of 8 joined by Gradient Lines
+    title: Figure of eight on a triangle
     tags: []
   - file: figure_eight_fifth.html
     title: Figure of 8 using Polar Coordinates
@@ -275,10 +246,6 @@
   - file: figure_eight_radiating_fixed.html
     title: Figure of 8 with Growing Lobes
     tags: []
-  - file: figure_eight_rotating.html
-    title: Animated Rotating Figure of 8
-    tags:
-    - Rotating
   - file: figure_eight_running.html
     title: Figure of 8 radiating with Rotating Offset Chords
     tags: []
@@ -374,11 +341,6 @@
   - file: chasing_lines_on_hexagon.html
     title: Chasing lines on rotating hexagon
     tags: []
-  - file: chasing_ngon_rotating_explore.html
-    title: Polygon Drawing with Iterations
-    tags:
-    - Interactive
-    - Rotating
   - file: chasing_pentagon.html
     title: Pentagon Drawing with Iterations
     tags: []
@@ -658,6 +620,9 @@
   - file: braided-torus-lines.html
     title: Braided torus — threads in colour
     tags: []
+  - file: braided-torus-tangent.html
+    title: Tangent streaks on a torus
+    tags: []
   - file: braided-torus.html
     title: Braided torus — Interactive Study
     tags: []
@@ -823,6 +788,9 @@
   items:
   - file: boy_surface.html
     title: Boy's Surface – Parametric Surface
+    tags: []
+  - file: costa_minimal_surface.html
+    title: Costa Minimal Surface
     tags: []
   - file: genus_one_helicoid.html
     title: Genus-One Helicoid — Rotating 3D
@@ -1003,6 +971,9 @@
     tags:
     - Rotating
     - Color
+  - file: superellipse.html
+    title: Superellipse Explorer — Interactive Study
+    tags: []
   - file: two_ellipse.html
     title: Two Ellipse Lines Animation
     tags: []
@@ -1040,6 +1011,9 @@
     title: Petal Curve — Interactive Study
     tags:
     - Animated
+  - file: simple_petal_clockwise_radius160_a6_b19.html
+    title: Petal Curve — Clockwise Rotation
+    tags: []
   - file: simple_petal_line.html
     title: Dynamic Petals with Red-to-Blue Gradient
     tags: []
@@ -1047,6 +1021,9 @@
     title: Dynamic Petals with Red-Blue-Yellow Gradient
     tags:
     - Color
+  - file: simple_petal_mirrored_anticlockwise_radius160_a6_b19.html
+    title: Petal Curve — Mirrored Anticlockwise Spiral
+    tags: []
   - file: simple_petal_rotating_petals.html
     title: Petal Curve — Rotating Petals
     tags:
@@ -1055,6 +1032,9 @@
     title: Petal Curve — Rotating Petals
     tags:
     - Rotating
+  - file: six_petal_ribbon_flower.html
+    title: Six-petal ribbon flower — Interactive Study
+    tags: []
   - file: three_petal.html
     title: Three Petal Shape Animation
     tags: []
@@ -1078,11 +1058,18 @@
   emoji: 🐚
   description: Spirals, vortexes and Islamic geometric star patterns in rotation.
   items:
+  - file: glowing_counter_rotating_spirals.html
+    title: Glowing Counter-Rotating Spirals
+    tags:
+    - Rotating
   - file: islamic_spiral.html
     title: Islamic Spiral Design
     tags: []
   - file: islamic_spiral2.html
     title: Islamic Spiral Design
+    tags: []
+  - file: nested_hexagonal_spiral.html
+    title: Nested hexagonal spiral — Interactive Study
     tags: []
   - file: rotating_islamic_spiral.html
     title: Rotating Islamic Spiral Design
@@ -1102,6 +1089,9 @@
   - file: spiral4.html
     title: Spiral with Rotating Colors
     tags: []
+  - file: spiral_of_dots.html
+    title: Spiral of dots — Interactive Study
+    tags: []
   - file: spiral_triangle.html
     title: Spiral with Rotating Colors
     tags: []
@@ -1112,6 +1102,10 @@
     title: 3D Spiral Tube with Adjustable Radius
     tags:
     - Interactive
+  - file: twin_spirals_counter_rotating.html
+    title: Twin Spirals — Counter-Rotation
+    tags:
+    - Rotating
   - file: vortex2_explore.html
     title: Vortex Parametric Equation Visualization
     tags:
@@ -1266,6 +1260,9 @@
     tags: []
   - file: geometric-studies.html
     title: 20 Geometric Studies — Interactive Canvas Gallery
+    tags: []
+  - file: one_line_geometric_dance.html
+    title: One-line geometric dance — Interactive Study
     tags: []
   - file: parametric_curve1_param_rotate.html
     title: Parametric Curve 1 — Interactive Study

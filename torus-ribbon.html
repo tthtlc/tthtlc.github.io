@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>One continuous torus ribbon</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#050609;color:#e9edf6;font:14px system-ui,sans-serif;overflow:hidden}canvas{display:block;width:100vw;height:100vh;touch-action:none;cursor:grab}canvas:active{cursor:grabbing}.panel{position:absolute;top:20px;left:20px;width:300px;padding:20px;border:1px solid #ffffff24;border-radius:16px;background:#11151edb;backdrop-filter:blur(16px)}h1{font-size:19px;margin:0 0 8px}p{line-height:1.5;color:#aeb9cb;margin:8px 0 18px}label{display:flex;justify-content:space-between;margin-top:15px}input[type=range]{width:100%;accent-color:#77d9ff;margin-top:9px}button{border:1px solid #ffffff35;background:#ffffff10;color:inherit;padding:9px 13px;border-radius:8px;cursor:pointer;margin:15px 5px 0 0}.note{position:absolute;bottom:20px;left:20px;color:#8b98ad;font-size:12px;pointer-events:none}.formula{font:12px ui-monospace,monospace;color:#bddbed;line-height:1.8;margin-top:16px}.badge{color:#8ce2c6;font-size:12px}.hide{display:none}@media(max-width:650px){.panel{width:245px;top:10px;left:10px;padding:14px}h1{font-size:16px}.formula{display:none}.note{bottom:12px;left:12px;font-size:11px}.panel p{font-size:12px;margin-bottom:10px}}
+</style>
+</head><body>
+<canvas id="view" aria-label="Interactive rendering of a single continuous spiral ribbon on a torus"></canvas>
+<section class="panel" id="panel">
+<h1>One continuous torus ribbon</h1><span class="badge">1 trip around the central hole · 1 closed band</span>
+<p>Drag to rotate. Scroll or pinch to zoom. The ribbon coils around the tube while making exactly one circuit around the torus.</p>
+<label for="turns">Tube coils <output id="turnsValue">12</output></label><input id="turns" type="range" min="1" max="28" step="1" value="12">
+<label for="coverage">Band coverage <output id="coverageValue">58%</output></label><input id="coverage" type="range" min="10" max="90" value="58">
+<label for="hole">Hole size <output id="holeValue">0.72</output></label><input id="hole" type="range" min="35" max="180" value="72">
+<label for="wire">Show torus guide <input id="wire" type="checkbox"></label>
+<button id="play">Pause rotation</button><button id="reset">Reset view</button>
+<div class="formula">u = t, v = n·t + s<br>x = (R + r cos v) cos u<br>y = (R + r cos v) sin u<br>z = r sin v<br>0 ≤ t ≤ 2π, −w/2 ≤ s ≤ w/2</div>
+</section><div class="note">Space: pause · H: hide controls · Double-click: reset view</div>
+<script>
+'use strict';
+const canvas=document.querySelector('canvas'),ctx=canvas.getContext('2d');
+const $=id=>document.getElementById(id),TAU=2*Math.PI;
+let W,H,dpr,mesh=[],guide=[],yaw=.28,pitch=1.03,zoom=1,playing=true,last=0,dirty=true;
+const pointers=new Map();let pinchDistance=0;
+function resize(){W=innerWidth;H=innerHeight;dpr=Math.min(devicePixelRatio||1,2);canvas.width=W*dpr;canvas.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);dirty=true}addEventListener('resize',resize);resize();
+function point(u,v,R,r){const a=R+r*Math.cos(v);return [a*Math.cos(u),a*Math.sin(u),r*Math.sin(v)]}
+function build(){
+ const n=+$('turns').value,coverage=+$('coverage').value/100,r=1,R=1+$('hole').value/100;
+ $('turnsValue').value=n;$('coverageValue').value=Math.round(coverage*100)+'%';$('holeValue').value=(R-1).toFixed(2);
+ // Adjacent tube coils are separated by 2π at fixed toroidal angle.
+ // Give the ribbon angular width 2π·coverage; coverage < 1 prevents overlap.
+ const width=TAU*coverage,steps=Math.max(700,n*90),across=8;
+ mesh=[];const rows=[];
+ for(let i=0;i<=steps;i++){
+  const u=TAU*i/steps,row=[];
+  for(let j=0;j<=across;j++)row.push(point(u,n*u+(j/across-.5)*width,R,r));
+  rows.push(row);
+ }
+ for(let i=0;i<steps;i++)for(let j=0;j<across;j++){
+  const u=TAU*(i+.5)/steps,v=n*u+((j+.5)/across-.5)*width;
+  mesh.push({p:[rows[i][j],rows[i+1][j],rows[i+1][j+1],rows[i][j+1]],normal:[Math.cos(v)*Math.cos(u),Math.cos(v)*Math.sin(u),Math.sin(v)],u,edge:j===0||j===across-1});
+ }
+ guide=[];for(let k=0;k<12;k++)for(let i=0;i<100;i++)guide.push([point(TAU*i/100,TAU*k/12,R,r),point(TAU*(i+1)/100,TAU*k/12,R,r)]);
+ dirty=true;
+}
+['turns','coverage','hole'].forEach(id=>$(id).addEventListener('input',build));$('wire').onchange=()=>dirty=true;
+function rotate(p){const c=Math.cos(yaw),s=Math.sin(yaw),a=p[0]*c-p[1]*s,b=p[0]*s+p[1]*c;return[a,b*Math.cos(pitch)-p[2]*Math.sin(pitch),b*Math.sin(pitch)+p[2]*Math.cos(pitch)]}
+function project(p){const q=rotate(p),perspective=10/(10-q[2]),R=1+$('hole').value/100,scale=Math.min(W,H)*.43/(R+1)*zoom;return[W*.5+q[0]*scale*perspective,H*.52-q[1]*scale*perspective,q[2]]}
+function draw(){
+ ctx.fillStyle='#050609';ctx.fillRect(0,0,W,H);
+ if($('wire').checked){ctx.strokeStyle='#91a6c62b';ctx.lineWidth=.7;ctx.beginPath();for(const line of guide){let a=project(line[0]),b=project(line[1]);ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1])}ctx.stroke()}
+ const faces=mesh.map(f=>{const p=f.p.map(project);return{f,p,z:p.reduce((a,b)=>a+b[2],0)/4}}).sort((a,b)=>a.z-b.z);
+ for(const {f,p} of faces){
+  const normal=rotate(f.normal),light=.63+.37*Math.abs(normal[0]*-.3+normal[1]*.45+normal[2]*.84);
+  // Continuous color at the closed seam; warm on one side, cool on the other.
+  const hue=185+145*Math.sin(f.u+.5),sat=82,lum=(f.edge?70:61)*light;
+  ctx.fillStyle=`hsl(${hue} ${sat}% ${lum}%)`;ctx.beginPath();ctx.moveTo(p[0][0],p[0][1]);for(let k=1;k<4;k++)ctx.lineTo(p[k][0],p[k][1]);ctx.closePath();ctx.fill();
+  ctx.strokeStyle=ctx.fillStyle;ctx.lineWidth=.45;ctx.stroke();
+ }
+}
+function frame(time){const dt=Math.min((time-last)/1000,.05);last=time;if(playing&&pointers.size===0){yaw+=dt*.13;dirty=true}if(dirty){draw();dirty=false}requestAnimationFrame(frame)}
+canvas.onpointerdown=e=>{canvas.setPointerCapture(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});pinchDistance=0};
+canvas.onpointermove=e=>{if(!pointers.has(e.pointerId))return;const old=pointers.get(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pointers.size===1){yaw+=(e.clientX-old.x)*.007;pitch+=(e.clientY-old.y)*.007}else{const [a,b]=[...pointers.values()],d=Math.hypot(a.x-b.x,a.y-b.y);if(pinchDistance)zoom=Math.max(.35,Math.min(2.8,zoom*d/pinchDistance));pinchDistance=d}dirty=true};
+function release(e){pointers.delete(e.pointerId);pinchDistance=0}canvas.onpointerup=release;canvas.onpointercancel=release;
+canvas.addEventListener('wheel',e=>{e.preventDefault();zoom=Math.max(.35,Math.min(2.8,zoom*Math.exp(-e.deltaY*.001)));dirty=true},{passive:false});
+function toggle(){playing=!playing;$('play').textContent=playing?'Pause rotation':'Resume rotation';dirty=true}
+function reset(){yaw=.28;pitch=1.03;zoom=1;dirty=true}
+$('play').onclick=toggle;$('reset').onclick=reset;canvas.ondblclick=reset;
+addEventListener('keydown',e=>{if(e.target.matches('input,button'))return;if(e.code==='Space'){e.preventDefault();toggle()}if(e.key.toLowerCase()==='h')$('panel').classList.toggle('hide')});
+build();requestAnimationFrame(frame);
+</script></body></html>
