@@ -1,0 +1,682 @@
+▗ ▗   ▖ ▖  Claude Code v2.1.316
+           deepseek-flash · API Usage Billing
+ ▘▘   ▝▝   ~/tthtlc.github.io
+
+
+❯ apply the dualfold_variation.html template to the files listed in /tmp/1.     
+
+⏺ I'll start by reading the file list and the template.
+
+  Thought for 3m 34s, read 13 files, listed 1 directory, ran 4 shell commands (ctrl+o to expand)
+
+⏺ I have the full picture now. Let me build a shared generator so all 19 pages
+  get the identical template shell, then verify each with headless Chrome.
+
+  Thought for 1s, ran 1 shell command (ctrl+o to expand)
+
+⏺ Write(/tmp/geomgen/build.py)
+  ⎿  Wrote 366 lines to /tmp/geomgen/build.py
+      1 #!/usr/bin/env python3
+      2 """Assemble the dualfold_variation.html shell around per-page geo
+        metry."""
+      3 import pathlib, sys
+      4 
+      5 REPO = pathlib.Path('/Users/tthtlc/tthtlc.github.io')
+      6 GEN = pathlib.Path('/tmp/geomgen')
+      7 
+      8 CSS = (":root{color-scheme:dark;font-family:Inter,system-ui,sans-
+        serif;background:#10151d;color:#eef2f8}*{box-sizing:border-box}bo
+     … +359 lines (~19 KB) (ctrl+o to expand)
+
+  Thought for 3s (ctrl+o to expand)
+
+⏺ Update(/tmp/geomgen/build.py)
+  ⎿  Added 1 line, removed 7 lines
+      347      print('wrote', page['slug'] + '.html', len(doc))
+      348  
+      349  
+      350 -PAGES = []                                                    
+      351 -                                                              
+      352 -                                                              
+      353 -def page(**kw):                                               
+      354 -    PAGES.append(kw)                                          
+      355 -                                                              
+      356 -                                                              
+      350  def main():
+      351 +    from pages import PAGES                                   
+      352      only = sys.argv[1:] if len(sys.argv) > 1 else None
+      353      for p in PAGES:
+      354          if only and p['slug'] not in only:
+
+  Thought for 3s (ctrl+o to expand)
+
+⏺ Write(/tmp/geomgen/js/chasing_circle.js)
+  ⎿  Wrote 41 lines to /tmp/geomgen/js/chasing_circle.js
+       1 const PREFIX='chasing_circle_';
+       2 const DEFAULT_COLOR='#7fd4ff';
+       3 const SLIDERS=[
+       4  {id:'offsetA',min:0,max:59,step:1,value:2,dec:null},
+       5  {id:'offsetB',min:0,max:59,step:1,value:30,dec:null},
+       6  {id:'points',min:3,max:120,step:1,value:60,dec:null},
+       7  {id:'lineWidth',min:0.2,max:3,step:0.05,value:0.9,dec:2}
+       8 ];
+       9 function fx(t,p){return Math.cos(t);}
+      10 function fy(t,p){return Math.sin(t);}
+     … +31 lines (ctrl+o to expand)
+
+  Thought for 3s (ctrl+o to expand)
+
+⏺ Write(/tmp/geomgen/js/moire_medallion.js)
+  ⎿  Wrote 35 lines to /tmp/geomgen/js/moire_medallion.js
+       1 const PREFIX='moire_medallion_';
+       2 const DEFAULT_COLOR='#bdd0e5';
+       3 const SLIDERS=[
+       4  {id:'spokes',min:12,max:120,step:1,value:48,dec:null},
+       5  {id:'inner',min:0.08,max:0.6,step:0.01,value:0.23,dec:2},
+       6  {id:'phase',min:0,max:1,step:0.002,value:0.25,dec:3},
+       7  {id:'lineWidth',min:0.3,max:3,step:0.1,value:1.2,dec:2}
+       8 ];
+       9 function formulaLines(p){
+      10  return ['θⱼ⁺ = 2πj / N + τ      θⱼ⁻ = 2πj / N − τ      (N = '+r
+     … +26 lines (ctrl+o to expand)
+
+  Thought for 1s (ctrl+o to expand)
+
+⏺ Update(/tmp/geomgen/js/moire_medallion.js)
+  ⎿  Added 2 lines, removed 1 line
+      17   const cx=W/2,cy=H/2;
+      18   const c=baseHsl(p);
+      19   const inner=Math.min(0.9,Math.max(0.02,p.inner));
+      20 - const tau=TAU*0.18*(((p.phase+prog)%1)+1)%1;                  
+      20 + const ph=(((p.phase+prog)%1)+1)%1;                            
+      21 + const tau=TAU*0.18*ph;                                        
+      22   ctx.lineCap='round';
+      23   for(let layer=0;layer<2;layer++){
+      24    const dir=layer?-1:1;
+
+  Thought for 7s (ctrl+o to expand)
+
+⏺ Write(/tmp/geomgen/js/negative_space_aperture.js)
+  ⎿  Wrote 48 lines to /tmp/geomgen/js/negative_space_aperture.js
+       1 const PREFIX='negative_space_aperture_';
+       2 const DEFAULT_COLOR='#a4e3d4';
+       3 const SLIDERS=[
+       4  {id:'opening',min:0.15,max:0.65,step:0.01,value:0.36,dec:2},
+       5  {id:'depth',min:0,max:0.42,step:0.01,value:0.28,dec:2},
+       6  {id:'phase',min:0,max:1,step:0.002,value:0.25,dec:3},
+       7  {id:'lineWidth',min:0.3,max:3,step:0.1,value:1.2,dec:2}
+       8 ];
+       9 function formulaLines(p){
+      10  return ['r(φ) = R · [1 + a · cos(6φ)]      a = depth · sin τ   
+     … +39 lines (~1 KB) (ctrl+o to expand)
+
+  Thought for 3s (ctrl+o to expand)
+
+⏺ Write(/tmp/geomgen/js/nested_hexagonal_spiral.js)
+  ⎿  Wrote 37 lines to /tmp/geomgen/js/nested_hexagonal_spiral.js
+       1 const PREFIX='nested_hexagonal_spiral_';
+       2 const DEFAULT_COLOR='#88dbc6';
+       3 const SLIDERS=[
+       4  {id:'layers',min:6,max:36,step:1,value:20,dec:null},
+       5  {id:'twist',min:0,max:0.35,step:0.005,value:0.16,dec:3},
+       6  {id:'ratio',min:0.78,max:0.96,step:0.005,value:0.88,dec:3},
+       7  {id:'phase',min:0,max:1,step:0.002,value:0.25,dec:3},
+       8  {id:'lineWidth',min:0.2,max:3,step:0.05,value:1.0,dec:2}
+       9 ];
+      10 function formulaLines(p){
+     … +27 lines (ctrl+o to expand)
+
+  Thought for 2s (ctrl+o to expand)
+
+⏺ Write(/tmp/geomgen/js/one_line_geometric_dance.js)
+  ⎿  Wrote 30 lines to /tmp/geomgen/js/one_line_geometric_dance.js
+       1 const PREFIX='one_line_geometric_dance_';
+       2 const DEFAULT_COLOR='#e9c89a';
+       3 const SLIDERS=[
+       4  {id:'amp',min:0,max:0.8,step:0.01,value:0.38,dec:2},
+       5  {id:'trace',min:0.08,max:1,step:0.01,value:1,dec:2},
+       6  {id:'phase',min:0,max:1,step:0.002,value:0.25,dec:3},
+       7  {id:'lineWidth',min:0.2,max:3,step:0.05,value:1.4,dec:2}
+       8 ];
+       9 function fx(t,p){return 0.9/(1+p.amp)*(Math.cos(t)+p.amp*Math.co
+         s(5*t+TAU*p.phase));}
+     … +21 lines (ctrl+o to expand)
+
+  Thought for 7s (ctrl+o to expand)
+
+⏺ Write(/tmp/geomgen/js/orbiting_sculptures.js)
+  ⎿  Wrote 55 lines to /tmp/geomgen/js/orbiting_sculptures.js
+       1 const PREFIX='orbiting_sculptures_';
+       2 const DEFAULT_COLOR='#9abaff';
+       3 const SLIDERS=[
+       4  {id:'tilt',min:0,max:1.5,step:0.01,value:0.8,dec:2},
+       5  {id:'size',min:0.15,max:0.5,step:0.01,value:0.29,dec:2},
+       6  {id:'phase',min:0,max:1,step:0.002,value:0.22,dec:3},
+       7  {id:'lineWidth',min:0.2,max:2,step:0.05,value:0.6,dec:2}
+       8 ];
+       9 function formulaLines(p){
+      10  return ['cᵢ = R·[cos αᵢ, sin αᵢ·cos τ, sin αᵢ·sin τ]      αᵢ = 
+     … +46 lines (~2 KB) (ctrl+o to expand)
+
+  Thought for 5s (ctrl+o to expand)
+
+⏺ Write(/tmp/geomgen/js/polka_dot_constellation.js)
+  ⎿  Wrote 38 lines to /tmp/geomgen/js/polka_dot_constellation.js
+       1 const PREFIX='polka_dot_constellation_';
+       2 const DEFAULT_COLOR='#9abaff';
+       3 const SLIDERS=[
+       4  {id:'dotR',min:1,max:7,step:0.1,value:3,dec:1},
+       5  {id:'spacing',min:1,max:2.6,step:0.01,value:1.85,dec:2},
+       6  {id:'phase',min:0,max:1,step:0.002,value:0.2,dec:3},
+       7  {id:'lineWidth',min:0.2,max:3,step:0.05,value:1,dec:2}
+       8 ];
+       9 function formulaLines(p){
+      10  return ['cᵢ = d·[cos(πi/3 + τ), sin(πi/3 + τ)]      d = 0.25 · 
+     … +29 lines (ctrl+o to expand)
+
+  Thought for 3s (ctrl+o to expand)
+
+⏺ Write(/tmp/geomgen/js/six_petal_ribbon_flower.js)
+  ⎿  Wrote 41 lines to /tmp/geomgen/js/six_petal_ribbon_flower.js
+       1 const PREFIX='six_petal_ribbon_flower_';
+       2 const DEFAULT_COLOR='#e9a9bd';
+       3 const SLIDERS=[
+       4  {id:'width',min:0.1,max:0.65,step:0.01,value:0.28,dec:2},
+       5  {id:'opening',min:0,max:1,step:0.01,value:0.65,dec:2},
+       6  {id:'phase',min:0,max:1,step:0.002,value:0.25,dec:3},
+       7  {id:'lineWidth',min:0.2,max:3,step:0.05,value:1.4,dec:2}
+       8 ];
+       9 function formulaLines(p){
+      10  return ['x(u) = 0.38 · (1 − cos u)      y(u) = w · sin u      u
+     … +32 lines (ctrl+o to expand)
+
+  Thought for 3s (ctrl+o to expand)
+⏺ Write(/tmp/geomgen/js/spiral_of_dots.js)
+  ⎿  Wrote 46 lines to /tmp/geomgen/js/spiral_of_dots.js
+       1 const PREFIX='spiral_of_dots_';
+       2 const DEFAULT_COLOR='#e8c48f';
+       3 const SLIDERS=[
+       4  {id:'turns',min:2,max:9,step:0.1,value:4.5,dec:1},
+       5  {id:'dots',min:100,max:700,step:1,value:360,dec:null},
+       6  {id:'dotSize',min:1,max:5,step:0.1,value:2.5,dec:1},
+       7  {id:'phase',min:0,max:1,step:0.002,value:0,dec:3},
+       8  {id:'lineWidth',min:0.2,max:2,step:0.05,value:0.6,dec:2}
+       9 ];
+      10 function formulaLines(p){
+     … +36 lines (ctrl+o to expand)
+
+  Thought for 3s (ctrl+o to expand)
+
+⏺ Write(/tmp/geomgen/js/double_polygon_double_rotation.js)
+  ⎿  Wrote 59 lines to /tmp/geomgen/js/double_polygon_double_rotation.js
+       1 const PREFIX='double_polygon_double_rotation_';
+       2 const DEFAULT_COLOR='#8ce2c6';
+       3 const SLIDERS=[
+       4  {id:'outerN',min:3,max:20,step:1,value:6,dec:null},
+       5  {id:'innerN',min:3,max:20,step:1,value:5,dec:null},
+       6  {id:'outerAng',min:0,max:360,step:1,value:0,dec:null},
+       7  {id:'innerAng',min:0,max:360,step:1,value:0,dec:null},
+       8  {id:'lineWidth',min:0.2,max:2,step:0.05,value:0.7,dec:2}
+       9 ];
+      10 function formulaLines(p){
+     … +49 lines (ctrl+o to expand)
+
+  Thought for 10s (ctrl+o to expand)
+
+⏺ Write(/tmp/geomgen/js/triangle_rosette.js)
+  ⎿  Wrote 71 lines to /tmp/geomgen/js/triangle_rosette.js
+       1 const PREFIX='triangle_rosette_';
+       2 const DEFAULT_COLOR='#dbe6ff';
+       3 const SLIDERS=[
+       4  {id:'density',min:6,max:32,step:1,value:12,dec:null},
+       5  {id:'radius',min:1.5,max:4,step:0.1,value:2.5,dec:1},
+       6  {id:'offset',min:-8,max:8,step:1,value:0,dec:null},
+       7  {id:'rotation',min:0,max:60,step:1,value:30,dec:null},
+       8  {id:'lineWidth',min:0.3,max:1.5,step:0.1,value:0.7,dec:1}
+       9 ];
+      10 function formulaLines(p){
+     … +61 lines (ctrl+o to expand)
+
+  Thought for 6s (ctrl+o to expand)
+
+⏺ Write(/tmp/geomgen/js/chromatic_rosette.js)
+  ⎿  Wrote 101 lines to /tmp/geomgen/js/chromatic_rosette.js
+       1 const PREFIX='chromatic_rosette_';
+       2 const DEFAULT_COLOR='#7057dd';
+       3 const SLIDERS=[
+       4  {id:'phase',min:0,max:360,step:1,value:0,dec:null},
+       5  {id:'contrast',min:10,max:100,step:1,value:85,dec:null},
+       6  {id:'density',min:6,max:32,step:1,value:14,dec:null},
+       7  {id:'radius',min:1.5,max:4,step:0.1,value:2.5,dec:1},
+       8  {id:'offset',min:-8,max:8,step:1,value:0,dec:null},
+       9  {id:'rotation',min:0,max:60,step:1,value:30,dec:null},
+      10  {id:'lineWidth',min:0.3,max:1.5,step:0.1,value:0.7,dec:1}
+     … +91 lines (ctrl+o to expand)
+
+  Thought for 17s (ctrl+o to expand)
+
+⏺ Write(/tmp/geomgen/js/torus-ribbon.js)
+  ⎿  Wrote 85 lines to /tmp/geomgen/js/torus-ribbon.js
+       1 const PREFIX='torus-ribbon_';
+       2 const DEFAULT_COLOR='#77d9ff';
+       3 const SLIDERS=[
+       4  {id:'turns',min:1,max:28,step:1,value:12,dec:null},
+       5  {id:'coverage',min:10,max:90,step:1,value:58,dec:null},
+       6  {id:'hole',min:35,max:180,step:1,value:72,dec:null},
+       7  {id:'view',min:0,max:360,step:1,value:16,dec:null},
+       8  {id:'lineWidth',min:0.2,max:2,step:0.05,value:0.45,dec:2}
+       9 ];
+      10 let meshKey='',mesh=[],viewPitch=1.03,viewZoom=1,yawNow=0;
+     … +75 lines (ctrl+o to expand)
+
+  Thought for 2s (ctrl+o to expand)
+
+⏺ Write(/tmp/geomgen/js/longitudinal-torus-ribbon.js)
+  ⎿  Wrote 83 lines to /tmp/geomgen/js/longitudinal-torus-ribbon.js
+       1 const PREFIX='longitudinal-torus-ribbon_';
+       2 const DEFAULT_COLOR='#80dfff';
+       3 const SLIDERS=[
+       4  {id:'laps',min:1,max:24,step:1,value:12,dec:null},
+       5  {id:'coverage',min:10,max:90,step:1,value:58,dec:null},
+       6  {id:'view',min:0,max:360,step:1,value:14,dec:null},
+       7  {id:'lineWidth',min:0.2,max:2,step:0.05,value:0.45,dec:2}
+       8 ];
+       9 let meshKey='',mesh=[],viewPitch=0.95,viewZoom=1,yawNow=0;
+      10 function formulaLines(p){
+     … +73 lines (ctrl+o to expand)
+
+  Thought for 3s (ctrl+o to expand)
+
+⏺ Write(/tmp/geomgen/js/shifted-torus-trips.js)
+  ⎿  Wrote 84 lines to /tmp/geomgen/js/shifted-torus-trips.js
+       1 const PREFIX='shifted-torus-trips_';
+       2 const DEFAULT_COLOR='#7ee4ff';
+       3 const SLIDERS=[
+       4  {id:'trips',min:1,max:40,step:1,value:18,dec:null},
+       5  {id:'shift',min:2,max:90,step:1,value:20,dec:null},
+       6  {id:'width',min:1,max:30,step:1,value:10,dec:null},
+       7  {id:'start',min:0,max:360,step:1,value:90,dec:null},
+       8  {id:'view',min:0,max:360,step:1,value:14,dec:null},
+       9  {id:'lineWidth',min:0.2,max:2,step:0.05,value:0.4,dec:2}
+      10 ];
+     … +74 lines (ctrl+o to expand)
+
+  Thought for 3s (ctrl+o to expand)
+
+⏺ Write(/tmp/geomgen/js/longitudinal-torus-ribbon5.js)
+  ⎿  Wrote 89 lines to /tmp/geomgen/js/longitudinal-torus-ribbon5.js
+       1 const PREFIX='longitudinal-torus-ribbon5_';
+       2 const DEFAULT_COLOR='#7edfff';
+       3 const SLIDERS=[
+       4  {id:'count',min:1,max:24,step:1,value:6,dec:null},
+       5  {id:'spacing',min:0,max:360,step:1,value:60,dec:null},
+       6  {id:'phase',min:0,max:360,step:1,value:0,dec:null},
+       7  {id:'hole',min:0,max:2,step:0.01,value:0.65,dec:2},
+       8  {id:'width',min:3,max:70,step:1,value:25,dec:null},
+       9  {id:'view',min:0,max:360,step:1,value:22,dec:null},
+      10  {id:'lineWidth',min:0.2,max:2,step:0.05,value:0.4,dec:2}
+     … +79 lines (ctrl+o to expand)
+
+  Thought for 2s (ctrl+o to expand)
+
+⏺ Write(/tmp/geomgen/js/longitudinal-torus-one-band-ribbon.js)
+  ⎿  Wrote 81 lines to
+     /tmp/geomgen/js/longitudinal-torus-one-band-ribbon.js
+       1 const PREFIX='longitudinal-torus-one-band-ribbon_';
+       2 const DEFAULT_COLOR='#7edfff';
+       3 const SLIDERS=[
+       4  {id:'hole',min:0,max:2,step:0.01,value:0.65,dec:2},
+       5  {id:'width',min:3,max:70,step:1,value:25,dec:null},
+       6  {id:'view',min:0,max:360,step:1,value:22,dec:null},
+       7  {id:'lineWidth',min:0.2,max:2,step:0.05,value:0.4,dec:2}
+       8 ];
+       9 let meshKey='',mesh=[],viewPitch=0.95,viewZoom=1,yawNow=0;
+      10 function formulaLines(p){
+     … +71 lines (ctrl+o to expand)
+
+  Thought for 35s (ctrl+o to expand)
+
+⏺ Now the two WebGL pages — they keep their Three.js artwork but get the
+  template shell, exports and gallery:
+
+⏺ API Error: Connection lost mid-response. The response above may be 
+  incomplete.
+
+✻ Brewed for 7m 34s · done 4:57 PM
+
+❯ continue                                                                      
+
+  Thought for 6s (ctrl+o to expand)
+
+⏺ Write(/tmp/geomgen/js/opaque-silver-cutaway.js)
+  ⎿  Wrote 425 lines to /tmp/geomgen/js/opaque-silver-cutaway.js
+       1 import * as THREE from 'three';
+       2 import {OrbitControls} from 'three/addons/controls/OrbitControls
+         .js';
+       3 
+       4 const $=id=>document.getElementById(id);
+       5 const canvas=$('canvas');
+       6 const TAU=Math.PI*2;
+       7 const PREFIX='opaque-silver-cutaway_';
+       8 const DEFAULT_COLOR='#e5e8ee';
+       9 const SLIDERS=[
+     … +416 lines (ctrl+o to expand)
+
+  Thought for 4s (ctrl+o to expand)
+
+⏺ Update(/tmp/geomgen/js/opaque-silver-cutaway.js)
+  ⎿  Removed 1 line
+      169    const m=new THREE.Mesh(new THREE.TorusGeometry(1.002*Math.si
+           n(theta),tube,5,160),gridMat);
+      170    m.rotation.x=Math.PI/2;m.position.y=1.002*Math.cos(theta);ba
+           llGrid.add(m);
+      171   }
+      172 - ballGrid.children[0].geometry.dispose();                     
+      172  }
+      173  let shapesKey='';
+      174  function applyShapes(p){
+
+  Thought for 10s (ctrl+o to expand)
+
+⏺ Write(/tmp/geomgen/js/silver-orbit.js)
+  ⎿  Wrote 375 lines to /tmp/geomgen/js/silver-orbit.js
+       1 import * as THREE from 'three';
+       2 import {OrbitControls} from 'three/addons/controls/OrbitControls
+         .js';
+       3 
+       4 const $=id=>document.getElementById(id);
+       5 const canvas=$('canvas');
+       6 const TAU=Math.PI*2;
+       7 const PREFIX='silver-orbit_';
+       8 const DEFAULT_COLOR='#e6e9ef';
+       9 const SLIDERS=[
+     … +366 lines (ctrl+o to expand)
+  Thought for 3s (ctrl+o to expand)
+
+⏺ Update(/tmp/geomgen/build.py)
+  ⎿  Added 8 lines, removed 4 lines
+      304  
+      305  
+      306  def build(page):
+      307 -    js = (GEN / 'js' / (page['slug'] + '.js')).read_text()    
+      308 -    if '//===WIRING===' in js:                                
+      309 -        head, tail = js.split('//===WIRING===', 1)            
+      307 +    js = (GEN / 'js' / (page['slug'] + '.js')).read_text(encod
+          +ing='utf-8')                                                  
+      308 +    if page.get('custom'):                                    
+      309 +        script = '<script type="module">\n' + js + '\n</script
+          +>'                                                            
+      310      else:
+      311 -        head, tail = js, ''                                   
+      311 +        if '//===WIRING===' in js:                            
+      312 +            head, tail = js.split('//===WIRING===', 1)        
+      313 +        else:                                                 
+      314 +            head, tail = js, ''                               
+      315 +        script = "<script>\n'use strict';\n" + head + '\n' + S
+          +HELL + '\n' + WIRING + '\n' + tail + '\n</script>'            
+      316      controls = '\n'.join(control(s) for s in page['sliders'])
+      317      controls += '\n<label>Base colour<input id="color" type="c
+           olor" value="%s"></label>' % page['color']
+      318      if page.get('extras'):
+
+⏺ Update(/tmp/geomgen/build.py)
+  ⎿  Added 3 lines, removed 9 lines
+      337  <p class="note" id="status"></p>
+      338  <section class="gallery"><h2>Saved PNGs</h2><p class="gallery-
+           note">PNG captures are named with their parameter values. Comm
+           it the downloaded files to the repo and they will appear here 
+           automatically (fetched via the GitHub API).</p><div id="galler
+           yItems" class="gallery-grid"></div></section>
+      339  </aside></main>
+      340 -<script>                                                      
+      341 -'use strict';                                                 
+      342 -{head}                                                        
+      343 -{SHELL}                                                       
+      344 -{WIRING}                                                      
+      345 -{tail}                                                        
+      346 -</script>                                                     
+      340 +{script}                                                      
+      341  </body></html>
+      342  """
+      349 -    (REPO / (page['slug'] + '.html')).write_text(doc)         
+      350 -    (GEN / 'out' / (page['slug'] + '.html')).write_text(doc)  
+      343 +    (REPO / (page['slug'] + '.html')).write_text(doc, encoding
+          +='utf-8')                                                     
+      344 +    (GEN / 'out' / (page['slug'] + '.html')).write_text(doc, e
+          +ncoding='utf-8')                                              
+      345      print('wrote', page['slug'] + '.html', len(doc))
+      346  
+      347  
+
+  Thought for 6s (ctrl+o to expand)
+
+⏺ Write(/tmp/geomgen/pages.py)
+  ⎿  Wrote 252 lines to /tmp/geomgen/pages.py
+       1 # -*- coding: utf-8 -*-
+       2 """Per-page metadata for the dualfold template build."""
+       3 
+       4 GEOM = r'<p>%s</p><p><code>%s</code></p>'
+       5 
+       6 PAGES = [
+       7  dict(slug='opaque-silver-cutaway', custom=True,
+       8       title='Opaque silver hemisphere — Interactive Study',
+       9       eyebrow='Reflective solid / 01', h1='Opaque silver cutaway
+         ',
+     … +243 lines (ctrl+o to expand)
+
+  Thought for 2s (ctrl+o to expand)
+
+⏺ Update(/tmp/geomgen/build.py)
+  ⎿  Added 12 lines
+      303              % (s['label'], s['id'], s['id'], num(s['min']), nu
+           m(s['max']), num(s['step']), num(s['value'])))
+      304  
+      305  
+      306 +def normalise(page):                                          
+      307 +    page = dict(page)                                         
+      308 +    sliders = []                                              
+      309 +    for t in page.get('slider_html', []):                     
+      310 +        label, sid, mn, mx, st, val = t[:6]                   
+      311 +        sliders.append(dict(label=label, id=sid, min=mn, max=m
+          +x, step=st, value=val,                                        
+      312 +                            dec=(t[6] if len(t) > 6 else None)
+          +))                                                            
+      313 +    page['sliders'] = sliders                                 
+      314 +    return page                                               
+      315 +                                                              
+      316 +                                                              
+      317  def build(page):
+      318 +    page = normalise(page)                                    
+      319      js = (GEN / 'js' / (page['slug'] + '.js')).read_text(encod
+           ing='utf-8')
+      320      if page.get('custom'):
+      321          script = '<script type="module">\n' + js + '\n</script
+           >'
+
+  Thought for 22s, read 3 files, ran 7 shell commands (ctrl+o to expand)
+
+⏺ Update(/tmp/geomgen/pages.py)
+  ⎿  Added 1 line
+       5  
+       6  PAGES = [
+       7   dict(slug='opaque-silver-cutaway', custom=True,
+       8 +      head='<script type="importmap">{"imports":{"three":"https
+         +://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","t
+         +hree/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examp
+         +les/jsm/"}}</script>',                                         
+       9        title='Opaque silver hemisphere — Interactive Study',
+      10        eyebrow='Reflective solid / 01', h1='Opaque silver cutawa
+          y',
+      11        aria='Solid chrome ball inside a silver hemispherical she
+          ll whose front half is cut away.',
+
+⏺ Update(/tmp/geomgen/pages.py)
+  ⎿  Added 1 line
+      19        color='#e5e8ee', hint='Drag to orbit · Scroll to zoom'),
+      20  
+      21   dict(slug='silver-orbit', custom=True,
+      22 +      head='<script type="importmap">{"imports":{"three":"https
+         +://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","t
+         +hree/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examp
+         +les/jsm/"}}</script>',                                         
+      23        title='Silver orbit — Interactive Study',
+      24        eyebrow='Reflective solid / 02', h1='Silver orbit',
+      25        aria='Two silver lattice cages around a small chrome core
+          , with a polished solid-ball mode.',
+
+  Thought for 1m 53s, read 13 files, ran 5 shell commands (ctrl+o to expand)
+
+⏺ Update(/tmp/geomgen/js/double_polygon_double_rotation.js)
+  ⎿  Added 1 line, removed 1 line
+      32     if(idx<shown){
+      33      const hue=((c.h+360*(idx/total))%360).toFixed(1);
+      34      ctx.strokeStyle='hsl('+hue+','+c.s+'%,58%)';
+      35 -    ctx.lineWidth=p.lineWidth;                                 
+      35 +    ctx.lineWidth=p.lineWidth/scale;                           
+      36      ctx.beginPath();
+      37      ctx.moveTo(inner[j][0],inner[j][1]);
+      38      ctx.lineTo(outer[i][0],outer[i][1]);
+
+⏺ Update(/tmp/geomgen/js/double_polygon_double_rotation.js)
+  ⎿  Added 1 line, removed 1 line
+      41     idx++;
+      42    }
+      43   }
+      44 - ctx.lineWidth=p.lineWidth*2.2;                                
+      44 + ctx.lineWidth=p.lineWidth*2.2/scale;                          
+      45   ctx.strokeStyle=colorFor(0,c.h,c.s);
+      46   ctx.beginPath();
+      47   outer.forEach((q,i)=>i?ctx.lineTo(q[0],q[1]):ctx.moveTo(q[0],q
+          [1]));
+
+  Thought for 8s (ctrl+o to expand)
+
+⏺ Update(/tmp/geomgen/js/negative_space_aperture.js)
+  ⎿  Added 2 lines, removed 2 lines
+      32     if(j===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+      33    }
+      34    ctx.lineTo(1.12*Math.cos(a1),1.12*Math.sin(a1));
+      35 -  ctx.lineTo(1.12*Math.cos(a0),1.12*Math.sin(a0));             
+      35 +  ctx.arc(0,0,1.12,a1,a0,true);                                
+      36    ctx.closePath();
+      37 -  ctx.fillStyle=k%2?'#141c28':'#182130';                       
+      37 +  ctx.fillStyle='hsl('+c.h+','+Math.round(c.s*0.45)+'%,'+(k%2?9
+         +:13)+'%)';                                                     
+      38    ctx.fill();
+      39    ctx.lineWidth=p.lineWidth/scale;
+      40    ctx.strokeStyle='hsla('+c.h+','+c.s+'%,72%,.38)';
+
+⏺ Update(/tmp/geomgen/js/polka_dot_constellation.js)
+  ⎿  Added 2 lines, removed 2 lines
+      14   if(prog==null)prog=1;
+      15   const t=TAU*(((p.phase+prog)%1)+1)%1;
+      16   const c=baseHsl(p);
+      17 - const scale=fitScale(W,H,1.02);                               
+      18 - const cx=W/2,cy=H/2;                                          
+      17   const r=0.25,d=r*p.spacing,dot=p.dotR/150;
+      18 + const scale=fitScale(W,H,d+r+dot*1.2);                        
+      19 + const cx=W/2,cy=H/2;                                          
+      20   ctx.save();
+      21   ctx.translate(cx,cy);ctx.scale(scale,-scale);
+      22   for(let i=-1;i<6;i++){
+
+  Thought for 5m 51s, searched for 3 patterns, read 11 files, listed 1 directory, ran 13 shell commands (ctrl+o to expand)
+
+⏺ Now let me verify the export paths (PNG/GIF) actually run, using Chrome
+  DevTools Protocol.
+
+⏺ Write(/tmp/geomgen/cdp_test.mjs)
+  ⎿  Wrote 48 lines to /tmp/geomgen/cdp_test.mjs
+       1 const port = 9222;
+       2 const sleep = ms => new Promise(r => setTimeout(r, ms));
+       3 
+       4 const targets = await (await fetch(`http://127.0.0.1:${port}/jso
+         n/list`)).json();
+       5 const page = targets.find(t => t.type === 'page');
+       6 if (!page) { console.log('no page target'); process.exit(1); }
+       7 
+       8 const ws = new WebSocket(page.webSocketDebuggerUrl);
+       9 let id = 0;
+     … +39 lines (ctrl+o to expand)
+
+  Thought for 3m 25s, searched for 1 pattern, read 2 files, ran 12 shell commands (ctrl+o to expand)
+
+⏺ All 19 pages are rebuilt on the dualfold_variation.html shell. Here's where
+  things landed.
+
+  What changed
+
+  Every page now shares the template's shell verbatim — the #10151d
+  radial-gradient stage, right-hand control sidebar, top-left eyebrow/title +
+  Geometry dropdown, bottom formula bar, auto-sweep of the first slider,
+  Animate, Save PNG / Save GIF with parameter-summary bands, and the GitHub-API
+  "Saved PNGs" gallery keyed to a per-page PREFIX.
+
+  What was customized per page is exactly what CLAUDE.md allows: SLIDERS, fx/fy,
+  formulaLines, drawScene, title/eyebrow, and the Geometry text.
+
+  Group: Parametric curves
+  Pages: chasing_circle, one_line_geometric_dance
+  Notes: Straight conversions — fx/fy + strokeRadial
+  ────────────────────────────────────────
+  Group: Motion studies
+  Pages: moire_medallion, negative_space_aperture, nested_hexagonal_spiral,
+  orbiting_sculptures, polka_dot_constellation, six_petal_ribbon_flower,
+  spiral_of_dots
+  Notes: Continuous time animation replaced by a Phase τ slider; Animate sweeps
+  one full cycle
+  ────────────────────────────────────────
+  Group: String art
+  Pages: triangle_rosette, chromatic_rosette
+  Notes: Rainbow/edges checkboxes became a base-colour-driven palette; chromatic
+
+  keeps its composition <select>
+  ────────────────────────────────────────
+  Group: Torus ribbon (5)
+  Pages: torus-ribbon, longitudinal-torus-ribbon, shifted-torus-trips,
+  longitudinal-torus-ribbon5, longitudinal-torus-one-band-ribbon
+  Notes: Painter's-algorithm 3D kept, plus drag-orbit and scroll-zoom; "View
+  angle" is a slider and Animate spins a full turn
+  ────────────────────────────────────────
+  Group: WebGL (2)
+  Pages: opaque-silver-cutaway, silver-orbit
+  Notes: Kept Three.js + OrbitControls, wrapped in the same shell; exports
+  composite the stage gradient under the WebGL canvas
+
+  Two behavioural changes worth flagging: the two Three.js pages had
+  speed/exposure controls, which I replaced with template-style geometric
+  parameters (radius, thickness, ball radius, grid weight / cage radii, tilt,
+  glow) so the formula bar describes something real; and their PNG/GIF paths are
+  new code, not the template's.
+
+  Verification
+
+  - node --check on all 19 generated scripts — clean.
+  - Headless Chrome screenshots of all 19 at 1400×900, plus a 430px mobile pass.
+  - Three real bugs found and fixed this way: a transposed translate(-500,+500)
+    in the two string-art pages (drew off-screen), missing /scale on line widths
+    in double_polygon_double_rotation (600px-wide strokes), and a chord-vs-arc
+    gap in negative_space_aperture.
+  - CDP-driven export test (PNG + GIF) on a 2D page, a torus page and both WebGL
+    pages — real blobs produced (e.g. torus-ribbon 763 KB PNG / 978 KB GIF;
+    silver-orbit 1.4 MB PNG / 2.2 MB GIF), no console errors.
+
+  Repo housekeeping
+
+  - _data/visualizations.yml was missing 7 of these pages (chromatic_rosette,
+    triangle_rosette, the four torus-ribbon pages, shifted-torus-trips) — added,
+    still alphabetically sorted; all 368 entries resolve to files on disk.
+  - Regenerated _data/visualization_categories.yml and _data/recent_pages.yml
+    (the latter now leads with the pages just edited).
+  - _data/navigation.yml reviewed — /blog/ resolves via blog.html's permalink: 
+    /blog/; index_todo.html's 19 entries all exist.
+  - Index pages left untouched: they're Jekyll templates reading site.data.*,
+    which is the procedure recorded in how_to_update_index.md.
+
+  Working tree: 22 modified files, nothing untracked, nothing committed. The
+  build script that generated the pages is in /tmp/geomgen (not added to the
+  repo).
+
+✻ Cooked for 19m 47s · done 5:18 PM
+
+※ recap: Goal was rebasing 19 visualization pages onto the dualfold_variation.html template; all 19 are rebuilt, verified in headless Chrome, and repo data files updated. Next action is yours: review the diff and commit if you're happy. (disable recaps in /config)

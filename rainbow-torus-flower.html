@@ -1,0 +1,36 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Rainbow torus flower</title><style>*{box-sizing:border-box}body{margin:0;background:#000;color:#edf4ff;font:14px system-ui}canvas{display:block;width:100vw;height:100vh;touch-action:none}#panel{position:absolute;left:18px;top:18px;width:285px;max-height:calc(100vh - 36px);overflow:auto;padding:18px;background:#10131de8;border:1px solid #ffffff25;border-radius:16px;backdrop-filter:blur(12px)}h1{font-size:19px;margin:0 0 8px}p{font-size:12px;line-height:1.5;color:#aab8ce}label{display:flex;justify-content:space-between;align-items:center;margin-top:13px;gap:10px}input[type=range]{width:100%;accent-color:#6be0d1}output{color:#91e8dc;font-variant-numeric:tabular-nums}button{background:#ffffff13;color:inherit;border:1px solid #ffffff30;border-radius:8px;padding:9px;margin:12px 4px 0 0;cursor:pointer}#toggle{position:absolute;right:18px;top:12px;background:#141824bc}#hint{position:absolute;bottom:12px;left:18px;color:#667085;font-size:11px;pointer-events:none}@media(max-width:600px){#panel{width:230px;left:8px;top:8px;padding:12px}h1{font-size:16px}label{margin-top:9px}}</style></head><body><canvas id="canvas" aria-label="Animated rainbow loops forming a torus flower"></canvas><section id="panel"><h1>Rainbow torus flower</h1><p>Closed loops around a zero-hole torus, repeated at different angles. Drag to orbit; scroll or pinch to zoom.</p><label>Loops <output id="countOut"></output></label><input id="count" type="range" min="1" max="36" step="1" value="12"><label>Animation speed <output id="speedOut"></output></label><input id="speed" type="range" min="0" max="2" step="0.01" value="0.35"><label>View tilt <output id="tiltOut"></output></label><input id="tilt" type="range" min="0" max="85" value="24"><label>Inner hole radius <output id="holeOut"></output></label><input id="hole" type="range" min="0" max="1.5" step="0.01" value="0"><label>Line width <output id="widthOut"></output></label><input id="width" type="range" min="0.5" max="6" step="0.1" value="2.2"><label>Perspective <output id="perspectiveOut"></output></label><input id="perspective" type="range" min="0" max="1" step="0.01" value="0.35"><label>Glow<input id="glow" type="checkbox" checked></label><label>Gently rock the view<input id="rock" type="checkbox" checked></label><button id="play">Pause</button><button id="reset">Reset</button><button id="save">Save PNG</button><p>Space: pause · H: controls · Double-click: reset view.<br>Every loop is closed; color follows its distance from the torus axis.</p></section><button id="toggle">Hide controls</button><div id="hint">Drag to orbit · Scroll / pinch to zoom · H to hide controls</div><script>
+'use strict';
+const $=id=>document.getElementById(id),canvas=$('canvas'),ctx=canvas.getContext('2d',{alpha:false}),TAU=2*Math.PI;
+let W,H,dpr,phase=0,angle=0,yaw=0,manualTilt=0,zoom=1,playing=true,last=null,dirty=true,pinch=0;const pointers=new Map();
+const ids=['count','speed','tilt','hole','width','perspective'];
+function values(){for(const id of ids)$(id+'Out').value=$(id).value+(id==='tilt'?'°':'');dirty=true}for(const id of ids)$(id).addEventListener('input',values);for(const id of ['glow','rock'])$(id).onchange=()=>dirty=true;
+function resize(){W=innerWidth;H=innerHeight;dpr=Math.min(devicePixelRatio||1,2);canvas.width=Math.round(W*dpr);canvas.height=Math.round(H*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);dirty=true}addEventListener('resize',resize);resize();values();
+function draw(){
+ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);
+const count=+$('count').value,hole=+$('hole').value,R=1+hole,steps=480,tilt=+$('tilt').value*Math.PI/180+manualTilt+($('rock').checked?.11*Math.sin(phase*.63):0),spin=angle+yaw,perspective=+$('perspective').value,scale=Math.min(W,H)*.445/(R+1)*zoom,segments=[];
+const ct=Math.cos(tilt),st=Math.sin(tilt),cs=Math.cos(spin),ss=Math.sin(spin);
+function project(x,y,z){let a=x*cs-y*ss,b=x*ss+y*cs,Y=b*ct-z*st,Z=b*st+z*ct,k=1/(1-perspective*Z/7);return[W*.5+a*scale*k,H*.5-Y*scale*k,Z]}
+for(let b=0;b<count;b++){
+const offset=TAU*b/count,points=[],radii=[];
+for(let i=0;i<steps;i++){
+ const t=TAU*i/steps,u=t+offset,v=Math.PI/2-t+phase,rho=R+Math.cos(v);
+ points.push(project(rho*Math.cos(u),rho*Math.sin(u),Math.sin(v)));radii.push((1+Math.cos(v))/2);
+}
+points.push(points[0]);radii.push(radii[0]);
+for(let i=0;i<steps;i++){const q=(radii[i]+radii[i+1])*.5;segments.push({a:points[i],b:points[i+1],z:(points[i][2]+points[i+1][2])*.5,q})}
+}
+segments.sort((a,b)=>a.z-b.z);
+const lineWidth=+$('width').value;
+ctx.lineCap='round';ctx.lineJoin='round';
+function stroke(seg,glow){const q=seg.q,hue=245*(1-Math.pow(q,1.55)),lum=14+40*Math.pow(q,.55);ctx.strokeStyle=`hsl(${hue} 100% ${lum}%)`;ctx.beginPath();ctx.moveTo(seg.a[0],seg.a[1]);ctx.lineTo(seg.b[0],seg.b[1]);ctx.stroke()}
+if($('glow').checked){ctx.globalAlpha=.12;ctx.lineWidth=lineWidth*3.2;for(const seg of segments)stroke(seg,true);ctx.globalAlpha=1}
+ctx.lineWidth=lineWidth;for(const seg of segments)stroke(seg,false);
+}
+function tick(time){let dt=last===null?0:Math.min((time-last)/1000,.05);last=time;if(playing&&pointers.size===0){const speed=+$('speed').value;phase+=dt*speed;angle+=dt*speed*.32;if(speed>0)dirty=true}if(dirty){draw();dirty=false}requestAnimationFrame(tick)}
+function togglePlay(){playing=!playing;$('play').textContent=playing?'Pause':'Resume';dirty=true}$('play').onclick=togglePlay;
+function resetView(){yaw=0;manualTilt=0;zoom=1;dirty=true}function reset(){const defaults={count:12,speed:.35,tilt:24,hole:0,width:2.2,perspective:.35};for(const id in defaults)$(id).value=defaults[id];$('glow').checked=true;$('rock').checked=true;phase=0;angle=0;resetView();values()}$('reset').onclick=reset;canvas.ondblclick=resetView;
+function toggleControls(){const hidden=!$('panel').hidden;$('panel').hidden=hidden;$('toggle').textContent=hidden?'Show controls':'Hide controls';$('hint').hidden=hidden}$('toggle').onclick=toggleControls;
+$('save').onclick=()=>{draw();const a=document.createElement('a');a.download='rainbow-torus-flower.png';a.href=canvas.toDataURL('image/png');a.click()};
+canvas.onpointerdown=e=>{canvas.setPointerCapture(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});pinch=0};canvas.onpointermove=e=>{if(!pointers.has(e.pointerId))return;const old=pointers.get(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pointers.size===1){yaw+=(e.clientX-old.x)*.006;manualTilt=Math.max(-1.5,Math.min(1.5,manualTilt+(e.clientY-old.y)*.006))}else{const [a,b]=[...pointers.values()],d=Math.hypot(a.x-b.x,a.y-b.y);if(pinch)zoom=Math.max(.25,Math.min(3,zoom*d/pinch));pinch=d}dirty=true};function release(e){pointers.delete(e.pointerId);pinch=0}canvas.onpointerup=release;canvas.onpointercancel=release;
+canvas.addEventListener('wheel',e=>{e.preventDefault();zoom=Math.max(.25,Math.min(3,zoom*Math.exp(-e.deltaY*.001)));dirty=true},{passive:false});addEventListener('keydown',e=>{if(e.target.matches('input,button'))return;if(e.code==='Space'){e.preventDefault();togglePlay()}if(e.key.toLowerCase()==='h')toggleControls()});requestAnimationFrame(tick);
+</script></body></html>
