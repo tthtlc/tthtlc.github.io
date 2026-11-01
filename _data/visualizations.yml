@@ -29,6 +29,7 @@
 - chasing_triangle.html
 - chasing_triangle_rotating.html
 - chopstick_explore.html
+- chromatic_rosette.html
 - circle_color.html
 - circle_cycle.html
 - circular_thread.html
@@ -176,6 +177,9 @@
 - lemniscate_random.html
 - line_art_explorer.html
 - line_drawing.html
+- longitudinal-torus-one-band-ribbon.html
+- longitudinal-torus-ribbon.html
+- longitudinal-torus-ribbon5.html
 - mandelbrot.html
 - mandelbrot_color.html
 - mandelbrot_mouse.html
@@ -269,6 +273,7 @@
 - running_chasing_3gon.html
 - running_star.html
 - saddle-wave-torus.html
+- shifted-torus-trips.html
 - sierpinski.html
 - sierpinski_carpet.html
 - silk_ribbons_template.html
@@ -327,10 +332,12 @@
 - three_petal.html
 - tiling.html
 - torus-knot-sculpture.html
+- torus-ribbon.html
 - triangle_auto_rotate.html
 - triangle_chasing_template.html
 - triangle_chasing_template1.html
 - triangle_line_rotate.html
+- triangle_rosette.html
 - triangle_sinusoidal_moving_color_background_explore.html
 - trifold_variation.html
 - triple_motion.html

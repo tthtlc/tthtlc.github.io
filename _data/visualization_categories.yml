@@ -42,7 +42,7 @@
     tags:
     - Interactive
   - file: double_polygon_double_rotation.html
-    title: Rotating Polygons with Connections
+    title: Double polygon, double rotation — Interactive Study
     tags: []
   - file: double_ring_rotate_line.html
     title: Rotating Perpendicular Rings in 3D
@@ -323,7 +323,7 @@
     - Motion
     - Color
   - file: chasing_circle.html
-    title: Interactive Circle Line Drawing with Dynamic Points
+    title: Chasing circle — Interactive Study
     tags: []
   - file: chasing_diamond_around_diamond.html
     title: Diamond Rotation and Translation
@@ -698,6 +698,15 @@
   - file: klein_bottle.html
     title: Klein Bottle Visualization
     tags: []
+  - file: longitudinal-torus-one-band-ribbon.html
+    title: Closed ribbon, variable hole — Interactive Study
+    tags: []
+  - file: longitudinal-torus-ribbon.html
+    title: Longitudinal torus spiral — Interactive Study
+    tags: []
+  - file: longitudinal-torus-ribbon5.html
+    title: Repeated closed torus bands — Interactive Study
+    tags: []
   - file: mobius.html
     title: Möbius Strip Wireframe
     tags: []
@@ -747,6 +756,9 @@
   - file: saddle-wave-torus.html
     title: Saddle-Wave Torus — Interactive Study
     tags: []
+  - file: shifted-torus-trips.html
+    title: Shifted torus ribbon trips — Interactive Study
+    tags: []
   - file: sinusoidal_on_sphere_equator.html
     title: Equatorial Waves on a Sphere
     tags: []
@@ -773,6 +785,9 @@
     tags: []
   - file: torus-knot-sculpture.html
     title: Torus-Knot Sculpture — Interactive Study
+    tags: []
+  - file: torus-ribbon.html
+    title: One continuous torus ribbon — Interactive Study
     tags: []
   - file: truncated_dodecahedron_one_corner.html
     title: Truncated Dodecahedron Line Graphics
@@ -983,6 +998,9 @@
   description: Flower-like curves built from rotated petals, from simple blossoms to complex multi-petal
     motion.
   items:
+  - file: chromatic_rosette.html
+    title: Chromatic triangle rosette — Interactive Study
+    tags: []
   - file: flower.html
     title: Animated Flower Pattern
     tags: []
@@ -1037,6 +1055,9 @@
     tags: []
   - file: three_petal.html
     title: Three Petal Shape Animation
+    tags: []
+  - file: triangle_rosette.html
+    title: Triangle string-art rosette — Interactive Study
     tags: []
   - file: two_petal.html
     title: Two-Petal Shape Animation
