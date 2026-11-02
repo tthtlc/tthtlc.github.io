@@ -34,7 +34,7 @@ for(let z=0;z<N;z++)for(let x=0;x<N;x++){let a=z*(N+1)+x,b=a+1,c=a+N+1,d=c+1;tri
 for(let z=0;z<=N;z+=3)for(let x=0;x<N;x++){let a=z*(N+1)+x;lines.push(a,a+1);}
 for(let x=0;x<=N;x+=3)for(let z=0;z<N;z++){let a=z*(N+1)+x;lines.push(a,a+N+1);}
 function buffer(target,data){let b=gl.createBuffer();gl.bindBuffer(target,b);gl.bufferData(target,data,gl.STATIC_DRAW);return b;}
-buffer(gl.ARRAY_BUFFER,new Float32Array(points));let location=gl.getAttribLocation(program,'pos');gl.enableVertexAttribArray(location);gl.vertexAttribPointer(location,2,gl.FLOAT,false,0,0);
+buffer(gl.ARRAY_BUFFER,new Float32Array(points));let posLoc=gl.getAttribLocation(program,'pos');gl.enableVertexAttribArray(posLoc);gl.vertexAttribPointer(posLoc,2,gl.FLOAT,false,0,0);
 const trianglesBuffer=buffer(gl.ELEMENT_ARRAY_BUFFER,new Uint16Array(triangles)),linesBuffer=buffer(gl.ELEMENT_ARRAY_BUFFER,new Uint16Array(lines));
 gl.enable(gl.DEPTH_TEST);gl.clearColor(0.027,0.055,0.095,1);
 function multiply(a,b){let c=new Float32Array(16);for(let col=0;col<4;col++)for(let row=0;row<4;row++)for(let j=0;j<4;j++)c[col*4+row]+=a[j*4+row]*b[col*4+j];return c;}
