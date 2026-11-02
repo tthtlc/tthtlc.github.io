@@ -39,7 +39,10 @@
 - contour-slice-torus.html
 - conway.html
 - costa_minimal_surface.html
+- counter-rotating-circle-groups.html
 - cubic.html
+- cubic_harmonic_animation_only_trails.html
+- cubic_harmonic_variation.html
 - diamond3.html
 - diamond3_animate.html
 - diamond4_animated.html
@@ -199,7 +202,6 @@
 - negative_space_aperture.html
 - nested_hexagonal_spiral.html
 - octagon_auto_rotate.html
-- one_line_geometric_dance.html
 - opaque-silver-cutaway.html
 - orbiting_sculptures.html
 - parametric_curve1_param_rotate.html
@@ -231,6 +233,8 @@
 - pythagorean_tree_explore.html
 - quart_motion.html
 - quintic_explorer.html
+- radial-circle-flower.html
+- rainbow-torus-flower.html
 - rhombicDodecahedron.html
 - rhombicIcosahedron.html
 - ribbon-wrap-torus.html
@@ -353,14 +357,19 @@
 - two_petal.html
 - valentine.html
 - valentine2.html
+- variable-spirograph.html
 - variable_fraction_npoint_petal_rotate.html
 - variable_fraction_petal_rotate.html
 - variable_petal_rotate.html
+- variable_spirograph_amplitudes.html
+- variable_spirograph_template.html
 - vicsek_fractal.html
 - vicsek_fractal_animate.html
 - vicsek_fractal_multiple.html
 - vortex2_explore.html
 - vortex_explore.html
+- water_waves_3d.html
+- water_waves_checkerbox_checkboard.html
 - wavylines.html
 - wavylines2.html
 - weird_shape_explore.html

@@ -59,7 +59,7 @@ CATEGORIES = [
      "Sine waves, square waves and sinusoidal ribbons — oscillation drawn in "
      "animated color.",
      [r"sinusoid", r"sinsoid", r"sinewave", r"squarewave", r"square_sine",
-      r"wavy", r"wavelines", r"sine_sinusoidal", r"spider"]),
+      r"wavy", r"wavelines", r"sine_sinusoidal", r"spider", r"wave"]),
     ("hearts", "Hearts & Valentine", "💗",
      "Heart-shaped curves and clickable valentine games.",
      [r"heart", r"valentine"]),
