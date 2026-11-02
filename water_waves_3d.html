@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Outward water waves · 3D</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#07111f;color:#dceafa;font:14px system-ui,sans-serif;overflow:hidden}canvas{display:block;width:100vw;height:100vh;touch-action:none}aside{position:absolute;top:20px;left:20px;width:310px;padding:22px;border:1px solid #34506c;border-radius:16px;background:#0b1829eF;box-shadow:0 12px 40px #0005}h1{font-size:21px;margin:0 0 7px}p{color:#a6bbd2;line-height:1.5;margin:8px 0 16px}.formula{font:14px ui-monospace,monospace;color:#76e1f2;background:#07111f;padding:12px;border-radius:8px;line-height:1.7}label{display:block;margin-top:16px;color:#b9cbe0}label span{float:right;color:#73e3ef}input[type=range]{width:100%;accent-color:#50d3e3;margin-top:8px}button,select{background:#18304a;color:#e1edf9;border:1px solid #355575;border-radius:7px;padding:9px;cursor:pointer}button{margin:15px 6px 0 0}select{width:100%;margin-top:8px}.hint{position:absolute;bottom:18px;right:22px;color:#b5cce2;background:#0b1829cc;padding:10px 14px;border-radius:8px}.small{font-size:12px;margin-top:16px;margin-bottom:0}#error{position:absolute;inset:40%;color:white}details summary{cursor:pointer;color:#78dbe7;margin-top:16px}details p{font-size:12px;margin-bottom:0}@media(max-width:600px){aside{top:10px;left:10px;width:255px;padding:14px;max-height:66vh;overflow:auto}h1{font-size:18px}.hint{font-size:11px;right:10px;bottom:10px}label{margin-top:10px}}
+</style></head><body><canvas id="view" aria-label="Interactive three-dimensional animated surface of circular water waves"></canvas>
+<aside><h1>Outward water waves</h1><p>A continuous source sends circular crests across a three-dimensional water surface.</p><div class="formula">η(r,t) = A · E(r) · cos(kr − ωt)<br>k = 2π/λ &nbsp; ω = 2πf</div>
+<label>Amplitude <span id="aValue"></span><input id="a" type="range" min="0.05" max="0.9" step="0.01" value="0.4"></label>
+<label>Wavelength <span id="lValue"></span><input id="l" type="range" min="1" max="5" step="0.05" value="2.8"></label>
+<label>Frequency <span id="fValue"></span><input id="f" type="range" min="0.1" max="1.5" step="0.01" value="0.55"></label>
+<label>Playback speed <span id="sValue"></span><input id="s" type="range" min="0.1" max="2" step="0.1" value="1"></label>
+<label>Surface display<select id="mode"><option value="both">Shaded surface + mesh</option><option value="surface">Shaded surface</option><option value="wire">Wireframe</option></select></label>
+<label><input id="spread" type="checkbox" checked> Geometric spreading</label>
+<button id="pause">Pause</button><button id="reset">Reset time</button><button id="camera">Reset view</button>
+<details><summary>Model and controls</summary><p>Drag to orbit; scroll or pinch to zoom. Lengths and time are in illustrative units. Frequency and wavelength are independently adjustable; this is a kinematic demonstration, not a fluid solver or a gravity–capillary dispersion model.</p><p>To avoid a singularity at the source, the envelope is smoothed: E(r) = [1 + (r/r₀)²]⁻¹/⁴, with r₀ = 1. It approaches r⁻¹/² far away. This smooth core is illustrative, not the exact source solution. Disabling spreading sets E = 1. The source is already running throughout the displayed surface at t = 0.</p></details>
+<p class="small" id="status"></p></aside><div class="hint">Drag to orbit · Scroll / pinch to zoom</div><script>
+'use strict';
+const canvas=document.querySelector('#view'),gl=canvas.getContext('webgl',{antialias:true,alpha:false});
+if(!gl){document.body.innerHTML='<p style="padding:40px">WebGL is unavailable. Enable hardware acceleration or try a WebGL-capable browser.</p>';throw Error('WebGL unavailable');}
+const vertex=`precision highp float;
+attribute vec2 pos;uniform mat4 vp;uniform float time,amp,k,omega,spread;
+varying float height;varying vec3 normal;varying vec2 xy;
+void main(){float r=length(pos);float envelope=pow(1.0+r*r,-0.25*spread);float phase=k*r-omega*time;
+float h=amp*envelope*cos(phase);float derivative=amp*envelope*(-0.5*spread*r/(1.0+r*r)*cos(phase)-k*sin(phase));
+vec2 gradient=r>0.0001?derivative*pos/r:vec2(0.0);normal=normalize(vec3(-gradient.x,1.0,-gradient.y));height=h/max(amp,0.001);xy=pos;
+gl_Position=vp*vec4(pos.x,h,pos.y,1.0);}`;
+const fragment=`precision mediump float;varying float height;varying vec3 normal;varying vec2 xy;uniform float wire;
+void main(){float u=clamp(height*0.5+0.5,0.0,1.0);vec3 base=mix(vec3(0.025,0.15,0.30),vec3(0.12,0.72,0.79),u);float light=0.42+0.58*max(dot(normalize(normal),normalize(vec3(-0.3,1.0,0.4))),0.0);vec3 color=base*light; if(wire>0.5)color=vec3(0.20,0.63,0.77)*0.7;gl_FragColor=vec4(color,1.0);}`;
+function shader(type,src){let s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS))throw Error(gl.getShaderInfoLog(s));return s;}
+const program=gl.createProgram();gl.attachShader(program,shader(gl.VERTEX_SHADER,vertex));gl.attachShader(program,shader(gl.FRAGMENT_SHADER,fragment));gl.linkProgram(program);if(!gl.getProgramParameter(program,gl.LINK_STATUS))throw Error(gl.getProgramInfoLog(program));gl.useProgram(program);
+const uniforms={};for(const name of ['vp','time','amp','k','omega','spread','wire'])uniforms[name]=gl.getUniformLocation(program,name);
+const N=180,L=22,points=[],triangles=[],lines=[];
+for(let z=0;z<=N;z++)for(let x=0;x<=N;x++)points.push((x/N-0.5)*L,(z/N-0.5)*L);
+for(let z=0;z<N;z++)for(let x=0;x<N;x++){let a=z*(N+1)+x,b=a+1,c=a+N+1,d=c+1;triangles.push(a,c,b,b,c,d);}
+for(let z=0;z<=N;z+=3)for(let x=0;x<N;x++){let a=z*(N+1)+x;lines.push(a,a+1);}
+for(let x=0;x<=N;x+=3)for(let z=0;z<N;z++){let a=z*(N+1)+x;lines.push(a,a+N+1);}
+function buffer(target,data){let b=gl.createBuffer();gl.bindBuffer(target,b);gl.bufferData(target,data,gl.STATIC_DRAW);return b;}
+buffer(gl.ARRAY_BUFFER,new Float32Array(points));let location=gl.getAttribLocation(program,'pos');gl.enableVertexAttribArray(location);gl.vertexAttribPointer(location,2,gl.FLOAT,false,0,0);
+const trianglesBuffer=buffer(gl.ELEMENT_ARRAY_BUFFER,new Uint16Array(triangles)),linesBuffer=buffer(gl.ELEMENT_ARRAY_BUFFER,new Uint16Array(lines));
+gl.enable(gl.DEPTH_TEST);gl.clearColor(0.027,0.055,0.095,1);
+function multiply(a,b){let c=new Float32Array(16);for(let col=0;col<4;col++)for(let row=0;row<4;row++)for(let j=0;j<4;j++)c[col*4+row]+=a[j*4+row]*b[col*4+j];return c;}
+function normalize(a){let n=Math.hypot(...a);return a.map(v=>v/n);}function cross(a,b){return [a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];}function dot(a,b){return a.reduce((s,v,i)=>s+v*b[i],0);}
+let yaw=0.75,pitch=0.65,distance=30;
+function matrix(){let target=[-2,0,0],eye=[target[0]+distance*Math.cos(pitch)*Math.sin(yaw),distance*Math.sin(pitch),distance*Math.cos(pitch)*Math.cos(yaw)];let z=normalize(eye.map((v,i)=>v-target[i])),x=normalize(cross([0,1,0],z)),y=cross(z,x);let view=new Float32Array([x[0],y[0],z[0],0,x[1],y[1],z[1],0,x[2],y[2],z[2],0,-dot(x,eye),-dot(y,eye),-dot(z,eye),1]);let f=1/Math.tan(Math.PI/8),aspect=canvas.width/canvas.height,near=.1,far=200;let p=new Float32Array([f/aspect,0,0,0,0,f,0,0,0,0,(far+near)/(near-far),-1,0,0,2*far*near/(near-far),0]);return multiply(p,view);}
+const inputs={};for(const id of ['a','l','f','s']){inputs[id]=document.getElementById(id);inputs[id].oninput=update;}function update(){for(const id of ['a','l','f','s'])document.getElementById(id+'Value').textContent=Number(inputs[id].value).toFixed(2)+(id==='s'?'×':'');}update();
+let paused=false,time=0,last=0,phase=0;
+document.querySelector('#pause').onclick=e=>{paused=!paused;e.target.textContent=paused?'Resume':'Pause';};document.querySelector('#reset').onclick=()=>{time=0;phase=0;};document.querySelector('#camera').onclick=()=>{yaw=.75;pitch=.65;distance=30;};
+const pointers=new Map();let pinch=0;
+canvas.onpointerdown=e=>{canvas.setPointerCapture(e.pointerId);pointers.set(e.pointerId,[e.clientX,e.clientY]);pinch=0;};
+canvas.onpointermove=e=>{if(!pointers.has(e.pointerId))return;let old=pointers.get(e.pointerId);pointers.set(e.pointerId,[e.clientX,e.clientY]);if(pointers.size===1){yaw-=(e.clientX-old[0])*.006;pitch=Math.max(.12,Math.min(1.5,pitch+(e.clientY-old[1])*.006));}else{let p=[...pointers.values()],d=Math.hypot(p[0][0]-p[1][0],p[0][1]-p[1][1]);if(pinch)distance=Math.max(12,Math.min(65,distance*pinch/Math.max(d,1)));pinch=d;}};
+for(const event of ['pointerup','pointercancel','lostpointercapture'])canvas.addEventListener(event,e=>{pointers.delete(e.pointerId);pinch=0;});canvas.addEventListener('wheel',e=>{e.preventDefault();distance=Math.max(12,Math.min(65,distance*Math.exp(e.deltaY*.001)));},{passive:false});
+function draw(now){let dt=last?Math.min((now-last)/1000,.1):0;last=now;let speed=+inputs.s.value,omega=2*Math.PI*+inputs.f.value;if(!paused){time+=dt*speed;phase=(phase+omega*dt*speed)%(2*Math.PI);}let ratio=Math.min(devicePixelRatio||1,2),w=Math.round(innerWidth*ratio),h=Math.round(innerHeight*ratio);if(canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h;gl.viewport(0,0,w,h);}gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.uniformMatrix4fv(uniforms.vp,false,matrix());gl.uniform1f(uniforms.time,phase);gl.uniform1f(uniforms.omega,1);gl.uniform1f(uniforms.amp,+inputs.a.value);gl.uniform1f(uniforms.k,2*Math.PI/+inputs.l.value);gl.uniform1f(uniforms.spread,document.querySelector('#spread').checked?1:0);
+let mode=document.querySelector('#mode').value;if(mode!=='wire'){gl.enable(gl.POLYGON_OFFSET_FILL);gl.polygonOffset(1,1);gl.uniform1f(uniforms.wire,0);gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,trianglesBuffer);gl.drawElements(gl.TRIANGLES,triangles.length,gl.UNSIGNED_SHORT,0);gl.disable(gl.POLYGON_OFFSET_FILL);}if(mode!=='surface'){gl.uniform1f(uniforms.wire,1);gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,linesBuffer);gl.drawElements(gl.LINES,lines.length,gl.UNSIGNED_SHORT,0);}
+document.querySelector('#status').textContent=`t = ${time.toFixed(1)} · crest speed λf = ${(+inputs.l.value * +inputs.f.value).toFixed(2)} · ${paused?'paused':'running'}`;requestAnimationFrame(draw);}requestAnimationFrame(draw);
+</script></body></html>

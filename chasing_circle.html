@@ -2,19 +2,16 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Chasing circle — Interactive Study</title>
+<title>Chord circle — Interactive Study</title>
 <style>
 :root{color-scheme:dark;font-family:Inter,system-ui,sans-serif;background:#10151d;color:#eef2f8}*{box-sizing:border-box}body{margin:0}main{display:grid;grid-template-columns:1fr 300px;height:100vh;min-height:0}.stage{position:relative;height:100vh;min-height:0;overflow:hidden;background:radial-gradient(ellipse at 50% 45%,#253247,#10151d 70%)}canvas{display:block;width:100%;height:100%;position:absolute;touch-action:auto}.topbar{position:absolute;top:32px;left:36px;right:36px;display:flex;align-items:flex-start;gap:36px;flex-wrap:wrap;z-index:2}.heading{pointer-events:none}h1{font-size:clamp(24px,3vw,40px);font-weight:500;letter-spacing:-.04em;margin:6px 0}.eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.22em;color:#91a5bf}.hint{position:absolute;bottom:28px;left:36px;color:#92a3b9;font-size:12px;pointer-events:none;z-index:2}.formula{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);z-index:3;max-width:calc(100% - 48px);background:rgba(16,21,29,.9);border:1px solid #2a3443;border-radius:9px;padding:7px 12px;font-size:10px;line-height:1.55;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#a4e3d4;text-align:center;white-space:pre;pointer-events:none;box-shadow:0 4px 18px rgba(0,0,0,.35)}aside{padding:32px 25px;background:#151c27;border-left:1px solid #2a3443;height:100vh;overflow-y:auto}aside::-webkit-scrollbar{width:8px}aside::-webkit-scrollbar-track{background:#10151d}aside::-webkit-scrollbar-thumb{background:#3a485b;border-radius:4px}aside::-webkit-scrollbar-thumb:hover{background:#4a5c74}h2{font-size:17px;font-weight:500;margin:0 0 26px}label{display:block;font-size:13px;color:#c7d2e3;margin-bottom:22px}.row{display:flex;justify-content:space-between;margin-bottom:8px}output{font-variant-numeric:tabular-nums;color:#88dbc6}input[type=range]{width:100%;accent-color:#88dbc6}select,button{background:#202d3d;color:#eef2f8;border:1px solid #3a485b;border-radius:8px;padding:10px;font:inherit;width:100%}input[type=color]{width:100%;height:34px;background:none;border:0;padding:0}button{cursor:pointer;margin-top:10px}button:hover{background:#2b3e53}button:disabled{opacity:.55;cursor:wait}.check{display:flex;gap:10px;align-items:center;margin:16px 0 0;font-size:13px;color:#c7d2e3}.check input[type=checkbox]{width:auto;accent-color:#88dbc6}.note{font-size:12px;color:#91a5bf;line-height:1.65;margin-top:25px}details{font-size:12px;color:#91a5bf;line-height:1.65}summary{cursor:pointer;color:#c7d2e3}code{color:#a4e3d4}.geometry{pointer-events:auto;max-width:min(46vw,400px);background:rgba(21,28,39,.88);border:1px solid #2a3443;border-radius:12px;padding:10px 14px;backdrop-filter:blur(6px);margin-top:4px}.geometry p{margin:.6em 0}.gallery{border-top:1px solid #2a3443;margin-top:25px;padding-top:22px}.gallery h2{margin:0 0 8px}.gallery-note{font-size:11px;color:#91a5bf;line-height:1.6;margin:0 0 14px}.gallery-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.gallery-item{display:block;border:1px solid #2a3443;border-radius:8px;overflow:hidden;text-decoration:none;background:#10151d}.gallery-item:hover{border-color:#88dbc6}.gallery-item img{display:block;width:100%;height:64px;object-fit:cover}.gallery-item span{display:block;font-size:9px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#91a5bf;padding:4px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.gallery-empty{grid-column:1/-1;color:#6b7d94;font-size:12px;text-align:center;padding:14px 0}@media(max-width:760px){main{grid-template-columns:1fr;height:auto;min-height:100vh}.stage{height:65vh;min-height:420px}aside{border-left:0;border-top:1px solid #2a3443;height:auto;max-height:none;overflow:visible}.topbar{left:24px;top:22px;right:24px;gap:24px}.hint{left:24px}.formula{left:24px;right:24px;transform:none;max-width:none;text-align:left}}
 </style>
-
-<!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-GEX61LPT08"></script> <script>   window.dataLayer = window.dataLayer || [];   function gtag(){dataLayer.push(arguments);}   gtag('js', new Date());   gtag('config', 'G-GEX61LPT08'); </script>
-</head>
+<!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-GEX61LPT08"></script> <script>   window.dataLayer = window.dataLayer || [];   function gtag(){dataLayer.push(arguments);}   gtag('js', new Date());   gtag('config', 'G-GEX61LPT08'); </script> </head>
 <body>
-<main><section class="stage"><canvas id="canvas" aria-label="Two interleaved families of chords between index-offset points of a circle."></canvas><div class="topbar"><div class="heading"><div class="eyebrow">Index chords / 03</div><h1>Chasing circle</h1></div><details class="geometry"><summary>Geometry</summary><p>Points are spaced evenly on one circle. Each point is joined to the point <code>a</code> steps ahead, then to the point <code>b</code> steps ahead, giving two counter-pointed chord families.</p><p><code>θᵢ = 2πi/n; Pᵢ → P(i+a) → P(i+b)  (mod n)</code></p></details></div><div class="formula" id="formula"></div></section>
+<main><section class="stage"><canvas id="canvas" aria-label="Chord pattern joining each of N evenly spaced points to the point A steps ahead."></canvas><div class="topbar"><div class="heading"><div class="eyebrow">Index chords / 04</div><h1>Chord circle</h1></div><details class="geometry"><summary>Geometry</summary><p><code>N</code> points are spaced evenly around one circle. Each point <code>i</code> (running 1…N) is joined to the point <code>i+A</code> steps ahead, wrapping modulo <code>N</code>.</p><p><code>θᵢ = 2πi/N;  Pᵢ → P(i+A)  (mod N)</code></p></details></div><div class="formula" id="formula"></div></section>
 <aside><h2>Shape &amp; appearance</h2>
-<label><span class="row"><span>Index offset a</span><output id="offsetAOut"></output></span><input id="offsetA" type="range" min="0" max="59" step="1" value="2"></label>
-<label><span class="row"><span>Index offset b</span><output id="offsetBOut"></output></span><input id="offsetB" type="range" min="0" max="59" step="1" value="30"></label>
-<label><span class="row"><span>Points n</span><output id="pointsOut"></output></span><input id="points" type="range" min="3" max="120" step="1" value="60"></label>
+<label><span class="row"><span>Step A</span><output id="AOut"></output></span><input id="A" type="range" min="1" max="119" step="3" value="30"></label>
+<label><span class="row"><span>Points N</span><output id="NOut"></output></span><input id="N" type="range" min="3" max="120" step="1" value="60"></label>
 <label><span class="row"><span>Line width</span><output id="lineWidthOut"></output></span><input id="lineWidth" type="range" min="0.2" max="3" step="0.05" value="0.9"></label>
 <label>Base colour<input id="color" type="color" value="#7fd4ff"></label>
 <button id="reset">Reset design</button><button id="export">Save PNG</button><button id="exportGif">Save GIF</button><button id="animate">Animate</button>
@@ -24,57 +21,14 @@
 </aside></main>
 <script>
 'use strict';
-const PREFIX='chasing_circle_';
-const DEFAULT_COLOR='#7fd4ff';
-const SLIDERS=[
- {id:'offsetA',min:0,max:59,step:1,value:2,dec:null},
- {id:'offsetB',min:0,max:59,step:1,value:30,dec:null},
- {id:'points',min:3,max:120,step:1,value:60,dec:null},
- {id:'lineWidth',min:0.2,max:3,step:0.05,value:0.9,dec:2}
-];
-function fx(t,p){return Math.cos(t);}
-function fy(t,p){return Math.sin(t);}
-function formulaLines(p){
- return ['θᵢ = 2πi / n     (n = '+rnd(p.points)+')',
-         'Pᵢ → P(i+'+rnd(p.offsetA)+') → P(i+'+rnd(p.offsetB)+')   mod n'];
-}
-function drawScene(ctx,W,H,p,prog){
- if(prog==null)prog=1;
- const n=Math.max(3,Math.round(p.points));
- const scale=fitScale(W,H,1.08);
- const cx=W/2,cy=H/2;
- const c=baseHsl(p);
- const shown=Math.max(0,Math.round(prog*n));
- ctx.lineCap='round';ctx.lineJoin='round';
- ctx.lineWidth=Math.max(0.6,p.lineWidth*0.55);
- ctx.strokeStyle=colorFor(0.18,c.h,c.s);
- ctx.beginPath();ctx.arc(cx,cy,scale,0,TAU);ctx.stroke();
- const aShift=Math.round(p.offsetA),bShift=Math.round(p.offsetB);
- for(let i=0;i<shown;i++){
-  const a=TAU*i/n;
-  const aA=TAU*(((i+aShift)%n)+n)%n/n;
-  const aB=TAU*(((i+bShift)%n)+n)%n/n;
-  const px=cx+scale*Math.cos(a),py=cy+scale*Math.sin(a);
-  const qx=cx+scale*Math.cos(aA),qy=cy+scale*Math.sin(aA);
-  const rx=cx+scale*Math.cos(aB),ry=cy+scale*Math.sin(aB);
-  ctx.lineWidth=p.lineWidth;
-  ctx.strokeStyle=colorFor(0.22+0.5*(i/n),c.h,c.s);
-  ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(qx,qy);ctx.stroke();
-  ctx.strokeStyle=colorFor(0.82-0.5*(i/n),(c.h+150)%360,c.s);
-  ctx.beginPath();ctx.moveTo(qx,qy);ctx.lineTo(rx,ry);ctx.stroke();
- }
-}
-
-
 const $=id=>document.getElementById(id);
 const canvas=$('canvas'),ctx=canvas.getContext('2d');
 const TAU=Math.PI*2;
 let width=1,height=1,dpr=1;
-const BANDS=72;
-const SEGMENTS=4000;
+const PREFIX='chord_circle_';
+const DEFAULT_COLOR='#7fd4ff';
+const SLIDERS=[{id:'A',min:1,max:119,step:1,value:30,dec:null},{id:'N',min:3,max:120,step:1,value:60,dec:null},{id:'lineWidth',min:0.2,max:3,step:0.05,value:0.9,dec:2}];
 function rnd(v){return Math.round(v*1000)/1000;}
-function gcd(a,b){a=Math.abs(Math.round(a));b=Math.abs(Math.round(b));return b?gcd(b,a%b):a;}
-function lcm(a,b){a=Math.abs(Math.round(a));b=Math.abs(Math.round(b));return (a/gcd(a,b))*b;}
 function hexToHsl(hex){
  const r=parseInt(hex.slice(1,3),16)/255,g=parseInt(hex.slice(3,5),16)/255,b=parseInt(hex.slice(5,7),16)/255;
  const max=Math.max(r,g,b),min=Math.min(r,g,b),l=(max+min)/2;
@@ -91,24 +45,16 @@ function hexToHsl(hex){
 }
 function baseHsl(p){const c=hexToHsl(p.color);return {h:Math.round(c.h),s:Math.round(c.s*100)};}
 function colorFor(f,hue,sat){const L=Math.round(88-58*f);return 'hsl('+hue+', '+sat+'%, '+L+'%)';}
-function fitScale(W,H,maxR,zoom,margin){zoom=zoom||1;margin=margin||0;return (Math.min(W,H)*0.46-margin)/Math.max(maxR,0.001)*zoom;}
-function strokeRadial(ctx,cx,cy,scale,pts,maxR,hue,sat,lw,maxIndex){
- if(maxIndex==null||maxIndex<0)maxIndex=pts.length-1;
- maxIndex=Math.min(maxIndex,pts.length-1);
- ctx.lineWidth=lw;ctx.lineCap='round';ctx.lineJoin='round';
- let bucket=-1,prevX=0,prevY=0;
- ctx.beginPath();
- for(let i=0;i<=maxIndex;i++){
-  const x=pts[i][0],y=pts[i][1];
-  const nx=cx+x*scale,ny=cy-y*scale;
-  if(i===0){ctx.moveTo(nx,ny);prevX=nx;prevY=ny;continue;}
-  const norm=Math.min(1,Math.hypot(x,y)/(maxR||1));
-  const b=Math.min(BANDS-1,Math.floor(norm*BANDS));
-  if(b!==bucket){ctx.stroke();ctx.beginPath();ctx.moveTo(prevX,prevY);bucket=b;ctx.strokeStyle=colorFor(b/(BANDS-1),hue,sat);}
-  ctx.lineTo(nx,ny);prevX=nx;prevY=ny;
+const PALETTE_SIZE=32;
+function buildPalette(c){
+ const pal=[];
+ for(let k=0;k<PALETTE_SIZE;k++){
+  const hue=(c.h+k*(360/PALETTE_SIZE))%360;
+  pal.push('hsl('+hue+', '+c.s+'%, 62%)');
  }
- ctx.stroke();
+ return pal;
 }
+function fitScale(W,H,maxR,zoom,margin){zoom=zoom||1;margin=margin||0;return (Math.min(W,H)*0.46-margin)/Math.max(maxR,0.001)*zoom;}
 function readParams(){
  const p={};
  for(const s of SLIDERS)p[s.id]=parseFloat($(s.id).value);
@@ -155,7 +101,7 @@ function stopAuto(){if(autoTimer){clearInterval(autoTimer);autoTimer=null;}}
 function startAuto(){
  stopAuto();
  const el=$(firstDef.id);
- el.value=firstDef.min;
+ el.value=firstDef.value;
  autoDir=1;
  autoTimer=setInterval(autoTick,1300);
  draw();
@@ -315,6 +261,39 @@ function saveGif(){
  },30);
 }
 
+function formulaLines(p){
+ return ['θᵢ = 2πi / N     (N = '+rnd(p.N)+',  A = '+Math.round(p.A)+')',
+         'Pᵢ → P(i+A)   mod N     (i = 1 … N)'];
+}
+function drawScene(ctx,W,H,p,prog){
+ if(prog==null)prog=1;
+ const N=Math.max(3,Math.round(p.N));
+ const A=Math.max(1,Math.round(p.A));
+ const scale=fitScale(W,H,1.08);
+ const cx=W/2,cy=H/2;
+ const c=baseHsl(p);
+ const shown=Math.max(0,Math.round(prog*N));
+ const palette=buildPalette(c);
+ ctx.lineCap='round';ctx.lineJoin='round';
+ ctx.lineWidth=Math.max(0.6,p.lineWidth*0.55);
+ ctx.strokeStyle=colorFor(0.18,c.h,c.s);
+ ctx.beginPath();ctx.arc(cx,cy,scale,0,TAU);ctx.stroke();
+ ctx.fillStyle=colorFor(0.22,c.h,c.s);
+ for(let i=1;i<=shown;i++){
+  const a1=TAU*i/N;
+  ctx.beginPath();ctx.arc(cx+scale*Math.cos(a1),cy+scale*Math.sin(a1),Math.max(1.1,p.lineWidth*0.6),0,TAU);ctx.fill();
+ }
+ for(let i=1;i<=shown;i++){
+  const a1=TAU*i/N;
+  const a2=TAU*((i+A)%N)/N;
+  ctx.lineWidth=p.lineWidth;
+  ctx.strokeStyle=palette[(i-1)%PALETTE_SIZE];
+  ctx.beginPath();
+  ctx.moveTo(cx+scale*Math.cos(a1),cy+scale*Math.sin(a1));
+  ctx.lineTo(cx+scale*Math.cos(a2),cy+scale*Math.sin(a2));
+  ctx.stroke();
+ }
+}
 
 for(const sd of SLIDERS)$(sd.id).addEventListener('input',function(){draw();});
 $('color').addEventListener('input',function(){draw();});
@@ -323,7 +302,6 @@ $('reset').onclick=function(){
  for(const sd of SLIDERS)$(sd.id).value=sd.value;
  $('color').value=DEFAULT_COLOR;
  $('autoSweep').checked=true;
- if(typeof resetExtras==='function')resetExtras();
  startAuto();
  draw();
 };
@@ -348,8 +326,5 @@ new ResizeObserver(function(){resize();}).observe(canvas.parentElement);
 syncOutputs(readParams());
 resize();
 startAuto();
-
-
-
 </script>
 </body></html>
