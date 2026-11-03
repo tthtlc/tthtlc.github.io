@@ -169,6 +169,8 @@ btnReset.addEventListener('click', () => { t = 0; trail.length = 0; tctx.clearRe
 axesChk.addEventListener('change', () => S.showAxes = axesChk.checked);
 traceChk.addEventListener('change', () => S.showTrace = traceChk.checked);
 
+let t = 0, last = null;
+const trail = [];
 let W = 0, H = 0, cx = 0, cy = 0, sc = 1;
 function resize() {
   const r = stage.getBoundingClientRect();
@@ -203,8 +205,6 @@ readPal();
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change', readPal);
 new MutationObserver(readPal).observe(document.documentElement, { attributes:true, attributeFilter:['data-theme'] });
 
-let t = 0, last = null;
-const trail = [];
 const th = tt => 2 * Math.PI * (S.rpm / 60) * tt;
 const bAt = tv => (S.bMax + S.bMin) / 2 + (S.bMax - S.bMin) / 2 * Math.cos(S.ratio * tv);
 
