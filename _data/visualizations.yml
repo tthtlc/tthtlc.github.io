@@ -56,7 +56,6 @@
 - dodecahedron_nolabel.html
 - double_circle_rotating.html
 - double_ellipse.html
-- double_hypotrochoid.html
 - double_hypotrochoid_explore.html
 - double_hypotrochoid_moving_offset_explore.html
 - double_hypotrochoid_rotating.html
@@ -99,7 +98,7 @@
 - epitrochoid_explore.html
 - figure_eight.html
 - figure_eight_double_wheel.html
-- figure_eight_fifth.html
+- figure_eight_radiating.html
 - figure_eight_radiating_fixed.html
 - figure_eight_running.html
 - figure_eight_third.html
@@ -357,7 +356,6 @@
 - two_petal.html
 - valentine.html
 - valentine2.html
-- variable-spirograph.html
 - variable_fraction_npoint_petal_rotate.html
 - variable_fraction_petal_rotate.html
 - variable_petal_rotate.html

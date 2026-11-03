@@ -9,9 +9,6 @@
     title: Dynamic Complex Line Drawing
     tags:
     - Rotating
-  - file: double_hypotrochoid.html
-    title: Hypotrochoid Curves
-    tags: []
   - file: double_hypotrochoid_explore.html
     title: Double hypotrochoid — Interactive Study
     tags:
@@ -232,9 +229,6 @@
     title: Rotating Perpendicular Rings in 3D
     tags:
     - Rotating
-  - file: variable-spirograph.html
-    title: Variable-frequency Spirograph
-    tags: []
   - file: variable_spirograph_amplitudes.html
     title: Variable-frequency spirograph — Interactive Study
     tags: []
@@ -250,8 +244,8 @@
   - file: figure_eight.html
     title: Figure of eight on a triangle
     tags: []
-  - file: figure_eight_fifth.html
-    title: Figure of 8 using Polar Coordinates
+  - file: figure_eight_radiating.html
+    title: Radiating Figure-eight — Interactive Study
     tags: []
   - file: figure_eight_radiating_fixed.html
     title: Figure of 8 with Growing Lobes
