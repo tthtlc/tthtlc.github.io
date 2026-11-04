@@ -895,10 +895,10 @@
     - Motion
     - Color
   - file: water_waves_3d.html
-    title: Outward water waves · 3D
+    title: Outward water waves · 3D — Interactive Study
     tags: []
   - file: water_waves_checkerbox_checkboard.html
-    title: Outward water waves · 3D
+    title: Outward water waves · Checkerboard — Interactive Study
     tags: []
   - file: wavylines.html
     title: Wavy Lines
@@ -946,6 +946,12 @@
   - file: double_ellipse.html
     title: Dynamic Ellipse Connection
     tags: []
+  - file: ellipse_atelier_v1.html
+    title: Ellipse Atelier · Ten studies
+    tags: []
+  - file: ellipse_atelier_v2.html
+    title: Ellipse Atelier · Corrected ten constructions
+    tags: []
   - file: ellipse_sliding_circle.html
     title: Tangential Ellipse Animation
     tags: []
@@ -963,7 +969,7 @@
     title: Generalized Ellipse Windings
     tags: []
   - file: rotating-ellipse.html
-    title: The 5:1 Ellipse
+    title: The 5:1 Ellipse — Interactive Study
     tags:
     - Rotating
   - file: rotating_ellipse.html
