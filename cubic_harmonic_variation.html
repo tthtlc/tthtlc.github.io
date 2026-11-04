@@ -10,7 +10,7 @@
 <body>
 <main><section class="stage"><canvas id="canvas" aria-label="Interactive parametric curve. Lines are bright near the centre and cool toward the rim; use the sliders to change its shape."></canvas><div class="topbar"><div class="heading"><div class="eyebrow">Parametric curve / Cubic harmonics</div><h1>Cubic harmonic curve</h1></div><details class="geometry"><summary>Geometry</summary><p>A unit-circle motion minus a cubed, high-frequency harmonic. Angles are in radians; the default trace runs from 0 to 2π.</p><p><code>x(t) = cos(t) − [cos(550t)]³</code><br><code>y(t) = sin(t) − [sin(550t)]³</code></p><p>Frequency and power are integers. The amplitude scales both subtracted terms.</p></details></div><div class="formula" id="formula"></div></section>
 <aside><h2>Shape &amp; appearance</h2>
-<label><span class="row"><span>Harmonic frequency n</span><output id="frequencyOut"></output></span><input id="frequency" type="range" min="1" max="120" step="1" value="3"></label>
+<label><span class="row"><span>Harmonic frequency n</span><output id="frequencyOut"></output></span><input id="frequency" type="range" min="1" max="200" step="1" value="60"></label>
 <label><span class="row"><span>Harmonic power p</span><output id="powerOut"></output></span><input id="power" type="range" min="1" max="9" step="1" value="3"></label>
 <label><span class="row"><span>Harmonic amplitude A</span><output id="amplitudeOut"></output></span><input id="amplitude" type="range" min="0" max="2" step="0.05" value="1"></label>
 <label><span class="row"><span>Line width</span><output id="lineWidthOut"></output></span><input id="lineWidth" type="range" min="0.1" max="3" step="0.05" value="0.35"></label>

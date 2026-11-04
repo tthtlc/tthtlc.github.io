@@ -42,6 +42,7 @@
 - counter-rotating-circle-groups.html
 - cubic.html
 - cubic_harmonic_animation_only_trails.html
+- cubic_harmonic_base_frequency.html
 - cubic_harmonic_variation.html
 - diamond3.html
 - diamond3_animate.html
@@ -327,6 +328,7 @@
 - squarewave.html
 - squarewave_animated.html
 - squarewave_revolving.html
+- star_line.html
 - static_concentric.html
 - super_3d_object.html
 - superellipse.html

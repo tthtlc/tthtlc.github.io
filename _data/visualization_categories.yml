@@ -1037,7 +1037,7 @@
     tags:
     - Rotating
   - file: radial-circle-flower.html
-    title: Radial circle flower
+    title: Radial circle flower — Interactive Study
     tags: []
   - file: rose.html
     title: Golden-angle rose — Interactive Study
@@ -1287,6 +1287,9 @@
   - file: cubic_harmonic_animation_only_trails.html
     title: Cubic harmonic curve — Interactive Study
     tags: []
+  - file: cubic_harmonic_base_frequency.html
+    title: Cubic harmonic curve · base frequency b — Interactive Study
+    tags: []
   - file: cubic_harmonic_variation.html
     title: Cubic harmonic curve — Interactive Study
     tags: []
@@ -1364,6 +1367,9 @@
     - Interactive
   - file: square_triangle.html
     title: Triangle Animation
+    tags: []
+  - file: star_line.html
+    title: Animated String Art
     tags: []
   - file: super_3d_object.html
     title: The superformula — Interactive Study
