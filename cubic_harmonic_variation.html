@@ -94,7 +94,7 @@ function updateOverlay(p){overlay.textContent=formulaLines(p).join('\n');}
 function updateStatus(p){
  let s=SLIDERS.map(sd=>sd.id+' '+(sd.dec!=null?p[sd.id].toFixed(sd.dec):p[sd.id])).join(' \u00b7 ');
  if(animId)s+=' \u2014 tracing';
- if(autoTimer)s+=' \u2014 auto-sweeping '+SLIDERS[0].id;
+ if(autoTimer)s+=' \u2014 auto-sweeping frequency + amplitude';
  statusEl.textContent=s;
 }
 function draw(){
@@ -105,18 +105,19 @@ function draw(){
  drawScene(ctx,width,height,p);
 }
 const firstDef=SLIDERS[0];
-let autoTimer=null,autoDir=1;
+const secondDef=SLIDERS[2];
+let autoTimer=null,autoDir=1,autoPhase=0;
 function stopAuto(){if(autoTimer){clearInterval(autoTimer);autoTimer=null;}}
 function startAuto(){
  stopAuto();
- const el=$(firstDef.id);
- // Sweep from the current value rather than changing the initial design.
+ // Sweep from the current values rather than changing the initial design.
  autoDir=1;
+ autoPhase=0;
  autoTimer=setInterval(autoTick,1300);
  draw();
 }
-function autoTick(){
- const el=$(firstDef.id);
+function stepSlider(id){
+ const el=$(id);
  const st=parseFloat(el.step)||1;
  const inc=st>=1?1:st;
  let v=parseFloat(el.value)+autoDir*inc;
@@ -124,6 +125,11 @@ function autoTick(){
  if(v>=mx){v=mx;autoDir=-1;}
  else if(v<=mn){v=mn;autoDir=1;}
  el.value=v;
+}
+function autoTick(){
+ // One frequency increment, then five amplitude increments, then repeat.
+ if(autoPhase===0){stepSlider(firstDef.id);autoPhase=1;}
+ else{stepSlider(secondDef.id);autoPhase=(autoPhase+1)%6;}
  draw();
 }
 const animateBtn=$('animate');
@@ -296,7 +302,7 @@ function drawScene(ctx,W,H,p,prog){
 
 for(const sd of SLIDERS)$(sd.id).addEventListener('input',function(){draw();});
 $('color').addEventListener('input',function(){draw();});
-$(firstDef.id).addEventListener('input',function(){if($('autoSweep').checked){$('autoSweep').checked=false;stopAuto();}});
+[firstDef.id,secondDef.id].forEach(function(id){$(id).addEventListener('input',function(){if($('autoSweep').checked){$('autoSweep').checked=false;stopAuto();}});});
 $('reset').onclick=function(){
  for(const sd of SLIDERS)$(sd.id).value=sd.value;
  $('color').value=DEFAULT_COLOR;
