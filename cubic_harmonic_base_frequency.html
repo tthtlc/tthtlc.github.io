@@ -8,7 +8,7 @@
 </style>
 </head>
 <body>
-<main><section class="stage"><canvas id="canvas" aria-label="Interactive parametric curve. Lines are bright near the centre and cool toward the rim; use the sliders to change its shape."></canvas><div class="topbar"><div class="heading"><div class="eyebrow">Parametric curve / Cubic harmonics · base b</div><h1>Cubic harmonic curve</h1></div><details class="geometry"><summary>Geometry</summary><p>A unit-circle motion run at angular frequency b, minus a cubed, high-frequency harmonic. Angles are in radians; the trace runs from 0 to 2π.</p><p><code>x(t) = cos(b·t) − [cos(nt)]³</code><br><code>y(t) = sin(b·t) − [sin(nt)]³</code></p><p>b runs from 0 to 12 in steps of 0.1, so the base loop may take several turns (or barely advance). Frequency n and power p are integers; amplitude A scales both subtracted terms. The trace closes on itself only when b is a whole number.</p></details></div><div class="formula" id="formula"></div></section>
+<main><section class="stage"><canvas id="canvas" aria-label="Interactive parametric curve. Lines are bright near the centre and cool toward the rim; use the sliders to change its shape."></canvas><div class="topbar"><div class="heading"><div class="eyebrow">Parametric curve / Cubic harmonics · base b</div><h1>Cubic harmonic curve</h1></div><details class="geometry"><summary>Geometry</summary><p>A unit-circle motion run at angular frequency b, minus a cubed, high-frequency harmonic. Angles are in radians; the trace runs from 0 to 2π.</p><p><code>x(t) = cos(b·t) − [cos(nt)]³</code><br><code>y(t) = sin(b·t) − [sin(nt)]³</code></p><p>b runs from 0 to 12 in steps of 0.1, so the base loop may take several turns (or barely advance). Frequency n and power p are integers; amplitude A scales both subtracted terms. The trace closes on itself only when b is a whole number. Animate steps the amplitude A from 0 to 2 in 0.05 increments, then back, turning the whole curve 2° per step up to 360°, then back. Spiral overlays the drawing at 10° steps through a full turn.</p></details></div><div class="formula" id="formula"></div></section>
 <aside><h2>Shape &amp; appearance</h2>
 <label><span class="row"><span>Base frequency b</span><output id="bOut"></output></span><input id="b" type="range" min="0" max="12" step="0.1" value="1"></label>
 <label><span class="row"><span>Harmonic frequency n</span><output id="frequencyOut"></output></span><input id="frequency" type="range" min="1" max="200" step="1" value="60"></label>
@@ -16,7 +16,7 @@
 <label><span class="row"><span>Harmonic amplitude A</span><output id="amplitudeOut"></output></span><input id="amplitude" type="range" min="0" max="2" step="0.05" value="1"></label>
 <label><span class="row"><span>Line width</span><output id="lineWidthOut"></output></span><input id="lineWidth" type="range" min="0.1" max="3" step="0.05" value="0.35"></label>
 <label>Base colour<input id="color" type="color" value="#ffff00"></label>
-<button id="reset">Reset design</button><button id="export">Save PNG</button><button id="exportGif">Save GIF</button><button id="animate">Animate</button>
+<button id="reset">Reset design</button><button id="export">Save PNG</button><button id="exportGif">Save GIF</button><button id="animate">Animate</button><button id="spiral">Spiral</button>
 <label class="check"><input type="checkbox" id="autoSweep"> Auto-sweep base frequency b</label>
 <p class="note" id="status"></p>
 <section class="gallery"><h2>Saved PNGs</h2><p class="gallery-note">PNG captures are named with their parameter values. Commit the downloaded files to the repo and they will appear here automatically (fetched via the GitHub API).</p><div id="galleryItems" class="gallery-grid"></div></section>
@@ -52,16 +52,19 @@ function hexToHsl(hex){
 function baseHsl(p){const c=hexToHsl(p.color);return {h:Math.round(c.h),s:Math.round(c.s*100)};}
 function colorFor(f,hue,sat){const L=Math.round(88-58*f);return 'hsl('+hue+', '+sat+'%, '+L+'%)';}
 function fitScale(W,H,maxR,zoom,margin){zoom=zoom||1;margin=margin||0;return (Math.min(W,H)*0.46-margin)/Math.max(maxR,0.001)*zoom;}
-function strokeRadial(ctx,cx,cy,scale,pts,maxR,hue,sat,lw,maxIndex){
+function strokeRadial(ctx,cx,cy,scale,pts,maxR,hue,sat,lw,maxIndex,rot){
  if(maxIndex==null||maxIndex<0)maxIndex=pts.length-1;
  maxIndex=Math.min(maxIndex,pts.length-1);
  ctx.lineWidth=lw;ctx.lineCap='round';ctx.lineJoin='round';
+ const cos=Math.cos(rot||0),sin=Math.sin(rot||0);
  const paths=Array.from({length:BANDS},()=>new Path2D());
  for(let i=1;i<=maxIndex;i++){
   const a=pts[i-1],b=pts[i];
   const band=Math.min(BANDS-1,Math.floor(Math.hypot(b[0],b[1])/(maxR||1)*BANDS));
-  paths[band].moveTo(cx+a[0]*scale,cy-a[1]*scale);
-  paths[band].lineTo(cx+b[0]*scale,cy-b[1]*scale);
+  const ax=a[0]*cos+a[1]*sin,ay=-a[0]*sin+a[1]*cos;
+  const bx=b[0]*cos+b[1]*sin,by=-b[0]*sin+b[1]*cos;
+  paths[band].moveTo(cx+ax*scale,cy-ay*scale);
+  paths[band].lineTo(cx+bx*scale,cy-by*scale);
  }
  paths.forEach((path,i)=>{ctx.strokeStyle=colorFor(i/(BANDS-1),hue,sat);ctx.stroke(path);});
 }
@@ -94,13 +97,14 @@ const statusEl=$('status');
 function updateOverlay(p){overlay.textContent=formulaLines(p).join('\n');}
 function updateStatus(p){
  let s=SLIDERS.map(sd=>sd.id+' '+(sd.dec!=null?p[sd.id].toFixed(sd.dec):p[sd.id])).join(' \u00b7 ');
- if(animId)s+=' \u2014 tracing';
+ if(animTimer)s+=' \u2014 amplitude '+p.amplitude.toFixed(2)+', rotation '+rnd(animRot)+'\u00b0';
+ if(spiralTimer)s+=' \u2014 spiralling '+rnd(spiralAngle)+'\u00b0';
  if(autoTimer)s+=' \u2014 auto-sweeping '+SLIDERS[0].id;
  statusEl.textContent=s;
 }
 function draw(){
  if(width<=1||height<=1)return;
- const p=readParams();
+ const p=viewParams();
  syncOutputs(p);updateOverlay(p);updateStatus(p);
  paintBackground(ctx,width,height);
  drawScene(ctx,width,height,p);
@@ -110,6 +114,8 @@ let autoTimer=null,autoDir=1;
 function stopAuto(){if(autoTimer){clearInterval(autoTimer);autoTimer=null;}}
 function startAuto(){
  stopAuto();
+ stopSpiral();
+ stopAnim();
  const el=$(firstDef.id);
  // Sweep from the current value rather than changing the initial design.
  autoDir=1;
@@ -128,23 +134,88 @@ function autoTick(){
  draw();
 }
 const animateBtn=$('animate');
-let animId=null,animStart=0;
-const ANIM_MS=60000;
-function animate(){
- if(animId){cancelAnimationFrame(animId);animId=null;animateBtn.textContent='Animate';draw();return;}
- stopAuto();if($('autoSweep').checked)$('autoSweep').checked=false;
+const ANIM_AMP_STEP=0.05;
+const ANIM_ROT_STEP=2;
+const ANIM_TICK_MS=150;
+let animTimer=null,animAmp=null,animRot=0,animAmpDir=1,animRotDir=1;
+function ampBounds(){
+ const el=$('amplitude');
+ return {lo:parseFloat(el.min),hi:parseFloat(el.max)};
+}
+function viewParams(){
+ const p=readParams();
+ p.amplitude=animAmp==null?p.amplitude:animAmp;
+ p.rotation=animRot;
+ return p;
+}
+function stopAnim(){
+ if(animTimer){clearInterval(animTimer);animTimer=null;}
+ animateBtn.textContent='Animate';
+}
+function startAnim(){
+ stopAuto();
+ if($('autoSweep').checked)$('autoSweep').checked=false;
+ animAmp=ampBounds().lo;
+ animRot=0;animAmpDir=1;animRotDir=1;
  animateBtn.textContent='Stop';
- animStart=performance.now();
- function frame(now){
-  const prog=Math.min(1,(now-animStart)/ANIM_MS);
-  const p=readParams();
-  syncOutputs(p);updateOverlay(p);updateStatus(p);
-  paintBackground(ctx,width,height);
-  drawScene(ctx,width,height,p,prog);
-  if(prog<1)animId=requestAnimationFrame(frame);
-  else{animId=null;animateBtn.textContent='Animate';}
+ draw();
+ animTimer=setInterval(animTick,ANIM_TICK_MS);
+}
+function animTick(){
+ const bounds=ampBounds();
+ const lo=bounds.lo,hi=bounds.hi;
+ if(hi-lo>1e-9){
+  animAmp=(animAmp==null?lo:animAmp)+animAmpDir*ANIM_AMP_STEP;
+  if(animAmp>=hi-1e-9){animAmp=hi;animAmpDir=-1;}
+  else if(animAmp<=lo+1e-9){animAmp=lo;animAmpDir=1;}
+  animAmp=Math.round(animAmp*100)/100;
+ }else{animAmp=lo;}
+ animRot+=animRotDir*ANIM_ROT_STEP;
+ if(animRot>=360){animRot=360;animRotDir=-1;}
+ else if(animRot<=0){animRot=0;animRotDir=1;}
+ draw();
+}
+function animate(){
+ if(animTimer){stopAnim();draw();}
+ else startAnim();
+}
+const spiralBtn=$('spiral');
+const SPIRAL_STEP_DEG=10;
+const SPIRAL_TICK_MS=150;
+let spiralTimer=null,spiralAngle=0;
+function stopSpiral(){
+ if(spiralTimer){clearInterval(spiralTimer);spiralTimer=null;}
+ spiralBtn.textContent='Spiral';
+ animateBtn.disabled=false;
+ const p=readParams();
+ syncOutputs(p);updateOverlay(p);updateStatus(p);
+}
+function startSpiral(){
+ stopAuto();
+ if($('autoSweep').checked)$('autoSweep').checked=false;
+ stopAnim();
+ animAmp=null;animRot=0;animAmpDir=1;animRotDir=1;
+ spiralAngle=0;
+ spiralBtn.textContent='Stop';
+ animateBtn.disabled=true;
+ spiralTimer=setInterval(spiralStep,SPIRAL_TICK_MS);
+ spiralStep(true);
+}
+function spiralStep(first){
+ if(first)paintBackground(ctx,width,height);
+ const p=viewParams();
+ p.rotation=spiralAngle;
+ drawScene(ctx,width,height,p);
+ syncOutputs(p);updateOverlay(p);updateStatus(p);
+ spiralAngle+=SPIRAL_STEP_DEG;
+ if(spiralAngle>360){
+  spiralAngle=360;
+  stopSpiral();
  }
- animId=requestAnimationFrame(frame);
+}
+function spiral(){
+ if(spiralTimer)stopSpiral();
+ else startSpiral();
 }
 function paramBand(w,h,p){
  const lines=formulaLines(p).concat(['line '+p.lineWidth.toFixed(2)+'px \u00b7 colour '+p.color+' \u00b7 background #10151d']);
@@ -169,7 +240,7 @@ function paramSlug(p){
 }
 function exportPng(){
  draw();
- const p=readParams();
+ const p=viewParams();
  const band=paramBand(canvas.width,canvas.height,p);
  const out=document.createElement('canvas');
  out.width=canvas.width;out.height=canvas.height+band.bandH;
@@ -281,8 +352,7 @@ function formulaLines(p){return [
  '0 ≤ t ≤ 2π'
 ];}
 let curveCache=null;
-function drawScene(ctx,W,H,p,prog){
- if(prog==null)prog=1;
+function drawScene(ctx,W,H,p){
  const key=[p.b,p.frequency,p.power,p.amplitude].join(':');
  if(!curveCache||curveCache.key!==key){
   const pts=[];let maxR=0;
@@ -293,23 +363,29 @@ function drawScene(ctx,W,H,p,prog){
   curveCache={key,pts,maxR};
  }
  const {pts,maxR}=curveCache,c=baseHsl(p);
- strokeRadial(ctx,W/2,H/2,fitScale(W,H,maxR),pts,maxR,c.h,c.s,p.lineWidth,Math.round(prog*SEGMENTS));
+ strokeRadial(ctx,W/2,H/2,fitScale(W,H,maxR),pts,maxR,c.h,c.s,p.lineWidth,null,(p.rotation||0)*Math.PI/180);
 }
 
-for(const sd of SLIDERS)$(sd.id).addEventListener('input',function(){draw();});
-$('color').addEventListener('input',function(){draw();});
+for(const sd of SLIDERS)$(sd.id).addEventListener('input',function(){
+ if(!animTimer&&sd.id==='amplitude'){animAmp=null;animRot=0;animAmpDir=1;animRotDir=1;}
+ if(spiralTimer)stopSpiral();
+ draw();
+});
+$('color').addEventListener('input',function(){if(spiralTimer)stopSpiral();draw();});
 $(firstDef.id).addEventListener('input',function(){if($('autoSweep').checked){$('autoSweep').checked=false;stopAuto();}});
 $('reset').onclick=function(){
  for(const sd of SLIDERS)$(sd.id).value=sd.value;
  $('color').value=DEFAULT_COLOR;
  $('autoSweep').checked=false;
- stopAuto();
- if(animId){cancelAnimationFrame(animId);animId=null;animateBtn.textContent='Animate';}
+ stopAuto();stopAnim();stopSpiral();
+ animAmp=null;animRot=0;animAmpDir=1;animRotDir=1;
+ spiralAngle=0;
  draw();
 };
 $('export').onclick=exportPng;
 $('exportGif').onclick=saveGif;
 animateBtn.onclick=animate;
+spiralBtn.onclick=spiral;
 $('autoSweep').addEventListener('change',function(){
  if(this.checked)startAuto();else stopAuto();
 });
