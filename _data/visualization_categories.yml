@@ -1284,6 +1284,9 @@
   - file: cubic.html
     title: Rotating Cubic
     tags: []
+  - file: cubic_harmonic_amplitude_sweep.html
+    title: Cubic harmonic amplitude sweep — Interactive Study
+    tags: []
   - file: cubic_harmonic_animation_only_trails.html
     title: Cubic harmonic curve — Interactive Study
     tags: []
