@@ -12,6 +12,7 @@
    Tokens
    -------------------------------------------------------------------------- */
 :root {
+  color-scheme: light;
   --cloth: #2f4a3e;          /* deep book-cloth green — the binding/structure */
   --cloth-deep: #233a30;     /* darker cloth for hover / depth                */
   --cloth-ink: #ece7d6;      /* chalk on cloth                                */
@@ -27,6 +28,8 @@
   --gold-on-cloth: #e3cd92;  /* gold lightened for text on the cloth green    */
   --hairline: #d9d3bf;       /* hairline rule on paper                        */
   --hairline-strong: #c3bb9f;
+  --surface: #ffffff;        /* white card / input / plate surfaces           */
+  --gilt-ink: #1d2620;       /* ink that stays dark on gilt (primary buttons) */
 
   --serif: 'STIX Two Text', 'Source Serif', Georgia, 'Times New Roman', serif;
   --mono: 'Source Code Pro', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
@@ -66,7 +69,7 @@ code { font-size: 0.9em; color: var(--ink-soft); background: var(--paper-deep); 
    layout of a page whose canvas fills its viewport. Pages that style their own
    canvas override this. */
 canvas {
-  background: #fff;
+  background: var(--surface);
   border: 1px solid var(--hairline) !important;
   border-radius: 2px;
   box-shadow: 0 2px 8px rgba(29, 38, 32, 0.07);
@@ -80,7 +83,7 @@ select, textarea {
   font-family: var(--serif);
   font-size: 0.95rem;
   color: var(--ink);
-  background: #fff;
+  background: var(--surface);
   border: 1px solid var(--hairline-strong);
   border-radius: 6px;
   padding: 0.5rem 0.7rem;
@@ -139,7 +142,7 @@ button, input[type="button"], input[type="submit"] {
   cursor: pointer;
 }
 button:hover, input[type="button"]:hover, input[type="submit"]:hover {
-  background: #fff;
+  background: var(--surface);
   border-color: var(--gilt);
   color: var(--gilt-deep);
 }
@@ -165,7 +168,7 @@ html { scrollbar-color: var(--hairline-strong) var(--paper); }
 .ma-masthead-top {
   display: flex;
   flex-wrap: wrap;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   gap: 0.25rem 1.5rem;
 }
@@ -270,13 +273,13 @@ html { scrollbar-color: var(--hairline-strong) var(--paper); }
   background: var(--paper-deep);
   color: var(--ink);
 }
-.ma-action:hover { border-color: var(--gilt); color: var(--gilt-deep); background: #fff; }
+.ma-action:hover { border-color: var(--gilt); color: var(--gilt-deep); background: var(--surface); }
 .ma-action.ma-action-primary {
   background: var(--gilt);
   border-color: var(--gilt);
-  color: var(--ink);
+  color: var(--gilt-ink);
 }
-.ma-action.ma-action-primary:hover { background: var(--gilt-bright); border-color: var(--gilt-bright); color: var(--ink); }
+.ma-action.ma-action-primary:hover { background: var(--gilt-bright); border-color: var(--gilt-bright); color: var(--gilt-ink); }
 
 /* Featured page of the week — spotlight cards in the frontispiece */
 .ma-featured {
@@ -317,7 +320,7 @@ html { scrollbar-color: var(--hairline-strong) var(--paper); }
 .ma-featured-plate {
   position: relative;
   height: 180px;
-  background: #fff;
+  background: var(--surface);
   border-bottom: 1px solid var(--hairline);
   overflow: hidden;
 }
@@ -398,7 +401,7 @@ html { scrollbar-color: var(--hairline-strong) var(--paper); }
 .ma-pager-btn:hover:not(:disabled) {
   border-color: var(--gilt);
   color: var(--gilt-deep);
-  background: #fff;
+  background: var(--surface);
 }
 .ma-pager-btn:disabled {
   opacity: 0.3;
@@ -434,7 +437,7 @@ html { scrollbar-color: var(--hairline-strong) var(--paper); }
 .ma-plate {
   position: relative;
   height: 150px;
-  background: #fff;
+  background: var(--surface);
   border-bottom: 1px solid var(--hairline);
   overflow: hidden;
 }
@@ -490,7 +493,7 @@ html { scrollbar-color: var(--hairline-strong) var(--paper); }
 .ma-search input {
   flex: 1; font-size: 1rem; padding: 0.7rem 1rem;
   border-radius: 8px; border: 1px solid var(--hairline-strong);
-  background: #fff;
+  background: var(--surface);
 }
 .ma-search .ma-count { font-family: var(--mono); font-size: 0.8rem; color: var(--marginalia); white-space: nowrap; }
 
@@ -502,7 +505,7 @@ html { scrollbar-color: var(--hairline-strong) var(--paper); }
   padding: 0.35rem 0.85rem; border-radius: 999px;
   border: 1px solid var(--hairline-strong); background: var(--paper-deep);
 }
-.ma-pill:hover { border-color: var(--gilt); color: var(--gilt-deep); background: #fff; }
+.ma-pill:hover { border-color: var(--gilt); color: var(--gilt-deep); background: var(--surface); }
 .ma-pill .ma-pill-count { color: var(--marginalia); font-size: 0.72rem; }
 
 /* Footer (colophon) */
@@ -542,7 +545,7 @@ html { scrollbar-color: var(--hairline-strong) var(--paper); }
 /* Search autocomplete dropdown */
 .ma-dropdown {
   max-width: 560px; margin: 0.35rem 0 0;
-  background: #fff; border: 1px solid var(--hairline-strong); border-radius: 8px;
+  background: var(--surface); border: 1px solid var(--hairline-strong); border-radius: 8px;
   box-shadow: 0 10px 26px rgba(29, 38, 32, 0.12);
   overflow: hidden;
 }
@@ -563,7 +566,7 @@ html { scrollbar-color: var(--hairline-strong) var(--paper); }
 .ma-wide .ma-wide-caption a:hover { color: var(--gilt); }
 .ma-wide iframe {
   width: 100%; height: 520px;
-  border: 1px solid var(--hairline); border-radius: 10px; background: #fff;
+  border: 1px solid var(--hairline); border-radius: 10px; background: var(--surface);
 }
 @media (max-width: 760px) { .ma-wide iframe { height: 340px; } }
 
@@ -594,3 +597,61 @@ html { scrollbar-color: var(--hairline-strong) var(--paper); }
   .ma-figure, .ma-plate-open { transition: none; }
   .ma-figure:hover { transform: none; }
 }
+
+/* --------------------------------------------------------------------------
+   Dark mode — the same tokens re-keyed for a night study. Toggled by setting
+   data-theme="dark" on <html> (see _includes/monograph-head.html + masthead).
+   -------------------------------------------------------------------------- */
+html[data-theme="dark"] {
+  color-scheme: dark;
+
+  --cloth: #234034;
+  --cloth-deep: #15271f;
+  --cloth-ink: #ece7d6;
+  --cloth-ink-dim: #b8bfae;
+
+  --paper: #121816;
+  --paper-deep: #1b231f;
+  --ink: #e6ebe6;
+  --ink-soft: #b4beb6;
+  --marginalia: #7e8a82;
+
+  --gilt: #c09040;
+  --gilt-deep: #d9b269;
+  --gilt-bright: #e8c57f;
+  --gold-on-cloth: #e3cd92;
+
+  --hairline: #2a342e;
+  --hairline-strong: #3a4a40;
+  --surface: #1e2723;
+  --gilt-ink: #1d2620;
+}
+
+/* Theme toggle — sits top-right in the masthead (always on cloth green). */
+.ma-theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--serif);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--cloth-ink);
+  background: rgba(236, 231, 214, 0.08);
+  border: 1px solid rgba(236, 231, 214, 0.35);
+  border-radius: 999px;
+  padding: 0.4rem 0.9rem;
+  cursor: pointer;
+  transition: border-color .18s ease, background .18s ease, color .18s ease;
+}
+.ma-theme-toggle:hover {
+  border-color: var(--gilt-bright);
+  color: var(--gold-on-cloth);
+  background: rgba(236, 231, 214, 0.16);
+}
+.ma-theme-toggle svg { width: 15px; height: 15px; flex: none; }
+.ma-theme-toggle .ma-theme-sun,
+.ma-theme-toggle .ma-theme-label-light { display: none; }
+html[data-theme="dark"] .ma-theme-toggle .ma-theme-sun { display: inline; }
+html[data-theme="dark"] .ma-theme-toggle .ma-theme-moon { display: none; }
+html[data-theme="dark"] .ma-theme-toggle .ma-theme-label-light { display: inline; }
+html[data-theme="dark"] .ma-theme-toggle .ma-theme-label-dark { display: none; }

@@ -1,6 +1,20 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>
+    /* Apply the saved (or system) theme before the stylesheet paints, to avoid
+       a flash of the wrong theme. Stored under "ma-theme" by the masthead toggle. */
+    (function () {
+      try {
+        var t = localStorage.getItem('ma-theme');
+        if (t === 'dark' || t === 'light') {
+          document.documentElement.setAttribute('data-theme', t);
+        } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        }
+      } catch (e) {}
+    })();
+  </script>
   <title>{% if page.title != "Mathematical Art" %}{{ page.title }} — {% endif %}Mathematical Art</title>
   <meta name="description" content="Interactive geometric visualizations, curves, fractals and animations.">
   <link rel="stylesheet" href="/assets/math-art.css">
