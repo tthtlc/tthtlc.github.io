@@ -35,6 +35,7 @@
 - circular_thread.html
 - claude_game_touch.html
 - clickme_circle_on_circle.html
+- complex_portraits.html
 - concentric.html
 - contour-slice-torus.html
 - conway.html
@@ -44,6 +45,7 @@
 - cubic_harmonic_amplitude_sweep.html
 - cubic_harmonic_animation_only_trails.html
 - cubic_harmonic_base_frequency.html
+- cubic_harmonic_phase.html
 - cubic_harmonic_variation.html
 - diamond3.html
 - diamond3_animate.html
@@ -56,6 +58,8 @@
 - dodecahedron.html
 - dodecahedron_fixed.html
 - dodecahedron_nolabel.html
+- domain_coloring.html
+- domain_colouring2.html
 - double_circle_rotating.html
 - double_ellipse.html
 - double_hypotrochoid_explore.html

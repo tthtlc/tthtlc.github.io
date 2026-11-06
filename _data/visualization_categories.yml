@@ -1293,6 +1293,9 @@
   - file: cubic_harmonic_base_frequency.html
     title: Cubic harmonic curve · base frequency b — Interactive Study
     tags: []
+  - file: cubic_harmonic_phase.html
+    title: Cubic harmonic curve · phase α — Interactive Study
+    tags: []
   - file: cubic_harmonic_variation.html
     title: Cubic harmonic curve — Interactive Study
     tags: []
