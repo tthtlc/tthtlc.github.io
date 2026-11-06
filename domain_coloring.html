@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Complex Function Domain Coloring</title>
+<style>
+  body {
+    background: #1a1a2e;
+    color: #eee;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    margin: 0;
+    padding: 20px;
+  }
+  h1 {
+    text-align: center;
+    color: #e94560;
+    margin-bottom: 5px;
+  }
+  .subtitle {
+    text-align: center;
+    color: #aaa;
+    margin-bottom: 25px;
+    font-size: 14px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .card {
+    background: #16213e;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  }
+  canvas {
+    display: block;
+    width: 100%;
+    image-rendering: auto;
+  }
+  .label {
+    padding: 12px 15px;
+    text-align: center;
+    font-size: 14px;
+    color: #ccc;
+    border-top: 1px solid #0f3460;
+  }
+  .label .eq {
+    font-style: italic;
+    color: #e94560;
+    font-size: 15px;
+    margin-bottom: 4px;
+  }
+  .label .desc {
+    font-size: 11px;
+    color: #888;
+  }
+  .controls {
+    text-align: center;
+    margin: 20px 0;
+  }
+  button {
+    background: #e94560;
+    color: white;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    margin: 0 5px;
+  }
+  button:hover { background: #c73e54; }
+  .loading {
+    text-align: center;
+    color: #e94560;
+    font-size: 18px;
+    padding: 40px;
+  }
+</style>
+</head>
+<body>
+
+<h1>Complex Function Domain Coloring</h1>
+<p class="subtitle">Hue = arg(f(z)), Brightness = log|f(z)|, Contours at integer powers of e</p>
+
+<div class="controls">
+  <button onclick="renderAll()">🔄 Re-render All</button>
+  <button onclick="toggleContours()">📐 Toggle Contours</button>
+</div>
+
+<div class="grid" id="grid">
+  <div class="loading" id="loadingMsg">Rendering complex functions...</div>
+</div>
+
+<script>
+// ─── Complex Number Utilities ───
+const C = {
+  add: (a,b) => [a[0]+b[0], a[1]+b[1]],
+  sub: (a,b) => [a[0]-b[0], a[1]-b[1]],
+  mul: (a,b) => [a[0]*b[0]-a[1]*b[1], a[0]*b[1]+a[1]*b[0]],
+  div: (a,b) => {
+    const d = b[0]*b[0]+b[1]*b[1];
+    return [(a[0]*b[0]+a[1]*b[1])/d, (a[1]*b[0]-a[0]*b[1])/d];
+  },
+  abs: a => Math.sqrt(a[0]*a[0]+a[1]*a[1]),
+  arg: a => Math.atan2(a[1], a[0]),
+  exp: a => { const e=Math.exp(a[0]); return [e*Math.cos(a[1]), e*Math.sin(a[1])]; },
+  log: a => [Math.log(C.abs(a)), C.arg(a)],
+  pow: (a, b) => C.exp(C.mul(b, C.log(a))),
+  sin: a => {
+    // sin(a+bi) = sin(a)cosh(b) + i·cos(a)sinh(b)
+    return [Math.sin(a[0])*Math.cosh(a[1]), Math.cos(a[0])*Math.sinh(a[1])];
+  },
+  cos: a => {
+    return [Math.cos(a[0])*Math.cosh(a[1]), -Math.sin(a[0])*Math.sinh(a[1])];
+  },
+  sqrt: a => {
+    const r = C.abs(a), th = C.arg(a);
+    return [Math.sqrt(r)*Math.cos(th/2), Math.sqrt(r)*Math.sin(th/2)];
+  },
+  conj: a => [a[0], -a[1]],
+  scale: (a,s) => [a[0]*s, a[1]*s],
+  fromReal: r => [r, 0],
+  fromImag: i => [0, i],
+};
+
+let showContours = true;
+
+// ─── Domain Coloring ───
+function domainColor(fz) {
+  const mag = C.abs(fz);
+  const arg = C.arg(fz);
+
+  // Hue from argument
+  let hue = ((arg / Math.PI + 1) / 2) * 360;
+
+  // Brightness from log magnitude
+  let logMag = Math.log(mag + 1e-10);
+  let lightness = 0.5 + 0.15 * Math.atan(logMag / Math.PI);
+
+  // Saturation
+  let saturation = 0.85 + 0.15 * Math.tanh(Math.abs(logMag));
+
+  // Contour lines at |f(z)| = e^k
+  if (showContours) {
+    const frac = logMag - Math.floor(logMag);
+    const dist = Math.min(frac, 1 - frac);
+    if (dist < 0.04) {
+      lightness *= 0.5;
+      saturation = 1;
+    }
+    // Also contour at half-integer powers
+    const frac2 = (logMag + 0.5) - Math.floor(logMag + 0.5);
+    const dist2 = Math.min(frac2, 1 - frac2);
+    if (dist2 < 0.02) {
+      lightness *= 0.7;
+    }
+  }
+
+  // Handle near-zero (poles/zeros)
+  if (mag < 1e-6) {
+    lightness = 0.05;
+  }
+  if (mag > 1e6) {
+    lightness = 0.95;
+  }
+
+  return hslToRgb(hue / 360, saturation, Math.max(0.02, Math.min(0.98, lightness)));
+}
+
+function hslToRgb(h, s, l) {
+  let r, g, b;
+  if (s === 0) { r = g = b = l; }
+  else {
+    const hue2rgb = (p, q, t) => {
+      if (t < 0) t += 1;
+      if (t > 1) t -= 1;
+      if (t < 1/6) return p + (q-p)*6*t;
+      if (t < 1/2) return q;
+      if (t < 2/3) return p + (q-p)*(2/3-t)*6;
+      return p;
+    };
+    const q = l < 0.5 ? l*(1+s) : l+s-l*s;
+    const p = 2*l - q;
+    r = hue2rgb(p, q, h+1/3);
+    g = hue2rgb(p, q, h);
+    b = hue2rgb(p, q, h-1/3);
+  }
+  return [Math.round(r*255), Math.round(g*255), Math.round(b*255)];
+}
+
+// ─── Function Definitions ───
+const functions = [
+  {
+    name: "(1/z)¹⁸ − (1/z)  /  (1/z − 1)",
+    desc: "18-fold rotational symmetry, poles at roots of unity",
+    range: [-2, 2, -2, 2],
+    fn: z => {
+      if (C.abs(z) < 1e-10) return [1e10, 0];
+      const inv = C.div([1,0], z);
+      const inv18 = C.pow(inv, [18, 0]);
+      const num = C.sub(inv18, inv);
+      const den = C.sub(inv, [1,0]);
+      if (C.abs(den) < 1e-10) return [1e10, 0];
+      return C.div(num, den);
+    }
+  },
+  {
+    name: "Σ zⁿ/(1−zⁿ), n=1..∞",
+    desc: "Lambert series, fractal boundary at |z|=1",
+    range: [-2, 2, -2, 2],
+    fn: z => {
+      let sum = [0, 0];
+      const maxN = 80;
+      for (let n = 1; n <= maxN; n++) {
+        const zn = C.pow(z, [n, 0]);
+        const denom = C.sub([1,0], zn);
+        if (C.abs(denom) < 1e-10) return [1e8, 0];
+        const term = C.div(zn, denom);
+        sum = C.add(sum, term);
+        if (C.abs(term) < 1e-12) break;
+      }
+      return sum;
+    }
+  },
+  {
+    name: "sin(1/z²)",
+    desc: "Essential singularity at z=0, Picard's theorem",
+    range: [-1.2, 1.2, -1.2, 1.2],
+    fn: z => {
+      if (C.abs(z) < 1e-10) return [1e10, 0];
+      const z2 = C.mul(z, z);
+      const inv = C.div([1,0], z2);
+      return C.sin(inv);
+    }
+  },
+  {
+    name: "√(1 − 1/z² + z³)",
+    desc: "Branch cuts and branch points of complex square root",
+    range: [-2, 2, -2, 2],
+    fn: z => {
+      if (C.abs(z) < 1e-10) return [1e10, 0];
+      const z2 = C.mul(z, z);
+      const z3 = C.mul(z2, z);
+      const invZ2 = C.div([1,0], z2);
+      const inner = C.add(C.sub([1,0], invZ2), z3);
+      return C.sqrt(inner);
+    }
+  },
+  {
+    name: "(z−2−i)²(z²−1) / (z²+2+i)",
+    desc: "Rational function: zeros at 2+i (order 2), ±1; poles at ±√(−2−i)",
+    range: [-3, 3, -3, 3],
+    fn: z => {
+      const zm = C.sub(z, [2, 1]);
+      const zm2 = C.mul(zm, zm);
+      const z2 = C.mul(z, z);
+      const num = C.mul(zm2, C.sub(z2, [1,0]));
+      const den = C.add(z2, [2, 1]);
+      if (C.abs(den) < 1e-10) return [1e10, 0];
+      return C.div(num, den);
+    }
+  },
+  {
+    name: "z^(2/3 + i)",
+    desc: "Complex power: spiral pattern from imaginary exponent",
+    range: [-2, 2, -2, 2],
+    fn: z => {
+      if (C.abs(z) < 1e-10) return [0, 0];
+      return C.pow(z, [2/3, 1]);
+    }
+  }
+];
+
+// ─── Rendering ───
+function renderFunction(func, canvasId) {
+  const canvas = document.getElementById(canvasId);
+  const W = canvas.width, H = canvas.height;
+  const ctx = canvas.getContext('2d');
+  const imgData = ctx.createImageData(W, H);
+  const data = imgData.data;
+
+  const [xMin, xMax, yMin, yMax] = func.range;
+
+  for (let py = 0; py < H; py++) {
+    for (let px = 0; px < W; px++) {
+      const x = xMin + (px / (W-1)) * (xMax - xMin);
+      const y = yMax - (py / (H-1)) * (yMax - yMin);
+      const z = [x, y];
+
+      let fz;
+      try {
+        fz = func.fn(z);
+      } catch(e) {
+        fz = [0, 0];
+      }
+
+      // Clamp extreme values
+      const mag = C.abs(fz);
+      if (mag > 1e8) fz = C.scale(fz, 1e8/mag);
+
+      const [r, g, b] = domainColor(fz);
+      const idx = (py * W + px) * 4;
+      data[idx] = r;
+      data[idx+1] = g;
+      data[idx+2] = b;
+      data[idx+3] = 255;
+    }
+  }
+  ctx.putImageData(imgData, 0, 0);
+}
+
+function buildGrid() {
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+  functions.forEach((f, i) => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <canvas id="canvas${i}" width="400" height="300"></canvas>
+      <div class="label">
+        <div class="eq">${f.name}</div>
+        <div class="desc">${f.desc}</div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function renderAll() {
+  const loading = document.getElementById('loadingMsg');
+  if (loading) loading.style.display = 'block';
+
+  // Use setTimeout to allow UI update
+  setTimeout(() => {
+    functions.forEach((f, i) => {
+      renderFunction(f, 'canvas' + i);
+    });
+    if (loading) loading.style.display = 'none';
+  }, 50);
+}
+
+function toggleContours() {
+  showContours = !showContours;
+  renderAll();
+}
+
+// Init
+buildGrid();
+renderAll();
+</script>
+
+</body>
+</html>
