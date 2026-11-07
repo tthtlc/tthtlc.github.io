@@ -205,18 +205,7 @@
     title: Dual Spirograph — Two Inner Circles
     tags: []
   - file: spirograph_ellipse_explore.html
-    title: Circle Rotating Around a Circle Contour with Trail
-    tags:
-    - Interactive
-  - file: spirograph_explore.html
-    title: Circle Rotating Around a Circle Contour with Trail
-    tags:
-    - Interactive
-  - file: spirograph_outline.html
-    title: Contour of Rolling Circle
-    tags: []
-  - file: spirograph_spirograph_explore.html
-    title: Circle Rotating Around a Circle Contour with Trail
+    title: Elliptical hypotrochoid — Interactive Study
     tags:
     - Interactive
   - file: trifold_variation.html
