@@ -208,6 +208,9 @@
     title: Elliptical hypotrochoid — Interactive Study
     tags:
     - Interactive
+  - file: threefold-harmonic-curves.html
+    title: Threefold harmonic curves — Interactive Study
+    tags: []
   - file: trifold_variation.html
     title: Tri-fold hypotrochoid — Interactive Study
     tags: []
@@ -835,7 +838,7 @@
   description: Sine waves, square waves and sinusoidal ribbons — oscillation drawn in animated color.
   items:
   - file: ellipse_fract_sinusoidal_moving_color_background_explore.html
-    title: Animated Sinusoidal Wave on Ellipse
+    title: Fractional sinusoid on ellipse — Interactive Study
     tags:
     - Interactive
     - Motion
@@ -1130,10 +1133,6 @@
   - file: spiral_tube.html
     title: 3D Spiral Tube with Pulsating Length
     tags: []
-  - file: spiral_tube_explore.html
-    title: 3D Spiral Tube with Adjustable Radius
-    tags:
-    - Interactive
   - file: twin_spirals_counter_rotating.html
     title: Twin Spirals — Counter-Rotation
     tags:

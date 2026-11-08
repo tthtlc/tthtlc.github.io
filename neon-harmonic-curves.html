@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Neon Harmonic Curves</title><style>
+*{box-sizing:border-box}body{margin:0;background:#000;color:#e4ddff;font:14px system-ui;overflow:hidden}canvas{display:block;width:100vw;height:100vh}aside{position:fixed;top:16px;left:18px;padding:15px;background:#10091bdb;border:1px solid #693394;border-radius:12px}h1{font-size:16px;margin:0 0 12px;color:#f6caff}label{display:flex;justify-content:space-between;align-items:center;gap:14px;margin:10px 0}input{width:135px;accent-color:#ff38dc}button{background:#241037;border:1px solid #8146ad;color:#f1ddff;padding:7px 10px;border-radius:6px;cursor:pointer}footer{position:fixed;bottom:14px;left:18px;color:#a089b4;font-size:11px;pointer-events:none}
+</style></head><body><canvas id="art" aria-label="Animated neon threefold harmonic curves"></canvas><aside id="panel"><h1>Neon harmonic curves</h1><label>Speed<input id="speed" type="range" min="0" max="1" step=".01" value=".25"></label><label>Curves<input id="count" type="range" min="12" max="70" value="32"></label><label>Spread<input id="spread" type="range" min=".1" max="1" step=".01" value=".68"></label><button id="pause">Pause</button> <button id="save">Save PNG</button> <button id="hide">Hide controls</button></aside><footer>Space: pause / resume · H: toggle controls</footer><script>
+'use strict';
+const $=id=>document.getElementById(id),canvas=$('art'),ctx=canvas.getContext('2d');
+const layer=document.createElement('canvas'),ink=layer.getContext('2d');
+let W,H,dpr,time=0,last=0,paused=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function resize(){dpr=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;for(const c of [canvas,layer]){c.width=Math.round(W*dpr);c.height=Math.round(H*dpr)}ctx.setTransform(dpr,0,0,dpr,0,0);ink.setTransform(dpr,0,0,dpr,0,0)}
+addEventListener('resize',resize);resize();
+// Cyclic neon gradient: cyan -> electric blue -> violet -> magenta -> hot pink -> cyan.
+const palette=[[0,255,244],[36,112,255],[131,58,255],[238,30,255],[255,38,151],[0,255,244]];
+function neon(p){p=((p%1)+1)%1;const f=p*(palette.length-1),i=Math.floor(f),k=f-i;return palette[i].map((v,j)=>Math.round(v+(palette[i+1][j]-v)*k))}
+function draw(){
+ ink.clearRect(0,0,W,H);const N=+$('count').value,spread=+$('spread').value,S=Math.min(W,H)*.292;
+ const rotation=-Math.PI/2+.065*Math.sin(time*.32),cr=Math.cos(rotation),sr=Math.sin(rotation),steps=900;
+ ink.save();ink.translate(W*.5,H*.52);ink.globalCompositeOperation='lighter';
+ for(let j=0;j<N;j++){
+  const u=j/(N-1),q=(u-.5)*2,a=1+.15*spread*q,b=.5+spread*.46*q,twist=.14*spread*q+.035*Math.sin(time*.55+q*2);let px,py;
+  for(let k=0;k<=steps;k++){
+   const t=k/steps*Math.PI*2,xx=a*Math.cos(t)+b*Math.cos(-2*t+twist),yy=a*Math.sin(t)+b*Math.sin(-2*t+twist),x=S*(xx*cr-yy*sr),y=S*(xx*sr+yy*cr);
+   if(k){const mid=(k-.5)/steps*Math.PI*2,dx=-a*Math.sin(mid)+2*b*Math.sin(-2*mid+twist),dy=a*Math.cos(mid)-2*b*Math.cos(-2*mid+twist),v=Math.hypot(dx,dy)/(a+2*Math.abs(b)),hot=Math.pow(Math.max(0,1-v),2.3);
+    const rgb=neon(k/steps+.28*u+.045*time),alpha=.20+.68*Math.pow(hot,.65);
+    ink.strokeStyle=`rgba(${rgb.join(',')},${alpha})`;ink.lineWidth=.6+1.6*hot;ink.beginPath();ink.moveTo(px,py);ink.lineTo(x,y);ink.stroke();
+   }px=x;py=y;
+  }
+ }ink.restore();
+ ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);ctx.save();ctx.globalCompositeOperation='lighter';
+ ctx.filter='blur(9px)';ctx.globalAlpha=.65;ctx.drawImage(layer,0,0,W,H);
+ ctx.filter='blur(3px)';ctx.globalAlpha=.75;ctx.drawImage(layer,0,0,W,H);
+ ctx.filter='none';ctx.globalAlpha=1;ctx.drawImage(layer,0,0,W,H);ctx.restore();
+}
+function frame(ms){const dt=Math.min((ms-last)/1000||0,.05);last=ms;if(!paused)time+=dt*+$('speed').value*2;draw();requestAnimationFrame(frame)}
+function toggle(){paused=!paused;$('pause').textContent=paused?'Resume':'Pause'}
+$('pause').textContent=paused?'Resume':'Pause';$('pause').onclick=toggle;$('hide').onclick=()=>{$('panel').style.display='none'};
+addEventListener('keydown',e=>{if(e.code==='Space'&&e.target.tagName!=='INPUT'){e.preventDefault();toggle()}if(e.key.toLowerCase()==='h')$('panel').style.display=$('panel').style.display==='none'?'block':'none'});
+$('save').onclick=()=>{const a=document.createElement('a');a.download='neon-harmonic-curves.png';a.href=canvas.toDataURL('image/png');a.click()};requestAnimationFrame(frame);
+</script></body></html>
