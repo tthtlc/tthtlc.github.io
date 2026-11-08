@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Linked circular sine wave</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#090f20;color:#e5edf9;font:15px system-ui,sans-serif}main{max-width:1100px;margin:auto;padding:24px}h1{font-size:25px;margin:0 0 8px}p{color:#9fb1cf;line-height:1.6}.panel{background:#111b30;border:1px solid #293650;border-radius:16px;padding:18px}.controls{display:flex;flex-wrap:wrap;gap:20px;align-items:center}label{display:flex;align-items:center;gap:9px}select,button{background:#1b2b48;color:#eef5ff;border:1px solid #41577b;padding:8px 13px;border-radius:8px;cursor:pointer}input{accent-color:#75e1d6}canvas{display:block;width:100%;height:auto;aspect-ratio:1;max-height:76vh;object-fit:contain}.legend{display:flex;gap:20px;flex-wrap:wrap;font-size:13px;color:#afbdd3}.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px}.formula{font-family:monospace;color:#75e1d6}output{min-width:35px}button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid #75e1d6;outline-offset:4px}
+</style></head><body><main><h1>Linked circular sine wave</h1><p>60 equally spaced angular samples on each circle and on the wave. Every wave sample connects to its matching inner and outer circle points.</p><div class="panel"><div class="controls"><label>Cycles <select id="cycles"><option value="2">2 — sin(2θ + φ)</option><option value="3">3 — sin(3θ + φ)</option><option value="4">4 — sin(4θ + φ)</option></select></label><label>Speed <input id="speed" type="range" min="0" max="2" step="0.05" value="0.6"><output id="speedOut">0.60</output></label><button id="play" aria-pressed="false">Pause</button><button id="reset">Reset phase</button><label><input id="links" type="checkbox" checked>Connections</label><label><input id="points" type="checkbox" checked>Points</label></div><canvas id="view" aria-label="Animated radial sine wave with sixty points connected to two concentric circles" role="img"></canvas><div class="legend"><span><i class="dot" style="background:#a78bfa"></i>Outer circle · 60 points</span><span><i class="dot" style="background:#60a5fa"></i>Inner circle · 60 points</span><span><i class="dot" style="background:#5eead4"></i>Sine wave · 60 points</span></div><p class="formula" id="formula"></p><p>Sampling: θᵢ = 2πi/60, i = 0,…,59. The smooth curve passes through those 60 samples; it uses additional drawing vertices only for smooth rendering. The circle anchors stay fixed as the wave moves, and all 120 connecting segments update every frame.</p></div></main><script>
+'use strict';
+const $=id=>document.getElementById(id),canvas=$('view'),ctx=canvas.getContext('2d');
+const N=60,TAU=2*Math.PI;let phase=0,playing=true,last=null,size=700;
+const reduced=matchMedia('(prefers-reduced-motion: reduce)');if(reduced.matches)playing=false;
+function updateButton(){$('play').textContent=playing?'Pause':'Play';$('play').setAttribute('aria-pressed',String(!playing));}
+updateButton();
+$('play').onclick=()=>{playing=!playing;updateButton();};$('reset').onclick=()=>{phase=0;};
+$('speed').oninput=()=>{$('speedOut').value=Number($('speed').value).toFixed(2);};
+function resize(){size=Math.min(canvas.parentElement.clientWidth-36,760);const dpr=window.devicePixelRatio||1;canvas.width=Math.round(size*dpr);canvas.height=Math.round(size*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);}
+new ResizeObserver(resize).observe(canvas.parentElement);resize();
+function point(r,t){return [size/2+r*Math.cos(t),size/2+r*Math.sin(t)];}
+function circle(r,color){ctx.beginPath();ctx.arc(size/2,size/2,r,0,TAU);ctx.strokeStyle=color;ctx.lineWidth=1.3;ctx.stroke();}
+function segment(a,b,color){ctx.beginPath();ctx.moveTo(...a);ctx.lineTo(...b);ctx.strokeStyle=color;ctx.lineWidth=1;ctx.stroke();}
+function dot(p,color,r=2.6){ctx.beginPath();ctx.arc(...p,r,0,TAU);ctx.fillStyle=color;ctx.fill();}
+function draw(){ctx.clearRect(0,0,size,size);const R=size*.32,A=size*.065,inner=size*.20,outer=size*.44,k=Number($('cycles').value);
+ctx.save();ctx.setLineDash([3,7]);circle(R,'#263750');ctx.restore();
+circle(outer,'#a78bfa');circle(inner,'#60a5fa');
+const samples=Array.from({length:N},(_,i)=>{const t=i*TAU/N;return {a:point(inner,t),b:point(outer,t),w:point(R+A*Math.sin(k*t+phase),t)};});
+if($('links').checked)for(const p of samples){segment(p.w,p.a,'rgba(96,165,250,.40)');segment(p.w,p.b,'rgba(167,139,250,.40)');}
+ctx.beginPath();for(let j=0;j<=720;j++){const t=j*TAU/720,p=point(R+A*Math.sin(k*t+phase),t);if(j===0)ctx.moveTo(...p);else ctx.lineTo(...p);}ctx.closePath();ctx.strokeStyle='#5eead4';ctx.lineWidth=2.5;ctx.stroke();
+if($('points').checked)for(const p of samples){dot(p.a,'#60a5fa');dot(p.b,'#a78bfa');dot(p.w,'#5eead4',3);}
+$('formula').textContent=`r(θ, t) = R + A sin(${k}θ + φ(t))  ·  φ = ${phase.toFixed(2)} rad`;
+}
+function frame(now){const dt=last===null?0:Math.min((now-last)/1000,.1);last=now;if(playing)phase=(phase+dt*Number($('speed').value))%TAU;draw();requestAnimationFrame(frame);}requestAnimationFrame(frame);
+</script></body></html>
