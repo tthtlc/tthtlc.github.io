@@ -113,9 +113,12 @@
     title: Figure of 8 using Polar Coordinates with Rotating Wheel
     tags: []
   - file: four-petal-spirograph.html
-    title: Four-petal Spirograph
+    title: Four-petal spirograph — Interactive Study
     tags: []
   - file: fourfold_variation.html
+    title: Four-fold hypotrochoid — Interactive Study
+    tags: []
+  - file: fourfold_variationv2.html
     title: Four-fold hypotrochoid — Interactive Study
     tags: []
   - file: fourfold_woven_ribbon.html
@@ -852,6 +855,9 @@
     - Interactive
     - Motion
     - Color
+  - file: linked_sinewave_circles.html
+    title: Linked circular sine wave
+    tags: []
   - file: sinewave_animated.html
     title: Sine Wave Animation
     tags:

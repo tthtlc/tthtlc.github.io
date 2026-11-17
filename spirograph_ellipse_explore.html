@@ -10,9 +10,9 @@
 <body>
 <main><section class="stage"><canvas id="canvas" aria-label="Interactive elliptical hypotrochoid. A circle rolls inside an ellipse; use the sliders to change the semi-axes and rolling radius."></canvas><div class="topbar"><div class="heading"><div class="eyebrow">Rolling curve / 19</div><h1>Elliptical hypotrochoid</h1></div><details class="geometry"><summary>Geometry</summary><p>A circle of radius <code>r</code> rolls inside a fixed ellipse with semi-axes <code>A</code> and <code>B</code>. Its centre travels the ellipse of radii <code>A − r</code> and <code>B − r</code>, and a pen fixed to the rolling circle traces the curve.</p><p><code>x(t) = (A − r)·cos t + r·cos(k·t)</code><br><code>y(t) = (B − r)·sin t − r·sin(k·t)</code><br><code>k = (A + B)/(2·r) − 1</code></p></details></div><div class="formula" id="formula"></div></section>
 <aside><h2>Shape &amp; appearance</h2>
-<label><span class="row"><span>Semi-axis A</span><output id="AOut"></output></span><input id="A" type="range" min="50" max="250" step="1" value="200"></label>
-<label><span class="row"><span>Semi-axis B</span><output id="BOut"></output></span><input id="B" type="range" min="50" max="250" step="1" value="50"></label>
-<label><span class="row"><span>Rolling radius r</span><output id="rOut"></output></span><input id="r" type="range" min="10" max="100" step="1" value="50"></label>
+<label><span class="row"><span>Semi-axis A</span><output id="AOut"></output></span><input id="A" type="range" min="1" max="250" step="1" value="200"></label>
+<label><span class="row"><span>Semi-axis B</span><output id="BOut"></output></span><input id="B" type="range" min="1" max="250" step="1" value="50"></label>
+<label><span class="row"><span>Rolling radius r</span><output id="rOut"></output></span><input id="r" type="range" min="10" max="300" step="1" value="50"></label>
 <label><span class="row"><span>Line width</span><output id="lineWidthOut"></output></span><input id="lineWidth" type="range" min="0.2" max="3" step="0.05" value="1.2"></label>
 <label>Base colour<input id="color" type="color" value="#ffff00"></label>
 <button id="reset">Reset design</button><button id="export">Save PNG</button>

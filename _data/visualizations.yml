@@ -121,6 +121,7 @@
 - four_petal_double.html
 - four_petal_rotate.html
 - fourfold_variation.html
+- fourfold_variationv2.html
 - fourfold_woven_ribbon.html
 - fractal_fern.html
 - generalized_ellipse_windings.html
@@ -188,6 +189,7 @@
 - lemniscate_random.html
 - line_art_explorer.html
 - line_drawing.html
+- linked_sinewave_circles.html
 - longitudinal-torus-one-band-ribbon.html
 - longitudinal-torus-ribbon.html
 - longitudinal-torus-ribbon5.html
@@ -202,12 +204,14 @@
 - mobius_radiating.html
 - mobius_strip.html
 - modular_string_art_visualizer.html
+- modulated-harmonic-grid.html
 - moire-torus.html
 - moire_medallion.html
 - moving_square.html
 - moving_square_rotate.html
 - moving_square_rotate_double.html
 - negative_space_aperture.html
+- neon-harmonic-curves.html
 - nested_hexagonal_spiral.html
 - octagon_auto_rotate.html
 - opaque-silver-cutaway.html
@@ -237,6 +241,8 @@
 - poincare_disk.html
 - poincare_hemisphere_checkerboard.html
 - polka_dot_constellation.html
+- power_harmonic_curve.html
+- power_harmonic_sampling.html
 - psychedlic_art.html
 - pythagorean_tree_explore.html
 - quart_motion.html
